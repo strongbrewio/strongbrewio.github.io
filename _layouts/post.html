@@ -59,6 +59,7 @@ class: 'post-template'
 
             <!-- Everything inside the #author tags pulls data from the author -->
             <!-- #author-->
+
             {% for author in site.data.authors %}
                 {% if author[1].username == page.author %}
                     {% if author[1].assets %}
