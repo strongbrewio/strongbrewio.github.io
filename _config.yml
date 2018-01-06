@@ -7,8 +7,8 @@ paginate: 5
 language: 'en-uk'
 
 # Website info
-name: 'Strongbrew blog'
-description: "Strongbrew blog"
+name: 'Strongbrew'
+description: ""
 
 short_url: 'blog.strongbrew.io'
 google_analytics: UA-112030289-1
@@ -22,7 +22,7 @@ permalink: /:title
 # permalink: /tag/:tag
 
 # gems and other configs
-plugins: [jekyll-paginate]
+plugins: [jekyll-paginate, jekyll-prism-plugin]
 exclude: [vendor]
 
 # Additional settings available on the front-matter

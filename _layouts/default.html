@@ -22,8 +22,7 @@
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}assets/css/syntax.css" />
 
     <!-- highlight.js -->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css">
-    <style>.hljs { background: none; }</style>
+    <link href="{{ site.baseurl }}assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
     {% include head.html %}
@@ -59,6 +58,6 @@
     <script type="text/javascript" src="{{ site.baseurl }}assets/js/jquery.fitvids.js"></script>
     <!-- The main JavaScript file for Casper -->
     <script type="text/javascript" src="{{ site.baseurl }}assets/js/index.js"></script>
-
+    <script type="text/javascript" src="{{ site.baseurl }}assets/js/prism.js"></script>
 </body>
 </html>
