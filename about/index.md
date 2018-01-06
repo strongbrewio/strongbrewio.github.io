@@ -6,8 +6,6 @@ logo: 'assets/images/ghost.png'
 current: about
 ---
 
-This is a demo blog for Ghost, it contains dummy content which allows you to click around and see what a Ghost blog running the default theme looks like.
+This is the Strongbrew blog. Here, Brecht and Kwinten upload all their blogpost to help you out!
 
-We use this for testing and for reference!
-
-If you'd like to set up your own blog, head on over to [https://ghost.org](https://ghost.org) and sign up.
+If you want to us to help you with your project through coaching, code review, constultancy, trouble shooting, ... go to <a href="https://strongbrew.io" target="_blank">strongbrew.io</a> for more information.
