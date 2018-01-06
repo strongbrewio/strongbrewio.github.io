@@ -46,11 +46,11 @@ exclude: [vendor]
 # or "master" otherwise
 safe: false
 lsi: false
-username: myjekyll
-repo: jasper
+username: strongbrewio
+repo: strongbrewio.github.io
 branch: master
 relative_source: ../jasper/
-destination: ../jasper-pages/
+destination: ./_site
 production_url:  https://strongbrewio.github.io/
 source_url:  https://github.com/strongbrewio/strongbrewio.github.io/
 
