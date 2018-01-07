@@ -16,7 +16,7 @@ SOURCE_BRANCH = CONFIG["branch"]
 DESTINATION_BRANCH = "gh-pages"
 
 def check_destination
-    sh "git clone https://$GIT_NAME:$GH_TOKEN@github.com/#{USERNAME}/#{REPO}.git #{CONFIG["destination"]}"
+    sh "git clone https://kwintenp:0f42af34b9437fdaf5a8b574581856b35b4f99a4 @github.com/#{USERNAME}/#{REPO}.git #{CONFIG["destination"]}"
 end
 
 namespace :site do
@@ -47,8 +47,8 @@ namespace :site do
 
     # Configure git if this is run in Travis CI
     if ENV["TRAVIS"]
-      sh "git config --global user.name $GIT_NAME"
-      sh "git config --global user.email $GIT_EMAIL"
+      sh "git config --global user.name kwintenp"
+      sh "git config --global user.email kwinten.pisman@gmail.com"
       sh "git config --global push.default simple"
     end
 
