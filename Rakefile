@@ -69,7 +69,7 @@ namespace :site do
       # check if there is anything to add and commit, and pushes it
       sh "if [ -n '$(git status)' ]; then
             git add --all .;
-            git commit -m 'Updatings tso #{USERNAME}/#{REPO}@#{sha}.';
+            git commit -m 'Updating to #{USERNAME}/#{REPO}@#{sha}.';
             git push --quiet origin #{DESTINATION_BRANCH};
          fi"
       puts "Pushed updated branch #{DESTINATION_BRANCH} to GitHub Pages"
