@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Safe image requests in angular</title>
+        
+          <description>&lt;p&gt;We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 24 Oct 2017 00:00:00 +0000</pubDate>
+        <link>
+        /safe-image-requests-in-angular</link>
+        <guid isPermaLink="true">/safe-image-requests-in-angular</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Code formatting and RxJS</title>
         
           <description>&lt;p&gt;One of the main benefits of RxJS to me is that it provides code that is ‘readable’. It provides us with a declarative programming approach where implementation details are hidden away. We are just describing what needs to be done, not how it should be done. This makes code you look at easy to understand.&lt;/p&gt;
@@ -38,6 +53,21 @@
     
       
       <item>
+        <title>A scalable angular architecture (part 2)</title>
+        
+          <description>&lt;h1 id=&quot;the-sandbox-pattern&quot;&gt;The sandbox pattern&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sun, 13 Aug 2017 00:00:00 +0000</pubDate>
+        <link>
+        /A-scalable-angular-architecture-part2</link>
+        <guid isPermaLink="true">/A-scalable-angular-architecture-part2</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Introducing Rx devtools</title>
         
           <description>&lt;p&gt;Ever since I first started using RxJS up until this very day, it has become my absolute favorite way of coding. I cannot believe to work in a world without observables anymore nor can I understand on how I was able to write code before. I have started sharing the knowlegde I had through blogposts, workshops and coaching.&lt;/p&gt;
@@ -48,6 +78,21 @@
         <link>
         /introducing-rx-devtools</link>
         <guid isPermaLink="true">/introducing-rx-devtools</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Thinking reactively in Angular and RXJS</title>
+        
+          <description>&lt;h2 id=&quot;foreword&quot;&gt;Foreword&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Tue, 25 Jul 2017 00:00:00 +0000</pubDate>
+        <link>
+        /thinking-reactively-in-angular-and-rxjs</link>
+        <guid isPermaLink="true">/thinking-reactively-in-angular-and-rxjs</guid>
       </item>
       
     
@@ -116,6 +161,21 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
     
       
       <item>
+        <title>Infinite scroll in Angular an RxJS</title>
+        
+          <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Wed, 21 Dec 2016 00:00:00 +0000</pubDate>
+        <link>
+        /infinite-scroll-with-rxjs-and-angular2</link>
+        <guid isPermaLink="true">/infinite-scroll-with-rxjs-and-angular2</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>How share() can reduce network requests</title>
         
           <description>&lt;p&gt;As you hopefully all know, observables you get back from the Angular 2 Http service are cold. A cold observable only starts when you subscribe to to it and is unicast (for every subscription to the Http observable, a network call is triggered).&lt;/p&gt;
@@ -146,6 +206,36 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
     
       
       <item>
+        <title>A scalable Angular 2 architecture</title>
+        
+          <description>&lt;h2 id=&quot;foreword&quot;&gt;Foreword&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Wed, 09 Nov 2016 00:00:00 +0000</pubDate>
+        <link>
+        /A-scalable-angular2-architecture</link>
+        <guid isPermaLink="true">/A-scalable-angular2-architecture</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Cancellable optimistic updates in Angular 2 and Redux</title>
+        
+          <description>&lt;p&gt;&lt;a href=&quot;https://angular.io/&quot;&gt;Angular 2&lt;/a&gt; and &lt;a href=&quot;https://github.com/reactjs/redux&quot;&gt;redux&lt;/a&gt; are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the &lt;a href=&quot;https://github.com/ngrx/store&quot;&gt;@ngrx/store&lt;/a&gt; variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the &lt;a href=&quot;http://redux.js.org/&quot;&gt;documentation&lt;/a&gt; first.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 23 Sep 2016 00:00:00 +0000</pubDate>
+        <link>
+        /Cancellable-optimistic-updates-in-Angular2-and-Redux</link>
+        <guid isPermaLink="true">/Cancellable-optimistic-updates-in-Angular2-and-Redux</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>combineReducers enhanced</title>
         
           <description>&lt;p&gt;When working with redux or ngrx/store, you get a lovely utillity method called &lt;code&gt;combineReducers&lt;/code&gt; that solves a pretty annoying problem for you. This method could however be further improved and we’ll see why in a bit.&lt;/p&gt;
@@ -156,6 +246,51 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         <link>
         /combinereducers-enhanced</link>
         <guid isPermaLink="true">/combinereducers-enhanced</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>How we made our app real-time in 6 lines of code</title>
+        
+          <description>&lt;p&gt;&lt;a href=&quot;https://blog.kwintenp.com/&quot;&gt;Kwinten Pisman&lt;/a&gt; and me were working on a workshop this weekend with the focus on Reactive applications with &lt;a href=&quot;http://angular.io&quot;&gt;Angular 2&lt;/a&gt;, &lt;a href=&quot;https://github.com/ReactiveX/rxjs&quot;&gt;RXJS&lt;/a&gt; and &lt;a href=&quot;https://github.com/ngrx&quot;&gt;@ngrx&lt;/a&gt;. Something that can’t miss in a reactive workshop are real-time updates. The application we are trying to make real-time is the &lt;a href=&quot;http://winecellar.surge.sh&quot;&gt;winecellar&lt;/a&gt; app (you can register an account here if you want to test it).&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sun, 11 Sep 2016 00:00:00 +0000</pubDate>
+        <link>
+        /How-we-made-our-app-real-time-in-6-lines-of-code</link>
+        <guid isPermaLink="true">/How-we-made-our-app-real-time-in-6-lines-of-code</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Components demystified</title>
+        
+          <description>&lt;h2 id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Tue, 30 Aug 2016 00:00:00 +0000</pubDate>
+        <link>
+        /components-demystified</link>
+        <guid isPermaLink="true">/components-demystified</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Modals in Angular 2</title>
+        
+          <description>&lt;p&gt;&lt;strong&gt;Updated at 3 september 2016 (RC.6 compliant)&lt;/strong&gt;&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 24 Aug 2016 00:00:00 +0000</pubDate>
+        <link>
+        /Modals-in-angular2</link>
+        <guid isPermaLink="true">/Modals-in-angular2</guid>
       </item>
       
     

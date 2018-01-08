@@ -12,6 +12,468 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Safe image requests in angular</title>
+	  <link>//safe-image-requests-in-angular</link>
+	  <author></author>
+	  <pubDate>2017-10-24T00:00:00+00:00</pubDate>
+	  <guid>//safe-image-requests-in-angular</guid>
+	  <description><![CDATA[
+	     <p>We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.</p>
+
+<p>Take this hypothetical application for instance: We have an app that is used to manage pictures and this particular app can have multiple users. It makes sense that every user owns their own images, right? For privacy reasons user A could never consume the images of user B. Since images are loaded through the DOM with the img DOM-element, it might be hard to add authorization there. Take this angular snippet for instance:</p>
+
+<pre><code class="language-typescript">@Component({
+    template: `
+        &lt;img [src]="img.src"/&gt;
+    `
+})
+export class FooComponent {
+    img = {
+        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
+    }
+}
+</code></pre>
+
+<p>Since the browser just loads this image through a normal HTTP call, how is the server supposed to know if user A or user B is trying to consume this image? The server needs some kind of authorization to be passed to it.</p>
+
+<h2 id="passing-the-authorization-with-session-cookies">Passing the authorization with Session cookies</h2>
+
+<p>We could use session cookies, which kinda works like this: The user authenticates with the backend of our app, receives a session cookie which will be passed with every future request. That way the backend knows who is trying to consume the resource in question.</p>
+
+<p>Some could argue that session cookies are not to way the go, and stateless backends are better and more scalable.
+If we use JWT or any other modern authentication system we would rather send <strong>authorization-headers</strong> instead of using the session cookie approach. The value that our server should receive in the authorization-header is called a <strong>Bearer token</strong>.</p>
+
+<h2 id="passing-the-authorization-without-cookies">Passing the authorization without cookies</h2>
+
+<p>Let’s explore 2 different methods to pass Bearer tokens to the backend:</p>
+
+<h3 id="passing-the-token-in-the-url">Passing the token in the url</h3>
+
+<p>In this case we would just pass the token as a <strong>query parameter</strong> in the url. The previous snippet would now look like this:</p>
+
+<pre><code class="language-typescript">@Component({
+    template: `
+        &lt;img [src]="img.src + '?bearer=' + bearToken"/&gt;
+    `
+})
+export class FooComponent {
+    img = {
+        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
+    }
+    bearerToken  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+}
+</code></pre>
+
+<p>The url of the server request would now look like this: <em>https://angular.io/assets/images/logos/angular/logo-nav@2x.png?bearer=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…</em></p>
+
+<p>Based on the token, the server knows which user tries to load the image and can block unauthorized users of fetching that image.</p>
+
+<p>There are a few tradeoffs:</p>
+
+<ul>
+  <li>The Token is there for everyone to see in the URL (less secure, but then again, they could still check it in the offline-storage)</li>
+  <li>Every time the token changes, the cache would be cleared, since the url of the resource changes</li>
+  <li>The backend would need a way to handle all the image calls that contain a bearer token in their url</li>
+  <li>We need to load and parse the token everywhere we load images in our components</li>
+  <li>Doesn’t work for css, unless it’s dynamically created</li>
+</ul>
+
+<h3 id="handling-the-images-with-ajax-calls">Handling the images with AJAX calls</h3>
+
+<p>In this approach we will create a generic way of handling image-security by using:</p>
+
+<ul>
+  <li>A generic component</li>
+  <li>AJAX calls with a blob responseType</li>
+  <li>HTTP interceptors (introduced by the new HttpClient in angular 4.3)</li>
+  <li>Data urls</li>
+</ul>
+
+<p>We would like to consume images like this:</p>
+
+<pre><code class="language-typescript">@Component({
+    template: `
+          &lt;secured-image [src]="img.src"&gt;&lt;/secured-image&gt;
+    `
+})
+export class FooComponent {
+    img = {
+        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
+    }
+}
+</code></pre>
+
+<p>Let’s create a <strong>secured-image</strong> component as shown above.
+This component needs to handle the following:</p>
+
+<ul>
+  <li>Load an image through an AJAX call</li>
+  <li>Create a data url based on a blob</li>
+  <li>When the source changes:
+    <ul>
+      <li>Cancel the previous AJAX call (if it’s still busy)</li>
+      <li>Start loading the new resource through AJAX</li>
+    </ul>
+  </li>
+  <li>When the component gets destroyed, cancel the current AJAX call (if it’s still busy)</li>
+</ul>
+
+<p>In the beginning, this might look like this:</p>
+
+<pre><code class="language-typescript">@Component({
+  selector: 'secured-image',
+  template: `
+    &lt;img [src]="dataUrl$|async"/&gt;
+  `
+})
+export class SecuredImageComponent implements OnChanges  {
+  // This code block just creates an rxjs stream from the src
+  // this makes sure that we can handle source changes
+  // or even when the component gets destroyed
+  // So basically turn src into src$
+  @Input() private src: string;
+  private src$ = new BehaviorSubject(this.src);
+  ngOnChanges(): void {
+    this.src$.next(this.src);
+  }
+
+  // this stream will contain the actual url that our img tag will load
+  // everytime the src changes, the previous call would be canceled and the
+  // new resource would be loaded
+  dataUrl$ = this.src$.switchMap(url =&gt; this.loadImage(url))
+  
+  // we need HttpClient to load the image
+  constructor(private httpClient: HttpClient) {
+  }
+
+  private loadImage(url: string): Observable&lt;any&gt; {
+    return this.httpClient
+      // load the image as a blob
+      .get(url, {responseType: 'blob'})
+      // create an object url of that blob that we can use in the src attribute
+      .map(e =&gt; URL.createObjectURL(e))
+  }
+}
+
+</code></pre>
+
+<p>This pretty much covers everything, but if we check it in the browser we get the following error.
+<strong>WARNING: sanitizing unsafe URL value blob:https://localhost:4200/da89c71e-5df2-4842-af06-993cd5263471 (see http://g.co/ng/security#xss)</strong></p>
+
+<p>Loading the image through AJAX does not work yet because we haven’t sanitized the url yet. For that we need the <strong>DomSanitizer</strong> that angular provides us. This is a security mechanism to protect the app from XSS-attacks. We basically have to tell angular which urls to trust.</p>
+
+<pre><code class="language-typescript">export class SecuredImageComponent implements OnChanges  {
+  ...
+  // inject the domSanitizer here as well
+  constructor(private httpClient: HttpClient, private domSanitizer: DomSanitizer) {
+  }
+
+  private loadImage(url: string): Observable&lt;any&gt; {
+    return this.httpClient
+      .get(...)
+      // pass the url through the domSanitizer so angular knows he can parse it
+      .map(e =&gt; this.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(e)))
+  }
+}
+
+</code></pre>
+
+<p>We now have a fully working way of loading images through AJAX calls. However, we still haven’t passed our Bearer token.
+We could add the the authorization header in the get call directly, but let’s find a cleaner solution.
+Since we use httpClient, this opens up a few doors for us.
+The new HttpClient, which was introduced in angular 4.3 offers a few new features. One of these features are <strong>interceptors</strong>.
+Interceptors are a way to hook into http calls that are being made by the new HttpClient.</p>
+
+<p>This would be a perfect solution to pass the bearer token wouldn’t you agree?</p>
+
+<p>Let’s create the interceptor and register it to angular.</p>
+
+<pre><code class="language-typescript">// my-http.interceptor.ts
+@Injectable()
+export class MyHttpInterceptor implements HttpInterceptor {
+  // intercept any http call done by the httpClient
+  intercept(request: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt; {
+    // fetch the bearer token from wherever you have stored it
+    // NOTE: fetching it directly from window is not a good idea (demo purpose)
+    const jwtToken = window.localStorage.getItem('jwtToken');
+
+    // if there is a token, clone the request and set the correct
+    // authorization header, if not =&gt; just use the old request
+    const requestToHandle = jwtToken
+      ? request.clone({
+        headers: request.headers.set('authorization', `Bearer ${jwtToken}`)
+      })
+      : request;
+    return next.handle(requestToHandle);
+  }
+}
+
+// app.module.ts
+@NgModule({
+  ...
+  // don't forget to import the HttpClientModule
+  imports: [ BrowserModule, FormsModule, HttpClientModule ],
+  providers: [{
+    // register the interceptor to our angular module
+    provide: HTTP_INTERCEPTORS, useClass: MyHttpInterceptor, multi: true
+  }]
+})
+export class AppModule { }
+</code></pre>
+
+<p>If you would like to learn more about interceptors, check this <a href="https://juristr.com/blog/2017/08/intercept-http-requests-in-angular/">awesome article</a> by <a href="https://twitter.com/juristr">Juri Strumpflohner</a>.
+He also has an amazing egghead course on that subject.</p>
+
+<p>Right now, every call that the secured-image component has initiated will load the image through AJAX with the right authorization header. That way the server can check who has been asking for that specific resource.</p>
+
+<p>However, this approach also introduces a few tradeoffs:</p>
+
+<ul>
+  <li>CORS headers for CDN resources. Since we are using a GET AJAX call there will be extra OPTIONS calls.</li>
+</ul>
+
+<p>Extra advantages:</p>
+<ul>
+  <li>It’s easier to handle the loading of the image, show a spinner or animation</li>
+  <li>Doesn’t work for css, unless it’s dynamically created</li>
+</ul>
+
+<p>You can find the complete source of a working version in this <a href="https://stackblitz.com/edit/secure-image-loads">stackblitz example</a>.</p>
+
+<h2 id="thanks-for-reading">Thanks for reading</h2>
+<p>I hope you all liked this article, if you have questions, shoot!</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>A scalable angular architecture (part 2)</title>
+	  <link>//A-scalable-angular-architecture-part2</link>
+	  <author></author>
+	  <pubDate>2017-08-13T00:00:00+00:00</pubDate>
+	  <guid>//A-scalable-angular-architecture-part2</guid>
+	  <description><![CDATA[
+	     <h1 id="the-sandbox-pattern">The sandbox pattern</h1>
+
+<h2 id="introduction">Introduction</h2>
+<p>A while ago I released a blogpost called “<a href="http://blog.brecht.io/A-scalable-angular2-architecture/">A scalable angular 2 architecture</a>” which was all about creating large scale enterprise webapplications. The title should actually have been <strong>“A scalable angular architecture”</strong> (It’s just angular) or even, <strong>“A scalable SPA architecture”</strong> since we can use the same architecture for <a href="https://facebook.github.io/react/">React</a> or <a href="https://vuejs.org">Vue.js</a>.</p>
+
+<p>It’s been over a year now, since I’ve been introducing that specific architecture in companies and projects. Nowadays, I know quite a few people that are using this particular architecture in their projects.
+Often, I ask developers about how they feel about this SPA-architecture and the feedback is mostly this:
+They believe its a <strong>clear and opiniated way</strong> to structure their code, and they have no trouble, finding their way into the codebase.</p>
+
+<p>A big part of the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">article</a> in question, was about explaining the so called “sandboxes”, a personal terminology for a very specific kind of facade.
+Since writing that <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">article</a> raised a bunch of questions about these “sandboxes”, it seemed like a good idea to write a followup article.</p>
+
+<p>In this article we will cover what sandboxes are really about and why I introduced them in the first place.</p>
+
+<p><strong>Note: This architecture is only one way of structuring your applications and the statements being made in this article are completely personal and might be opiniated.</strong></p>
+
+<h2 id="what-is-a-sandbox-in-a-nutshell">What is a sandbox in a nutshell</h2>
+
+<p>In real life it’s a place where we can put our children together with a limited set of toys. That way, they can only play with those toys and have fun, and we as parents wouldn’t have to worry about them running around in the garden.</p>
+
+<p>In this architecture a sandbox is a controlled environment, and the only place where components can consume pieces of the application.
+It’s the only interface for our smart components to communicate with the rest of the application. It’s a facade that abstracts away logic from our components. It does have very specific logic though.</p>
+
+<h2 id="here-is-why-i-introduced-sandboxes">Here is why I introduced sandboxes</h2>
+
+<p>One of the most challenging parts of creating big clientside javascript applications is encapsulation and dividing responsibilities. Having a decent encapsulated structure where every component, service, class has a clear reason of existence, makes it easy for us as developers to maintain the code and develop new features.</p>
+
+<p>When writing single-page-applications one could face the following challenges:</p>
+
+<h3 id="challenge-1-how-do-we-structure-components">Challenge 1: How do we structure components?</h3>
+
+<p>Since this topic is covered in the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">previous article</a>, we won’t do a deepdive in this subject.
+We use the smart/dumb component approach to structure our components. The dumb components mostly have presentational purposes and the smart components interact with the rest of the application.</p>
+
+<h3 id="challenge-2-how-do-we-handle-statemanagement">Challenge 2: How do we handle statemanagement?</h3>
+
+<p>Another topic covered by the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">previous article</a> is how handle our statemanagement. In short: we use @ngrx/store, or another redux implementation that embraces reactive programming.</p>
+
+<h3 id="challenge-3">Challenge 3</h3>
+
+<p>The first two challenges are met: we have a clear and structured presentational layer and because of the fact that we use @ngrx/store (or any statemanagement tool for that matter), we have a clear way of managing state. We can optimise performance with immutable data and still have clear unidirectional dataflow.</p>
+
+<p>However, there are still a few pieces of the puzzle missing, which might raise the following questions:</p>
+
+<h4 id="how-do-we-separate-the-presentation-layers-from-the-rest-of-the-application">How do we separate the presentation-layers from the rest of the application?</h4>
+
+<p>If we inject whatever we want in our smart components, their constructors might get huge in no-time. Do those smart components really need to know everything about the application? Do they need to know where everything lives and what service it should call from which module in the application? Wouldn’t it be easier if they had an interface they could talk to, that just handles things for them?
+It would certainly help to decouple angular modules from each other, and keep the responsibility of those smart components clear and compact. <strong>This is something a sandbox might be able to help us with.</strong></p>
+
+<h3 id="do-our-components-need-to-know-about-redux">Do our components need to know about redux?</h3>
+
+<p>Redux is an awesome library/principle that helps us ace statemanagement, but it’s a really heavy dependency if you don’t manage it carefully. What if your <strong>very specific</strong> redux actions would be everywhere in your components and services? In that case your codebase would be completely affected by it and it would be very hard to use another statemanagement tool in the future. It would be impossible to share that code in non-redux applications.
+It would be a huge depencency… What if you like to switch to firebase for instance, or MOBX, or even write your own statemanagement tool. You would need to refactor your whole application. The sole principle of redux is to manage state, and I prefer to use it that way. That is also why I don’t really use effects, thunk or saga. (That’s a personal preference)
+For me this means: <strong>Use redux only to manage state, not to trigger backend actions etc</strong>
+One could even argue that the action-dispatching and state-selecting should be combined in central places in your appliction.
+ <strong>Let’s add that logic to the sandboxes as well.</strong></p>
+
+<h4 id="do-our-http-services-need-to-know-about-a-redux-implementation">Do our HTTP services need to know about a redux implementation?</h4>
+
+<p>Well, as the name already reveals. An HTTP service is all about doing HTTP communication and returning asynchronous objects to the components. An HTTP service should have no notion about redux at all nor any other statemanagement tool. Its sole purpose is fetching data and returning it. Let’s take a look at the following example for instance. We fetch an array of wines from the backend and we want to persist that in a redux store. This is an example of an HTTP service that is being abused to achieve that:</p>
+
+<pre><code class="language-typescript">class WineService {
+	// bad
+	fetchWines(): void {
+		this.api.get('url')
+			.subscribe(wines =&gt; 
+				this.store.dispatch({type: 'SET_WINES', payload: {wines}});
+	}
+}
+</code></pre>
+
+<p>This code doesn’t belong here, it’s not the responsibility of that service. The question is where does it belong?
+Does it belong in the component? They would get dirty and reduxy in no-time…
+<em>*Again, this would belong to the sandbox!</em>.</p>
+
+<p>An http service should look like this:</p>
+
+<pre><code class="language-typescript">class WineService {
+	// good
+	fetchWines(): Observable&lt;any&gt; {
+		return this.api.get('url')
+	}
+}
+</code></pre>
+
+<h4 id="on-what-place-do-we-dispatch-actions-to-the-store">On what place do we dispatch actions to the store?</h4>
+
+<p>Err…, the sandbox =)</p>
+
+<h4 id="where-do-we-handle-optimistic-updates">Where do we handle optimistic updates</h4>
+
+<p>Again, that would be the sandbox</p>
+
+<h4 id="how-to-not-make-your-whole-application-smell-like-redux">How to NOT make your whole application smell like REDUX</h4>
+
+<p>Components and services should not know about redux, so the store interaction should be in a very specific place as well.</p>
+
+<p>I bet you saw it coming, but YES! That’s what a sandbox is all about! It’s about separation of concerns and having a very specific interface to handle this very specific logic.</p>
+
+<h2 id="what-does-a-sandbox-do">What does a sandbox do?</h2>
+
+<p>A sandbox has a very specific responsibility:</p>
+
+<ul>
+  <li>It lets your module communicate with other modules without that module having to know about the rest of the application</li>
+  <li>It sends Redux actions</li>
+  <li>It exposes streams of data (coming from Redux, Firebase or other technologies)</li>
+  <li>It handles optimistic updates</li>
+  <li>It keeps the containers stupid enough</li>
+</ul>
+
+<h2 id="whats-very-specific-on-a-sandbox">What’s very specific on a sandbox?</h2>
+
+<ul>
+  <li>They handle what the container tells them to handle, without the container having to know how…</li>
+  <li>They interact between modules</li>
+  <li>They handle a lot of redux (or similar technology) logic</li>
+  <li>The functions mostly have a void return-type, unless we want to be able to cancel HTTP calls</li>
+  <li>They expose observables/streams</li>
+  <li>It mostly contains redundant code, but no redundant logic (it’s all about KISS instead of DRY)</li>
+  <li>Mostly every module has a sandbox, unless it contains a huge amount of logic (in that case we could implement a sandbox for every container)</li>
+  <li>It does not contain business logic, ever…</li>
+  <li>It mostly doesn’t contain if-statements, that would be business logic right?!</li>
+  <li>It gives us a clear overview of the responsabilities of a module.</li>
+</ul>
+
+<h2 id="what-doesnt-a-sandbox-do">What doesn’t a sandbox do?</h2>
+
+<ul>
+  <li>It doesn’t contain business logic. It contains sandbox logic (see above).</li>
+  <li>It doesn’t contain presentation logic, like routing etc.</li>
+  <li>It doesn’t do HTTP calls directly, it delegates to http services.</li>
+  <li>It doesn’t let your components do whatever they want =)</li>
+</ul>
+
+<h2 id="an-example">An example</h2>
+
+<pre><code class="language-typescript">@Injectable()
+export class StockSandbox {
+	// these are the store select statements
+	// It's pretty dirty to have them all over our components
+	// Our components just want to get streams of data, no matter where they come from
+	wines$ = this.store.select(state =&gt; state.wines);
+	isAuthenticated$ = this.store.select(state =&gt; state.authentication.isAuthenticated);
+
+	constructor(
+		private store: Store&lt;ApplicationState&gt;, 
+		private stockService: StockService,
+		private fooService: FooService) {
+	}
+
+	addWine(wine: Wine): void {
+		// use the stockservice to add a wine
+		// and when it's done handle our statemanagement
+		this.stockService.add(wine).subscribe((wine: Wine) =&gt; {
+			this.store.dispatch(new AddWine(wine));
+		}, () =&gt; this.handleError());
+	}
+
+	 removeWine(wine: Wine): void {
+		// removing a wine can be done optimistically!
+		// this would certainly improve the performance and snappyness of our app
+		// this would be sandbox logic
+		let action = new RemoveWine(wine._id);
+		this.store.dispatch(action);
+		this.stockService.remove(wine).subscribe(
+			() =&gt; {}, 
+			// if the call failed, we have to undo an action. This is sandbox logic as well!
+			() =&gt; this.store.dispatch({type: UNDO_ACTION, payload: action}););
+	}
+
+	fetchWine(id: string): Observable&lt;Wine&gt; {
+		// simple delegation of fetching something: Sandbox logic
+		return this.stockService.fetchWine(id).share();
+	}
+
+	notifyAnotherModule(): void {
+		// our components should NOT know where fooService is, or what it does
+		// it should just tell its sandbox to handle a specific action
+		this.fooService.doSomething();
+	}
+}
+</code></pre>
+
+<p>Look how clean this smart component has become:</p>
+<pre><code class="language-typescript">export class StockPageContainer {
+    wines$ = this.sb.wines$; // Does this stream comes from Redux? or Firebase (I don't need to know)
+    numberOfWines$ = this.wines$.map(wines =&gt; sumBy(wines, (wine: Wine) =&gt; wine.inStock));
+
+	// a clean constructor makes it easy to test.
+	// Util dependencies or presentational dependencies like a router
+	// do not belong in the sandbox.
+	// They belong right here in the component, in the presentational layer.
+    constructor(private sb: StockSandbox, private router: Router) {
+    }
+
+    onRemove(wine: Wine): void {
+		// Hey Sandbox! Remove the wine please, I don't care how you do it
+		// I don't even care that you do optimistic updates, it's not my business
+        this.sb.removeWine(wine);
+    }
+
+    notifyAnotherModule(): void {
+		// I don't know what will happen, but that's okay... It's not my responsability
+        this.sb.notifyAnotherModule(); 
+    }
+}
+
+</code></pre>
+
+<p>I hope this clarifies the purpose of the sandbox and why I have introduced them in my projects.
+If you still have questions about this approach, don’t hesitate to contact me =)</p>
+
+<h3 id="special-thanks">Special thanks</h3>
+<p>Special thanks to <a href="'https://twitter.com/ManfredSteyer'">Manfred Steyer (@manfredsteyer)</a> and <a href="https://twitter.com/juristr">Juri Strumpflohner (@juristr)</a> for reviewing this article!</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>How share() can reduce network requests</title>
 	  <link>//how-share()-can-reduce-network-requests</link>
 	  <author></author>
@@ -126,6 +588,883 @@ Let’s see what this does:</p>
 
 <p><strong>NOTE:</strong> Thanks to <a href="https://twitter.com/juristr">@juristr</a> for the review!</p>
 
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>A scalable Angular 2 architecture</title>
+	  <link>//A-scalable-angular2-architecture</link>
+	  <author></author>
+	  <pubDate>2016-11-09T00:00:00+00:00</pubDate>
+	  <guid>//A-scalable-angular2-architecture</guid>
+	  <description><![CDATA[
+	     <h2 id="foreword">Foreword</h2>
+
+<p>This article might be more relevant for <a href="http://angular.io">Angular 2</a> developers, but I believe it can be used with other frameworks as well. It’s just a handbook for writing scalable and maintainable single-page-applications. It’s important to note, that this is not the only way, but it’s a way that works for me in quite a few situations.</p>
+
+<h3 id="writing-scalable-single-page-apps">Writing scalable Single-page-apps</h3>
+
+<p>A lot of developers are having trouble writing large-scale, maintainable single-page-applications. This results in early technical debt, a lot of frustration when fixing bugs, an eternal struggle when writing unit tests and creating reusable chunks of code…</p>
+
+<p>One of the biggest challenges might be: extending existing logic and writing new features based on a tricky foundation.</p>
+
+<p>Single-page-applications are rather new, and especially older frameworks gave you 100 different ways to design an application. There wasn’t any structure, encapsulation and everything was tightly coupled to each other.</p>
+
+<p>Most of the time in the beginning of a project the development process went blazingly fast. But after a few developers, features, refactors, the code started to become less maintainable. It started to look like spaghetti. Frameworks have matured a lot, but it’s also important that the architecture of the software you write matures along with the process.</p>
+
+<h2 id="spa-in-2016-and-even-before">SPA in 2016 (and even before)</h2>
+
+<p>To explain the architecture where this article is all about, here’s a reminder of how a web-application in 2016 might look like.
+These are concepts that your applications should rely on these days. It doesn’t matter whether using <a href="https://facebook.github.io/react/">React</a>, <a href="http://angular.io">Angular 2</a> or something else. These principles exist to make sure that your web architecture becomes maintainable.</p>
+
+<h3 id="principle-1-components">Principle 1: Components</h3>
+
+<p>SPA-technologies like React and Angular2 make us use components. A component is a piece of HTML and JavaScript combined. We don’t want to use standalone views or standalone controllers anymore.
+They can grow exponentially and are related to each other in a way that is hard to maintain.</p>
+
+<p>So basically the philosophy here is:
+<strong>everything should be a component</strong>, even your pages and your application. An application could look like this:</p>
+
+<pre><code class="language-html">&lt;application&gt;
+	&lt;navbar fullname="Brecht Billiet" logout="logMeOut()"&gt;
+	&lt;/navbar&gt;
+	&lt;users-page&gt;
+		...
+		&lt;grid data="users"&gt;
+		&lt;/grid&gt;
+		...
+	&lt;/users-page&gt;
+&lt;/application&gt;
+</code></pre>
+
+<p>Some very simple but very important tips in designing components:</p>
+<ul>
+<li>Keep them as small as possible</li>
+<li>Keep them as dumb as possible</li>
+</ul>
+
+<p>If you are new to designing components, this article might be of help: <a href="http://blog.brecht.io/components-demystified">components demystified</a></p>
+
+<p><strong>Note:</strong> Smart components are also called structural components, containers or stateful components</p>
+
+<h3 id="principle-2-unidirectional-dataflow">Principle 2: Unidirectional dataflow</h3>
+
+<p>Before, we used to update application state in a rather inefficient manner:</p>
+<ul>
+<li>We tried to make sibling components communicate with each other</li>
+<li>Parent components tried to notify child components with actions</li>
+<li>We tried to send events between different components</li>
+<li>We used one-way binding, two-way binding</li>
+<li>We injected models everywhere to share pieces of state</li>
+</ul>
+
+<p>Did you ever tried to make sibling components communicate with each other?
+Sometimes it seems pragmatic to do so, but please don’t.
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/scalableng2architecture/multidirectionaldataflow.png" alt="Multidirectional dataflow" /></p>
+
+<p><strong>This is bad design!</strong> It’s almost impossible to see in which direction the data flows. I’s also very hard to maintain this code, fix bugs in it or develop features.
+What we do want, is a unidirectional dataflow like <a href="https://facebook.github.io/flux/">Flux</a> or <a href="http://redux.js.org/">Redux</a>.</p>
+
+<p>It basically looks like this: child components only notify their parent components, the parent (smart component) will send an action to a store that contains state, and that action will update the state for the entire application. When that state is being updated, we can re-evaluate the component tree. As a result the data always flows in the same direction (downwards).</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/scalableng2architecture/unidirectionaldataflow.png" alt="Unidirectional dataflow" /></p>
+
+<p>The big advantages of this approach are:</p>
+<ul>
+<li>Decoupling components from each other</li>
+<li>Maintainability</li>
+<li>The switch to real-time is much smaller, because the software is reactive</li>
+<li>We can actually see what's going on by monitoring the actions</li>
+</ul>
+
+<p>If you are new to unidirectional dataflows checkout the <a href="http://redux.js.org/docs/introduction/">introduction to redux</a> and the part about <a href="http://redux.js.org/docs/basics/DataFlow.html">unidirectional dataflow</a>.</p>
+
+<h2 id="a-scalable-architecture">A scalable architecture</h2>
+
+<p>I designed a certain architecture based on principles of today (most of them explained above) and even principles from 10 years back. Would I say it’s the way to go for every SPA? Not at all… Every type of software deserves its own architecture, and I’m just showing a concept that works for me in a lot of scenarios. This architecture might come in handy for developers that are writing <a href="http://angular.io">Angular 2</a> where we can profit from awesome features like dependency injection, but it can also be applied in other frameworks.</p>
+
+<h3 id="abstraction-that-makes-sense">Abstraction that makes sense</h3>
+
+<p>This principle is partially based on the <a href="http://www.slideshare.net/nzakas/scalable-javascript-application-architecture">Sandbox principle</a> of <a href="https://twitter.com/slicknet">Nicholas Zakas</a>, which is already a few years old. For Nicholas Zakas, the sandbox acts like a dispatcher between different modules where a module is like a smart component.
+In that architecture, there was no unidirectional dataflow though.
+For me a sandbox is a way to <strong>decouple the presentation layer from the application logic</strong>, but that’s not its only responsibility.</p>
+
+<p>But let’s start from the beginning…
+In this particular scenario I’m going to assume that we use <a href="http://redux.js.org">Redux</a>. However, it doesn’t really matter what kind of state management you use, but it’s important that you know the principle behind it.</p>
+
+<h3 id="rule-number-one-dont-let-your-components-play-with-all-the-toys">Rule number ONE: Don’t let your components play with all the toys</h3>
+
+<p>The same reason you don’t let children play with everything: <strong>“It might get messy”</strong>.
+Smart components (also named containers here) should also follow a very strict set of rules. We don’t want to inject every service that we want in there, just because we can. For instance: it might not make sense to inject a game-engine in an authentication module.</p>
+
+<p>The following example shows a big constructor with a lot of dependencies. In this scenario <strong>MyComponent</strong> can pretty much do whatever it wants in the application. It gets injected whatever it wants and uses whatever it wants.
+That’s generally not a good idea.</p>
+
+<pre><code class="language-typescript">export class MyComponent{
+	constructor(...,private foo:Foo, private bar: Bar, 
+		private store: Store&lt;ApplicationState&gt;, private authService: AuthService,
+		private fooHttpService: FooHttpService, private barMapper: BarMapper, ...){
+	}
+}
+</code></pre>
+
+<p>The example above has too much dependencies in its constructor. It has to many links to the rest of the application. When you persue this kind of design it might end up looking like this: (The REST stands for restful services, so these are just the HTTP blocks)
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/scalableng2architecture/abstraction_step1.png" alt="Abstraction step1" /></p>
+
+<p>This is starting to look like spaghetti code, where everything is really tightly coupled.
+An abstraction layer could really help us here. In the example below we can see that the presentation layer is completely decoupled and the abstraction layer delegates everything.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/scalableng2architecture/abstraction_step2.png" alt="Abstraction step2" /></p>
+
+<p>The abstraction might look something like this:</p>
+
+<pre><code class="language-typescript">export class MyComponent{
+	constructor(private abstraction: SomeAbstractionType){
+	}
+	
+	doSomething(): void{
+	this.abstraction.doSomething();
+}
+</code></pre>
+
+<h3 id="rule-number-two-components-should-not-know-about-the-state-management-layer">Rule number TWO: Components should not know about the state management layer</h3>
+
+<p>Dumb components and smart components shouldn’t know that you use Redux, or any other state management layer for that matter. They should not care how state is being managed. They just trust that it’s being handled the right way. It’s not their responsibility. The responsibility of the presentation layer is <strong>“to present”</strong> and <strong>“to delegate”</strong>.</p>
+
+<p>The snippet below might be an example of bad design because the component is very tightly coupled to redux (we use <a href="https://github.com/ngrx/store">ngrx/store</a> in this example)</p>
+
+<pre><code class="language-typescript">export class MyComponent{
+	// we just care about the state, not where it comes from...
+	users$ = this.store.select(state =&gt; state.users);
+	foo$ = this.store.select(state =&gt; state.foo);
+	bar$ = this.store.select(state =&gt; state.bar);
+	constructor(..., 
+		private store: Store&lt;ApplicationState&gt;, ...){
+	}
+	
+	addUser(user: User): void{
+		// we don't care about the actiontype, payload or store
+		this.store.dispatch({type: ADD_USER, payload: {user}}
+	}
+	removeUser(userId: string): void{
+		// we don't care about the actiontype, payload or store
+		this.store.dispatch({type: REMOVE_USER, payload: {userId}}
+	}
+}
+</code></pre>
+
+<p>This might be clearer, and more loosely coupled:</p>
+
+<pre><code class="language-typescript">export class MyComponent{
+	users$ = this.facade.users$;
+	foo$ = this.facade.foo$;
+	bar$ = this.facade.bar$;
+	
+	constructor(private facade: ...){
+	}
+	
+	addUser(user: User): void{
+		this.facade.addUser(user);
+	}
+	removeUser(userId: string): void{
+		this.facade.removeUser(userId)
+	}
+}
+</code></pre>
+
+<p>Now the component really focusses on its responsibility. It doesn’t know how the user will be added or removed, it doesn’t know who populates the users$-stream, foo$-stream and bar$-stream. It gives that responsibility to its abstraction layer. Right now, the presentation layer is completely decoupled from the rest of the application. Which brings the following advantages</p>
+
+<ul>
+<li>We finally have encapsulation</li>
+<li>Easier to test, we only have to mock the abstraction layer</li>
+<li>If the abstraction layer keeps its API, it can be developed in parallel</li>
+<li>It reacts on the abstraction layer, so real-time development becomes easy</li>
+<li>The presentation layer is not coupled to the rest of the app anymore, so refactoring becomes easier</li>
+</ul>
+
+<h3 id="rule-number-three-http-services-should-not-know-about-the-state-management-layer">Rule number THREE: HTTP services should not know about the state management layer</h3>
+<p>At a first glance, it might seem pragmatic to handle the result of a GET call and put it in the store right in the service. But the only goal an HTTP service has, is <strong>to perform HTTP requests and return the result of those requests</strong>.
+This might look pragmatic:</p>
+
+<pre><code class="language-typescript">export class UserService{
+	// expose the users$-stream directly in the service
+	users$ = this.store.select(state =&gt; state.users);
+	
+	constructor(private store: Store&lt;ApplicationState&gt;, private http: Http){
+	}
+	
+	fetchUsers(): void{
+		this.http.get("...")
+			.map(...)
+			.subscribe((users) =&gt; {
+				// when successful, put the users in the store
+				// is this really my responsibility?
+				this.store.dispatch({type: SET_USERS, payload: {users}});
+			});
+	}
+}
+</code></pre>
+
+<p>But now our http services are very tightly coupled to our state management system.
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/scalableng2architecture/abstraction_step3.png" alt="Abstraction step3" /></p>
+
+<p>This is actually the only responsibility an http service should have.</p>
+
+<pre><code class="language-typescript">export class UserService{
+	constructor(private http: Http){
+	}
+	
+	// just let the consumer of this service handle the store interaction
+	// this will just return a stream of users
+	fetchUsers(): Observable&lt;Array&lt;User&gt;&gt;{
+		return this.http.get("...").map(...)
+	}
+}
+</code></pre>
+
+<h3 id="a-possible-solution">A possible solution</h3>
+<p>This is not the only solution of course, but it’s a solution that has worked most of the times for me.
+Every presentational module has access to its own sandbox. A sandbox is a service that will expose:</p>
+<ul>
+<li>Streams of state (selected from redux in this case)</li>
+<li>Methods of actions that the module (which consumes that sandbox) may execute</li>
+</ul>
+
+<p>No <strong>it’s not just a facade</strong> :) It should have a certain amount of logic.</p>
+<ul>
+<li>Fetching the right pieces of state from the store</li>
+<li>Dispatching the correct actions with the correct types and payloads to the store</li>
+<li>Delegating to the right services of different modules</li>
+<li>Handling [optimistic updates](http://blog.brecht.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/)</li>
+<li>If using something like firebase, exposing the correct streams from firebase</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/scalableng2architecture/sandboxes.png" alt="Abstraction Sandboxes" /></p>
+
+<p>The advantages of the sandbox are:</p>
+<ul>
+<li>Decoupling the presentation layer from the rest</li>
+<li>Abstracting away the state management layer</li>
+<li>You can see what a module has access to by opening its sandbox</li>
+<li>Components cannot just use and break whatever they want, better encapsulation</li>
+<li>Putting optimistic update logic in there seems like the right place because neither the component nor the service cares about that functionality</li>
+<li>We can switch to a different kind of state management without rewriting services and components</li>
+</ul>
+
+<h2 id="summary">Summary</h2>
+
+<p>This architecture is one way of doing things, but that doesn’t mean that it’s the only way.</p>
+
+<p>I do believe it’s very important to have encapsulation, loose-coupling and a decent structure of responsibilities. The frontend landscape evolves quickly, which means that we might want to be flexible for refactors/new technologies.
+I hope you enjoyed the article.</p>
+
+<h2 id="want-to-learn-more">Want to learn more?</h2>
+
+<p>Checkout <a href="http://strongbrew.io">strongbrew.io</a> where <a href="http://twitter.com/kwintenp">Kwinten Pisman</a> and <a href="http://twitter.com/brechtbilliet">me</a> are giving a “reactive applications workshop” where we go more into detail on this subject.</p>
+
+<h2 id="a-very-special-thanks">A very special thanks</h2>
+<p>I want to thank the people who have reviewed this article and gave me their valuable input. Thank you so much <a href="http://twitter.com/jvandemo">Jurgen Van de Moere</a>, <a href="http://twitter.com/carmenpopoviciu">Carmen Popoviciu</a>, <a href="http://twitter.com/manfredsteyer">Manfred Steyer</a> and <a href="http://twitter.com/juristr">Juri Strumpflohner</a>!!!</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Cancellable optimistic updates in Angular 2 and Redux</title>
+	  <link>//Cancellable-optimistic-updates-in-Angular2-and-Redux</link>
+	  <author></author>
+	  <pubDate>2016-09-23T00:00:00+00:00</pubDate>
+	  <guid>//Cancellable-optimistic-updates-in-Angular2-and-Redux</guid>
+	  <description><![CDATA[
+	     <p><a href="https://angular.io/">Angular 2</a> and <a href="https://github.com/reactjs/redux">redux</a> are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the <a href="https://github.com/ngrx/store">@ngrx/store</a> variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the <a href="http://redux.js.org/">documentation</a> first.</p>
+
+<h2 id="optimistic-updates">Optimistic updates</h2>
+
+<p>Redux has a client-side store that has all the data and state your client-side application needs. Therefore, it is the single source of truth for your frontend. When something in that store changes, your components get updated automatically. Let’s say that we are implementing a winecellar application which will obviously contain an array of wines.</p>
+
+<p><strong>Scenario: we want to remove a wine from the winecellar.</strong></p>
+
+<p>A user goes to the index page of our application, clicks a delete button in the datagrid which will call an angular service to remove a wine. The service does an HTTP call to a server, and when the wine finally gets deleted, the service responds with a 200 response (ok). When that happens we can update the redux store and our view gets updated.
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario1.png" alt="Scenario 1" /></p>
+
+<p>The code explained above might look like this:</p>
+
+<pre><code class="language-typescript">remove(wine: Wine): void {
+    this.http.delete(`${API_URL}/wines/${wine._id}`).subscribe(() =&gt; {
+    	// dispatch the action to the store, when the call was successful
+    	this.store.dispatch({type: REMOVE_WINE, payload: {_id: wine._id}});
+    });
+}
+</code></pre>
+
+<p>This is the traditional way of doing things, but I think we can do it better. What if we would update the store, regardless of the HTTP response the server returns? We click the delete button in the datagrid, call the angular service like we already did. But in that service we update the store directly (parallel with the http call)</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario2.png" alt="Scenario 2" /></p>
+
+<p>The code explained above might look like this:</p>
+
+<pre><code class="language-typescript">remove(wine: Wine): void {
+	// dispatch directly to the store
+	this.store.dispatch({type: REMOVE_WINE, payload: {_id: wine._id}};
+	// we still have to subscribe because http calls return cold observables
+    this.http.delete(`${API_URL}/wines/${wine._id}`).subscribe();
+}
+</code></pre>
+
+<p>This is a pretty nice change: Our application has just gotten a lot <strong>faster and snappier</strong>. Every time the user does an action, the store gets updated immediately, which means that the components will get updated immediately as well. We never have to wait for http responses again.</p>
+
+<p>There is one exception to this rule: When <strong>adding</strong> data, the backend has to return an ID which means that for POST calls we will have to postpone the store update until we get a 200 response. (otherwise we would have id-less wines in our store, and we can’t have that)</p>
+
+<h2 id="what-if-the-server-call-fails">What if the server-call fails?</h2>
+
+<p>What if the user’s internet-connection is lost? Or the backend doesn’t return a 200 response but an error. Our store will already be updated, the wine will be lost when it’s in fact still in the database. In some scenarios you want to prevent that kind of behavior. In those cases we want to rollback that specific action, but not interfere with the rest of the actions. It has to be completely safe.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario3.png" alt="Scenario 3" /></p>
+
+<p>We would like to implement something like this:</p>
+
+<pre><code class="language-typescript">remove(wine: Wine): void {
+	// create an action
+	let action = {type: REMOVE_WINE, payload: {_id: wine._id}};
+	//dispatch the action to the store
+	this.store.dispatch(action);
+	// call the backend
+    this.http.delete(`${API_URL}/wines/${wine._id}`)
+    	.subscribe(
+    		// on success, do nothing
+    		() =&gt; {}, 
+	    	// on error, rollback the action
+	    	() =&gt; {
+	    		this.store.dispatch({type: "UNDO_ACTION", payload: action});
+	    	// maybe show somekind of errormessage to show the user that it's action failed
+    	});
+}
+</code></pre>
+
+<p>It turns out that when using the redux pattern, this only takes 12 lines of code (without comments :-)). We will have to create a parent reducer that will delegate to our root reducer. The parent reducer will keep track of all the actions, so they can be rolled back.
+The implementation looks like this:</p>
+
+<pre><code class="language-typescript">import {ApplicationState} from "../statemanagement/state/ApplicationState";
+import {Action, ActionReducer} from "@ngrx/store";
+
+export function handleUndo(rootReducer: ActionReducer&lt;ApplicationState&gt;)
+	: ActionReducer&lt;ApplicationState&gt; {
+	// keep the executedActions
+    let executedActions: Array&lt;Action&gt; = [];
+    return (state: ApplicationState, action: Action) =&gt; {
+        if (action.type === "UNDO_ACTION") {
+        	// if the action is UNDO_ACTION, 
+        	// then call all the actions again on the rootReducer, 
+        	// except the one we want to rollback
+            let newState: any = {};
+            executedActions = executedActions.filter(eAct =&gt; eAct !== action.payload);
+            // update the state for every action untill we get the
+            // exact same state as before, but without the action we want to rollback
+            executedActions.forEach(executedAction =&gt; 
+            	newState = rootReducer(newState, executedAction));
+            return newState;
+        }
+        // push every action that isn't an UNDO_ACTION to the executedActions property
+        executedActions.push(action);
+        // just delegate
+        return rootReducer(state, action);
+    };
+}
+</code></pre>
+
+<p>So basically, when an action is being rolled back, every action that has been taken before is being executed on a piece of state again. When that piece of state is updated, it will return it and the store will be updated with the same state, except the one that our rolled back action created.</p>
+
+<p>To make sure the actions can be undone, we have to make redux use the piece of code above. This is how you could use it in Angular 2.</p>
+
+<pre><code class="language-typescript">@NgModule({
+	// instead of passing the rootReducer directly
+	// like we would have done before, wrap it in the handleUndo function
+    imports: [StoreModule.provideStore(handleUndo(rootReducer))/*, ...*/],
+    /* ... */
+})
+export class AppModule {
+}
+</code></pre>
+
+<h2 id="possible-improvements">Possible improvements</h2>
+
+<p>Won’t it become slow after a while, replaying all these actions?
+Some facts:</p>
+<ul>
+<li>Actions are very cheap</li>
+<li>They will update the store only once, we execute the actions ourselves, so ui won't get updated</li>
+<li>Actions only get replayed when there is an error</li>
+<li>The devtools also work like that, enables [timetraveling](https://onsen.io/blog/react-redux-devtools-with-time-travel)</li>
+</ul>
+<p>What if it would become slow?
+We can implement a buffer. Let’s say that we only want the last 100 actions to be kept.</p>
+
+<pre><code class="language-typescript">export function handleUndo(rootReducer: ActionReducer&lt;ApplicationState&gt;, 
+	bufferSize = 100): ActionReducer&lt;ApplicationState&gt; {
+    let executedActions: Array&lt;Action&gt; = [];
+    let initialState = undefined;
+    return (state: ApplicationState, action: Action) =&gt; {
+        if (action.type === "UNDO_ACTION") {
+        	// if the action is UNDO_ACTION, 
+        	// then call all the actions again on the rootReducer, 
+        	// except the one we want to rollback
+            let newState: any = initialState;
+            executedActions = executedActions.filter(eAct =&gt; eAct !== action.payload);
+            // update the state for every action untill we get the
+            // exact same state as before, but without the action we want to rollback
+            executedActions.forEach(executedAction =&gt; 
+            	newState = rootReducer(newState, executedAction));
+            return newState;
+        }
+       	// push every action that isn't an UNDO_ACTION to the executedActions property
+		executedActions.push(action);
+        let updatedState =  rootReducer(state, action);
+        if (executedActions.length === bufferSize + 1) {
+            let firstAction = executedActions[0];
+            // calculate the state x (buffersize) actions ago
+            initialState = rootReducer(initialState, firstAction);
+            // keep the correct actions
+            executedActions = executedActions.slice(1, bufferSize + 1);
+        }
+        return updatedState;
+    };
+}
+</code></pre>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>The redux pattern has opened amazing doors for frontend development. Just like <a href="http://blog.brecht.io/How-we-made-our-app-real-time-in-6-lines-of-code/">realtime</a> became a breeze we can do optimistic updates with almost no effort.
+The reason why you would do optimistic updates is that your application becomes amazingly fast and snappy! When implementing optimistic updates, the user will experience a native, mobile feeling.</p>
+
+<p>Here you can find the npm package I’ve created for angular, called <a href="https://www.npmjs.com/package/ngrx-undo">ngrx-undo</a></p>
+
+<p>Let me know if you enjoyed this article!</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>How we made our app real-time in 6 lines of code</title>
+	  <link>//How-we-made-our-app-real-time-in-6-lines-of-code</link>
+	  <author></author>
+	  <pubDate>2016-09-11T00:00:00+00:00</pubDate>
+	  <guid>//How-we-made-our-app-real-time-in-6-lines-of-code</guid>
+	  <description><![CDATA[
+	     <p><a href="https://blog.kwintenp.com/">Kwinten Pisman</a> and me were working on a workshop this weekend with the focus on Reactive applications with <a href="http://angular.io">Angular 2</a>, <a href="https://github.com/ReactiveX/rxjs">RXJS</a> and <a href="https://github.com/ngrx">@ngrx</a>. Something that can’t miss in a reactive workshop are real-time updates. The application we are trying to make real-time is the <a href="http://winecellar.surge.sh">winecellar</a> app (you can register an account here if you want to test it).</p>
+
+<p>To make this application real-time we changed some code in the node.js backend, but that’s out of scope for this post. 
+The cool thing is, that we only needed <strong>6 lines of code</strong> to make the frontend completely real-time.</p>
+
+<p>Here’s a small demo. Both computers are signed in with the same account. At the left screen, wines are being added and removed, and in the right screen you’ll see the changes happening real-time.
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/realtimein6lines/realtimewinecellar.gif" alt="Winecellar app" /></p>
+
+<h2 id="the-winecellar-app">The winecellar app</h2>
+
+<p>The winecellar application is a simple application with only a few features, but we overengineered it on purpose to make it work for largescale applications.
+You can find the open-source code of the winecellar project here: <a href="https://github.com/brechtbilliet/winecellar">frontend, (realtime branch)</a> and <a href="https://github.com/brechtbilliet/WineCellarBackend">backend</a>. Beware, the backend might be a little quick and dirty ;)</p>
+
+<h3 id="technology-stack">Technology stack</h3>
+
+<ul>
+<li>Angular 2</li>
+<li>RXJS</li>
+<li>@ngrx/store as redux implementation</li>
+<li>Typescript</li>
+<li>We will use socket.io to make the real-time connection with the backend</li>
+</ul>
+
+<h3 id="features">features</h3>
+
+<ul>
+<li>Authentication</li>
+<li>Add, update, remove wines</li>
+<li>Searching in a public wine database (wine.com)</li>
+<li>Filtering wines</li>
+<li>Update the stock of wines</li>
+<li>Setting ratings for wines</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/realtimein6lines/winecellar.png" alt="Winecellar app" /></p>
+
+<h2 id="what-part-of-the-application-should-be-real-time">What part of the application should be real-time?</h2>
+
+<ul>
+<li>All the actions that will update the content in the database eventually should push notifications to all clients except the one sending them.</li>
+<li>Even the filter should be real-time. (Eg. when filtering on "Chateau pomerol", and somebody adds that wine, we want to update our filtered results real-time)</li>
+</ul>
+
+<p>But why did we made something like that real-time? Actually, <strong>just because we can</strong>! It doesn’t really make sense that a user is logged in twice right? We did it for the purpose of the workshop.</p>
+
+<h2 id="how-did-we-manage-to-make-it-real-time">How did we manage to make it real-time?</h2>
+
+<p>First, let me give you a little bit of information about how the winecellar really works.</p>
+
+<p>Like said before we use @ngrx/store as our redux implementation. It is a redux library that we use to maintain the state of our application. Basically, you can see it as a client-side store of all our wines and other state. We use that particular store as a single-source-of-truth. We will send actions towards that store which will update the state with pure functions called reducers.</p>
+
+<p>In the following scheme you can see the unidirectional dataflow of redux: The view sends actions to the store which will update the state and then update the view.
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/realtimein6lines/redux.png" alt="Redux" /></p>
+
+<p>Let’s say that we want to add a wine. when we add a wine, we send a XHR request to the backend and send an action to the store, like you can see in the snippet below. That is already how to wine application works</p>
+
+<pre><code class="language-typescript">add(wine: Wine): void {
+    this.http.post(`${API_URL}/wines`, wine, this.authorizedHttpOptions())
+        .map((res: Response) =&gt; res.json())
+    	.subscribe(resp =&gt;
+    		this.store.dispatch({type: DATA_WINES_ADD, payload: {wine:resp}})
+		);
+}
+</code></pre>
+
+<p>This doesn’t have anything to do with real-time, right?! You are right, it doesn’t… But what if our backend can send Redux actions as well? If the backend can push redux actions to the frontend, then we can make it real-time with very little effort.</p>
+
+<p>For every REST call where something in the database gets updated, we can send a redux action to all the clients which are logged in with the same username (except for ourselves)</p>
+
+<p><strong>These are the 6 lines of code, that we need to make our frontend 100% real-time.</strong></p>
+
+<pre><code class="language-typescript">import * as io from "socket.io-client";
+// connect with socket.io and listen to redux actions
+connect(): void {
+    this.store.select(state =&gt; state.data.authentication.jwtToken)
+    	.take(1).subscribe((token: string) =&gt; {
+	        let socket = io(BACKEND, {query: "jwttoken=" + token});
+	        socket.on("UPDATE_REDUX", action =&gt; this.store.dispatch(action));
+    });
+}
+</code></pre>
+
+<p>This is a simplified example of what happens on the backend when we add a wine, for instance.</p>
+
+<pre><code class="language-typescript">@Post("/")
+public post(@Req()req: Request, @Res() res: Response): void {
+    let userId = handleAuth(req, res);
+    new Wine(req.body).save((error, response) =&gt; {
+        ...
+        // emit a socket.io event to the client
+        // which contains the redux action
+        this.pushToClient(userId, req, {type: DATA_WINES_ADD, payload: {wine: response}});
+        // return the new user
+        res.send(response);
+    });
+}
+</code></pre>
+
+<h2 id="check-the-devtools">Check the devtools</h2>
+<p>In The devtools below you’ll see the actions being dispatched during the lifecycle of the application. These actions can be triggered manually or real-time. Be sure to check them out at <a href="https://github.com/ngrx/store-devtools">https://github.com/ngrx/store-devtools</a>
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/realtimein6lines/winecellar_devtools.png" alt="Winecellar devtools" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The data that is managed by redux can be easily made real-time by making the backend dispatch redux actions to the frontend. 
+That way, we can make our application real-time in matter of minutes.
+If you want to learn more about these technologies: Be sure to checkout our workshop at <a href="http://ng-be.org">ngbe</a>.</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Modals in Angular 2</title>
+	  <link>//Modals-in-angular2</link>
+	  <author></author>
+	  <pubDate>2016-08-24T00:00:00+00:00</pubDate>
+	  <guid>//Modals-in-angular2</guid>
+	  <description><![CDATA[
+	     <p><strong>Updated at 3 september 2016 (RC.6 compliant)</strong></p>
+
+<p>Since one of my late New Year’s resolutions is blogging, behold my very first blogpost.
+For a customer of mine I had to implement modal-dialog functionality in Angular 2.
+As most developers would do in this scenario, I crawled the web searching for existing solutions.</p>
+
+<p>Since Angular 2 has made some big breaking changes in its latest release candidates, most of these solutions were deprecated. The ones that weren’t deprecated weren’t stable enough and/or very bloated.</p>
+
+<p>What I needed was actually very simple… I just needed a service that would open modals in Angular 2 and I only needed a few features:</p>
+<ul>
+<li>Multiple modals that could be placed above each other</li>
+<li>Custom modals</li>
+<li>The ability to destroy modals inside and outside the custom modal-component</li>
+</ul>
+
+<p><strong>Note:</strong> I’m using bootstrap as css framework so I don’t have to worry about the styling.</p>
+
+<p>What I needed was a simple service where I could pass a component that would get rendered on the page, without memory leaks of course. Basically, I needed something like this:</p>
+
+<pre><code class="language-typescript">
+// this was possible in RC.5
+this.modalService.create(MyCustomModalComponent, {foo: "bar"});
+
+
+// this is what we need to do in RC.6
+this.modalService.create(MyModule, MyCustomModalComponent, {foo: "bar"});
+
+</code></pre>
+
+<p>Since I didn’t found any viable solutions, I decided to write it myself.</p>
+
+<p>Writing this piece of functionality myself, actually made me realise a few things:</p>
+<ul>
+<li>It wasn't difficult to write this functionality on my own</li>
+<li>It was way more flexible than the solutions I found on the internet</li>
+<li>It wasn't bloated at all</li>
+<li>I wrote very few lines of code</li>
+<li><strong>We use too much dependencies from the net</strong></li>
+</ul>
+
+<p>Don’t get me wrong, I don’t think we should reinvent the wheel everytime. I’m just saying that sometimes it’s better to write something your self, when it doesn’t cost you to much effort and saves you a lot of bloat.</p>
+
+<p>The thing about a lot of open-source libraries is they want to make everybody happy, which mostly comes with a lot of bloat and features you don’t really need. And…, with a big codebase, comes a big issuelist…</p>
+
+<p><strong>Enough about that, let’s see how I implemented my requirements with very little code…</strong></p>
+
+<h2 id="a-brief-overview-of-the-flow">A brief overview of the flow</h2>
+<p>First of all the modal-placeholder will register the Injector and ViewContainerRef (see later) to the UserModalService. At that time we can create modals using the UserModalService. These modals will be rendered into the modal-placeholder.</p>
+
+<p><img src="https://github.com/brechtbilliet/brechtbilliet.github.io/raw/master/_posts/angular2modal.png" alt="Image of Angular 2 modal scheme" /></p>
+
+<h2 id="the-modal-placeholder">The modal placeholder</h2>
+
+<p>In Angular 2, you can not just compile stuff to the DOM, you need a placeholder.
+That’s why I created a <strong>modal-placeholder</strong>, that I can use like this. This will be the placeholder where our modals will be rendered in.</p>
+
+<pre><code class="language-typescript">@Component({
+    selector: "application",
+    template: `    
+       ...
+       &lt;modal-placeholder&gt;&lt;/modal-placeholder&gt;
+       ...
+`
+})
+export class ApplicationContainer {
+	...
+}
+</code></pre>
+
+<p><strong>Let’s look at the implementation</strong></p>
+
+<p>The modal-placeholder has 3 goals:</p>
+<ul>
+<li>Create a placeholder (see the # symbol)</li>
+<li>It should register that placeholder to a service where we can render modals into it (see ViewContainerRef)</li>
+<li>It should register the injector to that service. Our modals will need DI as well...</li>
+</ul>
+
+<pre><code class="language-typescript">@Component({
+    selector: "modal-placeholder",
+    template: `&lt;div #modalplaceholder&gt;&lt;/div&gt;`
+})
+export class ModalPlaceholderComponent implements OnInit {
+    @ViewChild("modalplaceholder", {read: ViewContainerRef}) 
+    	viewContainerRef;
+
+    constructor(
+    	private modalService: ModalService, 
+    	private injector: Injector) {
+    }
+    ngOnInit(): void {
+        this.modalService.registerViewContainerRef(this.viewContainerRef);
+        this.modalService.registerInjector(this.injector);
+    }
+}
+</code></pre>
+<p>As you can see above the ViewContainerRef holds a reference to the #modalplaceholder</p>
+
+<h2 id="the-modal-service">The modal service</h2>
+<p>This is the service that will dynamically generate custom components.</p>
+
+<pre><code class="language-typescript">export class ModalService {
+    // here we hold our placeholder
+    private vcRef: ViewContainerRef; 
+    // here we hold our injector
+    private injector: Injector; 
+    // we can use this to determine z-index of multiple modals
+    public activeInstances: number = 0;
+    
+    constructor(private compiler: Compiler) {
+    }
+
+    registerViewContainerRef(vcRef: ViewContainerRef): void {
+        this.vcRef = vcRef;
+    }
+
+    registerInjector(injector: Injector): void {
+        this.injector = injector;
+    }
+
+	// update: as of rc6 we have to pass the module as well
+    create&lt;T&gt;(module: any, component: any, parameters?: Object):
+     	Observable&lt;ComponentRef&lt;T&gt;&gt; {
+     	// we return a stream so we can  access the componentref
+        let componentRef$ = new ReplaySubject(); 
+        // compile the component based on its type and
+        // create a component factory
+        this.compiler.compileModuleAndAllComponentsAsync(module)
+            .then(factory =&gt; {
+            	// look for the componentfactory in the modulefactory
+             	let componentFactory = factory.componentFactories
+             		.filter(item =&gt; item.componentType === component)[0];
+            	// the injector will be needed for DI in 
+            	// the custom component
+                const childInjector = ReflectiveInjector
+                	.resolveAndCreate([], this.injector);
+            	// create the actual component
+                let componentRef = this.vcRef
+                	.createComponent(componentFactory, 0, childInjector);
+                // pass the @Input parameters to the instance
+                Object.assign(componentRef.instance, parameters); 
+                this.activeInstances ++;
+                // add a destroy method to the modal instance
+                componentRef.instance["destroy"] = () =&gt; {
+                    this.activeInstances --;
+                    // this will destroy the component
+                    componentRef.destroy(); 
+                };
+                // the component is rendered into the ViewContainerRef
+                // so we can update and complete the stream
+                componentRef$.next(componentRef);
+                componentRef$.complete();
+            });
+        return componentRef$;
+    }
+}
+</code></pre>
+
+<h2 id="the-custom-modal">The Custom modal</h2>
+
+<p>As we saw above, every modal component will have a destroy method. That method is dynamically added (see logic above) to the instance of the modalcomponent. This will call the <strong>componentRef.destroy()</strong> behind the scenes which will safely destroy the component. I also found it convenient to have a closeModal function on the modal as well. Therefore every custom modal component we create should inherit this class:</p>
+
+<pre><code class="language-typescript">export class ModalContainer {
+    destroy: Function;
+    closeModal(): void {
+        this.destroy();
+    }
+}
+</code></pre>
+
+<p>This means, a custom modal could look like this: (ideally you could also create a generic modal component)</p>
+
+<pre><code class="language-typescript">@Component({
+	selector: "my-custom-modal",
+	template: `
+	&lt;div modal="" class="modal fade in"&gt;
+		&lt;div class="modal-dialog"&gt;
+			&lt;div class="modal-content"&gt;
+				 &lt;button type="button" class="close" 
+				 	(click)="closeModal()"&gt;×&lt;/button&gt;
+				...
+			&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+	&lt;div class="modal-backdrop fade in"&gt;&lt;/div&gt;
+`
+})
+export class MyCustomModalComponent extends ModalContainer {
+	@Input() foo;
+	onSave(): Function;
+	constructor(){
+		super();
+	}
+	// the closeModal function will be available 
+	// on the ModalContainer parent class
+}
+</code></pre>
+
+<p>I love typescript decorators, and I didn’t want to inherit this ModalContainer everytime.
+I wanted to create modal components like this:</p>
+
+<pre><code class="language-typescript">@Component({
+	selector: "my-custom-modal",
+	template: `
+	...
+`
+})
+@Modal() // this decorator is all it takes
+export class MyCustomComponent {
+	@Input() foo;
+	onSave(): Function;
+}
+</code></pre>
+
+<p>This is basically the same thing as the inheritance example above, but much cleaner right?</p>
+
+<p>Here’s the code for the custom decorator: (How easy is that?!)</p>
+
+<pre><code class="language-typescript">export function Modal() {
+    return function (target) {
+        Object.assign(target.prototype,  ModalContainer.prototype);
+    };
+}
+</code></pre>
+
+<p>Ok, so what we have now is:</p>
+<ul>
+<li>modal-placeholder</li>
+<li>modal-service</li>
+<li>Modal container class with destroy delegation</li>
+<li>modal-decorator to make the inheritance cleaner</li>
+</ul>
+
+<p>And… that’s it folks. That’s the only code I had to write (cleaned up a bit but still…)
+It’s flexible, maintainable and easy to use… Let me show you…</p>
+
+<h2 id="how-to-use-it">How to use it</h2>
+
+<p>I want to create a modal of Type “MyCustomComponent”, pass it the property foo (@input) and pass a callback for the onSave function.</p>
+
+<p><strong>Update: Since RC.6 we have to pass the module as well</strong></p>
+
+<pre><code class="language-typescript">this.modalService.create&lt;MyCustomComponent&gt;(MyModule, MyCustomComponent, 
+{ 
+	foo: "bar", 
+	onSave: () =&gt; alert('save me')
+});
+</code></pre>
+
+<p>But wait? What if we want to destroy it outside of the component, you said you needed control over de lifetime of the component right?</p>
+
+<p>That’s why the create function returns an observable that contains the componentRef, which has a destroy function.</p>
+
+<pre><code class="language-typescript">this.modalService.create&lt;MyCustomComponent&gt;(MyModule, MyCustomComponent, 
+	{ 
+		foo: "bar", 
+		onSave: () =&gt; alert('save me')
+	})
+	.subscribe((ref: ComponentRef&lt;MyCustomComponent&gt;) =&gt; {
+		//destroy after 1 second
+		setTimeout(() =&gt; ref.destroy(), 1000);
+	});
+</code></pre>
+
+<h2 id="aot">AOT</h2>
+
+<p><a href="http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">Ahead-time-compilation</a> in angular2 breaks this pattern (because the compiler will not be available in production in that scenario). For AOT to work you just need to use the generated factory and update the modalservice like below.</p>
+
+<pre><code class="language-typescript">createFromFactory&lt;T&gt;(componentFactory: ComponentFactory&lt;T&gt;, 
+	parameters?: Object): Observable&lt;ComponentRef&lt;T&gt;&gt; {
+    let componentRef$ = new ReplaySubject();
+    const childInjector = ReflectiveInjector.resolveAndCreate([], this.injector);
+    let componentRef = this.vcRef.createComponent(componentFactory, 0, childInjector);
+    // pass the @Input parameters to the instance
+    Object.assign(componentRef.instance, parameters); 
+    this.activeInstances++;
+    componentRef.instance["destroy"] = () =&gt; {
+        this.activeInstances--;
+        componentRef.destroy();
+    };
+    componentRef$.next(componentRef);
+    componentRef$.complete();
+    return componentRef$.asObservable();
+}
+
+// you can call it like that
+this.modalService.createFromFactory(myCustomModalNgFactory);
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>With very little code I created a flexible way to create custom modal’s. Don’t <strong>always</strong> blindly rely on open source solutions. Think about the complexity and flexibility first.</p>
+
+<p>Thanks for reading! I Hope you enjoyed it</p>
+
+<h2 id="plunk">Plunk</h2>
+
+<p><a href="https://plnkr.co/edit/0c2YuGt7n7Fti0uup6Gs?p=info">Checkout this plunk I’ve created</a></p>
 
 	  ]]></description>
 	</item>
