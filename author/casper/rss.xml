@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   
+      <title>blog.strongbrew.io</title>
+   
+   <link></link>
+   <description></description>
+   <language>en-uk</language>
+   <managingEditor> </managingEditor>
+   <atom:link href="rss" rel="self" type="application/rss+xml" />
+   
+	<item>
+	  <title>The $onChanges lifecycle-hook in depth</title>
+	  <link>//the-onchanges-lifecycle-hook</link>
+	  <author></author>
+	  <pubDate>2016-04-06T00:00:00+00:00</pubDate>
+	  <guid>//the-onchanges-lifecycle-hook</guid>
+	  <description><![CDATA[
+	     <p>With the release of Angular 1.5.3 we got some awesome new features. As you all know, the point of the Angular 1.5 releases are to bring us closer to the Angular 2 way of working. With that in mind, the latest new feature we’ve got are Lifecycle hooks. What those are and how you can use them has already been perfectly explained by Pascal Precht on <a href="http://blog.thoughtram.io/angularjs/2016/03/29/exploring-angular-1.5-lifecycle-hooks.html">his blog</a>. For the remainder of this blog, I’m going to assume you have read it.
+I’m not going to try and do the same, instead I want to look at a specific lifecycle hook in depth, <code class="highlighter-rouge">$onChanges</code>. We’ll look at how it is implemented by Angular, how we can use it with some examples, a pitfall when using it with non-primitives and how we can fix it.</p>
+
+<h4 id="how-is-it-implemented-in-the-angular-codebase">How is it implemented in the Angular codebase</h4>
+<p>The <code class="highlighter-rouge">$onChanges</code> lifecycle hook can be used with the <code class="highlighter-rouge">'&lt;'</code> and <code class="highlighter-rouge">'@'</code> bindings. So to get started, we must look at how Angular handles these bindings.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">case</span> <span class="s1">'&lt;'</span><span class="p">:</span>
+     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasOwnProperty</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">attrs</span><span class="p">,</span> <span class="nx">attrName</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">optional</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+            <span class="nx">attrs</span><span class="p">[</span><span class="nx">attrName</span><span class="p">]</span> <span class="o">=</span> <span class="k">void</span> <span class="mi">0</span><span class="p">;</span>
+     <span class="p">}</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nx">optional</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">attrs</span><span class="p">[</span><span class="nx">attrName</span><span class="p">])</span> <span class="k">break</span><span class="p">;</span>
+     <span class="nx">parentGet</span> <span class="o">=</span> <span class="nx">$parse</span><span class="p">(</span><span class="nx">attrs</span><span class="p">[</span><span class="nx">attrName</span><span class="p">]);</span>
+     <span class="nx">destination</span><span class="p">[</span><span class="nx">scopeName</span><span class="p">]</span> <span class="o">=</span> <span class="nx">parentGet</span><span class="p">(</span><span class="nx">scope</span><span class="p">);</span>
+     <span class="nx">removeWatch</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span>
+          <span class="nx">parentGet</span><span class="p">,</span>
+          <span class="kd">function</span> <span class="nx">parentValueWatchAction</span><span class="p">(</span><span class="nx">newParentValue</span><span class="p">)</span> <span class="p">{</span>
+                   <span class="kd">var</span> <span class="nx">oldValue</span> <span class="o">=</span> <span class="nx">destination</span><span class="p">[</span><span class="nx">scopeName</span><span class="p">];</span>
+                   <span class="nx">recordChanges</span><span class="p">(</span><span class="nx">scopeName</span><span class="p">,</span> <span class="nx">newParentValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">);</span>
+                   <span class="nx">destination</span><span class="p">[</span><span class="nx">scopeName</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newParentValue</span><span class="p">;</span>
+          <span class="p">},</span>
+          <span class="nx">parentGet</span><span class="p">.</span><span class="nx">literal</span><span class="p">);</span>
+     <span class="nx">removeWatchCollection</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">removeWatch</span><span class="p">);</span>
+     <span class="k">break</span><span class="p">;</span>
+
+</code></pre></div></div>
+<p><strong>Note: We’ll only look at the <code class="highlighter-rouge">'&lt;'</code>binding since the concepts are the same.</strong></p>
+
+<p>This is the entire code block that is executed when a one-way binding is found. The part that really interests us here, is the <code class="highlighter-rouge">scope.$watch</code> expression and how it is setup.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span>
+     <span class="nx">parentGet</span><span class="p">,</span>
+     <span class="kd">function</span> <span class="nx">parentValueWatchAction</span><span class="p">(</span><span class="nx">newParentValue</span><span class="p">)</span> <span class="p">{</span>
+              <span class="kd">var</span> <span class="nx">oldValue</span> <span class="o">=</span> <span class="nx">destination</span><span class="p">[</span><span class="nx">scopeName</span><span class="p">];</span>
+              <span class="nx">recordChanges</span><span class="p">(</span><span class="nx">scopeName</span><span class="p">,</span> <span class="nx">newParentValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">);</span>
+              <span class="nx">destination</span><span class="p">[</span><span class="nx">scopeName</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newParentValue</span><span class="p">;</span>
+            <span class="p">},</span>
+     <span class="nx">parentGet</span><span class="p">.</span><span class="nx">literal</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>Let’s look at the listener function in particular, which is named <code class="highlighter-rouge">parentValueWatchAction</code> here. The listener function is the one that gets executed when the <code class="highlighter-rouge">$watch</code> expression is found dirty (if you do not understand what this means, I suggest you take a look at the <a href="https://www.ng-book.com/p/The-Digest-Loop-and-apply/">$digest cycle</a> which is a very important concept in Angular 1).
+We can see that, if a <code class="highlighter-rouge">$watch</code> expression is dirty and the listener function is fired, a method called <code class="highlighter-rouge">recordChanges(scopeName, newParentValue, oldValue);</code> is executed. Hmmm thats seems interesting, lets dig deeper.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">recordChanges</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">currentValue</span><span class="p">,</span> <span class="nx">previousValue</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">destination</span><span class="p">.</span><span class="nx">$onChanges</span><span class="p">)</span>
+             <span class="o">&amp;&amp;</span>
+            <span class="nx">currentValue</span> <span class="o">!==</span> <span class="nx">previousValue</span><span class="p">)</span> <span class="p">{</span>
+          <span class="c1">// If we have not already scheduled the top</span>
+          <span class="c1">// level onChangesQueue handler then do so now</span>
+          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">onChangesQueue</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">scope</span><span class="p">.</span><span class="nx">$$postDigest</span><span class="p">(</span><span class="nx">flushOnChangesQueue</span><span class="p">);</span>
+            <span class="nx">onChangesQueue</span> <span class="o">=</span> <span class="p">[];</span>
+          <span class="p">}</span>
+          <span class="c1">// If we have not already queued a trigger</span>
+          <span class="c1">// of onChanges for this controller then do so now</span>
+          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">changes</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">changes</span> <span class="o">=</span> <span class="p">{};</span>
+            <span class="nx">onChangesQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">triggerOnChangesHook</span><span class="p">);</span>
+          <span class="p">}</span>
+          <span class="c1">// If the has been a change on this property</span>
+          <span class="c1">// already then we need to reuse the previous value</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">changes</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="p">{</span>
+            <span class="nx">previousValue</span> <span class="o">=</span> <span class="nx">changes</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">previousValue</span><span class="p">;</span>
+          <span class="p">}</span>
+          <span class="c1">// Store this change</span>
+          <span class="nx">changes</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+               <span class="na">previousValue</span><span class="p">:</span> <span class="nx">previousValue</span><span class="p">,</span>
+               <span class="na">currentValue</span><span class="p">:</span> <span class="nx">currentValue</span>
+          <span class="p">};</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">triggerOnChangesHook</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">destination</span><span class="p">.</span><span class="nx">$onChanges</span><span class="p">(</span><span class="nx">changes</span><span class="p">);</span>
+        <span class="c1">// Now clear the changes so that we schedule</span>
+        <span class="c1">// onChanges when more changes arrive</span>
+        <span class="nx">changes</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This function, which is executed every time a dirty watch expression is found, does a number of things.
+What it basically does is: Check if your controller, called <code class="highlighter-rouge">destination</code> here, has an <code class="highlighter-rouge">$onChanges</code> method defined. If this is the case, it creates an object called <code class="highlighter-rouge">changes</code> with the previous value and the current value and pushes the <code class="highlighter-rouge">$onChanges</code> method with the <code class="highlighter-rouge">changes</code> object onto a queue.
+It also registers a function called <code class="highlighter-rouge">flushOnChangesQueue</code> to be executed during the <code class="highlighter-rouge">$$postDigest</code> phase. Let’s look at what this function does.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// This function is called in a $$postDigest to trigger</span>
+<span class="c1">// all the onChanges hooks in a single digest</span>
+<span class="kd">function</span> <span class="nx">flushOnChangesQueue</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="o">--</span><span class="nx">onChangesTtl</span><span class="p">))</span> <span class="p">{</span>
+          <span class="c1">// We have hit the TTL limit so reset everything</span>
+          <span class="nx">onChangesQueue</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+          <span class="k">throw</span> <span class="nx">$compileMinErr</span><span class="p">(</span>
+                <span class="s1">'infchng'</span><span class="p">,</span>
+                <span class="s1">'{0} $onChanges() iterations reached.Aborting!</span><span class="err">\</span><span class="s1">n'</span><span class="p">,</span>
+                <span class="nx">TTL</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="c1">// We must run this hook in an apply since</span>
+        <span class="c1">// the $$postDigest runs outside apply</span>
+        <span class="nx">$rootScope</span><span class="p">.</span><span class="nx">$apply</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+          <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">ii</span> <span class="o">=</span> <span class="nx">onChangesQueue</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">ii</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">onChangesQueue</span><span class="p">[</span><span class="nx">i</span><span class="p">]();</span>
+          <span class="p">}</span>
+          <span class="c1">// Reset the queue to trigger a new schedule</span>
+          <span class="c1">// next time there is a change</span>
+          <span class="nx">onChangesQueue</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+        <span class="p">});</span>
+      <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="nx">onChangesTtl</span><span class="o">++</span><span class="p">;</span>
+      <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>This function just loops over all the callbacks that were pushed on the queue earlier, and executes them. So every controller with the <code class="highlighter-rouge">$onChanges</code> callback defined, that has a bound value that was changed, is notified.</p>
+
+<p>That’s basically it! What’s important to remember is:</p>
+
+<ul>
+  <li>
+    <p>for the lifecycle hook to work, a <code class="highlighter-rouge">scope.$watch</code> expression must be dirty</p>
+  </li>
+  <li>
+    <p>the lifecycle hooks that have values changed, are triggered after every digest cycle</p>
+  </li>
+  <li>
+    <p>an object containing the old and the new value can be passed to the <code class="highlighter-rouge">$onChanges</code> callback</p>
+  </li>
+</ul>
+
+<h4 id="time-for-some-examples">Time for some examples!</h4>
+
+<h6 id="primitives">Primitives</h6>
+
+<p>We’re going to start of with an easy example. I’ve create a <a href="http://plnkr.co/edit/ZB6CLEXuRMrEnTIjUpo7?p=preview">plnkr</a> that contains two components. A  component called ‘outer’ that contains another component called ‘inner’. Let’s look at the ‘outer’ component first.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">OuterComponent</span><span class="p">{</span>
+  <span class="kr">public</span> <span class="nx">template</span><span class="p">:</span> <span class="nx">string</span> <span class="o">=</span><span class="s2">`
+    &lt;div&gt;
+      Value: {{$ctrl.primitiveValue}} &lt;br /&gt;
+      &lt;input ng-model="$ctrl.primitiveValue"&gt; &lt;br /&gt; &lt;br /&gt;
+
+      &lt;inner primitive-value="$ctrl.primitiveValue"&gt;&lt;/inner&gt;
+    &lt;/div&gt;
+  `</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><strong>Note: all the examples are written using Typescript.</strong></p>
+
+<p>It’s about as easy as it gets. If we look at it’s template, we can see it has a property called <code class="highlighter-rouge">primitiveValue</code> that you can change via an input box. It also defines our ‘inner’ component and binds the <code class="highlighter-rouge">primitiveValue</code>.</p>
+
+<p>Let’s look at the ‘inner’ component.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">InnerComponent</span> <span class="p">{</span>
+  <span class="kr">public</span> <span class="nx">controller</span><span class="p">:</span> <span class="nb">Function</span> <span class="o">=</span> <span class="nx">InnerController</span><span class="p">;</span>
+  <span class="kr">public</span> <span class="nx">bindings</span><span class="p">:</span> <span class="nx">any</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">primitiveValue</span> <span class="p">:</span> <span class="s2">"&lt;"</span>
+  <span class="p">};</span>
+  <span class="kr">public</span> <span class="nx">template</span><span class="p">:</span> <span class="nx">string</span> <span class="o">=</span><span class="s2">`
+    &lt;div&gt;
+      PrimitiveValue: {{$ctrl.primitiveValue}} &lt;br /&gt;
+      Number of times the $onChanges is invoked: {{$ctrl.onChangesCalledCounter}}
+    &lt;/div&gt;
+  `</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>We can see the one-way binding that accepts the <code class="highlighter-rouge">primitiveValue</code>. In the template, this is printed using <code class="highlighter-rouge">{{$ctrl.primitiveValue}}</code>.</p>
+
+<p>Let’s take a look at our ‘inner’ component’s controller.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">InnerController</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">onChangesCalledCounter</span><span class="p">:</span> <span class="nx">number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kr">public</span> <span class="nx">$onChanges</span><span class="p">(</span><span class="nx">changes</span><span class="p">:</span> <span class="nx">any</span><span class="p">){</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">onChangesCalledCounter</span><span class="o">++</span><span class="p">;</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">changes</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Notice the <code class="highlighter-rouge">$onChanges</code> definition in the controller. Every time it is executed, the <code class="highlighter-rouge">onChangesCalledCounter</code>, that is printed in the template as well, is incremented, and the changed object is logged to the console.</p>
+
+<p>The whole thing is wired together as follows.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s2">"app"</span><span class="p">,</span> <span class="p">[])</span>
+  <span class="p">.</span><span class="nx">component</span><span class="p">(</span><span class="s2">"outer"</span><span class="p">,</span><span class="k">new</span> <span class="nx">OuterComponent</span><span class="p">())</span>
+  <span class="p">.</span><span class="nx">component</span><span class="p">(</span><span class="s2">"inner"</span><span class="p">,</span> <span class="k">new</span> <span class="nx">InnerComponent</span><span class="p">());</span>
+</code></pre></div></div>
+<p>Note that this uses the new <code class="highlighter-rouge">.component</code> method introduced in Angular 1.5. This is a kind of directive that always has an isolate scope and has it’s <code class="highlighter-rouge">controllerAs</code> syntax set to <code class="highlighter-rouge">$ctrl</code> by default. Todd Motto has written an excellent <a href="https://toddmotto.com/exploring-the-angular-1-5-component-method/">blog post</a> on the subject.</p>
+
+<p>Let’s try input some text in the input box and see what it does:</p>
+<iframe style="width: 100%; height: 250px" src="https://embed.plnkr.co/ZB6CLEXuRMrEnTIjUpo7/" frameborder="0" allowfullscren="allowfullscren"></iframe>
+
+<p>As you might have expected, on every key input in the input box, the <code class="highlighter-rouge">$onChanges</code> function is invoked.
+With what we’ve learned, this is quite logical. A key input means the <code class="highlighter-rouge">primitiveValue</code> in the outer component has changed and a digest cycle is started. This will see that the <code class="highlighter-rouge">$watch</code> expression that is setup for the <code class="highlighter-rouge">'&lt;'</code> binding is dirty and register the <code class="highlighter-rouge">$onChanges</code> callback to be notified during the <code class="highlighter-rouge">$$postDigest</code> phase.
+Neat right!</p>
+
+<h6 id="non-primitive-values">Non primitive values</h6>
+<p>Let’s kick it up a notch! Next is an example where we bind an array from the ‘outer’ to the ‘inner’ component. This is the <a href="http://plnkr.co/edit/iUy6m9s49m6nXLEqIK1P?p=preview">plnkr</a>.
+Let’s look at the ‘outer’ component’s controller.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">OuterController</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">arrayValue</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="kr">private</span> <span class="nx">fruits</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"apple"</span><span class="p">,</span> <span class="s2">"banana"</span><span class="p">,</span> <span class="s2">"grape"</span><span class="p">];</span>
+  <span class="kr">private</span> <span class="nx">vegetables</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"brocolli"</span><span class="p">,</span> <span class="s2">"aubergine"</span><span class="p">,</span> <span class="s2">"avocado"</span><span class="p">];</span>
+
+  <span class="kr">public</span> <span class="nx">$onInit</span><span class="p">():</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">arrayValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">fruits</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// In a real case scenario, this could be a network call that refreshes with new data</span>
+  <span class="kr">public</span> <span class="nx">switchArrayValue</span><span class="p">():</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">arrayValue</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">fruits</span><span class="p">){</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">arrayValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">vegetables</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">arrayValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">fruits</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>A controller is introduced that initialises an array called <code class="highlighter-rouge">arrayValue</code> to the fruits array. It also contains a <code class="highlighter-rouge">switchArrayValue</code> function that simply switches the reference from the <code class="highlighter-rouge">arrayValue</code> between the fruits and vegetables.
+In our template, we’ve bounded the array to the ‘inner’ component and added a button to call the <code class="highlighter-rouge">switchArrayValue</code> function.</p>
+
+<p>The ‘inner’ component only changed in accepting an array instead of a primitive value.</p>
+
+<p>Let’s try to click the button and see what it does:</p>
+<iframe style="width: 100%; height: 250px" src="https://embed.plnkr.co/iUy6m9s49m6nXLEqIK1P/" frameborder="0" allowfullscren="allowfullscren"></iframe>
+
+<p>As you would’ve expected, it does exactly the same thing as the previous example for the same reasons.</p>
+
+<h6 id="non-primitive-values-pitfall">Non primitive values pitfall!</h6>
+
+<p>Next, let’s try to add an element to the array in the ‘outer’ component and see what happens.
+To do this, we must update the ‘outer’ component.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">OuterController</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">fruits</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"apple"</span><span class="p">,</span> <span class="s2">"banana"</span><span class="p">];</span>
+
+  <span class="kr">public</span> <span class="nx">addElement</span><span class="p">():</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">fruits</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">"grape"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We updated the controller to work with a fruit array and provide a method that adds an element to the array. In the template we just call this function when the button is clicked and bind the fruits array into our ‘inner’ component.</p>
+
+<p>What do you think will happen next? You’ve figured it out? Let’s give it a go!</p>
+
+<iframe style="width: 100%; height: 250px" src="https://embed.plnkr.co/Godmmy48YR5jv8O5fInI/" frameborder="0" allowfullscren="allowfullscren"></iframe>
+
+<p>Hmm, we see that the array in our ‘outer’ and our ‘inner’ component is updated. BUT our <code class="highlighter-rouge">$onChanges</code> callback is not fired. At first this might seem strange, but actually, it isn’t.
+To explain why, we must look at the definition of the <code class="highlighter-rouge">$watch</code> function in Angular.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$watch</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span>
+    <span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span><span class="p">,</span> <span class="nx">objectEquality</span><span class="p">,</span> <span class="nx">prettyPrintExpression</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+<p>Take a look at the third argument: <strong>objectEquality</strong>. This tells Angular whether to check the watch expression via reference or object equality. We looked at the way the watch expression is setup in the <code class="highlighter-rouge">recordChanges()</code> method above. No parameter is passed as third argument which means it defaults to comparison by reference.
+In our test case above, we did not change the reference of the array but only added an element. This means our <code class="highlighter-rouge">$watch</code> expression will never be dirty! In that case the <code class="highlighter-rouge">$onChanges</code> callback is never triggered.
+By now, you might wonder, then how the hell did our ‘inner’ component’s array change. That’s the thing. The ‘outer’ and ‘inner’ component share the same javascript reference to the fruits array. So even if you would push an element onto the array in the ‘inner’ component, it would also update the ‘outer’ component. Put’s a whole new light onto ‘one-way binding’ doesn’t it :).</p>
+
+<h6 id="immutable-data-structures-to-the-rescue">Immutable data structures to the rescue!</h6>
+<p>You might wonder if the Angular team made an error of judgement when implementing it this way. In fact, they didn’t. It was a deliberate choice to work with a reference-based comparison scheme. If you’d perform a deep compare on every object, your application’s performance would be extremely poor.
+So what can we do to get the expected behaviour for our <code class="highlighter-rouge">$onChanges</code> method. If we were to change the reference of our array every time we change something to the array, we would be getting exactly that. What we actually need are immutable data structures.
+For the following example <a href="http://plnkr.co/edit/ANZnoxxe2K2pztlrPRfu?p=preview">plnkr</a>, I’ve chosen <a href="https://facebook.github.io/immutable-js/">ImmutableJS</a> to demonstrate that we can get the expected behaviour with immutable data structures.</p>
+
+<p>I’ve made a few small changes to the way the fruits array is created and updated:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">OuterController</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">fruits</span><span class="p">:</span> <span class="nx">List</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="s2">"apple"</span> <span class="s2">"banana"</span><span class="p">);</span>
+
+  <span class="kr">public</span> <span class="nx">addElement</span><span class="p">():</span> <span class="k">void</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">fruits</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">fruits</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">"grape"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>First of all, we initialise our list using ImmutableJS. The push method that is available on the returned object, of type <code class="highlighter-rouge">List</code>, doesn’t add an element to the existing datatype. Instead it returns a new instance of the List type with the element added. This way, we change our reference <strong>and</strong> add an element.</p>
+
+<p>Let’s test again to see if it works as expected.</p>
+<iframe style="width: 100%; height: 250px" src="https://embed.plnkr.co/ANZnoxxe2K2pztlrPRfu/" frameborder="0" allowfullscren="allowfullscren"></iframe>
+
+<p>And it does!</p>
+
+<h4 id="conclusion">Conclusion</h4>
+
+<p>The lifecycle hook provides us with some great functionality. But be cautious. It’s only triggered if we use <strong>primitives</strong> or <strong>change the reference of the javascript object bound into the component</strong>. That’s why I would recommend to always use immutable data structures throughout your bindings.</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>A Full and Comprehensive Style Test</title>
+	  <link>//a-full-and-comprehensive-style-test</link>
+	  <author></author>
+	  <pubDate>2014-09-27T10:18:00+00:00</pubDate>
+	  <guid>//a-full-and-comprehensive-style-test</guid>
+	  <description><![CDATA[
+	     <p>This is just an <em>ipsis verbis</em> copy of the first example running on the <a href="http://demo.ghost.io">Ghost Demo</a>. This shows how you can use html styling to achieve your hopes.</p>
+
+
+<p>Below is just about everything you’ll need to style in the theme. Check the source code to see the many embedded elements within paragraphs.</p>
+
+
+<hr />
+
+<h1 id="heading1">Heading 1</h1>
+
+<h2 id="heading2">Heading 2</h2>
+
+<h3 id="heading3">Heading 3</h3>
+
+<h4 id="heading4">Heading 4</h4>
+
+<h5 id="heading5">Heading 5</h5>
+
+<h6 id="heading6">Heading 6</h6>
+
+<hr />
+
+<p>Lorem ipsum dolor sit amet, <a title="test link" href="#">test link</a> adipiscing elit. <strong>This is strong.</strong> Nullam dignissim convallis est. Quisque aliquam. <em>This is emphasized.</em> Donec faucibus. Nunc iaculis suscipit dui. 5<sup>3</sup> = 125. Water is H<sub>2</sub>O. Nam sit amet sem. Aliquam libero nisi, imperdiet at, tincidunt nec, gravida vehicula, nisl. <cite>The New York Times</cite> (That’s a citation). <span style="text-decoration:underline;">Underline.</span> Maecenas ornare tortor. Donec sed tellus eget sapien fringilla nonummy. Mauris a ante. Suspendisse quam sem, consequat at, commodo vitae, feugiat in, nunc. Morbi imperdiet augue quis tellus.</p>
+
+<p><abbr title="Hyper Text Markup Language">HTML</abbr> and <abbr title="Cascading Style Sheets">CSS</abbr> are our tools. Mauris a ante. Suspendisse quam sem, consequat at, commodo vitae, feugiat in, nunc. Morbi imperdiet augue quis tellus.  Praesent mattis, massa quis luctus fermentum, turpis mi volutpat justo, eu volutpat enim diam eget metus. To copy a file type <code>COPY <var>filename</var></code>. <del>Dinner’s at 5:00.</del> <ins>Let’s make that 7.</ins> This <span style="text-decoration:line-through;">text</span> has been struck.</p>
+
+<hr />
+
+<h2 id="media">Media</h2>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore.</p>
+
+<h3 id="bigimage">Big Image</h3>
+
+<p><img src="http://demo.ghost.io/content/images/2014/09/testimg1.jpeg" alt="Test Image" /></p>
+
+<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+
+<h3 id="smallimage">Small Image</h3>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore.</p>
+
+<p><img src="http://demo.ghost.io/content/images/2014/09/testimg2.jpg" alt="Small Test Image" /></p>
+
+<p>Labore et dolore.</p>
+
+<hr />
+
+<h2 id="listtypes">List Types</h2>
+
+<h3 id="definitionlist">Definition List</h3>
+
+<dl>
+<dt>Definition List Title</dt>
+<dd>This is a definition list division.</dd>
+<dt>Definition</dt>
+<dd>An exact statement or description of the nature, scope, or meaning of something: <em>our definition of what constitutes poetry.</em></dd>
+</dl>
+
+<h3 id="orderedlist">Ordered List</h3>
+
+<ol>
+<li>List Item 1  </li>
+<li>List Item 2 <br />
+<ol><li>Nested list item A</li>
+<li>Nested list item B</li></ol></li>
+<li>List Item 3</li>
+</ol>
+
+<h3 id="unorderedlist">Unordered List</h3>
+
+<ul>
+<li>List Item 1</li>
+<li>List Item 2
+<ul><li>Nested list item A</li>
+<li>Nested list item B</li></ul></li>
+<li>List Item 3</li>
+</ul>
+
+<hr />
+
+<h2 id="table">Table</h2>
+
+<table>
+<tbody>
+<tr>
+<th>Table Header 1</th>
+<th>Table Header 2</th>
+<th>Table Header 3</th>
+</tr>
+<tr>
+<td>Division 1</td>
+<td>Division 2</td>
+<td>Division 3</td>
+</tr>
+<tr class="even">
+<td>Division 1</td>
+<td>Division 2</td>
+<td>Division 3</td>
+</tr>
+<tr>
+<td>Division 1</td>
+<td>Division 2</td>
+<td>Division 3</td>
+</tr>
+</tbody>
+</table>
+
+<hr />
+
+<h2 id="preformattedtext">Preformatted Text</h2>
+
+<p>Typographically, preformatted text is not the same thing as code. Sometimes, a faithful execution of the text requires preformatted text that may not have anything to do with code. Most browsers use Courier and that’s a good default — with one slight adjustment, Courier 10 Pitch over regular Courier for Linux users.</p>
+
+<h3 id="code">Code</h3>
+
+<p>Code can be presented inline, like <code>&lt;?php bloginfo('stylesheet_url'); ?&gt;</code>, or within a <code>&lt;pre&gt;</code> block. Because we have more specific typographic needs for code, we’ll specify Consolas and Monaco ahead of the browser-defined monospace font.</p>
+
+<p>Code blocks can also be inserted with the highlight tag as below:</p>
+<pre>
+    
+    {% highlight language-x %}
+    # some code
+    {% endhighlight %}
+    
+</pre>
+
+<p>More information about code highlighting in jekyll can be found  <a href="https://jekyllrb.com/docs/templates/#code-snippet-highlighting">in Jekyll documentation</a>.</p>
+
+<p>These area a couple of examples showing the resulting highlighted code:</p>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/* css code sample */</span>
+<span class="nf">#container</span> <span class="p">{</span>
+    <span class="nl">float</span><span class="p">:</span> <span class="nb">left</span><span class="p">;</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">0</span> <span class="m">-240px</span> <span class="m">0</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// javascript code sample</span>
+<span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'POST'</span><span class="p">,</span>
+  <span class="na">url</span><span class="p">:</span> <span class="s1">'backend.php'</span><span class="p">,</span>
+  <span class="na">data</span><span class="p">:</span> <span class="s2">"q="</span><span class="o">+</span><span class="nx">myform</span><span class="p">.</span><span class="nx">serialize</span><span class="p">(),</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+    <span class="c1">// on success use return data here</span>
+  <span class="p">},</span>
+  <span class="na">error</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">xhr</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">exception</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// if ajax fails display error alert</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"ajax error response type "</span><span class="o">+</span><span class="nx">type</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></figure>
+
+<p>Now you can also use <a href="https://highlightjs.org/">highlight.js</a>.
+For more on how to use it and on the available styles check their
+<a href="https://highlightjs.org/static/demo/">demo</a> and
+<a href="http://highlightjs.readthedocs.org/en/latest/">documentation</a> pages.</p>
+
+<div class="system">
+<pre><code class="swift">// Swift code sample
+import Foundation
+
+@objc class Person: Entity {
+  var name: String!
+  var age:  Int!
+
+  init(name: String, age: Int) {
+    /* /* ... */ */
+  }
+
+  // Return a descriptive string for this person
+  func description(offset: Int = 0) -> String {
+    return "\(name) is \(age + offset) years old"
+  }
+}
+</code></pre>
+</div>
+
+
+<hr />
+
+<h2 id="blockquotes">Blockquotes</h2>
+
+<p>Let’s keep it simple. Italics are good to help set it off from the body text. Be sure to style the citation.</p>
+
+<blockquote>
+  <p>Good afternoon, gentlemen. I am a HAL 9000 computer. I became operational at the H.A.L. plant in Urbana, Illinois on the 12th of January 1992. My instructor was Mr. Langley, and he taught me to sing a song. If you’d like to hear it I can sing it for you. <cite>— <a href="http://en.wikipedia.org/wiki/HAL_9000">HAL 9000</a></cite></p>
+</blockquote>
+
+<p>And here’s a bit of trailing text.</p>
+
+<hr />
+
+<h2 id="textlevelsemantics">Text-level semantics</h2>
+
+<p>The <a href="#">a element</a> example <br />
+The <abbr>abbr element</abbr> and <abbr title="Title text">abbr element with title</abbr> examples <br />
+The <b>b element</b> example <br />
+The <cite>cite element</cite> example <br />
+The <code>code element</code> example <br />
+The <del>del element</del> example <br />
+The <dfn>dfn element</dfn> and <dfn title="Title text">dfn element with title</dfn> examples <br />
+The <em>em element</em> example <br />
+The <i>i element</i> example <br />
+The <ins>ins element</ins> example <br />
+The <kbd>kbd element</kbd> example <br />
+The <mark>mark element</mark> example <br />
+The <q>q element <q>inside</q> a q element</q> example <br />
+The <s>s element</s> example <br />
+The <samp>samp element</samp> example <br />
+The <small>small element</small> example <br />
+The <span>span element</span> example <br />
+The <strong>strong element</strong> example <br />
+The <sub>sub element</sub> example <br />
+The <sup>sup element</sup> example <br />
+The <var>var element</var> example <br />
+The <u>u element</u> example</p>
+
+<hr />
+
+<h2 id="forms">Forms</h2>
+
+<form>
+<fieldset>
+<legend>Inputs as descendents of labels (form legend)</legend>
+<label>
+<b>Text input</b>
+<input type="text" value="default value">
+</label>
+<label>
+<b>Email input</b>
+<input type="email">
+</label>
+<label>
+<b>Search input</b>
+<input type="search">
+</label>
+<label>
+<b>Tel input</b>
+<input type="tel">
+</label>
+<label>
+<b>URL input</b>
+<input type="url" placeholder="http://">
+</label>
+<label>
+<b>Password input</b>
+<input type="password" value="password">
+</label>
+<label>
+<b>File input</b>
+<input type="file">
+</label>
+<label>
+<b>Radio input</b>
+<input type="radio" name="rad">
+</label>
+<label>
+<b>Checkbox input</b>
+<input type="checkbox">
+</label>
+<label>
+<input type="radio" name="rad"> Radio input
+</label>
+<label>
+<input type="checkbox"> Checkbox input
+</label>
+<label>
+<b>Select field</b>
+<select>
+<option>Option 01</option>
+<option>Option 02</option>
+</select>
+</label>
+<label>
+<b>Textarea</b>
+<textarea cols="30" rows="5" >Textarea text</textarea>
+</label>
+</fieldset>
+
+<fieldset>
+<legend>Clickable inputs and buttons</legend>
+<input type="image" src="http://placekitten.com/90/24" alt="Image (input)">
+<input type="reset" value="Reset (input)">
+<input type="button" value="Button (input)">
+<input type="submit" value="Submit (input)">
+<button type="reset">Reset (button)</button>
+<button type="button">Button (button)</button>
+<button type="submit">Submit (button)</button>
+</fieldset>
+
+<fieldset id="boxsize">
+<legend>box-sizing tests</legend>
+<div><input type="text" value="text"></div>
+<div><input type="email" value="email"></div>
+<div><input type="search" value="search"></div>
+<div><input type="url" value="http://example.com"></div>
+<div><input type="password" value="password"></div>
+
+<div><input type="color" value="#000000"></div>
+<div><input type="number" value="5"></div>
+<div><input type="range" value="10"></div>
+<div><input type="date" value="1970-01-01"></div>
+<div><input type="month" value="1970-01"></div>
+<div><input type="week" value="1970-W01"></div>
+<div><input type="time" value="18:23"></div>
+<div><input type="datetime" value="1970-01-01T00:00:00Z"></div>
+<div><input type="datetime-local" value="1970-01-01T00:00"></div>
+
+<div><input type="radio"></div>
+<div><input type="checkbox"></div>
+
+<div><select><option>Option 01</option><option>Option 02</option></select></div>
+<div><textarea cols="30" rows="5" >Textarea text</textarea></div>
+
+<div><input type="image" src="http://placekitten.com/90/24" alt="Image (input)"></div>
+<div><input type="reset" value="Reset (input)"></div>
+<div><input type="button" value="Button (input)"></div>
+<div><input type="submit" value="Submit (input)"></div>
+
+<div><button type="reset">Reset (button)</button></div>
+<div><button type="button">Button (button)</button></div>
+<div><button type="submit">Submit (button)</button></div>
+</fieldset>
+</form>
+
+<hr />
+
+<h2 id="embeds">Embeds</h2>
+
+<p>Sometimes all you want to do is embed a little love from another location and set your post alive.</p>
+
+<h3 id="video">Video</h3>
+
+<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+<iframe src="//player.vimeo.com/video/103224792?title=0&amp;byline=0&amp;portrait=0" width="600" height="338" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+<p>Culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<h3 id="slides">Slides</h3>
+
+<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+<script async class="speakerdeck-embed" data-id="34d2856027ce01316b5d621ab8e7d421" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+
+<p>Culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<h3 id="audio">Audio</h3>
+
+<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+<iframe width="100%" height="450" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/169381837&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe>
+
+<p>Culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<h3 id="code">Code</h3>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
+
+<p><div data-height="268" data-theme-id="0" data-slug-hash="bcqhe" data-default-tab="js" data-user="rglazebrook" class='codepen'></p>
+
+<pre><code>var c = new Sketch.create({autoclear: false}),
+    bigCircle = 50,
+    littleCircle = 5,
+    // The velocity value determines how much to move the spinner head (in radians).
+    velocity = 0.105,
+    hue = 0,
+    // The alpha value below determines the length of the spinner&#39;s tail.
+    bg = &#39;rgba(40,40,40,.075)&#39;;
+    Spinner = function() {};
+
+Spinner.prototype.setup = function() {
+  this.x = c.width / 2;
+  this.y = c.height / 2 - bigCircle;
+  this.rotation = 0;
+}
+Spinner.prototype.update = function() {
+  this.rotation += velocity;
+  this.rotation = this.rotation % TWO_PI;
+  this.x = c.width /2 + cos(this.rotation) * bigCircle;
+  this.y = c.height / 2 + sin(this.rotation) * bigCircle;
+}
+Spinner.prototype.draw = function() {
+  c.fillStyle = &#39;hsl(&#39;+hue+&#39;,50%,50%)&#39;;
+  c.beginPath();
+  c.arc(this.x, this.y, littleCircle, 0, TWO_PI);
+  c.fill();
+  c.closePath();
+}
+c.setup = function() {
+  spinner = new Spinner();
+  spinner.setup();
+}
+c.update = function() {
+  spinner.update();
+  hue = ++hue % 360;
+}
+c.draw = function() {
+  spinner.draw();
+  c.fillStyle = bg;
+  c.fillRect(0,0,c.width,c.height);
+}
+</code></pre>
+
+<p>See the Pen <a href='http://codepen.io/rglazebrook/pen/bcqhe/'>Simple Rotating Spinner</a> by Rob Glazebrook (<a href='http://codepen.io/rglazebrook'>@rglazebrook</a>) on <a href='http://codepen.io'>CodePen</a>.</p>
+
+<p></div><script async src="//codepen.io/assets/embed/ei.js"></script></p>
+
+<p>Isn't it beautiful?</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>The Businessman & the fisherman</title>
+	  <link>//the-businessman-and-fisherman</link>
+	  <author></author>
+	  <pubDate>2014-08-12T10:18:00+00:00</pubDate>
+	  <guid>//the-businessman-and-fisherman</guid>
+	  <description><![CDATA[
+	     <p>An American businessman took a vacation to a small coastal Mexican village on doctor’s orders. Unable to sleep after an urgent phone call from the office the first morning, he walked out to the pier to clear his head. A small boat with just one fisherman had docked, and inside the boat were several large yellowfin tuna. The American complimented the Mexican on the quality of his fish.</p>
+
+<p>“How long did it take you to catch them?” the American asked.</p>
+
+<p>“Only a little while,” the Mexican replied in surprisingly good English.</p>
+
+<p>“Why don’t you stay out longer and catch more fish?” the American then asked.</p>
+
+<p>“I have enough to support my family and give a few to friends,” the Mexican said as he unloaded them into a basket.</p>
+
+<p>“But… What do you do with the rest of your time?”</p>
+
+<p>The Mexican looked up and smiled. “I sleep late, fish a little, play with my children, take a siesta with my wife, Julia, and stroll into the village each evening, where I sip wine and play guitar with my amigos. I have a full and busy life, señor.”</p>
+
+<p>The American laughed and stood tall. “Sir, I’m a Harvard M.B.A. and can help you. You should spend more time fishing, and with the proceeds, buy a bigger boat. In no time, you could buy several boats with the increased haul. Eventually, you would have a fleet of fishing boats.”</p>
+
+<p>He continued, “Instead of selling your catch to a middleman, you would sell directly to the consumers, eventually opening your own cannery. You would control the product, processing, and distribution. You would need to leave this small coastal fishing village, of course, and move to Mexico City, then to Los Angeles, and eventually to New York City, where you could run your expanded enterprise with proper management.</p>
+
+<p>The Mexican fisherman asked, “But, señor, how long will all this take?”</p>
+
+<p>To which the American replied, “15-20 years, 25 tops.”</p>
+
+<p>“But what then, señor?”</p>
+
+<p>The American laughed and said, “That’s the best part. When the time is right, you would announce an IPO and sell your company stock to the public and become very rich. You would make millions.”</p>
+
+<p>“Millions señor? Then what?”</p>
+
+<p>“Then you would retire and move to a small coastal fishing village, where you would sleep late, fish a little, play with your kids, take a siesta with your wife, and stroll in to the village in the evenings where you could sip wine and play your guitar with your amigos.”</p>
+
+<p>Adapted from the “Anekdote zur Senkung der Arbeitsmoral” by <strong>Heinrich Böll</strong></p>
+
+<p>An influential German write and Nobel Prize for Literature in 1972.</p>
+
+	  ]]></description>
+	</item>
+
+
+</channel>
+</rss>

@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Finding The Way Home</title>
+    <title>Strongbrew</title>
     <meta name="description" content="" />
 
     <!-- Mobile Meta -->
@@ -25,31 +25,31 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="//" />
+        <link rel="canonical" href="//tag/awesomeness/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Finding The Way Home" />
+    <meta property="og:title" content="Strongbrew" />
     <meta property="og:description" content="" />
-    <meta property="og:url" content="//" />
-    <meta property="og:image" content="/assets/images/bg-gradient.jpg" />
+    <meta property="og:url" content="//tag/awesomeness/" />
+    <meta property="og:image" content="/assets/images/cover2.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Finding The Way Home" />
+    <meta name="twitter:title" content="Strongbrew" />
     <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="//" />
-    <meta name="twitter:image:src" content="/assets/images/bg-gradient.jpg" />
+    <meta name="twitter:url" content="//tag/awesomeness/" />
+    <meta name="twitter:image:src" content="/assets/images/cover2.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Finding The Way Home",
-    "url": "//",
-    "image": "/assets/images/bg-gradient.jpg",
+    "name": "Strongbrew",
+    "url": "//tag/awesomeness/",
+    "image": "/assets/images/cover2.jpg",
     "description": ""
 }
     </script>
@@ -59,7 +59,7 @@
 
 
 </head>
-<body class="home-template nav-closed">
+<body class="tag-template nav-closed">
 
     <!-- The blog navigation links -->
     <div class="nav">
@@ -68,7 +68,7 @@
         <span class="hidden">Close</span>
     </a>
     <ul>
-        <li class="nav-home  nav-current" role="presentation"><a
+        <li class="nav-home " role="presentation"><a
                 href="/">Home</a></li>
         <li class="nav-about " role="presentation"><a
                 href="/about">About</a></li>
@@ -100,25 +100,30 @@
     <div class="site-wrapper">
 
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
-        <!-- < default -->
+        <!-- dynamically overriding backgrounds for tags as well as descriptions -->
+
+
+<!-- default -->
 <!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<!-- The big featured header  -->
-<header class="main-header "
-        style="background-image: url(/assets/images/bg-gradient.jpg) ">
+<!-- If we have a tag cover, display that - else blog cover - else nothing -->
+<header class="main-header tag-head " style="background-image: url(/assets/images/cover2.jpg) ">
     <nav class="main-nav overlay clearfix">
-        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
+        <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
         
             <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         
     </nav>
     <div class="vertical">
         <div class="main-header-content inner">
-            <h1 class="page-title">Strongbrew</h1>
-            <h2 class="page-description"></h2>
+            <h1 class="page-title">Awesomeness</h1>
+            <h2 class="page-description">
+            
+			    A 1-post collection
+            
+            </h2>
         </div>
     </div>
-    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">Scroll Down</span></a>
 </header>
 
 <!-- The main content area on the homepage -->
@@ -130,9 +135,7 @@
         
             <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 2 </span>
-     
-        <a class="older-posts" href="/page2/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 1 of 1 </span>
      
 </nav>
         
@@ -141,45 +144,18 @@
     
     <article class="post">
         <header class="post-header">
-            <h2 class="post-title"><a href="/the-onchanges-lifecycle-hook">The $onChanges lifecycle-hook in depth</a></h2>
+            <h2 class="post-title"><a href="/gettysburg-address">Gettysburg Address</a></h2>
         </header>
         <section class="post-excerpt">
-            <p>With the release of Angular 1.5.3 we got some awesome new features. As you all know, the point of the Angular 1.5 releases are to bring... <a class="read-more" href="/the-onchanges-lifecycle-hook">&raquo;</a></p>
+            <p>Fourscore and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men... <a class="read-more" href="/gettysburg-address">&raquo;</a></p>
         </section>
         <footer class="post-meta">
             
                 
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
+                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
                 <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
+                <a href='/author/brechtbilliet'>Brecht Billiet</a>
 
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/angularjs'>Angularjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2016-04-06">06 Apr 2016</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/a-full-and-comprehensive-style-test">A Full and Comprehensive Style Test</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>This is just an ipsis verbis copy of the first example running on the Ghost Demo. This shows how you can use html styling to achieve... <a class="read-more" href="/a-full-and-comprehensive-style-test">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
                 
             
                 
@@ -190,104 +166,11 @@
                 on
                 
                     
-                       <a href='/tag/test'>Test</a>,
-                    
-                
-                    
-                       <a href='/tag/content'>Content</a>
+                       <a href='/tag/awesomeness'>Awesomeness</a>
                     
                 
             
-            <time class="post-date" datetime="2014-09-27">27 Sep 2014</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/the-businessman-and-fisherman">The Businessman & the fisherman</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>An American businessman took a vacation to a small coastal Mexican village on doctor’s orders. Unable to sleep after an urgent phone call from the office... <a class="read-more" href="/the-businessman-and-fisherman">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/fables'>Fables</a>,
-                    
-                
-                    
-                       <a href='/tag/fiction'>Fiction</a>
-                    
-                
-            
-            <time class="post-date" datetime="2014-08-12">12 Aug 2014</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/i-have-a-dream">I Have a Dream</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>I am happy to join with you today in what will go down in history as the greatest demonstration for freedom in the history of our... <a class="read-more" href="/i-have-a-dream">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/speeches'>Speeches</a>
-                    
-                
-            
-            <time class="post-date" datetime="1963-08-28">28 Aug 1963</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/the-purpose-of-education">The Purpose of Education</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>As I engage in the so-called “bull sessions” around and about the school, I too often find that most college men have a misconception of the... <a class="read-more" href="/the-purpose-of-education">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/speeches'>Speeches</a>,
-                    
-                
-                    
-                       <a href='/tag/fiction'>Fiction</a>
-                    
-                
-            
-            <time class="post-date" datetime="1948-12-12">12 Dec 1948</time>
+            <time class="post-date" datetime="1863-11-19">19 Nov 1863</time>
         </footer>
     </article>
     
@@ -296,9 +179,7 @@
     
         <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 2 </span>
-     
-        <a class="older-posts" href="/page2/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 1 of 1 </span>
      
 </nav>
     
