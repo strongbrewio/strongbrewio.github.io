@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: RxJS Typescript
+cover: 'assets/images/cover/cover1.jpg'
 ---
 
 Last week, I was at a meetup in Ghent where I was talking with <a href="https://twitter.com/stefanlapers" target="_blank">Stefan Lapers</a> about programming languages in general. We started talking about writing your backend using either Java or node.js. We agreed that node.js has massive potential but in a lot of situations companies choose Java because of it's maturity. If you're using a microservices based architecture for example, you can rely heavily on spring cloud which does a whole bunch of stuff for you so you can focus on functionality.

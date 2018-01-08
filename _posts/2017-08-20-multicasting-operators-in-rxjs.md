@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: RxJS
+cover: 'assets/images/cover/cover1.jpg'
 ---
 
 With the arrival of RxJS 5.4 a while back, the RxJS team has given us yet another way to support multicasting in our applications. They introduced the `shareReplay` operator. With this new one around the corner, you might start wondering when to use which multicasting operator. Well, it's your lucky day cause that's what this post is all about.

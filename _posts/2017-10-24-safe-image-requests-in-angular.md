@@ -10,6 +10,7 @@ subclass: 'post'
 categories: 'casper'
 disqus: true
 tags: Angular
+cover: 'assets/images/cover/cover8.jpg'
 ---
 We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach. 
 

@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: Redux
+cover: 'assets/images/cover/cover4.jpg'
 ---
 Last week, someone asked me how I kept my reducers clean and how to properly test them. Since it wasn't the first time someone asked me that, I decided to write it down for future reference.
 Here it is!

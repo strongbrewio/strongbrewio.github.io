@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: RxJS
+cover: 'assets/images/cover/cover8.jpg'
 ---
 
 I have been coaching people in using RxJS for a while now. During this time, I've noticed that the hardest part for people to learn is not the API, concept or operators but the paradigm switch. Thinking reactively is not something that comes easily and you really have to get your hands dirty to get there. 

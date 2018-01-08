@@ -11,6 +11,7 @@ logo: 'assets/images/strongbrewlogo.png'
 published: true
 disqus: true
 author: kwintenp
+cover: 'assets/images/cover/cover4.jpg'
 ---
 With the release of Angular 1.5.3 we got some awesome new features. As you all know, the point of the Angular 1.5 releases are to bring us closer to the Angular 2 way of working. With that in mind, the latest new feature we've got are Lifecycle hooks. What those are and how you can use them has already been perfectly explained by Pascal Precht on [his blog](http://blog.thoughtram.io/angularjs/2016/03/29/exploring-angular-1.5-lifecycle-hooks.html). For the remainder of this blog, I'm going to assume you have read it.
 I'm not going to try and do the same, instead I want to look at a specific lifecycle hook in depth, `$onChanges`. We'll look at how it is implemented by Angular, how we can use it with some examples, a pitfall when using it with non-primitives and how we can fix it.

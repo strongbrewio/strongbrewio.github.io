@@ -10,6 +10,7 @@ disqus: true
 navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
+cover: 'assets/images/cover/cover7.jpg'
 tags: Redux
 ---
 When working with redux or ngrx/store, you get a lovely utillity method called `combineReducers` that solves a pretty annoying problem for you. This method could however be further improved and we'll see why in a bit.

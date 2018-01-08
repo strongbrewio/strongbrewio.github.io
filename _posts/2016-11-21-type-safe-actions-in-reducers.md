@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: Redux
+cover: 'assets/images/cover/cover4.jpg'
 ---
 I've been using TypeScript and Redux for a while now. One thing that's been bothering me from day one is the lack of typing on actions, or so I thought. Until the following twitter conversation last week caught my eye.
 

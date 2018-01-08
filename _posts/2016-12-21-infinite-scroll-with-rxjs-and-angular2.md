@@ -10,6 +10,7 @@ subclass: 'post'
 categories: 'casper'
 disqus: true
 tags: Angular, RxJS
+cover: 'assets/images/cover/cover12.jpg'
 ---
 
 ## About this article

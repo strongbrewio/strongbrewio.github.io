@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: RxJS
+cover: 'assets/images/cover/cover4.jpg'
 ---
 
 One of the main benefits of RxJS to me is that it provides code that is 'readable'. It provides us with a declarative programming approach where implementation details are hidden away. We are just describing what needs to be done, not how it should be done. This makes code you look at easy to understand.

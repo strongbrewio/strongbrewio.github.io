@@ -10,6 +10,7 @@ subclass: 'post'
 categories: 'casper'
 disqus: true
 tags: Angular Redux
+cover: 'assets/images/cover/cover6.jpg'
 ---
 
 [Angular 2](https://angular.io/) and [redux](https://github.com/reactjs/redux) are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the [@ngrx/store](https://github.com/ngrx/store) variant of the redux principle. Because I'm one of them I will be using @ngrx/store instead of redux.js for this article. Don't let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the [documentation](http://redux.js.org/) first.

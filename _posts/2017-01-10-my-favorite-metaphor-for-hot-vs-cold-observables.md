@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: RxJS
+cover: 'assets/images/cover/cover4.jpg'
 ---
 
 A few weeks ago, I was at NG-BE (best conference of the year btw), where I was giving a workshop on RxJS and @ngrx/store in Angular 2 applications. In this course, we also explain hot vs cold observables.

@@ -10,6 +10,7 @@ subclass: 'post'
 categories: 'casper'
 disqus: true
 tags: Angular
+cover: 'assets/images/cover/cover4.jpg'
 ---
 
 ## Foreword

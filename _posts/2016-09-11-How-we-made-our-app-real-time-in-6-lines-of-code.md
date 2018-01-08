@@ -10,6 +10,7 @@ subclass: 'post'
 categories: 'casper'
 disqus: true
 tags: Angular
+cover: 'assets/images/cover/cover9.jpg'
 ---
 [Kwinten Pisman](https://blog.kwintenp.com/) and me were working on a workshop this weekend with the focus on Reactive applications with [Angular 2](http://angular.io), [RXJS](https://github.com/ReactiveX/rxjs) and [@ngrx](https://github.com/ngrx). Something that can't miss in a reactive workshop are real-time updates. The application we are trying to make real-time is the [winecellar](http://winecellar.surge.sh) app (you can register an account here if you want to test it).
 

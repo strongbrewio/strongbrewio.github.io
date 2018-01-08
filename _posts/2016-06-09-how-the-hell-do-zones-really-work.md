@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: Angular
+cover: 'assets/images/cover/cover3.jpg'
 ---
 If you've read about Angular 2 change detection, you will probably have heard about zones. Zones is a feature that was ported from Dart and is used internally by Angular 2 to determine if a change detection cycle should be triggered.
 

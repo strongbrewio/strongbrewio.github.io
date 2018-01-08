@@ -11,6 +11,7 @@ navigation: True
 logo: 'assets/images/strongbrewlogo.png'
 author: kwintenp
 tags: RxJS
+cover: 'assets/images/cover/cover4.jpg'
 ---
 
 Ever since I first started using RxJS up until this very day, it has become my absolute favorite way of coding. I cannot believe to work in a world without observables anymore nor can I understand on how I was able to write code before. I have started sharing the knowlegde I had through blogposts, workshops and coaching. 

@@ -10,6 +10,7 @@ logo: 'assets/images/strongbrewlogo.png'
 published: true
 disqus: true
 author: kwintenp
+cover: 'assets/images/cover/cover2.jpg'
 ---
 If you follow the blogs of some of the more well known SPA guru's, you will most definitely have heard of the concept of `smart` and `dumb` components. If you haven't, here's a listing of some of those blogposts:
 
