@@ -18,7 +18,7 @@ baseurl: /
 
 # Permalinks
 permalink: /:title
-permalink: /author/:username
+# permalink: /author/:username
 # permalink: /tag/:tag
 
 # gems and other configs
