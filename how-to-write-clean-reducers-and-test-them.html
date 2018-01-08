@@ -34,13 +34,13 @@
     <meta property="og:title" content="How to write clean reducers (and test them!)" />
     <meta property="og:description" content="" />
     <meta property="og:url" content="//how-to-write-clean-reducers-and-test-them" />
-    <meta property="og:image" content="/assets/images/cover1.jpg" />
+    <meta property="og:image" content="/assets/images/cover/cover4.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="How to write clean reducers (and test them!)" />
     <meta name="twitter:description" content="" />
     <meta name="twitter:url" content="//how-to-write-clean-reducers-and-test-them" />
-    <meta name="twitter:image:src" content="/assets/images/cover1.jpg" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover4.jpg" />
 
     <script type="application/ld+json">
 {
@@ -49,7 +49,7 @@
     "publisher": "Strongbrew",
     "name": "How to write clean reducers (and test them!)",
     "url": "//how-to-write-clean-reducers-and-test-them",
-    "image": "/assets/images/cover1.jpg",
+    "image": "/assets/images/cover/cover4.jpg",
     "description": ""
 }
     </script>
@@ -106,8 +106,8 @@
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header class="main-header post-head no-cover">
-    <nav class="main-nav  clearfix">
+<header class="main-header post-head " style="background-image: url(/assets/images/cover/cover4.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
         <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
         
             <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
@@ -500,7 +500,7 @@ export function tweetReducer(state: Tweet = {}, action: Action) {
 
     <!-- [[! next_post ]] -->
     
-        <a class="read-next-story no-cover" href="/Modals-in-angular2">
+        <a class="read-next-story " style="background-image: url(/assets/images/cover/cover11.jpg)" href="/Modals-in-angular2">
             <section class="post">
                 <h2>Modals in Angular 2</h2>
                 <p>**Updated at 3 september 2016 (RC.6 compliant)** Since one of my late New Year's resolutions...</p>
@@ -510,7 +510,7 @@ export function tweetReducer(state: Tweet = {}, action: Action) {
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
-        <a class="read-next-story prev " style="background-image: url(/assets/images/posts/zone.png)" href="/how-the-hell-do-zones-really-work">
+        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover3.jpg)" href="/how-the-hell-do-zones-really-work">
             <section class="post">
                 <h2>How the hell does zone.js really work?</h2>
                 <p>If you’ve read about Angular 2 change detection, you will probably have heard about zones....</p>
