@@ -49,7 +49,7 @@ safe: false
 lsi: false
 username: strongbrewio
 repo: strongbrewio.github.io
-branch: master
+branch: develop
 relative_source: ./
 destination: ../jasper-pages/
 production_url:  https://strongbrewio.github.io/
