@@ -2,9 +2,9 @@ brechtbilliet:
   username: brechtbilliet
   name: Brecht Billiet
   location: Belgium
-  url_full: https://twitter.com/brechtbilliet
-  url: https://twitter.com/brechtbilliet
-  bio: A paranormal expert and his daughter bunk in an abandoned house populated by 3 mischievous ghosts and a friendly one, Casper.
+  url_full: http://www.brecht.io/
+  url: brecht.io
+  bio: Software architect/trainer/coach/speaker/blogger
   assets: assets/images/brecht.jpg
 kwintenp:
   username: kwintenp
@@ -12,5 +12,5 @@ kwintenp:
   location: Belgium
   url_full: twitter.com/kwintenp
   url: twitter.com/kwintenp
-  bio: Freelance frontend architect.
+  bio: Freelance frontend architect. Occasional blogger. Reactive fan.
   assets: assets/images/kwintenp.jpg
