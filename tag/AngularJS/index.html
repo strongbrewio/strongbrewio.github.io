@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>About</title>
+    <title>Strongbrew</title>
     <meta name="description" content="" />
 
     <!-- Mobile Meta -->
@@ -25,31 +25,31 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="//about/" />
+        <link rel="canonical" href="//tag/AngularJS/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="About" />
+    <meta property="og:title" content="Strongbrew" />
     <meta property="og:description" content="" />
-    <meta property="og:url" content="//about/" />
-    <meta property="og:image" content="/assets/images/cover1.jpg" />
+    <meta property="og:url" content="//tag/AngularJS/" />
+    <meta property="og:image" content="/assets/images/cover2.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="About" />
+    <meta name="twitter:title" content="Strongbrew" />
     <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="//about/" />
-    <meta name="twitter:image:src" content="/assets/images/cover1.jpg" />
+    <meta name="twitter:url" content="//tag/AngularJS/" />
+    <meta name="twitter:image:src" content="/assets/images/cover2.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "About",
-    "url": "//about/",
-    "image": "/assets/images/cover1.jpg",
+    "name": "Strongbrew",
+    "url": "//tag/AngularJS/",
+    "image": "/assets/images/cover2.jpg",
     "description": ""
 }
     </script>
@@ -59,7 +59,7 @@
 
 
 </head>
-<body class="home-template nav-closed">
+<body class="tag-template nav-closed">
 
     <!-- The blog navigation links -->
     <div class="nav">
@@ -70,7 +70,7 @@
     <ul>
         <li class="nav-home " role="presentation"><a
                 href="/">Home</a></li>
-        <li class="nav-about  nav-current" role="presentation"><a
+        <li class="nav-about " role="presentation"><a
                 href="/about">About</a></li>
         
             <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
@@ -96,41 +96,92 @@
     <div class="site-wrapper">
 
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
-        <!-- < default -->
+        <!-- dynamically overriding backgrounds for tags as well as descriptions -->
 
-<!-- This is a page template. A page outputs content just like any other post, and has all the same -->
-    <!-- attributes by default, but you can also customise it to behave differently if you prefer.  -->
 
-<!-- Everything inside the #post tags pulls data from the page -->
-<!-- #post -->
+<!-- default -->
+<!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<header class="main-header post-head no-cover">
-    <nav class="main-nav  clearfix">
+<!-- If we have a tag cover, display that - else blog cover - else nothing -->
+<header class="main-header tag-head " style="background-image: url(/assets/images/cover2.jpg) ">
+    <nav class="main-nav overlay clearfix">
         <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
         
             <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         
     </nav>
+    <div class="vertical">
+        <div class="main-header-content inner">
+            <h1 class="page-title">Angularjs</h1>
+            <h2 class="page-description">
+            
+			    A 1-post collection
+            
+            </h2>
+        </div>
+    </div>
 </header>
 
-<main class="content" role="main">
+<!-- The main content area on the homepage -->
+<main id="content" class="content" role="main">
+
+    <!-- The tag below includes the post loop - partials/loop.hbs -->
+        <!-- Previous/next page links - only displayed on page 2+ -->
+    <div class="extra-pagination inner">
+        
+            <nav class="pagination" role="pagination">
+    
+    <span class="page-number"> Page 1 of 1 </span>
+     
+</nav>
+        
+    </div>
+    <!-- This is the post loop - each post will be output using this markup -->
+    
     <article class="post">
-        <!-- Everything inside the #post tags pulls data from the post -->
-
         <header class="post-header">
-            <h1 class="post-title">About</h1>
+            <h2 class="post-title"><a href="/the-onchanges-lifecycle-hook">The $onChanges lifecycle-hook in depth</a></h2>
         </header>
-
-        <section class="post-content">
-            <p>This is the Strongbrew blog. Here, Brecht and Kwinten upload all their blogpost to help you out!</p>
-
-<p>If you want to us to help you with your project through coaching, code review, constultancy, trouble shooting, … go to <a href="https://strongbrew.io" target="_blank">strongbrew.io</a> for more information.</p>
-
+        <section class="post-excerpt">
+            <p>With the release of Angular 1.5.3 we got some awesome new features. As you all know, the point of the Angular 1.5 releases are to bring... <a class="read-more" href="/the-onchanges-lifecycle-hook">&raquo;</a></p>
         </section>
+        <footer class="post-meta">
+            
+                
+            
+                
+                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
+                <!-- author -->
+                <a href='/author/kwintenp'>Kwinten Pisman</a>
 
+                
+            
+
+            <!-- [[tags prefix=" on "]] -->
+            
+                on
+                
+                    
+                       <a href='/tag/AngularJS'>Angularjs</a>
+                    
+                
+            
+            <time class="post-date" datetime="2016-04-06">06 Apr 2016</time>
+        </footer>
     </article>
+    
+
+    <!-- Previous/next page links - displayed on every page -->
+    
+        <nav class="pagination" role="pagination">
+    
+    <span class="page-number"> Page 1 of 1 </span>
+     
+</nav>
+    
+
+
 </main>
-<!-- /post -->
 
 
         <!-- The tiny footer at the very bottom -->

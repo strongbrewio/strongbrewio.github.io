@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   
+      <title>blog.strongbrew.io</title>
+   
+   <link></link>
+   <description></description>
+   <language>en-uk</language>
+   <managingEditor> </managingEditor>
+   <atom:link href="rss" rel="self" type="application/rss+xml" />
+   
+	<item>
+	  <title>Type safe actions in reducers</title>
+	  <link>//type-safe-actions-in-reducers</link>
+	  <author></author>
+	  <pubDate>2016-11-21T00:00:00+00:00</pubDate>
+	  <guid>//type-safe-actions-in-reducers</guid>
+	  <description><![CDATA[
+	     <p>I’ve been using TypeScript and Redux for a while now. One thing that’s been bothering me from day one is the lack of typing on actions, or so I thought. Until the following twitter conversation last week caught my eye.</p>
+
+<p><img src="https://www.dropbox.com/s/28omnkkkn1o2rm1/Screenshot%202016-11-16%2016.45.43.png?raw=1" alt="twitter" /></p>
+
+<p>It’s about an exhaustive switch statement in flowtype and the option to do the same in TypeScript. But the real interesting part for me was the link from Mike Ryan. He pointed out they used some kind of pattern in the ngrx example app. Having never checked it out before, I decided to do so, and I found this cool idea to use classes for your actions.</p>
+
+<p>I loved it so much, I decided to blog about it :). All credits to Mike Ryan of course who came up with the idea.</p>
+
+<h3 id="my-previous-situation">My previous situation</h3>
+<p>This is what my old code looked like (see comments).</p>
+
+<pre><code class="language-typescript">// Create string constants for the action types
+const SET_ID: string = "SET_ID";
+const REMOVE_ID: string = "REMOVE_ID";
+
+// Create action creators for every action
+function setId(id): Action {
+	return { type: SET_ID, payload: { id } };
+}
+
+function removeId(): Action {
+	return { type: REMOVE_ID };
+}
+
+function test(state: string = "", action: Action): string {
+    // switch on the action type
+	switch (action.type) {
+		case SET_ID:
+		     // have absolutely no type safety on the
+		     // payload here since payload is
+		     // defined as 'any'
+		     return action.payload.id;
+		case REMOVE_ID:
+	         return "";
+		default:
+		     return state;
+	}
+}
+
+</code></pre>
+<p>While this is perfectly valid code, it doesn’t provide me with any code completion or type safety regarding the payload.
+Just check out this <a href="http://bit.ly/2fVxE7C" target="_blank">TypeScript playground</a> example and try to change the <code>action.payload.id</code> into <code>action.payload.whatever</code>. You will see no compile errors.</p>
+
+<p>Let’s see how this can be improved.</p>
+
+<h3 id="use-classes-to-define-actions">Use classes to define actions</h3>
+<p>In the following code snippet I used classes for actions instead of action creators. These classes extend from the Action interface. This means, every class will have the <code>type</code> property.
+I also created a new <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#union-types" target="blank">Union type</a> called <code>Actions</code> which combines all the possible action classes.</p>
+
+<p>Our switch statement works on the common denominator between all our actions, being the <code>type</code> property. This way the TypeScript compiler can
+know that, if the type is for example <code>"SET_ID"</code>, the only possible class in that specific ‘case’ part of the switch statement is the <code>SetId</code> class. It can then use the type information in that class to determine what the payload looks like. Check the code below if this is unclear.</p>
+
+<p>This is a concept called <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions" target="_blank">Discriminated Unions</a>.</p>
+
+<pre><code class="language-typescript">// Instead of using action creators, classes are used.
+class SetId implements Action {
+	type: "SET_ID" = "SET_ID";
+	// here we declare the type of the payload for the
+	// SetId class to be an object with a property 'id'
+	payload: { id: string };
+
+	public constructor(id: string) {
+		this.payload = { id };
+	}
+}
+
+class RemoveId implements Action {
+	type: "REMOVE_ID" = "REMOVE_ID";
+
+	public constructor() { }
+}
+
+// Create a union type that contains all the possible actions.
+type Actions = SetId | RemoveId;
+
+function test(state: string = "", action: Actions): string {
+    // The switch case statements use discriminated unions
+	switch (action.type) {
+		case "SET_ID":
+		    // The compiler knows this can only be the
+		    // class SetId so it can use the type
+		    // information in that class
+		    // to know the payload has an id property.
+			return action.payload.id;
+		case "REMOVE_ID":
+			return "";
+		default:
+			return state;
+	}
+}
+
+</code></pre>
+
+<p>You can try this <a href="http://bit.ly/2fXYiPB" target="_blank">TypeScript playground example</a>. If you remove the id property in the switch statement, you’ll see that you have autocompletion</p>
+
+<p><img src="https://www.dropbox.com/s/1s4zyh01xbp8g2a/Screenshot%202016-11-16%2020.31.03.png?raw=1" alt="autocomplete" /></p>
+
+<p>and type safety!</p>
+
+<p><img src="https://www.dropbox.com/s/6wtt9oupqr8290z/Screenshot%202016-11-16%2020.45.46.png?raw=1" alt="type safety" /></p>
+
+<p>Just try to change the property <code>id</code> into <code>whatever</code>, you’ll get a compilation error. You can even click on the <code>id</code> property and directly be redirected to the <code>SetId</code> class.</p>
+
+<p>Awesome right!</p>
+
+<h3 id="the-finishing-touch">The finishing touch</h3>
+<p>The way the type property in the classes were defined before, are a little strange.</p>
+
+<pre><code class="language-typescript">type: "REMOVE_ID";
+</code></pre>
+<p>This is actually called a <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#string-literal-types" target="_blank">String literal type</a>.
+There’s a better way to do this using a utility method that coerces a string you pass to it to a string literal type. It also remembers every action type you’ve passed to it to avoid duplicates in your app.</p>
+
+<pre><code class="language-typescript">let typeCache: { [label: string]: boolean } = {};
+export function type&lt;T&gt;(label: T | ''): T {
+  // this actually checks whether your action type
+  // name is unique!
+  if (typeCache[&lt;string&gt;label]) {
+    throw new Error(`Action type "${label}" is not unqiue"`);
+  }
+
+  typeCache[&lt;string&gt;label] = true;
+
+  return &lt;T&gt;label;
+}
+</code></pre>
+
+<p>Using this function, you can declare your action types like this:</p>
+
+<pre><code class="language-typescript">export const ActionTypes = {
+	SET_ID: type&lt;"SET_ID"&gt;("SET_ID"),
+	REMOVE_ID: type&lt;"REMOVE_ID"&gt;("REMOVE_ID")
+}
+</code></pre>
+
+<p>and use them everywhere like this:</p>
+
+<pre><code class="language-typescript">type = ActionTypes.SET_ID;
+// or
+case ActionTypes.SET_ID:
+</code></pre>
+
+<p>Checkout the finished <a href="http://bit.ly/2m7nG7S" target="blank">TypeScript playground example</a>. It’s basically the same as the previous one, but cleaner.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>Using some of TypeScript 2’s powerful typing system, you can make the actions in your reducers type safe with little effort.</p>
+
+<p><strong>Note:</strong> Thanks to <a href="https://twitter.com/PascalPrecht" target="_blank">Pascal Precht</a>, <a href="https://twitter.com/toddmotto" target="_blank">Todd Motto</a>, <a href="https://twitter.com/basarat" target="_blank">Basarat</a> and <a href="https://twitter.com/SamVerschueren" target="_blank">Sam Verschueren</a> for reviewing!</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>combineReducers enhanced</title>
+	  <link>//combinereducers-enhanced</link>
+	  <author></author>
+	  <pubDate>2016-09-15T00:00:00+00:00</pubDate>
+	  <guid>//combinereducers-enhanced</guid>
+	  <description><![CDATA[
+	     <p>When working with redux or ngrx/store, you get a lovely utillity method called <code>combineReducers</code> that solves a pretty annoying problem for you. This method could however be further improved and we’ll see why in a bit.</p>
+
+<p><strong>Note: some knowledge of the redux architecture is required to continue with this blogpost. Checkout <a href="http://redux.js.org/" target="_blank">this</a> for more info on Redux.</strong></p>
+
+<p><strong>Note: Since the PR still isn’t merged in the @ngrx/store library, I created a separate npm module with the functionality described below. You can find the github repo <a href="https://github.com/KwintenP/combine-reducers-enhanced" target="_blank">here</a>.</strong></p>
+
+<p><strong>TL;DR Go to the <a href="#conclusion">conclusion</a></strong></p>
+
+<h3 id="current-situation">Current situation</h3>
+<p>Take a look at the following state design.</p>
+
+<pre><code class="language-typescript">{
+	"ui": {
+		"topBarCollapsed": true,
+		"sideBarCollapsed": true
+	},
+	"data": {
+		"tweets": [],
+		"users": []
+	}
+}
+</code></pre>
+
+<p>Let’s try to translate this into reducers.</p>
+
+<h5 id="without-combinereducers">Without combineReducers</h5>
+
+<p>Remember, when your store is being initialised, you can only pass it a single reducer. To avoid a single reducer with all the logic, we are going to use the concept of reducer composition. Your reducer tree could look like this:</p>
+
+<p><img src="https://www.dropbox.com/s/gglg3j3ama5affo/Screenshot%202016-09-14%2016.35.12.png?raw=1" /></p>
+
+<p>You can then create your store like this:</p>
+
+<pre><code class="language-typescript">// pseudo code
+new Store(rootReducer);
+</code></pre>
+
+<p>The function of the rootReducer is:</p>
+
+<ul>
+  <li>Delegate the actions towards the dataReducer and the uiReducer with the correct state slice.</li>
+  <li>Assure that the reference of the data does not change if changes are made to the ui property and vice versa.</li>
+</ul>
+
+<p>The ‘rootReducer’ doesn’t do that much and it’s a PITA to have to write this every time. Every time a new action is added, you need to add it to the rootReducer as well.
+Enter <code>combineReducers</code>!</p>
+
+<h5 id="with-combinereducers">With combineReducers</h5>
+<p><code>combineReducers</code> removes the need to write this reducer yourself. When creating your store, you can pass it, not only a reducer function, but also an object like this:</p>
+
+<pre><code class="language-typescript">const rootReducer = {
+	ui: uiReducer,
+	data: dataReducer
+}
+
+new Store(rootReducer);
+</code></pre>
+
+<p>The store will see this is not a function, and thus not a ‘rootReducer’. Internally it will  pass this object to the <code>combineReducers</code> method. This will generate a ‘meta-reducer’ for you that does exactly the same as the ‘rootReducer’ we’ve described before.
+Conceptually speaking it looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/i1mh7frvr8tddg0/Screenshot%202016-09-15%2007.42.26.png?raw=1" /></p>
+
+<p>The advantage is that you do not need to write the ‘rootReducer’ yourself.
+Pretty neat right!</p>
+
+<h3 id="problem-description">Problem description</h3>
+<p>Let’s say, you have a state tree that looks more like this.</p>
+
+<pre><code class="language-typescript">{
+	"ui": {
+		"mainPage": {
+				"topBarCollapsed": true
+		},
+		"loginPage": {
+			"sideBarCollapsed": true
+		}
+	},
+	"data": {
+		"tweets": [],
+		"users": []
+	}
+}
+</code></pre>
+
+<p>As you can see, we have a second nested level for our ui property and maybe we want to split the data into two different reducers, a tweets- and usersReducer.
+Let’s take a look at how we can implement this.</p>
+
+<h3 id="current-possible-solutions">Current possible solutions</h3>
+<p>The <code>combineReducers</code> method only allows a single level of nesting, so we’ll have to see how we can fix this.</p>
+
+<h5 id="create-the-intermediary-reducers-yourself">Create the intermediary reducers yourself</h5>
+<p>You can always decide to just implement the intermediate reducers yourself.</p>
+
+<p><img src="https://www.dropbox.com/s/e2gjsrcp03cxzq9/Screenshot%202016-09-15%2020.11.55.png?raw=1" /></p>
+
+<p>However, writing these reducers yourself is the same PITA as it was for the first level so it’s not the preferred solution</p>
+
+<h5 id="use-a-third-party-library-which-handles-this-for-you">Use a third-party library which handles this for you</h5>
+<p>There is a third-party library created by Brecht Billiet that does exactly this. Check it out <a href="https://github.com/brechtbilliet/create-reducer-tree">here</a>.
+You can pass it an object and it will create all the intermediate reducers for you. This is an awesome solution, but unfortunately, it requires us to depend an yet another third-party library.</p>
+
+<h5 id="nest-the-combinereducers-method-yourself">Nest the combineReducers method yourself</h5>
+
+<p>Since we have the <code>combineReducers</code> method, we might as well leverage it fully and use it for every intermediary reducer. You can do this by passing an object like this to your store at creation time.</p>
+
+<pre><code class="language-typescript">const rootReducer = {
+	"ui": combineReducers({
+		"mainPage": mainPageReducer
+		"loginPage": loginReducer
+	}),
+	"data": combineReducers({
+		"tweets": tweetsReducer
+		"users": usersReducer
+	})
+}
+</code></pre>
+
+<p>It will generate all the intermediary reducers for you but the ‘rootReducer’ definition doesn’t look clean. For people just starting with Redux, this will probably look a little confusing as well.</p>
+
+<p>It turns out, the <code>combineReducers</code> method can be changed to fix this pretty easily.
+<a name="conclusion"></a></p>
+
+<h3 id="proposed-solution">Proposed solution</h3>
+<p>I’ve created a <a href="https://github.com/ngrx/store/pull/214" target="_blank">PR</a> towards the ngrx/store library where I extended the <code>combineReducers</code> method to work with nested objects as well. This allows you to create an object like this:</p>
+
+<pre><code class="language-typescript">const rootReducer = {
+	"ui": {
+		"mainPage": mainPageReducer
+		"loginPage": loginReducer
+	},
+	"data": {
+		"tweets": tweetsReducer
+		"users": usersReducer
+	}
+}
+
+new Store(rootReducer);
+</code></pre>
+
+<p>which will create this:</p>
+
+<p><img src="https://www.dropbox.com/s/lpd3io77pqemecp/Screenshot%202016-09-15%2007.42.41.png?raw=1" /></p>
+
+<p>It’s actually a change of only two LOC and semantically does exactly the same as nesting the <code>combineReducers</code> method yourself or the third-party library, but it’s a lot cleaner to implement and use.
+If you feel this feature might help you in the future, be sure to ‘like’ the PR it so it could be added to the library asap.</p>
+
+<p><strong>Note: As soon as the PR is being approved for the NGRX/Store library, I’ll submit a similar one to Redux.js</strong></p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>How to write clean reducers (and test them!)</title>
+	  <link>//how-to-write-clean-reducers-and-test-them</link>
+	  <author></author>
+	  <pubDate>2016-08-22T00:00:00+00:00</pubDate>
+	  <guid>//how-to-write-clean-reducers-and-test-them</guid>
+	  <description><![CDATA[
+	     <p>Last week, someone asked me how I kept my reducers clean and how to properly test them. Since it wasn’t the first time someone asked me that, I decided to write it down for future reference.
+Here it is!</p>
+
+<p><strong>NOTE: Reducers are a part of the Redux architecture. If you do not know what I’m talking about, checkout <a href="http://redux.js.org/" target="_blank">this</a>.</strong></p>
+
+<h3 id="reducers-basic-building-blocks">Reducers basic building blocks</h3>
+<p>To me, a clean reducer has a number of different building blocks. Let’s take a look at the following example. It’s a very simple tweetsReducer that manages an array of tweets.</p>
+
+<pre><code class="language-typescript">function tweetsReducer(
+        state: State = [],
+        action: Action): State {
+    let tweet: Tweet;
+    switch (action.type) {
+        case "ADD_TWEET":
+            ({tweet} = action.payload);
+            return [...state, tweet];
+        default:
+            return state;
+    }
+}
+</code></pre>
+
+<p><strong>NOTE: all examples are written using typescript</strong></p>
+
+<h4 id="default-values">Default values</h4>
+
+<p>First thing we’re going to focus on, is the default value for the input parameter.</p>
+
+<pre><code class="language-typescript">state: State = [];
+</code></pre>
+
+<p>To understand why defining a default parameter is important, you need to know about the lifecycle of Redux. Every Redux implementation has a method called <code>createStore</code> or something similar. This method creates the store.</p>
+
+<p><img src="https://cdn.meme.am/instances/500x/62970260.jpg" /></p>
+
+<p>What this method also does is dispatch an action to that newly created store. If you’ve used Redux before, then you know that the Store holds a single State object. At startup, this object doesn’t exist yet and in order to create it, every Redux implementation will dispatch an <code>INIT</code>-like action to get all the default values from the reducers and build the state tree.</p>
+
+<p>Next is a simplified, conceptual snippet that shows what a <code>createStore</code> method could look like.</p>
+
+<pre><code class="language-typescript">function createStore(reducer: Reducer): Store {
+    // Create the new store and pass the reducer
+	const store: Store = new Store(reducer)
+
+	// dispatch an init action to the store
+	store.dispatch({type: "REDUX_INIT"});
+
+	return store;
+}
+</code></pre>
+
+<p>The dispatching of the <code>INIT</code>-action will result in the reducer, for example the tweetsReducer, being called with the following parameters.</p>
+
+<pre><code class="language-typescript">tweetsReducer(undefined, initActionDispatchedToTheStore: Action);
+</code></pre>
+
+<p>The first parameter should be the state, but since the State object is not yet created, it will be undefined. This results in the use of the default value of the state parameter, which in our tweetsReducer is an empty array. The initial value won’t always be that easy, this can also be a complex object.</p>
+
+<p>What’s important to remember is to define default states to assure we get a nice, clean state object at startup.</p>
+
+<p><strong>NOTE: Be sure to never define an action with the same name of your Redux implementation’s <code>INIT</code>-action. You can easily check this in the source code.</strong></p>
+
+<p><strong>NOTE: Often, you can pass an initial state object to the <code>createStore</code> method as a second parameter. This doesn’t mean that you shouldn’t add the default values to ALL your reducers</strong></p>
+
+<h4 id="default-case">Default case</h4>
+<p>The second part I want to focus on is the default case of the switch statement. This simply returns the state object it was given.</p>
+
+<pre><code class="language-typescript">default:
+     return state;
+</code></pre>
+
+<p>In most cases, you will have multiple reducers in your application. These will be organised in a tree, matching your state object. Actions dispatched to the store will be delegated to the top reducers which will cascade, if necessary, the actions to the bottom reducers. The result of all these calls will form the new state object.
+If you forget to add the default case to your reducers, part of your state tree will dissapear. Take a look at the following example and imagine we’ve forgotten to implement the default case in our tweetsReducer.</p>
+
+<pre><code class="language-typescript">// Current state tree where we manage an array of users
+// and an array of tweets
+let currentState: State = {
+	"tweets": [
+                 {
+                    id: 1,
+                    username:"@KwintenP",
+                    content:"blogpost on clean reducers!"
+                 }
+	],
+	"users": []
+}
+
+// we dispatch an action to add a user
+store.dispatch({type: "ADD_USER", payload: {id: 1, name: "Kwinten"});
+</code></pre>
+
+<p>The store will send the action, not only to the usersReducers (left out for brevity), but also to our tweetsReducer.
+When the action enters our tweetsReducer, none of the cases defined would match and since we have no default case, the reducer would return undefined. This would result in the following state object.</p>
+
+<pre><code class="language-typescript">{ "tweets": undefined, "users": [{id: 1, name: "Kwinten"}]};
+</code></pre>
+
+<p>As you can see, the tweets that were previously there, are gone. So, remember to always implement the default case to avoid that parts of your state tree disappear.</p>
+
+<h4 id="es6-syntax-sugar">ES6 syntax sugar</h4>
+<p>A little bit of ES6 syntax sugar I like to use in my reducers is the following:</p>
+
+<pre><code class="language-typescript">//example payload
+action.payload = {tweet: new Tweet(....)};
+
+// we map the single value to the tweet property
+let tweet: Tweet;
+({tweet} = action.payload);
+// Non ES6 equivalent
+tweet = action.payload.tweet;
+
+// example payload
+action.payload = {tweet: new Tweet(...), id: 1};
+
+// We map multiple values to the properties
+let tweet: Tweet;
+let id: string;
+({tweet, id} = action.payload);
+// non ES6 equivalent
+tweet = action.payload.tweet;
+id = action.payload.id;
+</code></pre>
+
+<p>I always use this ES6 shorthand in my reducers. In my tweetsReducer (see snippet at the beginning), I define a few variables above my switch statement. I then use these inside my case statements to map the payload to. The reason I do this is to make the reducer more readable. If I now wish to add a tweet to my store, I just look at the top of my case statement and I can immediately see what parameters I need to add to the payload.</p>
+
+<pre><code class="language-typescript">case "ADD_TWEET":
+        ({tweet} = action.payload); // my payload needs a tweet object
+        return [...state, action.payload.tweet];
+</code></pre>
+
+<p>In this particular example this might not seem that handy, but once your reducers become (a lot) bigger, you’ll be happy if you’ve done this.</p>
+
+<p><strong>NOTE: If you’re using action creators (out of scope for this post), and you should, the problem that it’s not clear what parameters you should pass, becomes less applicable. But, I would strongly recommend to keep doing this for when you’re writing the action creators themselves and for your unit tests.</strong></p>
+
+<h4 id="use-reducer-composition">Use reducer composition</h4>
+<p>As soon as your application grows, your reducers will become more complex. To avoid having a single reducer that manages the entire state tree, you could use the concept of reducer composition.
+Take a look at the next reducer (I removed the implementations of the case statements for brevity):</p>
+
+<pre><code class="language-typescript">export function tweetsReducer(state:Array&lt;Tweet&gt; = [], action:Action):Array&lt;Tweet&gt; {
+    let id:number, tweet:Tweet, tweets: Array&lt;Tweet&gt;;
+    switch (action.type) {
+        // first block
+        case ADD_TWEET: // implementation
+        case REMOVE_TWEET: // implementation
+        case SET_TWEETS: // implementation
+        case UPDATE_TWEET: // implementation
+
+        // second block
+        case TWEET_UN_LIKED: // implementation
+        case TWEET_LIKED: // implementation
+        case TWEET_UN_RETWEETED: // implementation
+        case TWEET_RETWEETED: // implementation
+        case TOGGLE_STAR_TWEET: // implementation
+        default:
+            return state;
+    }
+}
+</code></pre>
+
+<p>If we were to implement every case in the same reducer, this would already become quite big. If we look closely, we can see that the cases can be divided into two categories. The first block, handle the tweets collection. The second block handles an individual tweet.</p>
+<h6 id="enter-reducer-composition">Enter reducer composition!</h6>
+<p>This is an ideal example to demonstrate when you can use reducer composition. We can make the tweetsReducer handle the collection, and make a new tweetReducer, which handles a single tweet. This would look like this:</p>
+
+<pre><code class="language-typescript">export function tweetsReducer(state:Array&lt;Tweet&gt; = [], action:Action):Array&lt;Tweet&gt; {
+    let id:number, tweet:Tweet, tweets: Array&lt;Tweet&gt;;
+    switch (action.type) {
+        // collection block
+        case ADD_TWEET: // implementation
+        case REMOVE_TWEET: // implementation
+        case SET_TWEETS: // implementation
+        case UPDATE_TWEET: // implementation
+
+        // single tweet block
+        case TWEET_UN_LIKED:
+        case TWEET_LIKED:
+        case TWEET_UN_RETWEETED:
+        case TWEET_RETWEETED:
+        case TOGGLE_STAR_TWEET:
+        // For the cases above, we delegate to the
+        // tweetReducer. Here we loop the current
+        // collection of tweets and if it's the one
+        // we wish to update, we replace it with the
+        // result of the tweetReducer.
+            ({id} = action.payload);
+            return state.map(tweet =&gt; tweet.id == id?
+                   tweetReducer(tweet, {type: action.type, payload: {tweet}}):
+                   tweet);
+        default:
+            return state;
+    }
+}
+
+export function tweetReducer(state: Tweet = {}, action: Action) {
+    let tweet: Tweet;
+    switch (action.type) {
+        case TOGGLE_STAR_TWEET: // implementation
+        case TWEET_RETWEETED: // implementation
+        case TWEET_UN_RETWEETED: // implementation
+        case TWEET_LIKED: // implementation
+        case TWEET_UN_LIKED: // implementation
+        default: return state;
+}
+
+</code></pre>
+
+<p>Working with reducer composition makes your individual reducers less complex to manage.</p>
+
+<h4 id="other-tips">Other tips</h4>
+
+<ol>
+  <li>You MUST keep your reducers immutable! You can use the new <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign" target="_blank">‘Object.assign’</a> and the <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Operators/Spread_operator" target="_blank">spread operator</a> from ES6 or libraries as <a href="https://facebook.github.io/immutable-js/" target="_blank">Immutable.js</a> or <a href="https://github.com/rtfeldman/seamless-immutable" target="_blank">seamless-immutable</a> to do this.</li>
+  <li>When you’re using reducer composition, combine your delegating cases at the bottom of your reducer. In the example of reducer composition, all the calls to the tweetReducer are combined at the bottom. This is merely a convention that I’ve found useful in the past.</li>
+</ol>
+
+<h4 id="how-to-test-them">How to test them</h4>
+<p>Testing reducers is quite easy and straightforward. You send a state object and an action to the reducer en check your result. But, you cannot forget to test the immutability of your reducers. To ensure this, you can use a library called deepFreeze. Check out this next example.</p>
+
+<pre><code class="language-typescript">describe("reducer: tweetsReducer", () =&gt; {
+    describe("on ADD_TWEET", () =&gt; {
+        it("should add a tweet to the
+           current list of tweets", () =&gt; {
+            // create the initial state object
+            let tweet: Tweet = new Tweet(...);
+            let initialState: Array&lt;Tweet&gt; = [tweet];
+
+            // perform a deepFreeze on the initial state object
+            deepFreeze(initialState);
+
+            // create the payload
+            let tweetToAdd: Tweet = new Tweet(...);
+            let payload: any = {tweet: tweetToAdd};
+
+            // Sent the action to the tweetsReducer
+            let changedState: Array&lt;Tweet&gt; = tweetsReducer(initialState,
+                {
+                    type: ADD_TWEET,
+                    payload
+                });
+
+            // Verify the changes are correct
+            expect(changedState.length).toBe(2);
+            expect(changedState[1]).toBe(payload.tweet);
+        });
+    });
+});
+</code></pre>
+
+<p>As you can see, testing reducers consists of four steps:</p>
+<ol>
+  <li>Create an <code>initialState</code> object.</li>
+  <li>Perform a deepFreeze on the <code>initialState</code> object. This library will perform a recursive <code>Object.freeze()</code> on the entire state object protecting it from mutation. This is an easily overlooked but extremely important step in the testing of your reducers!</li>
+  <li>Call the reducer with the initial state and the correct action.</li>
+  <li>Verify the result of your reducer.</li>
+</ol>
+
+<p>At least one test should be added for every case in your reducer’s switch statement. Besides those, you should also add a test for an unknown action to verify you’ve implemented the default case. And one more test for the <code>INIT</code>-action to make sure you’ve defined a default value for your state. In this particular test you pass undefined as your state value.</p>
+
+<h4 id="summary">Summary</h4>
+<ul>
+  <li>Use <strong>default values</strong> for your state object in your reducer</li>
+  <li>Implement the <strong>default case</strong> to just return the state</li>
+  <li>Use ES6 syntax sugar to make your reducers look more clean</li>
+  <li>Use <strong>reducer composition</strong> when necessary</li>
+  <li>Reducers MUST be <strong>immutable</strong></li>
+  <li>Use <strong>deepFreeze</strong> while testing to <strong>ensure immutability</strong></li>
+  <li>Combine your delegating cases at the bottom of your reducer</li>
+</ul>
+
+	  ]]></description>
+	</item>
+
+
+</channel>
+</rss>
