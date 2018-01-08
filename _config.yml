@@ -2,7 +2,9 @@
 #markdown: redcarpet
 #highlighter: pygments
 markdown: kramdown
-highlighter: rouge
+kramdown:
+  input: GFM
+highlighter: none
 paginate: 5
 language: 'en-uk'
 

@@ -4,7 +4,7 @@ cover: false
 navigation: True
 title: The $onChanges lifecycle-hook in depth
 date:   2016-04-06
-tags: angularjs
+tags: AngularJS
 subclass: 'post'
 categories: 'casper'
 logo: 'assets/images/strongbrewlogo.png'
