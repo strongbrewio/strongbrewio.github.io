@@ -12,241 +12,6 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
-	  <title>Safe image requests in angular</title>
-	  <link>//safe-image-requests-in-angular</link>
-	  <author></author>
-	  <pubDate>2017-10-24T00:00:00+00:00</pubDate>
-	  <guid>//safe-image-requests-in-angular</guid>
-	  <description><![CDATA[
-	     <p>We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.</p>
-
-<p>Take this hypothetical application for instance: We have an app that is used to manage pictures and this particular app can have multiple users. It makes sense that every user owns their own images, right? For privacy reasons user A could never consume the images of user B. Since images are loaded through the DOM with the img DOM-element, it might be hard to add authorization there. Take this angular snippet for instance:</p>
-
-<pre><code class="language-typescript">@Component({
-    template: `
-        &lt;img [src]="img.src"/&gt;
-    `
-})
-export class FooComponent {
-    img = {
-        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
-    }
-}
-</code></pre>
-
-<p>Since the browser just loads this image through a normal HTTP call, how is the server supposed to know if user A or user B is trying to consume this image? The server needs some kind of authorization to be passed to it.</p>
-
-<h2 id="passing-the-authorization-with-session-cookies">Passing the authorization with Session cookies</h2>
-
-<p>We could use session cookies, which kinda works like this: The user authenticates with the backend of our app, receives a session cookie which will be passed with every future request. That way the backend knows who is trying to consume the resource in question.</p>
-
-<p>Some could argue that session cookies are not to way the go, and stateless backends are better and more scalable.
-If we use JWT or any other modern authentication system we would rather send <strong>authorization-headers</strong> instead of using the session cookie approach. The value that our server should receive in the authorization-header is called a <strong>Bearer token</strong>.</p>
-
-<h2 id="passing-the-authorization-without-cookies">Passing the authorization without cookies</h2>
-
-<p>Let’s explore 2 different methods to pass Bearer tokens to the backend:</p>
-
-<h3 id="passing-the-token-in-the-url">Passing the token in the url</h3>
-
-<p>In this case we would just pass the token as a <strong>query parameter</strong> in the url. The previous snippet would now look like this:</p>
-
-<pre><code class="language-typescript">@Component({
-    template: `
-        &lt;img [src]="img.src + '?bearer=' + bearToken"/&gt;
-    `
-})
-export class FooComponent {
-    img = {
-        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
-    }
-    bearerToken  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-}
-</code></pre>
-
-<p>The url of the server request would now look like this: <em>https://angular.io/assets/images/logos/angular/logo-nav@2x.png?bearer=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…</em></p>
-
-<p>Based on the token, the server knows which user tries to load the image and can block unauthorized users of fetching that image.</p>
-
-<p>There are a few tradeoffs:</p>
-
-<ul>
-  <li>The Token is there for everyone to see in the URL (less secure, but then again, they could still check it in the offline-storage)</li>
-  <li>Every time the token changes, the cache would be cleared, since the url of the resource changes</li>
-  <li>The backend would need a way to handle all the image calls that contain a bearer token in their url</li>
-  <li>We need to load and parse the token everywhere we load images in our components</li>
-  <li>Doesn’t work for css, unless it’s dynamically created</li>
-</ul>
-
-<h3 id="handling-the-images-with-ajax-calls">Handling the images with AJAX calls</h3>
-
-<p>In this approach we will create a generic way of handling image-security by using:</p>
-
-<ul>
-  <li>A generic component</li>
-  <li>AJAX calls with a blob responseType</li>
-  <li>HTTP interceptors (introduced by the new HttpClient in angular 4.3)</li>
-  <li>Data urls</li>
-</ul>
-
-<p>We would like to consume images like this:</p>
-
-<pre><code class="language-typescript">@Component({
-    template: `
-          &lt;secured-image [src]="img.src"&gt;&lt;/secured-image&gt;
-    `
-})
-export class FooComponent {
-    img = {
-        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
-    }
-}
-</code></pre>
-
-<p>Let’s create a <strong>secured-image</strong> component as shown above.
-This component needs to handle the following:</p>
-
-<ul>
-  <li>Load an image through an AJAX call</li>
-  <li>Create a data url based on a blob</li>
-  <li>When the source changes:
-    <ul>
-      <li>Cancel the previous AJAX call (if it’s still busy)</li>
-      <li>Start loading the new resource through AJAX</li>
-    </ul>
-  </li>
-  <li>When the component gets destroyed, cancel the current AJAX call (if it’s still busy)</li>
-</ul>
-
-<p>In the beginning, this might look like this:</p>
-
-<pre><code class="language-typescript">@Component({
-  selector: 'secured-image',
-  template: `
-    &lt;img [src]="dataUrl$|async"/&gt;
-  `
-})
-export class SecuredImageComponent implements OnChanges  {
-  // This code block just creates an rxjs stream from the src
-  // this makes sure that we can handle source changes
-  // or even when the component gets destroyed
-  // So basically turn src into src$
-  @Input() private src: string;
-  private src$ = new BehaviorSubject(this.src);
-  ngOnChanges(): void {
-    this.src$.next(this.src);
-  }
-
-  // this stream will contain the actual url that our img tag will load
-  // everytime the src changes, the previous call would be canceled and the
-  // new resource would be loaded
-  dataUrl$ = this.src$.switchMap(url =&gt; this.loadImage(url))
-  
-  // we need HttpClient to load the image
-  constructor(private httpClient: HttpClient) {
-  }
-
-  private loadImage(url: string): Observable&lt;any&gt; {
-    return this.httpClient
-      // load the image as a blob
-      .get(url, {responseType: 'blob'})
-      // create an object url of that blob that we can use in the src attribute
-      .map(e =&gt; URL.createObjectURL(e))
-  }
-}
-
-</code></pre>
-
-<p>This pretty much covers everything, but if we check it in the browser we get the following error.
-<strong>WARNING: sanitizing unsafe URL value blob:https://localhost:4200/da89c71e-5df2-4842-af06-993cd5263471 (see http://g.co/ng/security#xss)</strong></p>
-
-<p>Loading the image through AJAX does not work yet because we haven’t sanitized the url yet. For that we need the <strong>DomSanitizer</strong> that angular provides us. This is a security mechanism to protect the app from XSS-attacks. We basically have to tell angular which urls to trust.</p>
-
-<pre><code class="language-typescript">export class SecuredImageComponent implements OnChanges  {
-  ...
-  // inject the domSanitizer here as well
-  constructor(private httpClient: HttpClient, private domSanitizer: DomSanitizer) {
-  }
-
-  private loadImage(url: string): Observable&lt;any&gt; {
-    return this.httpClient
-      .get(...)
-      // pass the url through the domSanitizer so angular knows he can parse it
-      .map(e =&gt; this.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(e)))
-  }
-}
-
-</code></pre>
-
-<p>We now have a fully working way of loading images through AJAX calls. However, we still haven’t passed our Bearer token.
-We could add the the authorization header in the get call directly, but let’s find a cleaner solution.
-Since we use httpClient, this opens up a few doors for us.
-The new HttpClient, which was introduced in angular 4.3 offers a few new features. One of these features are <strong>interceptors</strong>.
-Interceptors are a way to hook into http calls that are being made by the new HttpClient.</p>
-
-<p>This would be a perfect solution to pass the bearer token wouldn’t you agree?</p>
-
-<p>Let’s create the interceptor and register it to angular.</p>
-
-<pre><code class="language-typescript">// my-http.interceptor.ts
-@Injectable()
-export class MyHttpInterceptor implements HttpInterceptor {
-  // intercept any http call done by the httpClient
-  intercept(request: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt; {
-    // fetch the bearer token from wherever you have stored it
-    // NOTE: fetching it directly from window is not a good idea (demo purpose)
-    const jwtToken = window.localStorage.getItem('jwtToken');
-
-    // if there is a token, clone the request and set the correct
-    // authorization header, if not =&gt; just use the old request
-    const requestToHandle = jwtToken
-      ? request.clone({
-        headers: request.headers.set('authorization', `Bearer ${jwtToken}`)
-      })
-      : request;
-    return next.handle(requestToHandle);
-  }
-}
-
-// app.module.ts
-@NgModule({
-  ...
-  // don't forget to import the HttpClientModule
-  imports: [ BrowserModule, FormsModule, HttpClientModule ],
-  providers: [{
-    // register the interceptor to our angular module
-    provide: HTTP_INTERCEPTORS, useClass: MyHttpInterceptor, multi: true
-  }]
-})
-export class AppModule { }
-</code></pre>
-
-<p>If you would like to learn more about interceptors, check this <a href="https://juristr.com/blog/2017/08/intercept-http-requests-in-angular/">awesome article</a> by <a href="https://twitter.com/juristr">Juri Strumpflohner</a>.
-He also has an amazing egghead course on that subject.</p>
-
-<p>Right now, every call that the secured-image component has initiated will load the image through AJAX with the right authorization header. That way the server can check who has been asking for that specific resource.</p>
-
-<p>However, this approach also introduces a few tradeoffs:</p>
-
-<ul>
-  <li>CORS headers for CDN resources. Since we are using a GET AJAX call there will be extra OPTIONS calls.</li>
-</ul>
-
-<p>Extra advantages:</p>
-<ul>
-  <li>It’s easier to handle the loading of the image, show a spinner or animation</li>
-  <li>Doesn’t work for css, unless it’s dynamically created</li>
-</ul>
-
-<p>You can find the complete source of a working version in this <a href="https://stackblitz.com/edit/secure-image-loads">stackblitz example</a>.</p>
-
-<h2 id="thanks-for-reading">Thanks for reading</h2>
-<p>I hope you all liked this article, if you have questions, shoot!</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
 	  <title>Code formatting and RxJS</title>
 	  <link>//code-formatting-with-rxjs</link>
 	  <author></author>
@@ -609,233 +374,6 @@ We subscribe immediately and after three seconds. We can see that, even though t
 	</item>
 
 	<item>
-	  <title>A scalable angular architecture (part 2)</title>
-	  <link>//A-scalable-angular-architecture-part2</link>
-	  <author></author>
-	  <pubDate>2017-08-13T00:00:00+00:00</pubDate>
-	  <guid>//A-scalable-angular-architecture-part2</guid>
-	  <description><![CDATA[
-	     <h1 id="the-sandbox-pattern">The sandbox pattern</h1>
-
-<h2 id="introduction">Introduction</h2>
-<p>A while ago I released a blogpost called “<a href="http://blog.brecht.io/A-scalable-angular2-architecture/">A scalable angular 2 architecture</a>” which was all about creating large scale enterprise webapplications. The title should actually have been <strong>“A scalable angular architecture”</strong> (It’s just angular) or even, <strong>“A scalable SPA architecture”</strong> since we can use the same architecture for <a href="https://facebook.github.io/react/">React</a> or <a href="https://vuejs.org">Vue.js</a>.</p>
-
-<p>It’s been over a year now, since I’ve been introducing that specific architecture in companies and projects. Nowadays, I know quite a few people that are using this particular architecture in their projects.
-Often, I ask developers about how they feel about this SPA-architecture and the feedback is mostly this:
-They believe its a <strong>clear and opiniated way</strong> to structure their code, and they have no trouble, finding their way into the codebase.</p>
-
-<p>A big part of the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">article</a> in question, was about explaining the so called “sandboxes”, a personal terminology for a very specific kind of facade.
-Since writing that <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">article</a> raised a bunch of questions about these “sandboxes”, it seemed like a good idea to write a followup article.</p>
-
-<p>In this article we will cover what sandboxes are really about and why I introduced them in the first place.</p>
-
-<p><strong>Note: This architecture is only one way of structuring your applications and the statements being made in this article are completely personal and might be opiniated.</strong></p>
-
-<h2 id="what-is-a-sandbox-in-a-nutshell">What is a sandbox in a nutshell</h2>
-
-<p>In real life it’s a place where we can put our children together with a limited set of toys. That way, they can only play with those toys and have fun, and we as parents wouldn’t have to worry about them running around in the garden.</p>
-
-<p>In this architecture a sandbox is a controlled environment, and the only place where components can consume pieces of the application.
-It’s the only interface for our smart components to communicate with the rest of the application. It’s a facade that abstracts away logic from our components. It does have very specific logic though.</p>
-
-<h2 id="here-is-why-i-introduced-sandboxes">Here is why I introduced sandboxes</h2>
-
-<p>One of the most challenging parts of creating big clientside javascript applications is encapsulation and dividing responsibilities. Having a decent encapsulated structure where every component, service, class has a clear reason of existence, makes it easy for us as developers to maintain the code and develop new features.</p>
-
-<p>When writing single-page-applications one could face the following challenges:</p>
-
-<h3 id="challenge-1-how-do-we-structure-components">Challenge 1: How do we structure components?</h3>
-
-<p>Since this topic is covered in the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">previous article</a>, we won’t do a deepdive in this subject.
-We use the smart/dumb component approach to structure our components. The dumb components mostly have presentational purposes and the smart components interact with the rest of the application.</p>
-
-<h3 id="challenge-2-how-do-we-handle-statemanagement">Challenge 2: How do we handle statemanagement?</h3>
-
-<p>Another topic covered by the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">previous article</a> is how handle our statemanagement. In short: we use @ngrx/store, or another redux implementation that embraces reactive programming.</p>
-
-<h3 id="challenge-3">Challenge 3</h3>
-
-<p>The first two challenges are met: we have a clear and structured presentational layer and because of the fact that we use @ngrx/store (or any statemanagement tool for that matter), we have a clear way of managing state. We can optimise performance with immutable data and still have clear unidirectional dataflow.</p>
-
-<p>However, there are still a few pieces of the puzzle missing, which might raise the following questions:</p>
-
-<h4 id="how-do-we-separate-the-presentation-layers-from-the-rest-of-the-application">How do we separate the presentation-layers from the rest of the application?</h4>
-
-<p>If we inject whatever we want in our smart components, their constructors might get huge in no-time. Do those smart components really need to know everything about the application? Do they need to know where everything lives and what service it should call from which module in the application? Wouldn’t it be easier if they had an interface they could talk to, that just handles things for them?
-It would certainly help to decouple angular modules from each other, and keep the responsibility of those smart components clear and compact. <strong>This is something a sandbox might be able to help us with.</strong></p>
-
-<h3 id="do-our-components-need-to-know-about-redux">Do our components need to know about redux?</h3>
-
-<p>Redux is an awesome library/principle that helps us ace statemanagement, but it’s a really heavy dependency if you don’t manage it carefully. What if your <strong>very specific</strong> redux actions would be everywhere in your components and services? In that case your codebase would be completely affected by it and it would be very hard to use another statemanagement tool in the future. It would be impossible to share that code in non-redux applications.
-It would be a huge depencency… What if you like to switch to firebase for instance, or MOBX, or even write your own statemanagement tool. You would need to refactor your whole application. The sole principle of redux is to manage state, and I prefer to use it that way. That is also why I don’t really use effects, thunk or saga. (That’s a personal preference)
-For me this means: <strong>Use redux only to manage state, not to trigger backend actions etc</strong>
-One could even argue that the action-dispatching and state-selecting should be combined in central places in your appliction.
- <strong>Let’s add that logic to the sandboxes as well.</strong></p>
-
-<h4 id="do-our-http-services-need-to-know-about-a-redux-implementation">Do our HTTP services need to know about a redux implementation?</h4>
-
-<p>Well, as the name already reveals. An HTTP service is all about doing HTTP communication and returning asynchronous objects to the components. An HTTP service should have no notion about redux at all nor any other statemanagement tool. Its sole purpose is fetching data and returning it. Let’s take a look at the following example for instance. We fetch an array of wines from the backend and we want to persist that in a redux store. This is an example of an HTTP service that is being abused to achieve that:</p>
-
-<pre><code class="language-typescript">class WineService {
-	// bad
-	fetchWines(): void {
-		this.api.get('url')
-			.subscribe(wines =&gt; 
-				this.store.dispatch({type: 'SET_WINES', payload: {wines}});
-	}
-}
-</code></pre>
-
-<p>This code doesn’t belong here, it’s not the responsibility of that service. The question is where does it belong?
-Does it belong in the component? They would get dirty and reduxy in no-time…
-<em>*Again, this would belong to the sandbox!</em>.</p>
-
-<p>An http service should look like this:</p>
-
-<pre><code class="language-typescript">class WineService {
-	// good
-	fetchWines(): Observable&lt;any&gt; {
-		return this.api.get('url')
-	}
-}
-</code></pre>
-
-<h4 id="on-what-place-do-we-dispatch-actions-to-the-store">On what place do we dispatch actions to the store?</h4>
-
-<p>Err…, the sandbox =)</p>
-
-<h4 id="where-do-we-handle-optimistic-updates">Where do we handle optimistic updates</h4>
-
-<p>Again, that would be the sandbox</p>
-
-<h4 id="how-to-not-make-your-whole-application-smell-like-redux">How to NOT make your whole application smell like REDUX</h4>
-
-<p>Components and services should not know about redux, so the store interaction should be in a very specific place as well.</p>
-
-<p>I bet you saw it coming, but YES! That’s what a sandbox is all about! It’s about separation of concerns and having a very specific interface to handle this very specific logic.</p>
-
-<h2 id="what-does-a-sandbox-do">What does a sandbox do?</h2>
-
-<p>A sandbox has a very specific responsibility:</p>
-
-<ul>
-  <li>It lets your module communicate with other modules without that module having to know about the rest of the application</li>
-  <li>It sends Redux actions</li>
-  <li>It exposes streams of data (coming from Redux, Firebase or other technologies)</li>
-  <li>It handles optimistic updates</li>
-  <li>It keeps the containers stupid enough</li>
-</ul>
-
-<h2 id="whats-very-specific-on-a-sandbox">What’s very specific on a sandbox?</h2>
-
-<ul>
-  <li>They handle what the container tells them to handle, without the container having to know how…</li>
-  <li>They interact between modules</li>
-  <li>They handle a lot of redux (or similar technology) logic</li>
-  <li>The functions mostly have a void return-type, unless we want to be able to cancel HTTP calls</li>
-  <li>They expose observables/streams</li>
-  <li>It mostly contains redundant code, but no redundant logic (it’s all about KISS instead of DRY)</li>
-  <li>Mostly every module has a sandbox, unless it contains a huge amount of logic (in that case we could implement a sandbox for every container)</li>
-  <li>It does not contain business logic, ever…</li>
-  <li>It mostly doesn’t contain if-statements, that would be business logic right?!</li>
-  <li>It gives us a clear overview of the responsabilities of a module.</li>
-</ul>
-
-<h2 id="what-doesnt-a-sandbox-do">What doesn’t a sandbox do?</h2>
-
-<ul>
-  <li>It doesn’t contain business logic. It contains sandbox logic (see above).</li>
-  <li>It doesn’t contain presentation logic, like routing etc.</li>
-  <li>It doesn’t do HTTP calls directly, it delegates to http services.</li>
-  <li>It doesn’t let your components do whatever they want =)</li>
-</ul>
-
-<h2 id="an-example">An example</h2>
-
-<pre><code class="language-typescript">@Injectable()
-export class StockSandbox {
-	// these are the store select statements
-	// It's pretty dirty to have them all over our components
-	// Our components just want to get streams of data, no matter where they come from
-	wines$ = this.store.select(state =&gt; state.wines);
-	isAuthenticated$ = this.store.select(state =&gt; state.authentication.isAuthenticated);
-
-	constructor(
-		private store: Store&lt;ApplicationState&gt;, 
-		private stockService: StockService,
-		private fooService: FooService) {
-	}
-
-	addWine(wine: Wine): void {
-		// use the stockservice to add a wine
-		// and when it's done handle our statemanagement
-		this.stockService.add(wine).subscribe((wine: Wine) =&gt; {
-			this.store.dispatch(new AddWine(wine));
-		}, () =&gt; this.handleError());
-	}
-
-	 removeWine(wine: Wine): void {
-		// removing a wine can be done optimistically!
-		// this would certainly improve the performance and snappyness of our app
-		// this would be sandbox logic
-		let action = new RemoveWine(wine._id);
-		this.store.dispatch(action);
-		this.stockService.remove(wine).subscribe(
-			() =&gt; {}, 
-			// if the call failed, we have to undo an action. This is sandbox logic as well!
-			() =&gt; this.store.dispatch({type: UNDO_ACTION, payload: action}););
-	}
-
-	fetchWine(id: string): Observable&lt;Wine&gt; {
-		// simple delegation of fetching something: Sandbox logic
-		return this.stockService.fetchWine(id).share();
-	}
-
-	notifyAnotherModule(): void {
-		// our components should NOT know where fooService is, or what it does
-		// it should just tell its sandbox to handle a specific action
-		this.fooService.doSomething();
-	}
-}
-</code></pre>
-
-<p>Look how clean this smart component has become:</p>
-<pre><code class="language-typescript">export class StockPageContainer {
-    wines$ = this.sb.wines$; // Does this stream comes from Redux? or Firebase (I don't need to know)
-    numberOfWines$ = this.wines$.map(wines =&gt; sumBy(wines, (wine: Wine) =&gt; wine.inStock));
-
-	// a clean constructor makes it easy to test.
-	// Util dependencies or presentational dependencies like a router
-	// do not belong in the sandbox.
-	// They belong right here in the component, in the presentational layer.
-    constructor(private sb: StockSandbox, private router: Router) {
-    }
-
-    onRemove(wine: Wine): void {
-		// Hey Sandbox! Remove the wine please, I don't care how you do it
-		// I don't even care that you do optimistic updates, it's not my business
-        this.sb.removeWine(wine);
-    }
-
-    notifyAnotherModule(): void {
-		// I don't know what will happen, but that's okay... It's not my responsability
-        this.sb.notifyAnotherModule(); 
-    }
-}
-
-</code></pre>
-
-<p>I hope this clarifies the purpose of the sandbox and why I have introduced them in my projects.
-If you still have questions about this approach, don’t hesitate to contact me =)</p>
-
-<h3 id="special-thanks">Special thanks</h3>
-<p>Special thanks to <a href="'https://twitter.com/ManfredSteyer'">Manfred Steyer (@manfredsteyer)</a> and <a href="https://twitter.com/juristr">Juri Strumpflohner (@juristr)</a> for reviewing this article!</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
 	  <title>Introducing Rx devtools</title>
 	  <link>//introducing-rx-devtools</link>
 	  <author></author>
@@ -866,626 +404,6 @@ If you find any bugs, which I’m certain you will, please report them in the fo
 
 <p>Happy debugging!</p>
 
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Thinking reactively in Angular and RXJS</title>
-	  <link>//thinking-reactively-in-angular-and-rxjs</link>
-	  <author></author>
-	  <pubDate>2017-07-25T00:00:00+00:00</pubDate>
-	  <guid>//thinking-reactively-in-angular-and-rxjs</guid>
-	  <description><![CDATA[
-	     <h2 id="foreword">Foreword</h2>
-
-<p>RxJS is an awesome library that can help us with creating <strong>reactive web applications</strong>. Reactive web applications can be overwhelming in the beginning, but eventually, they can be really rewarding.</p>
-
-<p>This article is all about making the paradigm switch from thinking imperatively towards <strong>thinking reactively</strong>.
-In this article, we will explain how to write a reactive calendar application in only a few lines of code (<strong>spoiler: It’s gonna be real time too</strong>).</p>
-
-<p>We will use Angular, Angular Material, TypeScript, RxJS, Firebase, and AngularFire as our main technology stack. Keep in mind that this article really focusses on reactive programming. Don’t expect a deep dive into all RxJS operators, but rather expect an explanation of how to draw, think, and reason about reactive web applications. We will learn <strong>how to think in streams</strong>. If you haven’t heard of streams yet, please read <a href="https://gist.github.com/staltz/868e7e9bc2a7b8c1f754">this awesome article</a> first.</p>
-
-<p><strong>Note:</strong> This article contains personal terminology.</p>
-
-<h2 id="the-reactive-calendar">The Reactive Calendar</h2>
-<p>This is the application we are going to write. It’s a small but complete calendar application that allows us to:</p>
-
-<ul>
-  <li>Switch between different view modes: day, week, month.</li>
-  <li>Navigate to previous and next days, weeks, and months.</li>
-  <li>Add, update, and remove appointments.</li>
-  <li>Search for specific appointments.</li>
-</ul>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar1.png" alt="Reactive calendar" /></p>
-
-<p>The user can interact with the following UI elements:</p>
-
-<ul>
-  <li><strong>Next button:</strong> Allows the user to go to the next day in day mode, week in week mode, etc.</li>
-  <li><strong>Previous button:</strong> Allows the user to go to the previous day in day mode, week in week mode, etc.</li>
-  <li><strong>Day, week, month buttons:</strong> Allows the user to switch between the different view modes</li>
-  <li><strong>Search term input:</strong> Allows the user to filter the appointments on the fly</li>
-  <li><strong>Plus-buttons in the grid:</strong> Allows the user to create new appointments</li>
-  <li><strong>Trashcan buttons in the grid:</strong> Allows the user to remove appointments</li>
-  <li><strong>Description inputs:</strong> Allows the user to update the description of an appointment</li>
-</ul>
-
-<p>I decided to use Firebase as a backend and because of that, our application will be realtime and offline first by default!</p>
-
-<p><strong>Note:</strong> One small issue, I’ve been a bit lazy so we can only create lunch appointments. =) But hey! Consider it some homework.</p>
-
-<h2 id="setting-up-the-project">Setting Up the Project</h2>
-
-<p>I’ve created the git branch <strong>initial</strong> to get us started. It contains the default logic/components, setup, and styles. There is no reactive code written yet, just plain Angular code. The goal is to write the reactive part ourselves.</p>
-
-<h3 id="the-component-tree">The Component Tree</h3>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar3.png" alt="The component tree" />
-The dumb components (blue) are already implemented. The <code>app-root</code> (orange) is the one and only smart component in the application and the only place where we will write code.</p>
-
-<p>If you don’t know the difference between smart and dumb components, <a href="http://blog.brecht.io/components-demystified/#smart-vs-dumb-components">read this first</a>.</p>
-
-<h3 id="installing-the-project-locally">Installing the Project Locally</h3>
-<p>First of all, we have to clone the project locally and check out the <strong>initial</strong> branch. This branch already contains all the uninteresting parts that don’t have anything to do with this article.</p>
-
-<p>In the terminal, we have to go to the folder where we want to install the project and run the following commands:</p>
-
-<pre><code>$ git clone git@github.com:brechtbilliet/reactive-calendar.git
-$ cd reactive-calendar/reactive-calendar
-$ git checkout initial
-$ npm install
-</code></pre>
-
-<h3 id="setting-up-firebase">Setting Up Firebase</h3>
-
-<p>We are using <a href="https://firebase.google.com/">Firebase</a> as our backend because it requires minimal setup, it’s realtime by default, and <a href="https://github.com/angular/angularfire2">AngularFire</a> gives us streams for free. We can complete the Firebase configuration in a few steps:</p>
-
-<ul>
-  <li>Go to <a href="https://firebase.google.com/">https://firebase.google.com</a>, click on the “GO TO CONSOLE” button, and choose your Google account.</li>
-  <li>Click on the “Add project” button and choose a name for your project. Let’s take <strong>“reactive-calendar”</strong> to keep it simple.</li>
-  <li>Click on the “CREATE PROJECT” button. Now we should be redirected to <a href="https://console.firebase.google.com/project/reactive-calendar/overview">something like this</a>.</li>
-  <li>In the Authentication tab, go to “SIGN-IN METHOD” and enable the “Anonymous” setting.</li>
-  <li>Click on database and navigate to the rules tab. Set the read and write property to “true” and click “publish”:
-    <pre><code class="language-json">{
-  "rules": {
-      ".read": "true",
-      ".write": "true"
-  }
-}
-</code></pre>
-  </li>
-  <li>Go back to the overview by clicking on the home icon, and then select “Add Firebase to your web app”.</li>
-  <li>Copy the config with the correct properties and replace the firebaseConfig object in src/app/app.module.ts with these properties.
-It might look something like this:</li>
-</ul>
-
-<pre><code class="language-typescript">const firebaseConfig = {
-    apiKey: "AIzaSyBuqjTJd5v6xTf8D2EZmvFUl8lseH8lVuHU",
-    authDomain: "reactive-calendar.firebaseapp.com",
-    databaseURL: "https://reactive-calendar.firebaseio.com",
-    projectId: "reactive-calendar",
-    storageBucket: "reactive-calendar.appspot.com",
-    messagingSenderId: "3978123451455750"
-};
-</code></pre>
-
-<p>Let’s continue. Start the project by running the following command and open your browser on <a href="http://localhost:4200">http://localhost:4200</a>.</p>
-
-<pre><code>npm start
-</code></pre>
-
-<p>As you can see, this just handles static data, the buttons/inputs won’t work, and the appointments are not loaded yet.
-This is where we start from.</p>
-
-<h2 id="thinking-reactively">Thinking Reactively</h2>
-
-<p>Now comes the tricky part. We are trying to forget imperative programming for now, and we are trying to evolve into a reactive mindset.</p>
-
-<h3 id="marble-diagrams">Marble Diagrams</h3>
-
-<p>To be able to think reactively, we need some kind of graphic model so we can picture streams in our head. Marble diagrams are a great way to do that.
-As you can see in the image below, a marble represents a value over time.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar12.png" alt="Marble diagrams" /></p>
-
-<p>The website <a href="http://rxmarbles.com/">rxmarbles.com</a> has a great playground for learning how to use and draw marble diagrams.</p>
-
-<h4 id="ascii-documentation">ASCII Documentation</h4>
-
-<p>One could argue that code should not be documented and be self-explanatory. I don’t believe that to be the case when writing complex streams. When we document complex streams, we can see what’s going on inside the stream, which makes it easier for our colleagues.
-Streams can be documented by ASCII documentation. Since that is not really part of this article, I’m only going to show a small example below.</p>
-
-<pre><code class="language-typescript">// a$ gets three values over time and then stops
-// a$: -------a-----b-----c|
-
-// b$ has an initial value (a), has three values in total
-// and will keep on living
-// b$: a------b-----c------...
-</code></pre>
-
-<h3 id="imperative-programming-what-does-the-app-have-to-do">Imperative Programming: What Does the App Have to Do?</h3>
-
-<p>When we think about the functionality of our application, we quickly notice that there are quite a few corner cases and special scenarios. For every interaction the user makes in the UI, the app needs to handle that specific interaction accordingly. Sometimes it has to combine these interactions and handle that specific combination as well. Take this crazy (but simple) example, for instance.</p>
-
-<blockquote>
-When the view mode is changed to week mode, and the previous view mode was month mode, and the month was June, and the year was 2017, and an appointment was added, while the search term was set to "Brecht", then we would have to update...
-</blockquote>
-
-<p>Yes, we would have to update a bunch of stuff. This is imperative thinking, and it can become exhausting. There is a big chance that we forget certain corner cases. Let’s not even imagine that we have to combine that with asynchronous actions as well.</p>
-
-<p>In the image below, we see all the different interactions the user has in the calendar application.
-<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar2.png" alt="Application events" /></p>
-
-<p>As we can see, for every specific interaction, the UI will have to update specific things.</p>
-
-<h3 id="reactive-programming-what-data-will-change-and-what-data-do-the-components-need">Reactive programming: What Data Will Change, and What Data Do the Components Need?</h3>
-
-<h4 id="source-streams">Source Streams</h4>
-
-<p>Now, let’s completely stop with what we are thinking. Let’s free our minds and stop thinking about corner cases and special scenarios. We have to learn to think in streams. A stream is a collection of events that will change over time. Think about what can change in your application and call these streams of data. Let’s call them <strong>source streams</strong>.</p>
-
-<p><strong>Note:</strong> For readability purposes, we will suffix all the streams with a <code>$</code> symbol.</p>
-
-<p>We can come up with 4 source streams:</p>
-
-<ul>
-  <li><strong>navigation$:</strong> Can contain the values: -1, 0 or 1</li>
-  <li><strong>viewMode$:</strong> Can contain the values: DAY, WEEK, or MONTH</li>
-  <li><strong>searchTerm$:</strong> The value of the search field</li>
-  <li><strong>appointments$:</strong> This is an array of appointments that comes from Firebase</li>
-</ul>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar4.png" alt="data streams" /></p>
-
-<p>That was pretty easy. We just had to think about the events that can occur in our application. A user can navigate, change view mode, search for appointments, and the appointments in Firebase can change. This is the beginning of thinking reactively. Don’t think about who triggers what. Think about the changes as streams.</p>
-
-<p>It’s always a good idea to draw marble diagrams to make it easier to reason.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar5.png" alt="data stream diagram" /></p>
-
-<p><code>The appointments$</code> is a stream that will be provided to us by AngularFire, but the <code>viewMode$</code>, <code>searchTerm$</code>, and <code>navigation$</code> are simple behavior subjects. We use subjects because we need to control the values of the streams ourselves, and we use the <code>BehaviorSubject</code> in particular because all our source streams need an initial value.</p>
-
-<pre><code class="language-typescript">export class AppComponent {
-    ...
-    // this is how we can retrieve the list of appointments from angularfire
-    appointments$ = this.db.list('/appointments');
-     // 0--------(+1)----(+1)----(-1)-------------...
-    viewMode$ = new BehaviorSubject(VIEW_MODE.MONTH);
-    navigation$ = new BehaviorSubject(0);
-    searchTerm$ = new BehaviorSubject('');
-
-	// because we set up the angularfire configuration correctly, we can just
-	// inject the angularfiredatabase right here and use it
-    constructor(private db: AngularFireDatabase) {
-    }
-    ...
-}
-
-</code></pre>
-
-<p>These subjects get values from the simple interactions from the template.</p>
-
-<pre><code class="language-typescript">@Component({
-    ...
-    template: `
-        &lt;topbar
-                (next)="onNext()"
-                (previous)="onPrevious()"
-                (setViewMode)="onSetViewMode($event)"
-                (searchChanged)="onSearchChanged($event)"&gt;
-        &lt;/topbar&gt;
-        ...
-    `
-})
-export class AppComponent {
-    ...
-    
-    onSetViewMode(viewMode: string): void {
-        // when the viewmode changes, update its subject
-        this.viewMode$.next(viewMode);
-    }
-
-    onPrevious(): void {
-        // when the user clicks the previous button
-        // update the navigation subject
-        this.navigation$.next(-1);
-    }
-
-    onNext(): void {
-        // when the user clicks the next button
-        // update the navigation subject
-        this.navigation$.next(1);
-    }
-
-    onSearchChanged(e: string): void {
-        // when the user searches
-        // update the searchterm subject
-        this.searchTerm$.next(e);
-    }
-}
-
-</code></pre>
-
-<h4 id="presentational-streams">Presentational Streams</h4>
-
-<p>Now we have to think about the data that our components need, because those components will need to be updated based on those source streams.
-Let’s take this code sample, for instance:</p>
-
-<pre><code class="language-html">&lt;div [ngSwitch]="XX" class="main"&gt;
-    &lt;day-view
-            *ngSwitchCase="'DAY'"
-            [appointments]="XX"
-            [date]="XX"
-            ...&gt;
-    &lt;/day-view&gt;
-    &lt;week-view
-            *ngSwitchCase="'WEEK'"
-            [appointments]="XX"
-            [year]="XX"
-            [week]="XX"
-            ...&gt;
-    &lt;/week-view&gt;
-    &lt;month-view
-            *ngSwitchCase="'MONTH'"
-            [month]="XX"
-            [year]="XX"
-            [appointments]="xxx"
-            ...&gt;
-    &lt;/month-view&gt;
-&lt;/div&gt;
-</code></pre>
-
-<p>I marked the input properties with XX to show what our components need in terms of data. These places will need streams as well. Let’s call them <strong>presentational streams</strong>.</p>
-
-<p>Let’s try to fill in these gaps, shall we?</p>
-
-<p><strong>Note:</strong> We use the <a href="https://angular.io/api/common/AsyncPipe">async pipe</a> from Angular to subscribe/unsubscribe the streams automatically.</p>
-
-<pre><code class="language-html">&lt;div [ngSwitch]="viewMode$|async" class="main"&gt;
-    &lt;day-view
-            *ngSwitchCase="'DAY'"
-            [appointments]="filteredAppointments$|async"
-            [date]="currentDate$|async"
-            ...&gt;
-    &lt;/day-view&gt;
-    &lt;week-view
-            *ngSwitchCase="'WEEK'"
-            [appointments]="filteredAppointments$|async"
-            [year]="currentYear$|async"
-            [week]="currentWeek$|async"
-            ...&gt;
-    &lt;/week-view&gt;
-    &lt;month-view
-            *ngSwitchCase="'MONTH'"
-            [month]="currentMonth$|async"
-            [year]="currentYear$|async"
-            [appointments]="filteredAppointments$|async"
-            ...&gt;
-    &lt;/month-view&gt;
-&lt;/div&gt;
-</code></pre>
-
-<p>We have gathered the 6 following presentational streams:</p>
-
-<ul>
-  <li><strong>viewMode$ (string):</strong> needed to determine which view has to be shown</li>
-  <li><strong>filteredAppointments$ (Array &lt; Appointment &gt;):</strong> needed by day view, week view, and month view to render the correct appointments</li>
-  <li><strong>currentDate$ (date):</strong> the current date for the day view</li>
-  <li><strong>currentWeek$ (number):</strong> the current week for the week view</li>
-  <li><strong>currentYear$ (number):</strong> needed by week view and month view</li>
-  <li><strong>currentMonth$ (number):</strong> needed by the month view</li>
-</ul>
-
-<p>Okay, great, we know the source streams, which are the sources of change in our application.
-We know the presentational streams, which are simply the streams that our components need. Now it’s time for the cool part: <strong>We need to create those presentational streams based on the source streams</strong>.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar6.png" alt="sources to presentational streams" /></p>
-
-<p>The first presentational stream we need is <code>viewMode$</code>. This is already an easy one, since <code>viewMode$</code> is also a source stream.</p>
-
-<h4 id="currentdate">currentDate$</h4>
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar7.png" alt="currentDate$" /></p>
-
-<p><strong>Note:</strong> We use moment.js for date calculation. The suffix M after the currentDate property shows that the type is <code>Moment</code>. So in short, it’s not just a date, but a moment wrapper.</p>
-
-<pre><code class="language-typescript">// we will need this stream a few times, so let's extract the stream 
-// in a currentDateM first
-
-// viewMode$:     M------------------W---------------D--------...
-// navigation$:   0---(+1)-(-1)----------(+1)-(-1)------------...
-// currentDateM$: d---d----d---------d---d----d------d--------...
-private currentDateM = this.viewMode$.flatMap((viewMode: string) =&gt; {
-    // every time the viewMode changes, the navigation should be reset as well
-    // the dateM variable will contain the navigation and because of the 
-    // flatMap it will reset every time the view mode changes
-    // if the navigation$ changes afterwards it will manipulate the dateM object
-    // by adding months, weeks, or days depending on the viewMode
-    const dateM = moment();
-    return this.navigation$
-        .map((action: number) =&gt; {
-            switch (viewMode) {
-                case VIEW_MODE.MONTH:
-                    return dateM.startOf('month').add(action, "months");
-                case VIEW_MODE.WEEK:
-                    return dateM.startOf('week').add(action, "weeks");
-                case VIEW_MODE.DAY:
-                    return dateM.startOf('day').add(action, "days");
-            }
-            return dateM;
-        })
-})
-currentDate$ = this.currentDateM$.map(dateM =&gt; dateM.toDate());
-
-</code></pre>
-
-<h4 id="currentweek">currentWeek$</h4>
-
-<p>Based on the <code>currentDateM$</code> we can calculate the current week. The <code>currentDateM$</code> is just a moment object of the current date based on the navigation and viewMode.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar8.png" alt="currentWeek$" /></p>
-
-<pre><code class="language-typescript">currentWeek$ = this.currentDateM$.map(dateM =&gt; dateM.week());
-</code></pre>
-
-<h4 id="currentmonth">currentMonth$</h4>
-
-<p>Just like we calculated the <code>currentWeek$</code> based on the <code>currentDateM$</code>, we can do the same thing here.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar9.png" alt="currentMonth$" /></p>
-
-<pre><code class="language-typescript">currentMonth$ = this.currentDateM$.map(dateM =&gt; dateM.month());
-</code></pre>
-<h4 id="currentyear">currentYear$</h4>
-
-<p>Just like we calculated the <code>currentWeek$</code> and the <code>currentMonth$</code> based on the <code>currentDateM$</code>, we can do the same thing here.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar10.png" alt="currentYear$" /></p>
-
-<pre><code class="language-typescript">currentYear$ = this.currentDateM$.map(dateM =&gt; dateM.year());
-</code></pre>
-
-<h4 id="filteredappointments">filteredAppointments$</h4>
-
-<p>This is the most important stream. It is used to show the appointments in all the different views, and it is dependent on a bunch of streams:</p>
-
-<ul>
-  <li>viewMode$</li>
-  <li>currentDateM$</li>
-  <li>appointments$</li>
-  <li>searchTerm$</li>
-</ul>
-
-<p>This looks a bit more complex, but let’s give it a go.</p>
-
-<p><strong>Note:</strong> the <code>[]</code> in the image below stands for an empty array, the <code>[.]</code> for an array with one value, and so on.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar11.png" alt="filteredAppointment$" /></p>
-
-<p>Let’s take the time to process this image. The operator we will use to combine all these streams is called <strong>combineLatest</strong>. It will create a stream that will wait until all streams have a value and will start emitting values for every change of every stream.</p>
-
-<p>So basically, it gives us a function where we have all the information we need. The appointments in Firebase, the view mode, the search term, and the current date. Based on those values, we can calculate the appointments for every view:</p>
-
-<pre><code class="language-typescript">filteredAppointments$ = Observable.combineLatest(
-    [this.viewMode$, this.currentDateM$, 
-    this.appointments$, this.searchTerm$],
-    (viewMode: string, currentDateM: Moment, 
-        appointments: Array&lt;Appointment&gt;, searchTerm: string) =&gt; {
-        switch (viewMode) {
-            // calculate the appointments for the month-view based on
-            // the current date, the appointments in firebase 
-            // and the searchterm
-            case VIEW_MODE.MONTH:
-                return appointments
-                    .filter(item =&gt; moment(item.date).format('MM/YYYY') === currentDateM.format('MM/YYYY'))
-                    .filter(item =&gt; this.filterByTerm(item, searchTerm));
-             // calculate the appointments for the week-view based on
-             // the current date, the appointments in firebase
-             // and the searchterm
-            case VIEW_MODE.WEEK:
-                return appointments
-                    .filter(item =&gt; moment(item.date).format('ww/YYYY') === currentDateM.format('ww/YYYY'))
-                    .filter(item =&gt; this.filterByTerm(item, searchTerm));
-            // calculate the appointments for the day-view based on
-            // the current date, the appointments in firebase
-            // and the searchterm
-            case VIEW_MODE.DAY:
-                return appointments
-                    .filter(item =&gt; moment(item.date).format('DD/MM/YYYY') === currentDateM.format('DD/MM/YYYY'))
-                    .filter(item =&gt; this.filterByTerm(item, searchTerm));
-
-        }
-    });
-
-private filterByTerm(appointment: Appointment, term: string): boolean {
-    return appointment.description.toLowerCase().indexOf(term.toLowerCase()) &gt; -1;
-}
-</code></pre>
-
-<p>This is all we have to do in order to create a kick-ass realtime reactive calendar application. We have created it in no time and with only a few lines of code. If we think about it, we will soon realize that all corner cases have been covered.</p>
-
-<h2 id="performance-improvements">Performance Improvements</h2>
-
-<p>The complete component looks like the code snippet below now. The calendar should be completely functional in your browser.</p>
-
-<pre><code class="language-typescript">import { Component } from '@angular/core';
-import { VIEW_MODE } from '../../constants';
-import * as moment from 'moment';
-import { Appointment } from '../../types/appointment.type';
-import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
-import Moment = moment.Moment;
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
-
-@Component({
-    selector: 'app-root',
-    template: `
-        &lt;topbar
-                (next)="onNext()"
-                (previous)="onPrevious()"
-                (setViewMode)="onSetViewMode($event)"
-                (searchChanged)="onSearchChanged($event)"&gt;
-        &lt;/topbar&gt;
-        &lt;div [ngSwitch]="viewMode$|async"&gt;
-            &lt;day-view
-                    *ngSwitchCase="VIEW_MODE.DAY"
-                    [appointments]="filteredAppointments$|async"
-                    [date]="currentDate$|async"
-                    (removeAppointment)="onRemoveAppointment($event)"
-                    (addAppointment)="onAddAppointment($event)"
-                    (updateAppointment)="onUpdateAppointment($event)"
-            &gt;
-            &lt;/day-view&gt;
-            &lt;week-view
-                    *ngSwitchCase="VIEW_MODE.WEEK"
-                    [appointments]="filteredAppointments$|async"
-                    [year]="currentYear$|async"
-                    [week]="currentWeek$|async"
-                    (removeAppointment)="onRemoveAppointment($event)"
-                    (addAppointment)="onAddAppointment($event)"
-                    (updateAppointment)="onUpdateAppointment($event)"
-            &gt;
-            &lt;/week-view&gt;
-            &lt;month-view
-                    *ngSwitchCase="VIEW_MODE.MONTH"
-                    [month]="currentMonth$|async"
-                    [year]="currentYear$|async"
-                    [appointments]="filteredAppointments$|async"
-                    (removeAppointment)="onRemoveAppointment($event)"
-                    (addAppointment)="onAddAppointment($event)"
-                    (updateAppointment)="onUpdateAppointment($event)"
-            &gt;
-            &lt;/month-view&gt;
-        &lt;/div&gt;
-    `,
-    styleUrls: ['./app.component.less']
-})
-export class AppComponent {
-    VIEW_MODE = VIEW_MODE;
-    viewMode$ = new BehaviorSubject(VIEW_MODE.MONTH);
-    // 0--------(+1)----(+1)----(-1)-------------...
-    navigation$ = new BehaviorSubject&lt;number&gt;(0);
-    searchTerm$ = new BehaviorSubject('');
-
-    // -----MONTH---------------------YEAR------...
-    // -----MONTH-------------------------------...
-    // -----(d)---------------------------------...
-    // --------(+1)----(+1)----(-1)-------------...
-    // -----d---d-------d-------d-----d----------...
-
-    private currentDateM$ = this.viewMode$.flatMap((viewMode: string) =&gt; {
-        let dateM = moment();
-        return this.navigation$
-            .map((action: number) =&gt; {
-                switch (viewMode) {
-                    case VIEW_MODE.MONTH:
-                        return dateM.startOf('month').add(action, 'months');
-                    case VIEW_MODE.WEEK:
-                        return dateM.startOf('week').add(action, 'weeks');
-                    case VIEW_MODE.DAY:
-                        return dateM.startOf('day').add(action, 'days');
-                }
-                return dateM;
-            })
-    });
-
-    currentDate$ = this.currentDateM$.map(dateM =&gt; dateM.toDate());
-    currentYear$ = this.currentDateM$.map(dateM =&gt; dateM.year());
-    currentMonth$ = this.currentDateM$.map(dateM =&gt; dateM.month());
-    currentWeek$ = this.currentDateM$.map(dateM =&gt; dateM.week());
-    appointments$ = this.db.list('/appointments');
-    filteredAppointments$ = Observable.combineLatest([this.viewMode$, this.currentDateM$, this.appointments$, this.searchTerm$],
-        (viewMode: string, currentDateM: Moment, appointments: Array&lt;Appointment&gt;, searchTerm: string) =&gt; {
-            switch (viewMode) {
-                case VIEW_MODE.MONTH:
-                    return appointments
-                        .filter(item =&gt; moment(item.date).format('MM/YYYY') === currentDateM.format('MM/YYYY'))
-                        .filter(item =&gt; this.filterByTerm(item, searchTerm));
-                case VIEW_MODE.WEEK:
-                    return appointments
-                        .filter(item =&gt; moment(item.date).format('ww/YYYY') === currentDateM.format('ww/YYYY'))
-                        .filter(item =&gt; this.filterByTerm(item, searchTerm));
-                case VIEW_MODE.DAY:
-                    return appointments
-                        .filter(item =&gt; moment(item.date).format('DD/MM/YYYY') === currentDateM.format('DD/MM/YYYY'))
-                        .filter(item =&gt; this.filterByTerm(item, searchTerm));
-
-            }
-        });
-
-    constructor(private db: AngularFireDatabase) {
-    }
-
-    private filterByTerm(appointment: Appointment, term: string): boolean {
-        return appointment.description.toLowerCase().indexOf(term.toLowerCase()) &gt; -1;
-    }
-
-    onSetViewMode(viewMode: string): void {
-        this.viewMode$.next(viewMode);
-    }
-
-    onPrevious(): void {
-        this.navigation$.next(-1);
-    }
-
-    onNext(): void {
-        this.navigation$.next(1);
-    }
-
-    onSearchChanged(e: string): void {
-        this.searchTerm$.next(e);
-    }
-
-    onRemoveAppointment(id: string): void {
-        this.appointments$.remove(id);
-    }
-
-    onAddAppointment(date: Date): void {
-        this.appointments$.push(new Appointment(date.toDateString(), ''));
-    }
-
-    onUpdateAppointment(appointment: Appointment): void {
-        this.db.object('appointments/' + appointment.$key).set({
-            description: appointment.description,
-            date: appointment.date
-        });
-    }
-}
-
-</code></pre>
-
-<p>There is only one problem. We use the same observables multiple times in our template. Since observables are cold by default, they will get executed every time there is a subscription. In Angular, this means a subscription for every async pipe. For performance reasons, we only want to recalculate these streams when something actually changes. For that purpose, we can try to use the <code>share()</code> operator from RxJS. The <code>share()</code> operator is an alias for <code>publish().refCount()</code> and will share the subscription.</p>
-
-<p>However, that creates some problems with Angular and its async pipe.
-The situation of the problem goes like this:</p>
-
-<ul>
-  <li>Since we are using BehaviorSubjects, the streams will get an initial value (which is what we want, of course).</li>
-  <li>The share() operator will emit that value on the first subscription</li>
-  <li>When the app is initialized, the async pipes will start subscribing to the stream.</li>
-  <li>Because the first async pipe triggered the first emit the rest of the async pipes will miss that value.</li>
-</ul>
-
-<p><strong>Solution: shareReplay() will emit those values but keep track of them. That way, the async pipes will never miss a value.</strong></p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>We have created a completely reactive calendar that is performant and fixes a bunch of corner cases in only a few lines of code. Just by thinking about source streams and presentational streams, it wasn’t even that hard. I hope that I can encourage more people to take on this reactive approach and start writing kick-ass applications.</p>
-
-<h2 id="special-thanks">Special Thanks</h2>
-
-<p>I would like to give special thanks to the awesome people that reviewed this post and gave me pointers:</p>
-
-<ul>
-  <li>Dominic Elm (<a href="https://twitter.com/elmd_">@elmd_</a>)</li>
-  <li>Manfred Steyer (<a href="https://twitter.com/manfredsteyer">@manfredsteyer</a>)</li>
-  <li>David Müllerchen (<a href="https://twitter.com/webdave_de">@webdave_de</a>)</li>
-  <li>Maxim Robert (<a href="https://twitter.com/sizerone">@sizerOne</a>)</li>
-</ul>
-
-<p>Thanks, guys! It means a lot!</p>
 
 	  ]]></description>
 	</item>
@@ -2055,6 +973,445 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
   <li>Cold observable 		-&gt; 		Movie with netflix</li>
   <li>‘Warm’ observable 	-&gt; 		Movie with friends</li>
 </ul>
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>How share() can reduce network requests</title>
+	  <link>//how-share()-can-reduce-network-requests</link>
+	  <author></author>
+	  <pubDate>2016-12-20T00:00:00+00:00</pubDate>
+	  <guid>//how-share()-can-reduce-network-requests</guid>
+	  <description><![CDATA[
+	     <p>As you hopefully all know, observables you get back from the Angular 2 Http service are cold. A cold observable only starts when you subscribe to to it and is unicast (for every subscription to the Http observable, a network call is triggered).</p>
+
+<p><strong>Note:</strong> If you want to dive deeper into hot vs cold observables, Christoph Burgdorf from Thoughtram wrote <a href="http://blog.thoughtram.io/angular/2016/06/16/cold-vs-hot-observables.html" target="_blank">an awesome article </a> on the subject (Rx pun intended :)).</p>
+
+<h4 id="project-setup">Project setup</h4>
+
+<p>To demonstrate how the <code>share()</code> operator can reduce our number of network calls, I’ve created a demo application (code available on <a href="https://github.com/KwintenP/save-netwerk-requests-with-share" target="_blank">Github</a>). The setup looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/d87po1zbp2ri11u/Screenshot%202016-12-15%2020.08.33.png?raw=1" alt="setup" /></p>
+
+<p>As you can see, we have an app component, which is smart, and three dumb components. During startup, the app component will randomly fetch one of the Star Wars characters by calling the StarWarsService.</p>
+
+<pre><code class="language-typescript">// app.component.ts
+this.character$ =
+     this.starWarsService.getCharacter(this.generateNumber());
+</code></pre>
+
+<p>The StarWarsService uses Angular’s Http and returns a character from the series using the swapi.co API.</p>
+
+<pre><code class="language-typescript">// star-wars.service.ts
+public getCharacter(id: number): Observable&lt; StarWarsCharacter &gt; {
+    return this.http.get('https://swapi.co/api/people/' + id)
+      .map((response: Response) =&gt; response.json());
+}
+</code></pre>
+
+<p>The app component creates three new observables by mapping the <code>character$</code> source observable.</p>
+
+<pre><code class="language-typescript">// app.component.ts
+this.name$ = this.character$.map(character =&gt; character.name);
+this.birthDate$ = this.character$.map(character =&gt; character.birth_year);
+this.gender$ = this.character$.map(character =&gt; character.gender);
+</code></pre>
+
+<p>The data is passed to the dumb components using the <code>async</code> pipe.</p>
+
+<pre><code class="language-html">&lt;app-character-name [name]="name$ | async"&gt;
+&lt;/app-character-name&gt;
+&lt;app-character-birthdate [birthDate]="birthDate$ | async"&gt;
+&lt;/app-character-birthdate&gt;
+
+&lt;button type="button" (click)="toggleEnabled()"&gt;
+     Enable gender component
+&lt;/button&gt;
+&lt;app-character-gender *ngIf="enabled" [gender]="gender$ | async"&gt;
+&lt;/app-character-gender&gt;
+</code></pre>
+
+<p>As you can see in the snippet above, the gender component is only rendered <strong>after</strong> the button has been clicked. This way we can simulate a ‘delayed subscription’. We’ll see why this is important in a second.</p>
+
+<h4 id="potential-pitfall">Potential pitfall</h4>
+<p>If we run this code, everything works perfectly. But if we look at the network tab, we can see some strange behaviour.</p>
+
+<p><img src="https://www.dropbox.com/s/j5etmgqz668v4wp/Dec-15-2016%2020-00-10.gif?raw=1" alt="setup" /></p>
+
+<p>When the page is refreshed, we already see two calls to the backend. If we click the button to enable the gender component, we see another request being send. Why do we see multiple backend requests if we’re only asking for one <code>character$</code>?</p>
+
+<p>The reason is simple. The <code>character$</code> is a <strong>cold observable</strong>. If you subscribe to a cold http observable twice, you’ll have two backend requests.
+We map this <code>character$</code> or source observable using the <code>map</code> operator to three different observables. Every subscription to one of these three observables (which is done by the async pipe), is basically the same as subscribing to the <code>character$</code> observable directly. And because the <code>character$</code> observable is a cold observable, you see multiple requests.
+The problem with this is that the underlying subscription to the source observable is <strong>not shared</strong>.</p>
+
+<h4 id="how-can-we-fix-this-kind-of">How can we fix this (kind of)</h4>
+
+<p>Let’s change the observable that the StarWarsService returns like this:</p>
+
+<pre><code class="language-typescript">return this.http.get('https://swapi.co/api/people/' + id)
+      .map((response: Response) =&gt; response.json())
+      .share();
+</code></pre>
+
+<p>We added the <code>share()</code> operator. This is an alias for doing <code>publish().refCount()</code>. This will make the <code>character$</code> a hot observable that starts emitting events as soon as the first one subscribes. The <code>character$</code> observable will be a ‘shared’ one. Let’s first see what this means and explain afterwards:</p>
+
+<p><img src="https://www.dropbox.com/s/o3i03kudmutt1gk/Dec-15-2016%2019-57-47.gif?raw=1" alt="setup" /></p>
+
+<p>Now we can see that, on the initial page load, there is only one request. That’s because the <code>share()</code> operator will share the underlying subscription between its listeners. As soon as the first one subscribes, it will listen to the Http observable and thus trigger one backend request. Everybody else who starts listening afterwards, will get the same result. Hence we only see a single request to the swapi.co API.</p>
+
+<p>But, when I click on the button to enable the gender component, we can see that a second request is triggered. This means our <code>share()</code> operator doesn’t help us entirely. It turns out that with <code>share()</code>, if the source observable completes, the underlying subscription is gone as well. So when the gender component gets rendered, the original request is long finished and completed. For every new subscription after this completion, in our case via the <code>gender$</code> observable, the <code>share()</code> operator will start a new backend request.</p>
+
+<p>This can perfectly be expected behaviour, if you want it. In some cases though, you don’t.</p>
+
+<h4 id="publishreplay-to-the-rescue">publishReplay to the rescue</h4>
+
+<p>Let’s change the observable from the StarWarsService one more time:</p>
+
+<pre><code class="language-typescript">let obs$: ConnectableObservable&lt;StarWarsCharacter&gt; =
+     this.http.get('https://swapi.co/api/people/' + id)
+         .map((response: Response) =&gt; response.json())
+         .publishReplay();
+obs$.connect();
+return obs$;
+</code></pre>
+
+<p>I removed the <code>share()</code> operator and used <code>publishReplay()</code> instead. This will return an observable that will subscribe to the source observable as soon as you <code>connect()</code> it. In our case, this needs to happen immediately, so I call it before returning.
+Let’s see what this does:</p>
+
+<p><img src="https://www.dropbox.com/s/5j4381vj8439dbb/Dec-15-2016%2019-55-20.gif?raw=1" alt="setup" /></p>
+
+<p>Alright! Now we only have one request at startup time and we do not have a new one when we render the gender component. The <code>publishReplay()</code> operator doesn’t care if the Http observable completes or not. For every new subscription, it will just return the previous result.</p>
+
+<h4 id="conclusion">Conclusion</h4>
+
+<ul>
+  <li>If your source observable ‘splits’ into multiple observables, using the <code>share()</code> operator will reduce network requests.</li>
+  <li>If you have subscriptions which are delayed due to delayed rendering, you might want to use the <code>publishReplay()</code> operator to avoid extra requests.</li>
+</ul>
+
+<p><strong>NOTE:</strong> Thanks to <a href="https://twitter.com/juristr">@juristr</a> for the review!</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Type safe actions in reducers</title>
+	  <link>//type-safe-actions-in-reducers</link>
+	  <author></author>
+	  <pubDate>2016-11-21T00:00:00+00:00</pubDate>
+	  <guid>//type-safe-actions-in-reducers</guid>
+	  <description><![CDATA[
+	     <p>I’ve been using TypeScript and Redux for a while now. One thing that’s been bothering me from day one is the lack of typing on actions, or so I thought. Until the following twitter conversation last week caught my eye.</p>
+
+<p><img src="https://www.dropbox.com/s/28omnkkkn1o2rm1/Screenshot%202016-11-16%2016.45.43.png?raw=1" alt="twitter" /></p>
+
+<p>It’s about an exhaustive switch statement in flowtype and the option to do the same in TypeScript. But the real interesting part for me was the link from Mike Ryan. He pointed out they used some kind of pattern in the ngrx example app. Having never checked it out before, I decided to do so, and I found this cool idea to use classes for your actions.</p>
+
+<p>I loved it so much, I decided to blog about it :). All credits to Mike Ryan of course who came up with the idea.</p>
+
+<h3 id="my-previous-situation">My previous situation</h3>
+<p>This is what my old code looked like (see comments).</p>
+
+<pre><code class="language-typescript">// Create string constants for the action types
+const SET_ID: string = "SET_ID";
+const REMOVE_ID: string = "REMOVE_ID";
+
+// Create action creators for every action
+function setId(id): Action {
+	return { type: SET_ID, payload: { id } };
+}
+
+function removeId(): Action {
+	return { type: REMOVE_ID };
+}
+
+function test(state: string = "", action: Action): string {
+    // switch on the action type
+	switch (action.type) {
+		case SET_ID:
+		     // have absolutely no type safety on the
+		     // payload here since payload is
+		     // defined as 'any'
+		     return action.payload.id;
+		case REMOVE_ID:
+	         return "";
+		default:
+		     return state;
+	}
+}
+
+</code></pre>
+<p>While this is perfectly valid code, it doesn’t provide me with any code completion or type safety regarding the payload.
+Just check out this <a href="http://bit.ly/2fVxE7C" target="_blank">TypeScript playground</a> example and try to change the <code>action.payload.id</code> into <code>action.payload.whatever</code>. You will see no compile errors.</p>
+
+<p>Let’s see how this can be improved.</p>
+
+<h3 id="use-classes-to-define-actions">Use classes to define actions</h3>
+<p>In the following code snippet I used classes for actions instead of action creators. These classes extend from the Action interface. This means, every class will have the <code>type</code> property.
+I also created a new <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#union-types" target="blank">Union type</a> called <code>Actions</code> which combines all the possible action classes.</p>
+
+<p>Our switch statement works on the common denominator between all our actions, being the <code>type</code> property. This way the TypeScript compiler can
+know that, if the type is for example <code>"SET_ID"</code>, the only possible class in that specific ‘case’ part of the switch statement is the <code>SetId</code> class. It can then use the type information in that class to determine what the payload looks like. Check the code below if this is unclear.</p>
+
+<p>This is a concept called <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions" target="_blank">Discriminated Unions</a>.</p>
+
+<pre><code class="language-typescript">// Instead of using action creators, classes are used.
+class SetId implements Action {
+	type: "SET_ID" = "SET_ID";
+	// here we declare the type of the payload for the
+	// SetId class to be an object with a property 'id'
+	payload: { id: string };
+
+	public constructor(id: string) {
+		this.payload = { id };
+	}
+}
+
+class RemoveId implements Action {
+	type: "REMOVE_ID" = "REMOVE_ID";
+
+	public constructor() { }
+}
+
+// Create a union type that contains all the possible actions.
+type Actions = SetId | RemoveId;
+
+function test(state: string = "", action: Actions): string {
+    // The switch case statements use discriminated unions
+	switch (action.type) {
+		case "SET_ID":
+		    // The compiler knows this can only be the
+		    // class SetId so it can use the type
+		    // information in that class
+		    // to know the payload has an id property.
+			return action.payload.id;
+		case "REMOVE_ID":
+			return "";
+		default:
+			return state;
+	}
+}
+
+</code></pre>
+
+<p>You can try this <a href="http://bit.ly/2fXYiPB" target="_blank">TypeScript playground example</a>. If you remove the id property in the switch statement, you’ll see that you have autocompletion</p>
+
+<p><img src="https://www.dropbox.com/s/1s4zyh01xbp8g2a/Screenshot%202016-11-16%2020.31.03.png?raw=1" alt="autocomplete" /></p>
+
+<p>and type safety!</p>
+
+<p><img src="https://www.dropbox.com/s/6wtt9oupqr8290z/Screenshot%202016-11-16%2020.45.46.png?raw=1" alt="type safety" /></p>
+
+<p>Just try to change the property <code>id</code> into <code>whatever</code>, you’ll get a compilation error. You can even click on the <code>id</code> property and directly be redirected to the <code>SetId</code> class.</p>
+
+<p>Awesome right!</p>
+
+<h3 id="the-finishing-touch">The finishing touch</h3>
+<p>The way the type property in the classes were defined before, are a little strange.</p>
+
+<pre><code class="language-typescript">type: "REMOVE_ID";
+</code></pre>
+<p>This is actually called a <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#string-literal-types" target="_blank">String literal type</a>.
+There’s a better way to do this using a utility method that coerces a string you pass to it to a string literal type. It also remembers every action type you’ve passed to it to avoid duplicates in your app.</p>
+
+<pre><code class="language-typescript">let typeCache: { [label: string]: boolean } = {};
+export function type&lt;T&gt;(label: T | ''): T {
+  // this actually checks whether your action type
+  // name is unique!
+  if (typeCache[&lt;string&gt;label]) {
+    throw new Error(`Action type "${label}" is not unqiue"`);
+  }
+
+  typeCache[&lt;string&gt;label] = true;
+
+  return &lt;T&gt;label;
+}
+</code></pre>
+
+<p>Using this function, you can declare your action types like this:</p>
+
+<pre><code class="language-typescript">export const ActionTypes = {
+	SET_ID: type&lt;"SET_ID"&gt;("SET_ID"),
+	REMOVE_ID: type&lt;"REMOVE_ID"&gt;("REMOVE_ID")
+}
+</code></pre>
+
+<p>and use them everywhere like this:</p>
+
+<pre><code class="language-typescript">type = ActionTypes.SET_ID;
+// or
+case ActionTypes.SET_ID:
+</code></pre>
+
+<p>Checkout the finished <a href="http://bit.ly/2m7nG7S" target="blank">TypeScript playground example</a>. It’s basically the same as the previous one, but cleaner.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>Using some of TypeScript 2’s powerful typing system, you can make the actions in your reducers type safe with little effort.</p>
+
+<p><strong>Note:</strong> Thanks to <a href="https://twitter.com/PascalPrecht" target="_blank">Pascal Precht</a>, <a href="https://twitter.com/toddmotto" target="_blank">Todd Motto</a>, <a href="https://twitter.com/basarat" target="_blank">Basarat</a> and <a href="https://twitter.com/SamVerschueren" target="_blank">Sam Verschueren</a> for reviewing!</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>combineReducers enhanced</title>
+	  <link>//combinereducers-enhanced</link>
+	  <author></author>
+	  <pubDate>2016-09-15T00:00:00+00:00</pubDate>
+	  <guid>//combinereducers-enhanced</guid>
+	  <description><![CDATA[
+	     <p>When working with redux or ngrx/store, you get a lovely utillity method called <code>combineReducers</code> that solves a pretty annoying problem for you. This method could however be further improved and we’ll see why in a bit.</p>
+
+<p><strong>Note: some knowledge of the redux architecture is required to continue with this blogpost. Checkout <a href="http://redux.js.org/" target="_blank">this</a> for more info on Redux.</strong></p>
+
+<p><strong>Note: Since the PR still isn’t merged in the @ngrx/store library, I created a separate npm module with the functionality described below. You can find the github repo <a href="https://github.com/KwintenP/combine-reducers-enhanced" target="_blank">here</a>.</strong></p>
+
+<p><strong>TL;DR Go to the <a href="#conclusion">conclusion</a></strong></p>
+
+<h3 id="current-situation">Current situation</h3>
+<p>Take a look at the following state design.</p>
+
+<pre><code class="language-typescript">{
+	"ui": {
+		"topBarCollapsed": true,
+		"sideBarCollapsed": true
+	},
+	"data": {
+		"tweets": [],
+		"users": []
+	}
+}
+</code></pre>
+
+<p>Let’s try to translate this into reducers.</p>
+
+<h5 id="without-combinereducers">Without combineReducers</h5>
+
+<p>Remember, when your store is being initialised, you can only pass it a single reducer. To avoid a single reducer with all the logic, we are going to use the concept of reducer composition. Your reducer tree could look like this:</p>
+
+<p><img src="https://www.dropbox.com/s/gglg3j3ama5affo/Screenshot%202016-09-14%2016.35.12.png?raw=1" /></p>
+
+<p>You can then create your store like this:</p>
+
+<pre><code class="language-typescript">// pseudo code
+new Store(rootReducer);
+</code></pre>
+
+<p>The function of the rootReducer is:</p>
+
+<ul>
+  <li>Delegate the actions towards the dataReducer and the uiReducer with the correct state slice.</li>
+  <li>Assure that the reference of the data does not change if changes are made to the ui property and vice versa.</li>
+</ul>
+
+<p>The ‘rootReducer’ doesn’t do that much and it’s a PITA to have to write this every time. Every time a new action is added, you need to add it to the rootReducer as well.
+Enter <code>combineReducers</code>!</p>
+
+<h5 id="with-combinereducers">With combineReducers</h5>
+<p><code>combineReducers</code> removes the need to write this reducer yourself. When creating your store, you can pass it, not only a reducer function, but also an object like this:</p>
+
+<pre><code class="language-typescript">const rootReducer = {
+	ui: uiReducer,
+	data: dataReducer
+}
+
+new Store(rootReducer);
+</code></pre>
+
+<p>The store will see this is not a function, and thus not a ‘rootReducer’. Internally it will  pass this object to the <code>combineReducers</code> method. This will generate a ‘meta-reducer’ for you that does exactly the same as the ‘rootReducer’ we’ve described before.
+Conceptually speaking it looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/i1mh7frvr8tddg0/Screenshot%202016-09-15%2007.42.26.png?raw=1" /></p>
+
+<p>The advantage is that you do not need to write the ‘rootReducer’ yourself.
+Pretty neat right!</p>
+
+<h3 id="problem-description">Problem description</h3>
+<p>Let’s say, you have a state tree that looks more like this.</p>
+
+<pre><code class="language-typescript">{
+	"ui": {
+		"mainPage": {
+				"topBarCollapsed": true
+		},
+		"loginPage": {
+			"sideBarCollapsed": true
+		}
+	},
+	"data": {
+		"tweets": [],
+		"users": []
+	}
+}
+</code></pre>
+
+<p>As you can see, we have a second nested level for our ui property and maybe we want to split the data into two different reducers, a tweets- and usersReducer.
+Let’s take a look at how we can implement this.</p>
+
+<h3 id="current-possible-solutions">Current possible solutions</h3>
+<p>The <code>combineReducers</code> method only allows a single level of nesting, so we’ll have to see how we can fix this.</p>
+
+<h5 id="create-the-intermediary-reducers-yourself">Create the intermediary reducers yourself</h5>
+<p>You can always decide to just implement the intermediate reducers yourself.</p>
+
+<p><img src="https://www.dropbox.com/s/e2gjsrcp03cxzq9/Screenshot%202016-09-15%2020.11.55.png?raw=1" /></p>
+
+<p>However, writing these reducers yourself is the same PITA as it was for the first level so it’s not the preferred solution</p>
+
+<h5 id="use-a-third-party-library-which-handles-this-for-you">Use a third-party library which handles this for you</h5>
+<p>There is a third-party library created by Brecht Billiet that does exactly this. Check it out <a href="https://github.com/brechtbilliet/create-reducer-tree">here</a>.
+You can pass it an object and it will create all the intermediate reducers for you. This is an awesome solution, but unfortunately, it requires us to depend an yet another third-party library.</p>
+
+<h5 id="nest-the-combinereducers-method-yourself">Nest the combineReducers method yourself</h5>
+
+<p>Since we have the <code>combineReducers</code> method, we might as well leverage it fully and use it for every intermediary reducer. You can do this by passing an object like this to your store at creation time.</p>
+
+<pre><code class="language-typescript">const rootReducer = {
+	"ui": combineReducers({
+		"mainPage": mainPageReducer
+		"loginPage": loginReducer
+	}),
+	"data": combineReducers({
+		"tweets": tweetsReducer
+		"users": usersReducer
+	})
+}
+</code></pre>
+
+<p>It will generate all the intermediary reducers for you but the ‘rootReducer’ definition doesn’t look clean. For people just starting with Redux, this will probably look a little confusing as well.</p>
+
+<p>It turns out, the <code>combineReducers</code> method can be changed to fix this pretty easily.
+<a name="conclusion"></a></p>
+
+<h3 id="proposed-solution">Proposed solution</h3>
+<p>I’ve created a <a href="https://github.com/ngrx/store/pull/214" target="_blank">PR</a> towards the ngrx/store library where I extended the <code>combineReducers</code> method to work with nested objects as well. This allows you to create an object like this:</p>
+
+<pre><code class="language-typescript">const rootReducer = {
+	"ui": {
+		"mainPage": mainPageReducer
+		"loginPage": loginReducer
+	},
+	"data": {
+		"tweets": tweetsReducer
+		"users": usersReducer
+	}
+}
+
+new Store(rootReducer);
+</code></pre>
+
+<p>which will create this:</p>
+
+<p><img src="https://www.dropbox.com/s/lpd3io77pqemecp/Screenshot%202016-09-15%2007.42.41.png?raw=1" /></p>
+
+<p>It’s actually a change of only two LOC and semantically does exactly the same as nesting the <code>combineReducers</code> method yourself or the third-party library, but it’s a lot cleaner to implement and use.
+If you feel this feature might help you in the future, be sure to ‘like’ the PR it so it could be added to the library asap.</p>
+
+<p><strong>Note: As soon as the PR is being approved for the NGRX/Store library, I’ll submit a similar one to Redux.js</strong></p>
+
 
 	  ]]></description>
 	</item>
