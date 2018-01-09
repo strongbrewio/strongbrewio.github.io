@@ -28,7 +28,7 @@ Custom css
 .followme {
   background: #f1f1f1;
   position: fixed;
-  margin-left: 1400px;
+  right: 100px;
   padding: 20px;
   display: flex;
   flex-direction: column;
