@@ -4,7 +4,7 @@ cover: false
 title: Multicasting operators in RxJS
 date:   2017-08-20
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

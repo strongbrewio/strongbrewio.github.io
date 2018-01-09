@@ -4,7 +4,7 @@ cover: 'assets/images/posts/zone.png'
 title: How the hell does zone.js really work?
 date:   2016-06-09
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

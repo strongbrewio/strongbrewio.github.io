@@ -7,7 +7,7 @@ author: brechtbilliet
 comments: true
 date: 2016-11-09
 subclass: 'post'
-categories: 'casper'
+categories: 'brechtbilliet'
 disqus: true
 tags: Angular
 cover: 'assets/images/cover/cover4.jpg'

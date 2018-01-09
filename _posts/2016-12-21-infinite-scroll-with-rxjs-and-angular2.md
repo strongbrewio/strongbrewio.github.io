@@ -7,9 +7,9 @@ author: brechtbilliet
 comments: true
 date: 2016-12-21
 subclass: 'post'
-categories: 'casper'
+categories: 'brechtbilliet'
 disqus: true
-tags: Angular, RxJS
+tags: Angular RxJS
 cover: 'assets/images/cover/cover12.jpg'
 ---
 

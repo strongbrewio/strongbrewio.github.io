@@ -6,7 +6,7 @@ title: The $onChanges lifecycle-hook in depth
 date:   2016-04-06
 tags: AngularJS
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 logo: 'assets/images/strongbrewlogo.png'
 published: true
 disqus: true

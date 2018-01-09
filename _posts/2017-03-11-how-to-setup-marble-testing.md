@@ -4,7 +4,7 @@ cover: false
 title: How to setup marble testing
 date:   2017-02-15
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

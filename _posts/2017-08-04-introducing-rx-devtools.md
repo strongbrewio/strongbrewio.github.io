@@ -4,7 +4,7 @@ cover: false
 title: Introducing Rx devtools
 date:   2017-08-04
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

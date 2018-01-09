@@ -7,9 +7,9 @@ description: RxJS is an awesome library that can help us with creating reactive 
 comments: true
 date: 2017-07-25
 subclass: 'post'
-categories: 'casper'
+categories: 'brechtbilliet'
 disqus: true
-tags: Angular, RxJS
+tags: Angular RxJS
 cover: 'assets/images/cover/cover12.jpg'
 ---
 

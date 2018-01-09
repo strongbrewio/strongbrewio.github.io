@@ -4,7 +4,7 @@ cover: false
 title: combineReducers enhanced
 date:   2016-09-15
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

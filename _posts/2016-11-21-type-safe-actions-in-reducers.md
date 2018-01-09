@@ -4,7 +4,7 @@ cover: false
 title: Type safe actions in reducers
 date:   2016-11-21
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

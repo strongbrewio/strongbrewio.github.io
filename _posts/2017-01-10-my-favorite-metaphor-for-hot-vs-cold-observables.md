@@ -4,7 +4,7 @@ cover: false
 title: My favorite metaphor for hot vs cold observables
 date:   2017-01-10
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

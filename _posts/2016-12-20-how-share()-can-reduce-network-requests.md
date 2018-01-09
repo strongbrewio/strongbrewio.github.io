@@ -4,7 +4,7 @@ cover: false
 title: How share() can reduce network requests
 date:   2016-12-20
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

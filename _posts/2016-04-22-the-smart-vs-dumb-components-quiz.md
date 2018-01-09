@@ -5,7 +5,7 @@ navigation: True
 title: The smart vs dumb component quiz
 date:   2016-04-22
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 logo: 'assets/images/strongbrewlogo.png'
 published: true
 disqus: true

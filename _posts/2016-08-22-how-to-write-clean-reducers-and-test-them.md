@@ -4,7 +4,7 @@ cover: false
 title: How to write clean reducers (and test them!)
 date:   2016-08-22
 subclass: 'post'
-categories: 'casper'
+categories: 'kwintenp'
 published: true
 disqus: true
 navigation: True

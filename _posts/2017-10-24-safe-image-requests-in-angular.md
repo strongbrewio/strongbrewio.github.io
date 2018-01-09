@@ -7,7 +7,7 @@ description: Since the browser just loads this image through a normal HTTP call,
 comments: true
 date: 2017-10-24
 subclass: 'post'
-categories: 'casper'
+categories: 'brechtbilliet'
 disqus: true
 tags: Angular
 cover: 'assets/images/cover/cover8.jpg'

@@ -7,7 +7,7 @@ description: These documents are the beginning of a book (or a collection of doc
 comments: true
 date: 2016-08-30
 subclass: 'post'
-categories: 'casper'
+categories: 'brechtbilliet'
 disqus: true
 cover: 'assets/images/cover/cover4.jpg'
 ---

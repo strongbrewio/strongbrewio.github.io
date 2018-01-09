@@ -7,7 +7,7 @@ description: Since one of my late New Year's resolutions is blogging, behold my 
 comments: true
 date: 2016-08-24
 subclass: 'post'
-categories: 'casper'
+categories: 'brechtbilliet'
 disqus: true
 tags: Angular
 cover: 'assets/images/cover/cover11.jpg'
