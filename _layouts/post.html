@@ -106,7 +106,12 @@ class: 'post-template'
 
             <!-- Add Disqus Comments -->
             {% if page.disqus %}
-                {% include disqus.html %}
+                {% if page.author == 'brechtbilliet'%}
+                    {% include disqus_brecht.html %}
+                {% endif %}
+                {% if page.author == 'kwintenp'%}
+                    {% include disqus_kwinten.html %}
+                {% endif %}
             {% endif %}
 
         </footer>
