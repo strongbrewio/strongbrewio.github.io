@@ -19,7 +19,7 @@ disqus: username
 baseurl: /
 
 # Permalinks
-permalink: /:title
+permalink: /:title/
 # permalink: /author/:username
 # permalink: /tag/:tag
 
