@@ -14,7 +14,8 @@ description: ""
 
 short_url: 'blog.strongbrew.io'
 google_analytics: UA-76318751-3
-disqus: username
+disqus_brecht: brechtbilliet
+disqus_kwinten: kwintenpghostio
 # edit baseurl to simply '/' if using as your personal page (instead of a project page)
 baseurl: /
 
