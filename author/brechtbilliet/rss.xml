@@ -13,10 +13,10 @@
    
 	<item>
 	  <title>Safe image requests in angular</title>
-	  <link>//safe-image-requests-in-angular</link>
+	  <link>//safe-image-requests-in-angular/</link>
 	  <author></author>
 	  <pubDate>2017-10-24T00:00:00+00:00</pubDate>
-	  <guid>//safe-image-requests-in-angular</guid>
+	  <guid>//safe-image-requests-in-angular/</guid>
 	  <description><![CDATA[
 	     <p>We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.</p>
 
@@ -248,10 +248,10 @@ He also has an amazing egghead course on that subject.</p>
 
 	<item>
 	  <title>A scalable angular architecture (part 2)</title>
-	  <link>//A-scalable-angular-architecture-part2</link>
+	  <link>//A-scalable-angular-architecture-part2/</link>
 	  <author></author>
 	  <pubDate>2017-08-13T00:00:00+00:00</pubDate>
-	  <guid>//A-scalable-angular-architecture-part2</guid>
+	  <guid>//A-scalable-angular-architecture-part2/</guid>
 	  <description><![CDATA[
 	     <h1 id="the-sandbox-pattern">The sandbox pattern</h1>
 
@@ -475,10 +475,10 @@ If you still have questions about this approach, don’t hesitate to contact me 
 
 	<item>
 	  <title>Thinking reactively in Angular and RXJS</title>
-	  <link>//thinking-reactively-in-angular-and-rxjs</link>
+	  <link>//thinking-reactively-in-angular-and-rxjs/</link>
 	  <author></author>
 	  <pubDate>2017-07-25T00:00:00+00:00</pubDate>
-	  <guid>//thinking-reactively-in-angular-and-rxjs</guid>
+	  <guid>//thinking-reactively-in-angular-and-rxjs/</guid>
 	  <description><![CDATA[
 	     <h2 id="foreword">Foreword</h2>
 
@@ -1095,10 +1095,10 @@ The situation of the problem goes like this:</p>
 
 	<item>
 	  <title>Infinite scroll in Angular an RxJS</title>
-	  <link>//infinite-scroll-with-rxjs-and-angular2</link>
+	  <link>//infinite-scroll-with-rxjs-and-angular2/</link>
 	  <author></author>
 	  <pubDate>2016-12-21T00:00:00+00:00</pubDate>
-	  <guid>//infinite-scroll-with-rxjs-and-angular2</guid>
+	  <guid>//infinite-scroll-with-rxjs-and-angular2/</guid>
 	  <description><![CDATA[
 	     <h2 id="about-this-article">About this article</h2>
 
@@ -1377,10 +1377,10 @@ Let’s say that we would like to free up DOM-elements and use only 100 items at
 
 	<item>
 	  <title>A scalable Angular 2 architecture</title>
-	  <link>//A-scalable-angular2-architecture</link>
+	  <link>//A-scalable-angular2-architecture/</link>
 	  <author></author>
 	  <pubDate>2016-11-09T00:00:00+00:00</pubDate>
-	  <guid>//A-scalable-angular2-architecture</guid>
+	  <guid>//A-scalable-angular2-architecture/</guid>
 	  <description><![CDATA[
 	     <h2 id="foreword">Foreword</h2>
 
@@ -1654,10 +1654,10 @@ I hope you enjoyed the article.</p>
 
 	<item>
 	  <title>Cancellable optimistic updates in Angular 2 and Redux</title>
-	  <link>//Cancellable-optimistic-updates-in-Angular2-and-Redux</link>
+	  <link>//Cancellable-optimistic-updates-in-Angular2-and-Redux/</link>
 	  <author></author>
 	  <pubDate>2016-09-23T00:00:00+00:00</pubDate>
-	  <guid>//Cancellable-optimistic-updates-in-Angular2-and-Redux</guid>
+	  <guid>//Cancellable-optimistic-updates-in-Angular2-and-Redux/</guid>
 	  <description><![CDATA[
 	     <p><a href="https://angular.io/">Angular 2</a> and <a href="https://github.com/reactjs/redux">redux</a> are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the <a href="https://github.com/ngrx/store">@ngrx/store</a> variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the <a href="http://redux.js.org/">documentation</a> first.</p>
 
@@ -1827,10 +1827,10 @@ The reason why you would do optimistic updates is that your application becomes 
 
 	<item>
 	  <title>How we made our app real-time in 6 lines of code</title>
-	  <link>//How-we-made-our-app-real-time-in-6-lines-of-code</link>
+	  <link>//How-we-made-our-app-real-time-in-6-lines-of-code/</link>
 	  <author></author>
 	  <pubDate>2016-09-11T00:00:00+00:00</pubDate>
-	  <guid>//How-we-made-our-app-real-time-in-6-lines-of-code</guid>
+	  <guid>//How-we-made-our-app-real-time-in-6-lines-of-code/</guid>
 	  <description><![CDATA[
 	     <p><a href="https://blog.kwintenp.com/">Kwinten Pisman</a> and me were working on a workshop this weekend with the focus on Reactive applications with <a href="http://angular.io">Angular 2</a>, <a href="https://github.com/ReactiveX/rxjs">RXJS</a> and <a href="https://github.com/ngrx">@ngrx</a>. Something that can’t miss in a reactive workshop are real-time updates. The application we are trying to make real-time is the <a href="http://winecellar.surge.sh">winecellar</a> app (you can register an account here if you want to test it).</p>
 
@@ -1945,10 +1945,10 @@ If you want to learn more about these technologies: Be sure to checkout our work
 
 	<item>
 	  <title>Components demystified</title>
-	  <link>//components-demystified</link>
+	  <link>//components-demystified/</link>
 	  <author></author>
 	  <pubDate>2016-08-30T00:00:00+00:00</pubDate>
-	  <guid>//components-demystified</guid>
+	  <guid>//components-demystified/</guid>
 	  <description><![CDATA[
 	     <h2 id="table-of-contents">Table of Contents</h2>
 
@@ -2151,10 +2151,10 @@ When you put them in the same file there are some advantages:</p>
 
 	<item>
 	  <title>Modals in Angular 2</title>
-	  <link>//Modals-in-angular2</link>
+	  <link>//Modals-in-angular2/</link>
 	  <author></author>
 	  <pubDate>2016-08-24T00:00:00+00:00</pubDate>
-	  <guid>//Modals-in-angular2</guid>
+	  <guid>//Modals-in-angular2/</guid>
 	  <description><![CDATA[
 	     <p><strong>Updated at 3 september 2016 (RC.6 compliant)</strong></p>
 

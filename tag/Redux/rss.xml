@@ -13,10 +13,10 @@
    
 	<item>
 	  <title>Type safe actions in reducers</title>
-	  <link>//type-safe-actions-in-reducers</link>
+	  <link>//type-safe-actions-in-reducers/</link>
 	  <author></author>
 	  <pubDate>2016-11-21T00:00:00+00:00</pubDate>
-	  <guid>//type-safe-actions-in-reducers</guid>
+	  <guid>//type-safe-actions-in-reducers/</guid>
 	  <description><![CDATA[
 	     <p>I’ve been using TypeScript and Redux for a while now. One thing that’s been bothering me from day one is the lack of typing on actions, or so I thought. Until the following twitter conversation last week caught my eye.</p>
 
@@ -173,10 +173,10 @@ case ActionTypes.SET_ID:
 
 	<item>
 	  <title>Cancellable optimistic updates in Angular 2 and Redux</title>
-	  <link>//Cancellable-optimistic-updates-in-Angular2-and-Redux</link>
+	  <link>//Cancellable-optimistic-updates-in-Angular2-and-Redux/</link>
 	  <author></author>
 	  <pubDate>2016-09-23T00:00:00+00:00</pubDate>
-	  <guid>//Cancellable-optimistic-updates-in-Angular2-and-Redux</guid>
+	  <guid>//Cancellable-optimistic-updates-in-Angular2-and-Redux/</guid>
 	  <description><![CDATA[
 	     <p><a href="https://angular.io/">Angular 2</a> and <a href="https://github.com/reactjs/redux">redux</a> are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the <a href="https://github.com/ngrx/store">@ngrx/store</a> variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the <a href="http://redux.js.org/">documentation</a> first.</p>
 
@@ -346,10 +346,10 @@ The reason why you would do optimistic updates is that your application becomes 
 
 	<item>
 	  <title>combineReducers enhanced</title>
-	  <link>//combinereducers-enhanced</link>
+	  <link>//combinereducers-enhanced/</link>
 	  <author></author>
 	  <pubDate>2016-09-15T00:00:00+00:00</pubDate>
-	  <guid>//combinereducers-enhanced</guid>
+	  <guid>//combinereducers-enhanced/</guid>
 	  <description><![CDATA[
 	     <p>When working with redux or ngrx/store, you get a lovely utillity method called <code>combineReducers</code> that solves a pretty annoying problem for you. This method could however be further improved and we’ll see why in a bit.</p>
 
@@ -506,10 +506,10 @@ If you feel this feature might help you in the future, be sure to ‘like’ the
 
 	<item>
 	  <title>How to write clean reducers (and test them!)</title>
-	  <link>//how-to-write-clean-reducers-and-test-them</link>
+	  <link>//how-to-write-clean-reducers-and-test-them/</link>
 	  <author></author>
 	  <pubDate>2016-08-22T00:00:00+00:00</pubDate>
-	  <guid>//how-to-write-clean-reducers-and-test-them</guid>
+	  <guid>//how-to-write-clean-reducers-and-test-them/</guid>
 	  <description><![CDATA[
 	     <p>Last week, someone asked me how I kept my reducers clean and how to properly test them. Since it wasn’t the first time someone asked me that, I decided to write it down for future reference.
 Here it is!</p>

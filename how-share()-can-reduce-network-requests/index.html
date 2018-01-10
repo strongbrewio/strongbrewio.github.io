@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>How share() can reduce network requests</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="//how-share()-can-reduce-network-requests/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How share() can reduce network requests" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="//how-share()-can-reduce-network-requests/" />
+    <meta property="og:image" content="/assets/images/cover/cover8.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How share() can reduce network requests" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="//how-share()-can-reduce-network-requests/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover8.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "How share() can reduce network requests",
+    "url": "//how-share()-can-reduce-network-requests/",
+    "image": "/assets/images/cover/cover8.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header class="main-header post-head " style="background-image: url(/assets/images/cover/cover8.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme">
+    <h5>Want to work with us?</h5>
+    <button onclick="location.href='mailto:info@strongbrew.io';">Hire us</button>
+</div>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">How share() can reduce network requests</h1>
+            <section class="post-meta">
+            <!-- <a href='/'></a> -->
+
+            
+                
+            
+                
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                
+            
+            <time class="post-date" datetime="2016-12-20">20 Dec 2016</time>
+                <!-- [[tags prefix=" on "]] -->
+                
+                on
+                
+                    
+                       <a href='/tag/RxJS'>Rxjs</a>,
+                    
+                
+                    
+                       <a href='/tag/Angular'>Angular</a>
+                    
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+
+            <p>As you hopefully all know, observables you get back from the Angular 2 Http service are cold. A cold observable only starts when you subscribe to to it and is unicast (for every subscription to the Http observable, a network call is triggered).</p>
+
+<p><strong>Note:</strong> If you want to dive deeper into hot vs cold observables, Christoph Burgdorf from Thoughtram wrote <a href="http://blog.thoughtram.io/angular/2016/06/16/cold-vs-hot-observables.html" target="_blank">an awesome article </a> on the subject (Rx pun intended :)).</p>
+
+<h4 id="project-setup">Project setup</h4>
+
+<p>To demonstrate how the <code>share()</code> operator can reduce our number of network calls, I’ve created a demo application (code available on <a href="https://github.com/KwintenP/save-netwerk-requests-with-share" target="_blank">Github</a>). The setup looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/d87po1zbp2ri11u/Screenshot%202016-12-15%2020.08.33.png?raw=1" alt="setup" /></p>
+
+<p>As you can see, we have an app component, which is smart, and three dumb components. During startup, the app component will randomly fetch one of the Star Wars characters by calling the StarWarsService.</p>
+
+<pre><code class="language-typescript">// app.component.ts
+this.character$ =
+     this.starWarsService.getCharacter(this.generateNumber());
+</code></pre>
+
+<p>The StarWarsService uses Angular’s Http and returns a character from the series using the swapi.co API.</p>
+
+<pre><code class="language-typescript">// star-wars.service.ts
+public getCharacter(id: number): Observable&lt; StarWarsCharacter &gt; {
+    return this.http.get('https://swapi.co/api/people/' + id)
+      .map((response: Response) =&gt; response.json());
+}
+</code></pre>
+
+<p>The app component creates three new observables by mapping the <code>character$</code> source observable.</p>
+
+<pre><code class="language-typescript">// app.component.ts
+this.name$ = this.character$.map(character =&gt; character.name);
+this.birthDate$ = this.character$.map(character =&gt; character.birth_year);
+this.gender$ = this.character$.map(character =&gt; character.gender);
+</code></pre>
+
+<p>The data is passed to the dumb components using the <code>async</code> pipe.</p>
+
+<pre><code class="language-html">&lt;app-character-name [name]="name$ | async"&gt;
+&lt;/app-character-name&gt;
+&lt;app-character-birthdate [birthDate]="birthDate$ | async"&gt;
+&lt;/app-character-birthdate&gt;
+
+&lt;button type="button" (click)="toggleEnabled()"&gt;
+     Enable gender component
+&lt;/button&gt;
+&lt;app-character-gender *ngIf="enabled" [gender]="gender$ | async"&gt;
+&lt;/app-character-gender&gt;
+</code></pre>
+
+<p>As you can see in the snippet above, the gender component is only rendered <strong>after</strong> the button has been clicked. This way we can simulate a ‘delayed subscription’. We’ll see why this is important in a second.</p>
+
+<h4 id="potential-pitfall">Potential pitfall</h4>
+<p>If we run this code, everything works perfectly. But if we look at the network tab, we can see some strange behaviour.</p>
+
+<p><img src="https://www.dropbox.com/s/j5etmgqz668v4wp/Dec-15-2016%2020-00-10.gif?raw=1" alt="setup" /></p>
+
+<p>When the page is refreshed, we already see two calls to the backend. If we click the button to enable the gender component, we see another request being send. Why do we see multiple backend requests if we’re only asking for one <code>character$</code>?</p>
+
+<p>The reason is simple. The <code>character$</code> is a <strong>cold observable</strong>. If you subscribe to a cold http observable twice, you’ll have two backend requests.
+We map this <code>character$</code> or source observable using the <code>map</code> operator to three different observables. Every subscription to one of these three observables (which is done by the async pipe), is basically the same as subscribing to the <code>character$</code> observable directly. And because the <code>character$</code> observable is a cold observable, you see multiple requests.
+The problem with this is that the underlying subscription to the source observable is <strong>not shared</strong>.</p>
+
+<h4 id="how-can-we-fix-this-kind-of">How can we fix this (kind of)</h4>
+
+<p>Let’s change the observable that the StarWarsService returns like this:</p>
+
+<pre><code class="language-typescript">return this.http.get('https://swapi.co/api/people/' + id)
+      .map((response: Response) =&gt; response.json())
+      .share();
+</code></pre>
+
+<p>We added the <code>share()</code> operator. This is an alias for doing <code>publish().refCount()</code>. This will make the <code>character$</code> a hot observable that starts emitting events as soon as the first one subscribes. The <code>character$</code> observable will be a ‘shared’ one. Let’s first see what this means and explain afterwards:</p>
+
+<p><img src="https://www.dropbox.com/s/o3i03kudmutt1gk/Dec-15-2016%2019-57-47.gif?raw=1" alt="setup" /></p>
+
+<p>Now we can see that, on the initial page load, there is only one request. That’s because the <code>share()</code> operator will share the underlying subscription between its listeners. As soon as the first one subscribes, it will listen to the Http observable and thus trigger one backend request. Everybody else who starts listening afterwards, will get the same result. Hence we only see a single request to the swapi.co API.</p>
+
+<p>But, when I click on the button to enable the gender component, we can see that a second request is triggered. This means our <code>share()</code> operator doesn’t help us entirely. It turns out that with <code>share()</code>, if the source observable completes, the underlying subscription is gone as well. So when the gender component gets rendered, the original request is long finished and completed. For every new subscription after this completion, in our case via the <code>gender$</code> observable, the <code>share()</code> operator will start a new backend request.</p>
+
+<p>This can perfectly be expected behaviour, if you want it. In some cases though, you don’t.</p>
+
+<h4 id="publishreplay-to-the-rescue">publishReplay to the rescue</h4>
+
+<p>Let’s change the observable from the StarWarsService one more time:</p>
+
+<pre><code class="language-typescript">let obs$: ConnectableObservable&lt;StarWarsCharacter&gt; =
+     this.http.get('https://swapi.co/api/people/' + id)
+         .map((response: Response) =&gt; response.json())
+         .publishReplay();
+obs$.connect();
+return obs$;
+</code></pre>
+
+<p>I removed the <code>share()</code> operator and used <code>publishReplay()</code> instead. This will return an observable that will subscribe to the source observable as soon as you <code>connect()</code> it. In our case, this needs to happen immediately, so I call it before returning.
+Let’s see what this does:</p>
+
+<p><img src="https://www.dropbox.com/s/5j4381vj8439dbb/Dec-15-2016%2019-55-20.gif?raw=1" alt="setup" /></p>
+
+<p>Alright! Now we only have one request at startup time and we do not have a new one when we render the gender component. The <code>publishReplay()</code> operator doesn’t care if the Http observable completes or not. For every new subscription, it will just return the previous result.</p>
+
+<h4 id="conclusion">Conclusion</h4>
+
+<ul>
+  <li>If your source observable ‘splits’ into multiple observables, using the <code>share()</code> operator will reduce network requests.</li>
+  <li>If you have subscriptions which are delayed due to delayed rendering, you might want to use the <code>publishReplay()</code> operator to avoid extra requests.</li>
+</ul>
+
+<p><strong>NOTE:</strong> Thanks to <a href="https://twitter.com/juristr">@juristr</a> for the review!</p>
+
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+                
+            
+                
+                    
+                        <figure class="author-image">
+                            <a class="img" href="/author/kwintenp" style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                        </figure>
+                    
+
+                    <section class="author">
+                        <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                        
+                            <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                        
+                        <div class="author-meta">
+                            <span class="author-location icon-location"> Belgium</span>
+                            <span class="author-link icon-link"><a href="https://twitter.com/kwintenp"> twitter.com/kwintenp</a></span>
+                        </div>
+                    </section>
+
+                    <!-- /author  -->
+
+                    <section class="share">
+                        <h4>Share this post</h4>
+                        <a class="icon-twitter" href="http://twitter.com/share?text=How share() can reduce network requests&amp;url=how-share()-can-reduce-network-requests"
+                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                            <span class="hidden">Twitter</span>
+                        </a>
+                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=how-share()-can-reduce-network-requests"
+                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                            <span class="hidden">Facebook</span>
+                        </a>
+                        <a class="icon-google-plus" href="https://plus.google.com/share?url=how-share()-can-reduce-network-requests"
+                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                            <span class="hidden">Google+</span>
+                        </a>
+                    </section>
+                
+            
+
+            <!-- Add Disqus Comments -->
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'username'; // required: replace example with your forum shortname
+        var disqus_identifier = '/how-share()-can-reduce-network-requests/';
+        var disqus_url = '/how-share()-can-reduce-network-requests/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+            
+
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+        <a class="read-next-story " style="background-image: url(/assets/images/cover/cover12.jpg)" href="/infinite-scroll-with-rxjs-and-angular2">
+            <section class="post">
+                <h2>Infinite scroll in Angular an RxJS</h2>
+                <p>## About this article This article explains how the "reactive-programming" approach helps us to create...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover4.jpg)" href="/type-safe-actions-in-reducers">
+            <section class="post">
+                <h2>Type safe actions in reducers</h2>
+                <p>I’ve been using TypeScript and Redux for a while now. One thing that’s been bothering...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-76318751-3', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>

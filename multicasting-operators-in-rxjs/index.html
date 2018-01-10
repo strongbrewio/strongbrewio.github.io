@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Multicasting operators in RxJS</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="//multicasting-operators-in-rxjs/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Multicasting operators in RxJS" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="//multicasting-operators-in-rxjs/" />
+    <meta property="og:image" content="/assets/images/cover/cover1.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Multicasting operators in RxJS" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="//multicasting-operators-in-rxjs/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover1.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "Multicasting operators in RxJS",
+    "url": "//multicasting-operators-in-rxjs/",
+    "image": "/assets/images/cover/cover1.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header class="main-header post-head " style="background-image: url(/assets/images/cover/cover1.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme">
+    <h5>Want to work with us?</h5>
+    <button onclick="location.href='mailto:info@strongbrew.io';">Hire us</button>
+</div>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Multicasting operators in RxJS</h1>
+            <section class="post-meta">
+            <!-- <a href='/'></a> -->
+
+            
+                
+            
+                
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                
+            
+            <time class="post-date" datetime="2017-08-20">20 Aug 2017</time>
+                <!-- [[tags prefix=" on "]] -->
+                
+                on
+                
+                    
+                       <a href='/tag/RxJS'>Rxjs</a>
+                    
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+
+            <p>With the arrival of RxJS 5.4 a while back, the RxJS team has given us yet another way to support multicasting in our applications. They introduced the <code>shareReplay</code> operator. With this new one around the corner, you might start wondering when to use which multicasting operator. Well, it’s your lucky day cause that’s what this post is all about.</p>
+
+<p><strong>TL:DR;</strong> You can find an overview of all the multicasting operators and their properties <a href="#operator-overview">here</a>.</p>
+
+<h2 id="what-is-multicasting">What is multicasting</h2>
+
+<p>First of all, I would like to go a little deeper into the subject of multicasting. What does this really mean? As you hopefully know, observables can be divided into two categories, hot and cold.
+If you subscribe to an observable, you are going to start executing that observable. What this means is the observable will start producing values. When you are working with a cold observable, every new subscription will ‘restart’ the observables producer.</p>
+
+<p><strong>Note</strong>: If you do not know what hot and cold observables mean, you can read this excellent article on the Thoughtram blog <a href="https://blog.thoughtram.io/angular/2016/06/16/cold-vs-hot-observables.html" target="_blank">here</a>.</p>
+
+<p><strong>Note2:</strong> The fact that an observable is either cold or hot is somewhat debatable as we’ll see later on. An observable can also hold properties from both of these states. In the Thoughtram article described above, they point to these observables as being ‘warm’.</p>
+
+<p>Let’s take a look at an example:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/jefupu/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>Here we can see an interval observable that will emit 5 values with half a second between them. We subscribe to this observable immediately and again after 1,5 seconds. As you can see, when the second subscription happens, it doesn’t get the same values as the first subscription. Instead, it starts with the value ‘0’. 
+We can conclude from this that for every subscription, the observable is ‘restarted’ and the observable will restart the production of values.</p>
+
+<p>If we try to put this into a visual representation, it might look a little like this:</p>
+
+<p><img src="https://www.dropbox.com/s/y9bh74hsiqwy205/Screenshot%202017-09-03%2014.55.00.png?raw=1" width="400" /></p>
+
+<p>We can see that the interval observable is ‘recreated’ when the second subscription occurs.</p>
+
+<p>This might feel a little weird in the beginning, but it gives us the benefit to re-use observables, which is a quite powerful concept once you get the hang of it. It however also introduces some weird side effects. Let’s take a look at an example:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/terapof/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>We create an observable, <code>getLuke$</code>, which will perform a call to fetch the character of Luke Skywalker from the swapi.co API. We use this as a source to create two new observables. One holds the name of the character, the other one holds the gender of the character. We immediately subscribe to both of the observables. If you open your devtools onto the network tab, you will see that there are actually two network request being performed.</p>
+
+<p>This might seem weird at first, but in fact, it’s quite logical. The <code>getLuke$</code> observable we created is a cold one. The two new observables we create both use this one as a source. So in fact, subscribing to our <code>gender$</code> and <code>name$</code> observable, is the equivalent of subscribing to the <code>getLuke$</code> observable twice. And, as we have seen above, every subscription to a cold observable, will trigger two executions of the observable, two times the production of values, thus in this case two network requests.</p>
+
+<p>While this behaviour can be useful, sometimes you might want two backend calls, it can also be quite annoying. The problem that we are facing here is that the execution of the observable is restarted on every subscription. While sometimes, we want to share the underlying subscription. Sharing the underlying subscription is what multicasting is all about.</p>
+
+<p><strong>Note:</strong> If you are multicasting an observable, you have transformed it from a cold to a hot observable.</p>
+
+<h3 id="multicasting-example">Multicasting example</h3>
+
+<p>Let’s change our example to share the underlying subscription. For this we will use the <code>share</code> operator for now. We will investigate all the other ones and their properties later on.</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/higujow/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>If you run this example while opening your devtool’s network tab, you can see that there is only one request. That’s because the underlying subscription is shared. 
+Let’s again try to visualize this in a diagram.</p>
+
+<p><img src="https://www.dropbox.com/s/kcohbr9wa5ax631/Screenshot%202017-09-06%2021.08.08.png?raw=1" width="400" /></p>
+
+<p>Here, we can see that the share operator will only subscribe once to the source observable, being the observable that does a backend call, and will multicast the data to all the subscriptions. It acts as a proxy.</p>
+
+<h2 id="the-properties-of-multicasting">The properties of multicasting</h2>
+
+<p>A multicasting operator shares the underlying subscription towards its subscribers. The way they do it can vary quite a lot. Next we are going to go over all of the properties a multicasting operator can have.</p>
+
+<h3 id="connectable">Connectable</h3>
+
+<p>One of the ways to share the underlying subscription to multiple subscribers, is by using the <code>publish</code> operator. When you call <code>publish()</code> on an observable, you get back a <code>ConnectableObservable</code>. This is an observable that will subscribe to the source observable once you have called it’s <code>connect()</code> method. Let’s try and put this in a ASCII marble diagram to visualise it better.</p>
+
+<pre><code class="language-typescript">source observable:         ---a----b----c|
+                             -publish()-
+connect point:             C
+subscriber 1:          ^------a----b-!     
+subscriber 2:                   ^--b----c|
+</code></pre>
+
+<p><strong>Note:</strong> If you don’t know the ASCII marble syntax, take a look at the <a href="https://github.com/ReactiveX/rxjs/blob/5.4.2/doc/writing-marble-tests.md#marble-syntax" target="_blank">official documentation</a></p>
+
+<p>We have a source observable which will emit 3 values, a, b and c. We use the <code>publish</code> operator on this cold observable. This will return a <code>ConnectableObservable</code>. We have a subscriber that subscribes immediately to this stream, and a subscriber that subscribes after some time.</p>
+
+<p>We can see that the first subscription point of subscriber 1, doesn’t trigger the source observable to be started. It’s only at the time the <code>ConnectableObservables</code>’s <code>connect</code> method gets called (indicated by the ‘C’), that the source observable is started.
+When the second subscription happens, the ‘a’ value has already been passed by the <code>ConnectableObservable</code> to all available subscribers at that time, which was only the first subscriber. The second subscriber missed this value. 
+When the ‘b’ value is produced by the source observable, it is passed to both the first and second subscriber. 
+Next the second subscriber unsubscribes (denoted by the ‘!’). So when the source observable emits the last value, c, and completes, only the second subscriber gets these values.</p>
+
+<p>Let’s take a look at coding example:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/wicarev/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>Here we can see an interval observable that will emit 4 values. We use the <code>publish</code> operator to create a <code>publishedInterval</code> observable. We subscribe to it immediately and we subscribe to it after 2500ms. As you can see, the first subscription will not trigger the interval to be started. It’s only when we call it’s <code>connect</code> method after 600ms that it will start emitting values.</p>
+
+<p><strong>Conclusion:</strong> A multicasting operator is connectable when you have to call the <code>connect</code> method before it subscribes to the source observable and starts proxying.</p>
+
+<h3 id="reference-counting">Reference counting</h3>
+
+<p>The next property we are going to discuss is reference counting. As we’ve seen above, when we get a <code>ConnectableObservable</code> we need to call <code>connect()</code> on it before the source observable is subscribed to. Sometimes, you might want the source observable to be subscribed to as soon as there is at least one subscriber. And that’s exactly what you can achieve with reference counting through the <code>refCount</code> operator. Let’s see what this looks like in a marble diagram.</p>
+
+<pre><code class="language-typescript">source observable:     --0--1--2--!    --0--1!
+                             -publish().refCount()-
+subscriber 1:          ^-0--1!
+subscriber 2:             ^-1--2--!
+subscriber 3:                          ^-0--1!
+</code></pre>
+
+<p>We have a source observable that will emit values with some time in between. As soon as the first subscription happens, the source observable is started. When the second subscription happens, the source observable is still emitting values and it will get the same values as the first subscription. When the first subscription stops, the source observable is not unsubscribed to, but when the second one stops, it is. 
+The <code>refCount</code> operator will count the number of subscriptions. As soon as this number is 1, it will subscribe to the source observable and as long as this number stays 1 or higher, the source observable is subscribed to. If this number drops to 0, it unsubscribes from the source observable. 
+When the number rises back from 0 to 1, as it is with our third subscriber, the source observable is resubscribed to.</p>
+
+<p>Let’s take a look at some code:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/vujozac/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>We have an interval observable that <code>publish().refCount()</code> is applied to. This newly created observable is subscribed to. When this happens, the source observable, our interval observable, is immediately subscribed to. 
+After 700ms, we subscribe a second time. At this moment, both subscriptions get the same values.
+When the first subscriber unsubscribes, after 1100ms. It doesn’t influence the source observable. This is because the reference counting is still on 1. When the second subscriber stops listening, after 1700ms, the source observable is unsubscribed to because the reference counting dropped to 0. 
+When we resubscribe a third time, the source is subscribed to again.</p>
+
+<p><strong>Note:</strong> Using <code>publish().refCount()</code> is a quite common operation. For that reason, the <code>share()</code> alias was introduced which is the exact same thing.</p>
+
+<p><strong>Conclusion:</strong> An observable is reference counting when it subscribes as soon as there is a single subscriber and stops when there are no more subscribers.</p>
+
+<h3 id="replayable">Replayable</h3>
+
+<p>If you subscribe to a hot observable, you might have missed some values. In some cases, this might not be what you want. You might want to get at least the latest emitted value before you subscribed or the latest x values that were emitted before you subscribed. Luckily, there is a way to do that.</p>
+
+<p>Let’s first create an ASCII marble diagram to visualise what we want:</p>
+
+<pre><code class="language-typescript">source observable:     ---a----b-------c----d----e|
+                             -shareReplay(2)-
+subscriber 1:          ^--a----b!     
+subscriber 2:                    ^(ab)-c----d----e|
+</code></pre>
+
+<p>In this scenario, we are using the <code>shareReplay</code> operator. We are subscribing to the created observable twice. When the second subscription happens, the source stream has already emitted two values. When the second subscription happens, it normally would have missed these two values. But because we use the <code>shareReplay</code> operator we get these two values. We passed ‘2’ to the operator which means that it will replay the last two values before the subscription.</p>
+
+<p>Let’s take a look at an example:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/qumego/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>We have an interval observable, to which the <code>shareReplay</code> operator is applied with parameter ‘2’. We subscribe to it immediately and once after some values have already been passed. We can see that, as soon as the second subscription happens, it also receives the last two values that were emitted before the subscription.</p>
+
+<p><strong>Conclusion:</strong> A multicasting operator is replayable when it emits the ‘x’ latest values to a new subscriber.</p>
+
+<h3 id="repeatable">Repeatable</h3>
+
+<p>In the previous examples, we were dealing with a source observable that completed. This could mean that if we subscribe to an observable that is multicasted or hot, for which the source has completed it will never get any values. For this reason, there are also hot observables that are repeatable. Let’s look at a ASCII marble diagram that represents this:</p>
+
+<pre><code class="language-typescript">source observable:     ---a----b|    ---a----b|    
+                             -share()-
+subscriber 1:          ^--a----b|     
+subscriber 2:                   	   ^---a----b|
+</code></pre>
+
+<p>We have a source observable that we are applying the <code>share</code> operator to. When we have a first subscriber, the source observable is started and the first subscriber get’s all the values. But by the time the second one subscribes, the source observable has already completed. In that case, at least for the <code>share</code>, the source observable is resubscribed to and the second observable will get the same values (remember the source observable in this case is a cold one so for every new subscription, the observable is restarted).</p>
+
+<p>Let’s take a look at an example:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/doyojenatu/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>Here we have an interval observable where we apply the <code>share</code> operator to. It will emit 3 values in 1.5 seconds and then complete. We subscribe to it once immediately and again after 3 seconds. If we look at the output, we can see that both the subscriptions get the same values. From this we can conclude that the source observable was repeated.</p>
+
+<p><strong>Conclusion:</strong> A multicasting operator is repeatable when it resubscribes to the source observable when there is a new subscription and the source observable had already completed. It re-executes the source observable.</p>
+
+<h3 id="retryable">Retryable</h3>
+
+<p>As stated before, a multicasting operator will share the underlying subscription towards it’s subscribers and acts as a proxy. But what happens when this source observable throws an error? There are multicasting operators that will retry subscribing to the source observable when it threw an error. Let’s put this into a marble diagram:</p>
+
+<pre><code class="language-typescript">source observable:     ---#            ---#
+                             -shareReplay()-
+subscriber 1:          ^--#
+subscriber 2:                   	   ^--#
+</code></pre>
+
+<p>Here we have a source observable onto which the <code>shareReplay</code> operator is applied. When the first subscriber starts listening to it, the source observable will be subscribed to. Here, it will throw an error after some time which is send to the first subscriber.
+A little while later the observable is resubscribed to by a second subscriber. This will start a new invocation of the source observable. This one will have the same effect as the first subscription. In a real life scenario, the first invocation might fail, but this doesn’t necessarily mean that the second will. In those scenario’s, retrying can be very useful.</p>
+
+<p>Let’s look at an example:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/diroqe/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.0.4"></script></p>
+
+<p>We have an observable <code>throw$</code> that will, once subscribed to, will throw an error. We use the <code>do</code> operator to see if it was invoked. We apply the <code>shareReplay</code> operator to this <code>throw$</code> observable. 
+We subscribe immediately and after three seconds. We can see that, even though the first subscriber gets an error, as soon as the second one subscribes, the source observable is resubscribed to by the <code>shareReplay</code> operator. This makes it retryable.</p>
+
+<p><strong>Conclusion:</strong> A multicasting operator is retryable when it resubscribes to the source observable when there is a new subscription and the source observable has errored before.</p>
+
+<h2 id="operator-overview">Operator overview</h2>
+
+<p>Time to give an overview of all the multicasting operators and their respective properties:
+<!-- 
+|                     | Multicasting 	                | Connectable                     | Reference counting*             | Replayable                      | Repeatable                      | Retryable                       |
+| ------------------- | :-----------------------------: | :------------------------------:| :-----------------------------: | :-----------------------------: |:------------------------------: |:------------------------------: |
+| share()             | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox" checked> | <input type="checkbox" checked> |
+| shareReplay()       | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox" checked> | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox" checked> |
+| publish()           | <input type="checkbox" checked> | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox">         | <input type="checkbox">         | <input type="checkbox">         |
+| publishReplay()     | <input type="checkbox" checked> | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox">         |
+| publishBehaviour()  | <input type="checkbox" checked> | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox">         | <input type="checkbox">         | <input type="checkbox">         |
+| publishLast()       | <input type="checkbox" checked> | <input type="checkbox" checked> | <input type="checkbox">         | <input type="checkbox">         | <input type="checkbox">         | <input type="checkbox">         |
+ -->
+<img src="https://www.dropbox.com/s/6kufxt28eca9e94/Screenshot%202018-01-08%2019.26.33.png?raw=1" alt="tableOverview" /></p>
+
+<nowiki>*Every multicasting operator which is connectable can also have the `refCount` operator applied to. In this table however, every operator that has 'Reference counting' checked, has reference counting implicitgit ly applied in the implementation of the operator.</nowiki>
+
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+                
+            
+                
+                    
+                        <figure class="author-image">
+                            <a class="img" href="/author/kwintenp" style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                        </figure>
+                    
+
+                    <section class="author">
+                        <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                        
+                            <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                        
+                        <div class="author-meta">
+                            <span class="author-location icon-location"> Belgium</span>
+                            <span class="author-link icon-link"><a href="https://twitter.com/kwintenp"> twitter.com/kwintenp</a></span>
+                        </div>
+                    </section>
+
+                    <!-- /author  -->
+
+                    <section class="share">
+                        <h4>Share this post</h4>
+                        <a class="icon-twitter" href="http://twitter.com/share?text=Multicasting operators in RxJS&amp;url=multicasting-operators-in-rxjs"
+                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                            <span class="hidden">Twitter</span>
+                        </a>
+                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=multicasting-operators-in-rxjs"
+                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                            <span class="hidden">Facebook</span>
+                        </a>
+                        <a class="icon-google-plus" href="https://plus.google.com/share?url=multicasting-operators-in-rxjs"
+                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                            <span class="hidden">Google+</span>
+                        </a>
+                    </section>
+                
+            
+
+            <!-- Add Disqus Comments -->
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'username'; // required: replace example with your forum shortname
+        var disqus_identifier = '/multicasting-operators-in-rxjs/';
+        var disqus_url = '/multicasting-operators-in-rxjs/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+            
+
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+        <a class="read-next-story " style="background-image: url(/assets/images/cover/cover4.jpg)" href="/code-formatting-with-rxjs">
+            <section class="post">
+                <h2>Code formatting and RxJS</h2>
+                <p>One of the main benefits of RxJS to me is that it provides code that...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover8.jpg)" href="/A-scalable-angular-architecture-part2">
+            <section class="post">
+                <h2>A scalable angular architecture (part 2)</h2>
+                <p>The sandbox pattern Introduction A while ago I released a blogpost called “A scalable angular...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-76318751-3', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>

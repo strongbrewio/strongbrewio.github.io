@@ -13,10 +13,10 @@
    
 	<item>
 	  <title>Code formatting and RxJS</title>
-	  <link>//code-formatting-with-rxjs</link>
+	  <link>//code-formatting-with-rxjs/</link>
 	  <author></author>
 	  <pubDate>2017-09-08T00:00:00+00:00</pubDate>
-	  <guid>//code-formatting-with-rxjs</guid>
+	  <guid>//code-formatting-with-rxjs/</guid>
 	  <description><![CDATA[
 	     <p>One of the main benefits of RxJS to me is that it provides code that is ‘readable’. It provides us with a declarative programming approach where implementation details are hidden away. We are just describing what needs to be done, not how it should be done. This makes code you look at easy to understand.</p>
 
@@ -172,10 +172,10 @@ By extracting nested observables to a separate variable and naming this new obse
 
 	<item>
 	  <title>Multicasting operators in RxJS</title>
-	  <link>//multicasting-operators-in-rxjs</link>
+	  <link>//multicasting-operators-in-rxjs/</link>
 	  <author></author>
 	  <pubDate>2017-08-20T00:00:00+00:00</pubDate>
-	  <guid>//multicasting-operators-in-rxjs</guid>
+	  <guid>//multicasting-operators-in-rxjs/</guid>
 	  <description><![CDATA[
 	     <p>With the arrival of RxJS 5.4 a while back, the RxJS team has given us yet another way to support multicasting in our applications. They introduced the <code>shareReplay</code> operator. With this new one around the corner, you might start wondering when to use which multicasting operator. Well, it’s your lucky day cause that’s what this post is all about.</p>
 
@@ -375,10 +375,10 @@ We subscribe immediately and after three seconds. We can see that, even though t
 
 	<item>
 	  <title>Introducing Rx devtools</title>
-	  <link>//introducing-rx-devtools</link>
+	  <link>//introducing-rx-devtools/</link>
 	  <author></author>
 	  <pubDate>2017-08-04T00:00:00+00:00</pubDate>
-	  <guid>//introducing-rx-devtools</guid>
+	  <guid>//introducing-rx-devtools/</guid>
 	  <description><![CDATA[
 	     <p>Ever since I first started using RxJS up until this very day, it has become my absolute favorite way of coding. I cannot believe to work in a world without observables anymore nor can I understand on how I was able to write code before. I have started sharing the knowlegde I had through blogposts, workshops and coaching.</p>
 
@@ -410,10 +410,10 @@ If you find any bugs, which I’m certain you will, please report them in the fo
 
 	<item>
 	  <title>How to setup marble testing</title>
-	  <link>//how-to-setup-marble-testing</link>
+	  <link>//how-to-setup-marble-testing/</link>
 	  <author></author>
 	  <pubDate>2017-02-15T00:00:00+00:00</pubDate>
-	  <guid>//how-to-setup-marble-testing</guid>
+	  <guid>//how-to-setup-marble-testing/</guid>
 	  <description><![CDATA[
 	     <p>In an earlier blogpost, I showed you guys how to do client side filtering with streams (<a href="http://blog.kwintenp.com/client-side-filtering-with-streams/" target="_blank">here</a>). I tried to show you how you could use marble diagrams to draw out how the data will flow in your streams. Turns out that drawing your marble diagrams up front can help you a lot in testing your code as well. Using the marble diagram testing provided by RxJS, we can easily test the code we’ve written in the previous post. Let’s see how.</p>
 
@@ -577,10 +577,10 @@ Let’s take a look at the full example.</p>
 
 	<item>
 	  <title>Using decorators and observables to implement retry</title>
-	  <link>//decorators-and-observables-to-implement-retry-logic</link>
+	  <link>//decorators-and-observables-to-implement-retry-logic/</link>
 	  <author></author>
 	  <pubDate>2017-02-15T00:00:00+00:00</pubDate>
-	  <guid>//decorators-and-observables-to-implement-retry-logic</guid>
+	  <guid>//decorators-and-observables-to-implement-retry-logic/</guid>
 	  <description><![CDATA[
 	     <p>Last week, I was at a meetup in Ghent where I was talking with <a href="https://twitter.com/stefanlapers" target="_blank">Stefan Lapers</a> about programming languages in general. We started talking about writing your backend using either Java or node.js. We agreed that node.js has massive potential but in a lot of situations companies choose Java because of it’s maturity. If you’re using a microservices based architecture for example, you can rely heavily on spring cloud which does a whole bunch of stuff for you so you can focus on functionality.
 One element in spring cloud is hystrix. When you’re doing a network call which is protected by hystrix, you can, by just adding an annotation, tell how many times you want to retry this if it fails and even provide a fallback if it fails entirely.</p>
@@ -724,10 +724,10 @@ public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
 
 	<item>
 	  <title>Client side filtering using streams</title>
-	  <link>//client-side-filtering-with-streams</link>
+	  <link>//client-side-filtering-with-streams/</link>
 	  <author></author>
 	  <pubDate>2017-02-15T00:00:00+00:00</pubDate>
-	  <guid>//client-side-filtering-with-streams</guid>
+	  <guid>//client-side-filtering-with-streams/</guid>
 	  <description><![CDATA[
 	     <p>I have been coaching people in using RxJS for a while now. During this time, I’ve noticed that the hardest part for people to learn is not the API, concept or operators but the paradigm switch. Thinking reactively is not something that comes easily and you really have to get your hands dirty to get there.</p>
 
@@ -918,10 +918,10 @@ We also don’t have to manually unsubscribe from the filteredCharacters$, the a
 
 	<item>
 	  <title>My favorite metaphor for hot vs cold observables</title>
-	  <link>//my-favorite-metaphor-for-hot-vs-cold-observables</link>
+	  <link>//my-favorite-metaphor-for-hot-vs-cold-observables/</link>
 	  <author></author>
 	  <pubDate>2017-01-10T00:00:00+00:00</pubDate>
-	  <guid>//my-favorite-metaphor-for-hot-vs-cold-observables</guid>
+	  <guid>//my-favorite-metaphor-for-hot-vs-cold-observables/</guid>
 	  <description><![CDATA[
 	     <p>A few weeks ago, I was at NG-BE (best conference of the year btw), where I was giving a workshop on RxJS and @ngrx/store in Angular 2 applications. In this course, we also explain hot vs cold observables.
 When I try to explain new concepts to people, I either try to start from a known concept and build my way up to the new thing or use a metaphor. I’ve been looking for a similar approach to explain the hot vs cold observables concept but didn’t found one myself.
@@ -979,10 +979,10 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
 
 	<item>
 	  <title>How share() can reduce network requests</title>
-	  <link>//how-share()-can-reduce-network-requests</link>
+	  <link>//how-share()-can-reduce-network-requests/</link>
 	  <author></author>
 	  <pubDate>2016-12-20T00:00:00+00:00</pubDate>
-	  <guid>//how-share()-can-reduce-network-requests</guid>
+	  <guid>//how-share()-can-reduce-network-requests/</guid>
 	  <description><![CDATA[
 	     <p>As you hopefully all know, observables you get back from the Angular 2 Http service are cold. A cold observable only starts when you subscribe to to it and is unicast (for every subscription to the Http observable, a network call is triggered).</p>
 
@@ -1098,10 +1098,10 @@ Let’s see what this does:</p>
 
 	<item>
 	  <title>Type safe actions in reducers</title>
-	  <link>//type-safe-actions-in-reducers</link>
+	  <link>//type-safe-actions-in-reducers/</link>
 	  <author></author>
 	  <pubDate>2016-11-21T00:00:00+00:00</pubDate>
-	  <guid>//type-safe-actions-in-reducers</guid>
+	  <guid>//type-safe-actions-in-reducers/</guid>
 	  <description><![CDATA[
 	     <p>I’ve been using TypeScript and Redux for a while now. One thing that’s been bothering me from day one is the lack of typing on actions, or so I thought. Until the following twitter conversation last week caught my eye.</p>
 
@@ -1258,10 +1258,10 @@ case ActionTypes.SET_ID:
 
 	<item>
 	  <title>combineReducers enhanced</title>
-	  <link>//combinereducers-enhanced</link>
+	  <link>//combinereducers-enhanced/</link>
 	  <author></author>
 	  <pubDate>2016-09-15T00:00:00+00:00</pubDate>
-	  <guid>//combinereducers-enhanced</guid>
+	  <guid>//combinereducers-enhanced/</guid>
 	  <description><![CDATA[
 	     <p>When working with redux or ngrx/store, you get a lovely utillity method called <code>combineReducers</code> that solves a pretty annoying problem for you. This method could however be further improved and we’ll see why in a bit.</p>
 
