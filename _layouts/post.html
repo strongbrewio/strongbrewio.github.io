@@ -4,14 +4,13 @@ disqus: false
 class: 'post-template'
 ---
 <!-- default -->
-
 <!-- The comment above "< default" means - insert everything in this file into -->
     <!-- the [body] of the default.hbs template, which contains our header/footer. -->
 
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header class="main-header post-head {% if page.cover %}" style="background-image: url({{ site.baseurl }}{{ page.cover }}) {% else %}no-cover{% endif %}">
+<header id="header" class="main-header post-head {% if page.cover %}" style="background-image: url({{ site.baseurl }}{{ page.cover }}) {% else %}no-cover{% endif %}">
     <nav class="main-nav {% if page.cover %} overlay {% endif %} clearfix">
         {% if page.logo %}<a class="blog-logo" href="{{ site.baseurl }}"><img src="{{ site.baseurl }}{{ page.logo }}" alt="Blog Logo" /></a>{% endif %}
         {% if page.navigation %}
@@ -143,5 +142,4 @@ class: 'post-template'
     {% endif %}
     <!-- [[! /prev_post ]] -->
 </aside>
-
 <!-- /post -->
