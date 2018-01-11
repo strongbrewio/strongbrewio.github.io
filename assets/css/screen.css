@@ -1898,6 +1898,10 @@ body.page-template .post-title {
    ========================================================================== */
 
 @media only screen and (max-width: 900px) {
+  .followme {
+    display: none;
+  }
+
   blockquote {
     margin-left: 0;
   }
@@ -2052,6 +2056,10 @@ body.page-template .post-title {
    ========================================================================== */
 
 @media only screen and (max-width: 500px) {
+  .followme {
+    display: none;
+  }
+
   .main-header {
     margin-bottom: 15px;
     height: 40vh;
