@@ -27,17 +27,25 @@ Custom css
  */
 .followme {
   background: #f1f1f1;
-  position: fixed;
-  right: 100px;
   padding: 20px;
   display: flex;
+  right: 40px;
   flex-direction: column;
   justify-content: center;
 }
 
+.followme-abs {
+  position: absolute;
+}
+
+.followme-fixed {
+  position: fixed;
+  top: 50px;
+}
+
 .followme > button {
-    width: 100px;
-    align-self: flex-end;
+  width: 100px;
+  align-self: flex-end;
 }
 /* ==========================================================================
    0. normalize.css v3.0.3 | MIT License | git.io/normalize | (minified)

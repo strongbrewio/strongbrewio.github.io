@@ -97,14 +97,13 @@
 
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
         <!-- default -->
-
 <!-- The comment above "< default" means - insert everything in this file into -->
     <!-- the [body] of the default.hbs template, which contains our header/footer. -->
 
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header class="main-header post-head " style="background-image: url(/assets/images/cover/cover8.jpg) ">
+<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover8.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
         
@@ -113,10 +112,25 @@
     </nav>
 </header>
 
-<div class="followme">
+<div class="followme followme-abs" id="followme">
     <h5>Want to work with us?</h5>
     <button onclick="location.href='mailto:info@strongbrew.io';">Hire us</button>
 </div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
 
 <main class="content" role="main">
 
@@ -428,7 +442,6 @@ Let’s take a look at the full example.</p>
     
     <!-- [[! /prev_post ]] -->
 </aside>
-
 <!-- /post -->
 
 
