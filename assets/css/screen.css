@@ -32,6 +32,7 @@ Custom css
   right: 40px;
   flex-direction: column;
   justify-content: center;
+  width: 10vw;
 }
 
 .followme-abs {
@@ -1899,6 +1900,19 @@ body.page-template .post-title {
   display: block;
   width: 45%;
   float: left;
+}
+
+@media only screen and (max-width: 1110px) {
+  .followme {
+    width: 8vw;
+    right: 10px;
+  }
+}
+
+@media only screen and (max-width: 1000px) {
+  .followme {
+    display: none;
+  }
 }
 
 /* ==========================================================================
