@@ -1,11 +1,18 @@
 ---
-layout: post
-title: RXJS best practices in Angular
+title: RxJS best practices in Angular
 published: false
 author: brechtbilliet
 description: This article is all about the do's and don'ts when it comes to writing reactive applications with RxJS in Angular applications. 
-
-comments: true
+layout: post
+navigation: True
+date:   2018-01-04
+tags: RxJS Angular
+subclass: 'post'
+categories: 'brechtbilliet'
+logo: 'assets/images/strongbrewlogo.png'
+published: true
+disqus: true
+cover: 'assets/images/cover/cover4.jpg'
 ---
 
 This article is all about the do's and don'ts when it comes to writing reactive applications with [RxJS](http://reactivex.io/) in [Angular](https://angular.io/) applications. 
@@ -35,8 +42,8 @@ That being said, I would not consider it a best practice, just a personal choice
 
 ## Learning how to think reactive
 
-Reactive programming is completely different than imperative programming. It requires us to make a certain mindswitch. 
-This mindswitch is rather important if we want to benifit from RxJS completely. 
+Reactive programming is completely different than imperative programming. It requires us to make a certain mind switch.
+This mind switch is rather important if we want to benefit from RxJS completely.
 We want to **stop thinking in specific actions** and we want to **start thinking in streams**. 
 It requires us to forget a part of practices that we already know (at least for a moment).
 In [this article](http://blog.brecht.io/Creating-reactive-calendar-in-angular4/) we can find some tips and practical examples on how to start thinking reactive in RxJS.
@@ -97,11 +104,11 @@ The concepts behind ASCII marble documentation are quite simple. Take this easy 
 // ---a--b--c--d---e#
 // ---a--b-^-c--d---e
 ```
-- `-` (stands for a timeframe)
-- `a-z` (are the values that are nexted in the stream)
+- `-` (stands for a time frame)
+- `a-z` (are the values that are next'ed in the stream)
 - `|` (indicates that the stream has completed)
 - `...` (indicates that the stream will keep on living)
-- `#` (indicates that an error occured)
+- `#` (indicates that an error occurred)
 - `^` (indicates where we start subscribing (only for hot streams)
 
 Perhaps it's time to check a real example and how we might document it:
@@ -117,13 +124,13 @@ const new$ = interval$
     )
 ```
 
-Take a minute to let this sink into your brain, because this might be **THE WAY** of making a complex codesnippets readable for anyone.
+Take a minute to let this sink into your brain, because this might be **THE WAY** of making a complex code snippets readable for anyone.
 When we take a look at this diagram, it's fairly easy to comprehend what happens, and how every operator affects the `new$` stream we can see above. There is no "one way of doing things" when it comes to writing ASCII marble-diagrams. You can put them where and how you want.
 As we want to do for all other documentation: **keep it up to date!**
 
 ## Using pure functions
 
-RXJS follows the concepts of functional reactive programming which basically means that we will use [pure functions](https://medium.com/javascript-scene/master-the-javascript-interview-what-is-a-pure-function-d1c076bec976) to create our reactive flow. 
+RxJS follows the concepts of functional reactive programming which basically means that we will use [pure functions](https://medium.com/javascript-scene/master-the-javascript-interview-what-is-a-pure-function-d1c076bec976) to create our reactive flow.
 A function is pure when:
 - It doesn't mutate anything
 - It will always return the same value based on the same parameters
@@ -139,7 +146,7 @@ That subscription will keep on living until the stream is **completed** or until
 Managing subscriptions is very important and in a number of cases we will have to manually unsubscribe an existing subscription to avoid memory leaks. Take this example for instance:
 
 ```typescript 
-class AppComponent imlements OnInit {
+class AppComponent implements OnInit {
    ngOnInit() {
         // The following stream will produce values every second
         // 0--1--2--3--4--5--6--...
@@ -156,7 +163,7 @@ class AppComponent imlements OnInit {
 To remove the memory-leak in this component we can keep track of the subscriptions by taking advantage of the `ngOnDestroy()` lifecycle hook of Angular:
 
 ```typescript 
-class AppComponent imlements OnInit, OnDestroy {
+class AppComponent implements OnInit, OnDestroy {
     subscriptions = [];
     ngOnInit() {
         const interval$ = interval(1000);
@@ -171,11 +178,11 @@ class AppComponent imlements OnInit, OnDestroy {
     }
 }
 ```
-
+// TODO: is niet helemaal duidelijk dat als je next op je subject dat die takeUntil een complete zal sturen naar je originele stream
 However, when we are using a bunch of subscriptions, it can become quite dirty. Before, we talked about the fact that a subscription will live until we manually unsubscribe (like we just did in the snippet above), but also until the stream gets **completed**. A cool way to handle this issue is to use a Subject that we next in the `ngOnDestroy()` lifecycle hook of Angular:
 
 ```typescript 
-class AppComponent imlements OnInit, OnDestroy {
+class AppComponent implements OnInit, OnDestroy {
     destroy$ = new Subject();
     ngOnInit() {
         // interval$: 0--1--2--3--4--5--6--...
@@ -249,15 +256,15 @@ class AppComponent {
 
 ## Avoiding manual subscribes in Angular
 
-To consume a stream we need to subscribe that stream, that's simply how observables work. But what if a component needs values from 5 different streams... Would that mean, that we want to subscribe to all of these streams and manually map all the values to unqiue properties, just to make it work? That would suck, right?!
+To consume a stream we need to subscribe that stream, that's simply how observables work. But what if a component needs values from 5 different streams... Would that mean, that we want to subscribe to all of these streams and manually map all the values to unique properties, just to make it work? That would suck, right?!
 
 Angular has this super cool feature called the `async pipe`. It's used to consume streams directly in the template
 The async pipe does 3 things for us:
 - It subscribes to the stream and passes the value to a component
 - It **unsubscribes automatically** when the component gets destroyed (removes a lot of unsubscribe logic)
-- Triggers changedetection automatically
+- Triggers change detection automatically
 
-This means we don't have to manually subscribe nor usubscribe anymore. Which cleans up the code a lot.
+This means we don't have to manually subscribe nor unsubscribe anymore. Which cleans up the code a lot.
 Let's have a look at the cleaned up previous example:
 
 ```typescript
@@ -287,7 +294,7 @@ If you are into [React](https://reactjs.org/), I've created this lib called [rea
 ## Don't pass streams to components directly
 
 One of the most important aspects of software architecture might be the concept of **decoupling** pieces of code.
-Therefore we could consider passing streams to child components as a **bad practice** because it creates a very tight link between the parent component and the child component. They are no longer decoupled since subscriptions in the child component might trigger actions in the parent component. We never want the child component to be responsable of initiating data calls right?! That's the task of the smart component. See the difference between
+Therefore we could consider passing streams to child components as a **bad practice** because it creates a very tight link between the parent component and the child component. They are no longer decoupled since subscriptions in the child component might trigger actions in the parent component. We never want the child component to be responsible of initiating data calls right?! That's the task of the smart component. See the difference between
 [smart and dumb components here](http://blog.brecht.io/components-demystified/#smart-vs-dumb-components).
 A component should always receive an object or value and should not even care if that object or value comes from a stream or not.
 
@@ -367,13 +374,13 @@ class UserDetailComponent {
 }
 ```
 
- The responsability of the component is clear. The user-detail is meant to be dumb and is completely decoupled from its parent.
+The responsibility of the component is clear. The user-detail is meant to be dumb and is completely decoupled from its parent.
 
 There are however situations where we would like to create a stream from an input. In that case we could take a look at this library: [ngx-reactivetoolkit](https://www.npmjs.com/package/ngx-reactivetoolkit)
 
 ## Don't pass streams to services
 
-Allthough, it might seem like a pragmatic solution to pass streams directly to services, it could be seen as a **bad practice** if we consider the decoupling again. By passing a stream to a service we don't know what's going to happen to it. The stream could be subscribed to, or even combined with another stream that has a longer lifecycle, that could eventually determine the state of our application. 
+Although, it might seem like a pragmatic solution to pass streams directly to services, it could be seen as a **bad practice** if we consider the decoupling again. By passing a stream to a service we don't know what's going to happen to it. The stream could be subscribed to, or even combined with another stream that has a longer lifecycle, that could eventually determine the state of our application.
 Subscriptions might trigger unwanted behavior. And after all, services don't care that your components are using streams. Take this example for instance:
 
 ```typescript
@@ -397,7 +404,7 @@ class FooService {
 }
 ```
 
-It would be better to use higher order streams for these situtations.
+It would be better to use higher order streams for these situations.
 Use `switchMap` over `mergeMap` if possible, since it will unsubscribe the previous stream.
 The following example is better since all the RxJS logic is centralized in one place where the subscribing and unsubscribing happens: The smart component.
 
@@ -426,13 +433,13 @@ class FooService {
 Since most streams are cold by default, every subscription will trigger the **producer** of these streams.
 The execution of the producer logic on every subscription, might not be what we want if we have multiple subscriptions.
 Eg. Subscribing to Angular its `http.get()` multiple times will actually perform multiple xhr calls.
-The following example will triger the xhr call twice because `numberOfUsers$` depends on `users$`.
+The following example will trigger the xhr call twice because `numberOfUsers$` depends on `users$`.
 
 ```typescript
 @Component({
     selector: 'app',
     template: `
-        Number of users: {{numberOfUsers$|async}}
+        Number of users: {{"{{numberOfUsers$|async"}}}}
         <users-grid [users]="users$|async"></users-grid>
     `
 })
@@ -450,7 +457,7 @@ In those cases we might want to share the subscriptions. The following example u
 @Component({
     selector: 'app',
     template: `
-        Number of users: {{numberOfUsers$|async}}
+        Number of users: {{"{{numberOfUsers$|async"}}}}
         <users-grid [users]="users$|async"></users-grid>
     `
 })
@@ -491,9 +498,9 @@ class AppComponent {
 ## When to use Subjects
 
 A Subject is both a hot observable and an observer at the same time. This gives us the opportunity to next values into the stream ourselves.
-Subjects tend to be overused by people that didn't make the mindswitch towards reactive programming yet.
+Subjects tend to be overused by people that didn't make the mind switch towards reactive programming yet.
 
-Only use them when realy needed, for instance it's ok to use Subjects in the following scenarios:
+Only use them when really needed, for instance it's ok to use Subjects in the following scenarios:
 ### When mocking streams in tests
 
 ```typescript
@@ -518,7 +525,7 @@ search$ = new Subject(); // ----t-----te-----ter----term...
 
 ### When handling circular references
 
-I'm not going to dive in this to deep, but [Dominic Elm]() does an awesome job by explaning in [this great article](https://blog.thoughtram.io/rxjs/2017/08/24/taming-snakes-with-reactive-streams.html#behaviorsubject-to-the-rescue)
+I'm not going to dive in this to deep, but [Dominic Elm]() does an awesome job explaining this in [this great article](https://blog.thoughtram.io/rxjs/2017/08/24/taming-snakes-with-reactive-streams.html#behaviorsubject-to-the-rescue)
 
 
 For most other cases an operator or Observable.create might be enough.
@@ -527,9 +534,9 @@ For most other cases an operator or Observable.create might be enough.
 A BehaviorSubject is commonly used because it has a `getValue()` function. That would also be considered a bad practice.
 When we are trying to fetch a specific value it usually means we are not thinking reactive.
 
-## Cleancode practices
+## Clean code practices
 Consistent code indentation and formatting can improve the readability of complex streams:
-- Align operators below eachother
+- Align operators below each other
 
 ```typescript
     foo$.pipe(
@@ -541,12 +548,12 @@ Consistent code indentation and formatting can improve the readability of comple
 
 - Extract into different streams when it becomes unreadable
 - Put complexer functionality in private methods (make the reactive flow clear)
-- Avoid the use of brackets for readablity, that's personal preference.
+- Avoid the use of brackets for readability, that's personal preference.
 
 
 ## Angular embraces RxJS
 
-We already saw a glympse of why Angular is a framework that really embraces the use of RxJS. 
+We already saw a glimpse of why Angular is a framework that really embraces the use of RxJS.
 Therefore it's recommended to use the functionality that Angular provides.
 - The `ActivatedRoute` has exposes a params stream.
 - The Http and HttpClient both return streams
