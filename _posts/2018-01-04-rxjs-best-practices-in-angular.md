@@ -10,7 +10,6 @@ tags: RxJS Angular
 subclass: 'post'
 categories: 'brechtbilliet'
 logo: 'assets/images/strongbrewlogo.png'
-published: true
 disqus: true
 cover: 'assets/images/cover/cover4.jpg'
 ---
