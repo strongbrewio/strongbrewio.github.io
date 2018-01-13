@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>RxJS best practices in Angular</title>
+    <meta name="description" content="This article is all about the do's and don'ts when it comes to writing reactive applications with RxJS in Angular applications." />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="//rxjs-best-practices-in-angular/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="RxJS best practices in Angular" />
+    <meta property="og:description" content="This article is all about the do's and don'ts when it comes to writing reactive applications with RxJS in Angular applications." />
+    <meta property="og:url" content="//rxjs-best-practices-in-angular/" />
+    <meta property="og:image" content="/assets/images/cover/cover4.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RxJS best practices in Angular" />
+    <meta name="twitter:description" content="This article is all about the do's and don'ts when it comes to writing reactive applications with RxJS in Angular applications." />
+    <meta name="twitter:url" content="//rxjs-best-practices-in-angular/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover4.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "RxJS best practices in Angular",
+    "url": "//rxjs-best-practices-in-angular/",
+    "image": "/assets/images/cover/cover4.jpg",
+    "description": "This article is all about the do's and don'ts when it comes to writing reactive applications with RxJS in Angular applications."
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover4.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+    <h5>Want to work with us?</h5>
+    <button onclick="location.href='mailto:info@strongbrew.io';">Hire us</button>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">RxJS best practices in Angular</h1>
+            <section class="post-meta">
+            <!-- <a href='/'></a> -->
+
+            
+                
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                
+            
+                
+            
+            <time class="post-date" datetime="2018-01-04">04 Jan 2018</time>
+                <!-- [[tags prefix=" on "]] -->
+                
+                on
+                
+                    
+                       <a href='/tag/RxJS'>Rxjs</a>,
+                    
+                
+                    
+                       <a href='/tag/Angular'>Angular</a>
+                    
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+
+            <p>This article is all about the do’s and don’ts when it comes to writing reactive applications with <a href="http://reactivex.io/">RxJS</a> in <a href="https://angular.io/">Angular</a> applications. 
+The best practices described in this article are based on personal experiences and can be assumed as personal opinions.</p>
+
+<p>The topics we will tackle in this article are:</p>
+<ul>
+  <li><a href="#learning-how-to-think-reactive">Learning how to think reactive</a></li>
+  <li><a href="#lettable-operators">Lettable operators</a></li>
+  <li><a href="#ascii-marble-diagrams">ASCII marble diagrams</a></li>
+  <li><a href="#using-pure-functions">Using pure functions</a></li>
+  <li><a href="#avoiding-memory-leaks">Avoiding memory leaks</a></li>
+  <li><a href="#avoiding-nested-subscribes">Avoiding nested subscribes</a></li>
+  <li><a href="#avoiding-manual-subscribes-in-Angular">Avoiding manual subscribes in Angular</a></li>
+  <li><a href="#dont-pass-streams-to-components-directly">Don’t pass streams to components directly</a></li>
+  <li><a href="#dont-pass-streams-to-services">Don’t pass streams to services</a></li>
+  <li><a href="#sharing-subscriptions">Sharing subscriptions</a></li>
+  <li><a href="#when-to-use-Subjects">When to use Subjects</a></li>
+  <li><a href="#cleancode-practices">Clean-code practices</a></li>
+  <li><a href="#Angular-embraces-RxJS">Angular embraces RxJS</a></li>
+</ul>
+
+<p><strong>Note:</strong>
+We will refer to observables as streams in this article.
+Since the streams in this article use the <code>$</code>-suffix, a short explanation.
+First of all, there is a lot of debate about the <code>$</code>-suffix but I believe this should be a personal preference. 
+The reason why I prefer to use it, is because I find it very easy to separate streams from regular objects.
+That being said, I would not consider it a best practice, just a personal choice.</p>
+
+<h2 id="learning-how-to-think-reactive">Learning how to think reactive</h2>
+
+<p>Reactive programming is completely different than imperative programming. It requires us to make a certain mind switch.
+This mind switch is rather important if we want to benefit from RxJS completely.
+We want to <strong>stop thinking in specific actions</strong> and we want to <strong>start thinking in streams</strong>. 
+It requires us to forget a part of practices that we already know (at least for a moment).
+In <a href="http://blog.brecht.io/Creating-reactive-calendar-in-angular4/">this article</a> we can find some tips and practical examples on how to start thinking reactive in RxJS.</p>
+
+<h2 id="lettable-operators">Lettable operators</h2>
+
+<p>The first best practice is the use of lettable operators. The operators being used in this article are lettable.
+Since version 5.5 RxJS has introduced these so called lettable operators which are easier to import than patch operators, and
+also have <a href="https://webpack.js.org/guides/tree-shaking/">treeshaking</a> advantages. More information about lettable operators can be found <a href="https://blog.angularindepth.com/rxjs-understanding-lettable-operators-fe74dda186d3">here</a> and <a href="https://blog.hackages.io/rxjs-5-5-piping-all-the-things-9d469d1b3f44">here</a>.</p>
+
+<p>This example illustrates the difference between doing it the old way and the new way.</p>
+
+<pre><code class="language-typescript">// BAD: This is the old way and should be avoided (patch operators)
+// as we can see the operators (filter, map) are part of the
+// Observable prototype
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+const new$ = Observable.interval$
+    .filter(v =&gt; v % 2 === 0)
+    .map(v =&gt; v * 2);
+
+// GOOD: This is the new and improved way (lettable operators)
+// we just use the pipe operator where we pass operators that
+// we can import from 'rxjs/operators'
+import {filter, map} from 'rxjs/operators';
+const new$ = interval$
+    .pipe(
+        filter(v =&gt; v % 2 === 0),
+        map(v =&gt; v *2)
+    )
+</code></pre>
+
+<h2 id="ascii-marble-diagrams">ASCII marble diagrams</h2>
+
+<p>Some developers tend to say: “Great code should be self-explanatory, writing documentation is something that we might want to avoid.”
+In some cases I would agree with that statement, but for complex RxJS code we might want to reconsider.
+Streams can become complex in the following scenarios:</p>
+<ul>
+  <li>When we take the lifecycle of streams into account, (how long do they live? when do they start living? what destroys them?)</li>
+  <li>When we start combining streams (every stream has a different lifecycle remember?)</li>
+  <li>When we subscribe multiple times or even subscribe after a while, or even never subscribe to them</li>
+</ul>
+
+<p><a href="http://rxmarbles.com/">marble diagrams</a> are a cool way of visualising streams but it’s hard to put those marble-diagrams in our code right?!
+There is an ASCII variant of these marble-diagrams that we can use to describe and document our complex streams and how they interact with each other.</p>
+
+<p>ASCII diagrams have more advantages then just documenting:</p>
+<ul>
+  <li>It gives us a graphic thinking model</li>
+  <li>It becomes easy to review someones code and validate to see if it really does what it’s supposed to be doing</li>
+  <li>Great to draw on a whiteboard before we start coding</li>
+  <li>You can type them in your IDE or editor before you actually start coding. (An easy way to trick your mind into thinking reactively)</li>
+  <li>We can use them to write unit tests as well: <a href="http://blog.kwintenp.com/how-to-setup-marble-testing/">Checkout this awesome article</a></li>
+</ul>
+
+<p>The concepts behind ASCII marble documentation are quite simple. Take this easy example for instance:</p>
+
+<pre><code class="language-typescript">// ---a--b--c--d---e---...
+// ---a--b--c--d---e|
+// ---a--b--c--d---e#
+// ---a--b-^-c--d---e
+</code></pre>
+<ul>
+  <li><code>-</code> (stands for a time frame)</li>
+  <li><code>a-z</code> (are the values that are next’ed in the stream)</li>
+  <li><code>|</code> (indicates that the stream has completed)</li>
+  <li><code>...</code> (indicates that the stream will keep on living)</li>
+  <li><code>#</code> (indicates that an error occurred)</li>
+  <li><code>^</code> (indicates where we start subscribing (only for hot streams)</li>
+</ul>
+
+<p>Perhaps it’s time to check a real example and how we might document it:</p>
+
+<pre><code class="language-typescript">const interval$ = interval(1000)            // 0--1--2--3--4--5--6...
+const new$ = interval$
+    .pipe(
+        skip(1),                            // ---1--2--3--4--5--6...
+        take(5),                            // ---1--2--3--4--5|
+        filter(v =&gt; v % 2 === 0),           // ------2-----4-----6
+        map(v =&gt; v + 1)                     // ------3-----5-----7
+    )
+</code></pre>
+
+<p>Take a minute to let this sink into your brain, because this might be <strong>THE WAY</strong> of making a complex code snippets readable for anyone.
+When we take a look at this diagram, it’s fairly easy to comprehend what happens, and how every operator affects the <code>new$</code> stream we can see above. There is no “one way of doing things” when it comes to writing ASCII marble-diagrams. You can put them where and how you want.
+As we want to do for all other documentation: <strong>keep it up to date!</strong></p>
+
+<h2 id="using-pure-functions">Using pure functions</h2>
+
+<p>RxJS follows the concepts of functional reactive programming which basically means that we will use <a href="https://medium.com/javascript-scene/master-the-javascript-interview-what-is-a-pure-function-d1c076bec976">pure functions</a> to create our reactive flow.
+A function is pure when:</p>
+<ul>
+  <li>It doesn’t mutate anything</li>
+  <li>It will always return the same value based on the same parameters</li>
+  <li>It doesn’t have any side effects. It can’t mutate state outside of the function</li>
+</ul>
+
+<p>In the beginning it might seem pragmatic to use side effects, but that mostly means we aren’t fully thinking reactively. 
+Therefore avoid side effects at much as possible.</p>
+
+<h2 id="avoiding-memory-leaks">Avoiding memory leaks</h2>
+
+<p>To consume a stream we need to <strong>subscribe</strong> to that stream. When we subscribe to that stream a <strong>subscription</strong> will be created.
+That subscription will keep on living until the stream is <strong>completed</strong> or until we <strong>unsubscribe manually</strong> from that stream.
+Managing subscriptions is very important and in a number of cases we will have to manually unsubscribe an existing subscription to avoid memory leaks. Take this example for instance:</p>
+
+<pre><code class="language-typescript">class AppComponent implements OnInit {
+   ngOnInit() {
+        // The following stream will produce values every second
+        // 0--1--2--3--4--5--6--...
+        const interval$ = interval(1000);
+        // Even when this component gets destroyed,
+        // the stream will keep producing values...
+        // This means the console will keep on logging
+        // This is a classic example of a memory-leak
+        const subscription = interval$.subscribe(r =&gt; console.log(r));
+    }
+}
+</code></pre>
+
+<p>To remove the memory-leak in this component we can keep track of the subscriptions by taking advantage of the <code>ngOnDestroy()</code> lifecycle hook of Angular:</p>
+
+<pre><code class="language-typescript">class AppComponent implements OnInit, OnDestroy {
+    subscriptions = [];
+    ngOnInit() {
+        const interval$ = interval(1000);
+        const subscription = interval$.subscribe(r =&gt; console.log(r));
+        // manually keep track of the subscriptions in a subscription array
+        this.subscriptions.push(subscription);
+    }
+
+    ngOnDestroy() {
+        // when the component get's destroyed, unsubscribe all the subscriptions
+        this.subscriptions.forEach(sub =&gt; sub.unsubscribe());
+    }
+}
+</code></pre>
+<p>// TODO: is niet helemaal duidelijk dat als je next op je subject dat die takeUntil een complete zal sturen naar je originele stream
+However, when we are using a bunch of subscriptions, it can become quite dirty. Before, we talked about the fact that a subscription will live until we manually unsubscribe (like we just did in the snippet above), but also until the stream gets <strong>completed</strong>. A cool way to handle this issue is to use a Subject that we next in the <code>ngOnDestroy()</code> lifecycle hook of Angular:</p>
+
+<pre><code class="language-typescript">class AppComponent implements OnInit, OnDestroy {
+    destroy$ = new Subject();
+    ngOnInit() {
+        // interval$: 0--1--2--3--4--5--6--...
+        // destroy$:  -------------true|
+        // result:    0--1--2--3--4|
+        const interval$ = interval(1000);
+        interval$
+            // let the interval$ stream live 
+            // until the destroy$ Subject gets a value
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(r =&gt; console.log(r));
+    }
+
+    ngOnDestroy() {
+        // when the component get's destroyed, pass something to the
+        // destroy$ Subject
+        this.destroy$.next(true);
+    }
+}
+</code></pre>
+
+<h2 id="avoiding-nested-subscribes">Avoiding nested subscribes</h2>
+
+<p>Nesting subscribes is something that needs to be avoided as much as possible. It makes the code unreadable, complex, and introduces side effects.
+It basically forces you to <strong>NOT</strong> think reactively. Take this Angular example for instance:</p>
+
+<pre><code class="language-typescript">class AppComponent {
+    user: User;
+    constructor(
+        private route: ActivatedRoute, 
+        private userService: UserService)
+    {
+        // when the params of the route changes,
+        // we want to fetch the user and set the user property
+        //
+        // VERY BAD: nesting subscribes is ugly and takes away
+        // the control over a stream
+        this.route.params
+            .pipe(map(v =&gt; v.id))
+            .subscribe(id =&gt; 
+                this.userService.fetchById(id)
+                    .subscribe(user =&gt; this.user = user))
+    }
+}
+</code></pre>
+
+<p>The previous implementation is considered a bad-practice. It’s recommended to use <strong>higher-order streams</strong> like <code>mergeMap</code> or <code>switchMap</code>. Let’s have a look at this example:</p>
+
+<pre><code class="language-typescript">class AppComponent {
+    user: User;
+    constructor(
+        private route: ActivatedRoute, 
+        private userService: UserService) 
+    {
+        // when the params of the route changes,
+        // we want to fetch the user and set the user property
+        //
+        // GOOD: we have created a single subscribe which makes
+        // the flow way easier and gives us the control we need
+        this.route.params
+            .pipe(
+                map(v =&gt; v.id),
+                switchMap(id =&gt; this.userService.fetchById(id))
+            )
+            .subscribe(user =&gt; this.user = user)
+    }
+}
+</code></pre>
+
+<h2 id="avoiding-manual-subscribes-in-angular">Avoiding manual subscribes in Angular</h2>
+
+<p>To consume a stream we need to subscribe that stream, that’s simply how observables work. But what if a component needs values from 5 different streams… Would that mean, that we want to subscribe to all of these streams and manually map all the values to unique properties, just to make it work? That would suck, right?!</p>
+
+<p>Angular has this super cool feature called the <code>async pipe</code>. It’s used to consume streams directly in the template
+The async pipe does 3 things for us:</p>
+<ul>
+  <li>It subscribes to the stream and passes the value to a component</li>
+  <li>It <strong>unsubscribes automatically</strong> when the component gets destroyed (removes a lot of unsubscribe logic)</li>
+  <li>Triggers change detection automatically</li>
+</ul>
+
+<p>This means we don’t have to manually subscribe nor unsubscribe anymore. Which cleans up the code a lot.
+Let’s have a look at the cleaned up previous example:</p>
+
+<pre><code class="language-typescript">@Component({
+    ...
+    template: `
+        &lt;user-detail [user]="user$|async"&gt;&lt;/user-detail&gt;
+    `
+})
+class AppComponent {
+    // expose a user$ stream that will be 
+    // subscribed in the template with the async pipe
+    user$ = this.route.params.pipe(
+        map(v =&gt; v.id),
+        switchMap(id =&gt; this.userService.fetchById(id))
+    );
+
+    constructor(
+        private route: ActivatedRoute, 
+        private userService: UserService) {
+    }
+}
+</code></pre>
+
+<p>If you are into <a href="https://reactjs.org/">React</a>, I’ve created this lib called <a href="https://www.npmjs.com/package/react-rx-connect">react-rx-connect</a> that would solve this problem. It binds the streams to the state, and unsubscribes from them when the component gets destroyed.</p>
+
+<h2 id="dont-pass-streams-to-components-directly">Don’t pass streams to components directly</h2>
+
+<p>One of the most important aspects of software architecture might be the concept of <strong>decoupling</strong> pieces of code.
+Therefore we could consider passing streams to child components as a <strong>bad practice</strong> because it creates a very tight link between the parent component and the child component. They are no longer decoupled since subscriptions in the child component might trigger actions in the parent component. We never want the child component to be responsible of initiating data calls right?! That’s the task of the smart component. See the difference between
+<a href="http://blog.brecht.io/components-demystified/#smart-vs-dumb-components">smart and dumb components here</a>.
+A component should always receive an object or value and should not even care if that object or value comes from a stream or not.</p>
+
+<pre><code class="language-typescript">// BAD
+// app.component.ts
+@Component({
+    selector: 'app',
+    template: `
+        &lt;!-- 
+            BAD: The users$ steram is passed
+            to user-detail directly as a stream 
+        --&gt;
+        &lt;user-detail [user$]="user$"&gt;&lt;/user-detail&gt;
+    `
+})
+class AppComponent {
+    // this http call will get called when the 
+    // user-detail component subscribes to users$
+    // We don't want that
+    users$ = this.http.get(...);
+    ...
+}
+
+// user-detail.component.ts
+@Component({
+    selector: 'user-detail',
+    template: `
+        
+    `
+})
+class UserDetailComponent implements OnInit {
+    @Input() user$: Observable&lt;User&gt;;
+    user: User;
+    ngOnInit(){
+        // WHOOPS! This child component subscribes to the stream
+        // of the parent component which will do an automatic XHR call
+        // because Angular HTTP returns a cold stream
+        this.user$.subscribe(u =&gt; this.user = u);
+    }
+}
+</code></pre>
+
+<p>It would be better to handle the subscription in the parent component itself:</p>
+
+<pre><code class="language-typescript">// GOOD
+// app.component.ts
+@Component({
+    selector: 'app',
+    template: `
+        &lt;user-detail [user]="user$|async"&gt;&lt;/user-detail&gt;
+    `
+})
+class AppComponent implements OnInit {
+    users$: Observable&lt;User[]&gt; = this.http.get(...);
+    user: User;
+    ngOnInit(){
+        // the app component (smart) subscribes to the user$ which will
+        // do an XHR call here
+        this.users$ = this.http.get(...);
+    }
+    ...
+}
+
+// user-detail.component.ts
+@Component({
+    selector: 'user-detail',
+    template: `
+        
+    `
+})
+class UserDetailComponent {
+    // This component doesn't even know that we are using RxJS which
+    // results in better decoupling
+    @Input() user: User;
+}
+</code></pre>
+
+<p>The responsibility of the component is clear. The user-detail is meant to be dumb and is completely decoupled from its parent.</p>
+
+<p>There are however situations where we would like to create a stream from an input. In that case we could take a look at this library: <a href="https://www.npmjs.com/package/ngx-reactivetoolkit">ngx-reactivetoolkit</a></p>
+
+<h2 id="dont-pass-streams-to-services">Don’t pass streams to services</h2>
+
+<p>Although, it might seem like a pragmatic solution to pass streams directly to services, it could be seen as a <strong>bad practice</strong> if we consider the decoupling again. By passing a stream to a service we don’t know what’s going to happen to it. The stream could be subscribed to, or even combined with another stream that has a longer lifecycle, that could eventually determine the state of our application.
+Subscriptions might trigger unwanted behavior. And after all, services don’t care that your components are using streams. Take this example for instance:</p>
+
+<pre><code class="language-typescript">// BAD
+// app.component.ts
+class AppComponent {
+     users$ = this.http.get(...)
+     filteredusers$ = this.fooService
+        .filterUsers(this.users$); // Passing stream directly: BAD
+    ...
+}
+
+// foo.service.ts
+class FooService {
+    // return a stream based on a stream
+    // BAD! because we don't know what will happen here
+    filterUsers(users$: Observable&lt;User[]&gt;): Observable&lt;User[]&gt; {
+        return users$.pipe(
+            map(users =&gt; users.filter(user =&gt; user.age &gt;= 18))
+    }
+}
+</code></pre>
+
+<p>It would be better to use higher order streams for these situations.
+Use <code>switchMap</code> over <code>mergeMap</code> if possible, since it will unsubscribe the previous stream.
+The following example is better since all the RxJS logic is centralized in one place where the subscribing and unsubscribing happens: The smart component.</p>
+
+<pre><code class="language-typescript">// GOOD
+// app.component.ts
+class AppComponent {
+    users$ = this.http.get(...)
+    filteredusers$ = this.users$
+        .pipe(switchMap(users =&gt; this.fooService.filterUsers(users)));
+    ...
+}
+
+// foo.service.ts
+class FooService {
+    // this is way cleaner: this service doesn't even know
+    // about streams now
+    filterUsers(users: User): User[] {
+        return users.pipe(filter(user =&gt; user.age &gt;= 18);
+    }
+}
+</code></pre>
+
+<h2 id="sharing-subscriptions">Sharing subscriptions</h2>
+
+<p>Since most streams are cold by default, every subscription will trigger the <strong>producer</strong> of these streams.
+The execution of the producer logic on every subscription, might not be what we want if we have multiple subscriptions.
+Eg. Subscribing to Angular its <code>http.get()</code> multiple times will actually perform multiple xhr calls.
+The following example will trigger the xhr call twice because <code>numberOfUsers$</code> depends on <code>users$</code>.</p>
+
+<pre><code class="language-typescript">@Component({
+    selector: 'app',
+    template: `
+        Number of users: {{numberOfUsers$|async}}
+        &lt;users-grid [users]="users$|async"&gt;&lt;/users-grid&gt;
+    `
+})
+// BAD
+class AppComponent {
+    users$ = this.http.get(...)
+    // the subscription on this stream will execute the xhr call again
+    numberOfUsers$ = this.users$.pipe(map(v =&gt; v.length); 
+}
+</code></pre>
+
+<p>In those cases we might want to share the subscriptions. The following example uses the <code>share()</code> operator:</p>
+
+<pre><code class="language-typescript">@Component({
+    selector: 'app',
+    template: `
+        Number of users: {{numberOfUsers$|async}}
+        &lt;users-grid [users]="users$|async"&gt;&lt;/users-grid&gt;
+    `
+})
+// GOOD
+class AppComponent {
+    users$ = this.http.get(...).pipe(share());
+    // the subscription on this stream will execute the xhr call again
+    numberOfUsers$ = this.users$.pipe(map(v =&gt; v.length); 
+}
+</code></pre>
+
+<p>Sharing a stream makes it hot. This means that if we subscribe after the value is produced, we will miss that value.
+In that case we might want to use <code>shareReplay(1)</code> instead of <code>share()</code>. This will keep the last value in memory for us.</p>
+
+<p>It’s a common mistake to share everything. We don’t always want to work with hot streams and sharing subscriptions comes with a small performance cost.Also, lazy streams have their advantages.</p>
+
+<p>Angular also provides a <em>great alternative</em> that can reduce the sharing of streams to a minimum by using the <code>async as else</code> syntax.. 
+Personally I would consider the use of this feature as a best practice.
+The following example reduces the number of streams, the number of subscriptions and gives us <strong>an easy way to show a loading indicator</strong>.</p>
+
+<pre><code class="language-typescript">@Component({
+    selector: 'app',
+    template: `
+        &lt;div *ngIf="users$|async as users; else loading"&gt;
+            Number of users: 
+            &lt;users-grid [users]="users"&gt;&lt;/users-grid&gt;
+        &lt;/div&gt;
+        &lt;ng-template #loading&gt;Loading...&lt;/ng-template&gt;
+    `
+})
+class AppComponent {
+    // This stream will only subscribed to once
+    users$ = this.http.get(...);
+}
+</code></pre>
+
+<h2 id="when-to-use-subjects">When to use Subjects</h2>
+
+<p>A Subject is both a hot observable and an observer at the same time. This gives us the opportunity to next values into the stream ourselves.
+Subjects tend to be overused by people that didn’t make the mind switch towards reactive programming yet.</p>
+
+<p>Only use them when really needed, for instance it’s ok to use Subjects in the following scenarios:</p>
+<h3 id="when-mocking-streams-in-tests">When mocking streams in tests</h3>
+
+<pre><code class="language-typescript">const fetchAll$ = new Subject(); // use a Subject as a mock
+usersServiceMock.fetchAll.mockReturnValue(fetchAll$);
+fetchAll$.next(fakeUser);
+</code></pre>
+
+<h3 id="when-we-want-to-create-streams-from-outputs-in-angular">When we want to create streams from outputs in Angular</h3>
+
+<pre><code class="language-typescript">@Component({
+    ...
+    template: `
+    &lt;some-component (search)="search$.next($event)"&gt;&lt;/some-component&gt;
+    `
+})
+class AppComponent {
+search$ = new Subject(); // ----t-----te-----ter----term...
+}
+</code></pre>
+
+<h3 id="when-handling-circular-references">When handling circular references</h3>
+
+<p>I’m not going to dive in this to deep, but <a href="">Dominic Elm</a> does an awesome job explaining this in <a href="https://blog.thoughtram.io/rxjs/2017/08/24/taming-snakes-with-reactive-streams.html#behaviorsubject-to-the-rescue">this great article</a></p>
+
+<p>For most other cases an operator or Observable.create might be enough.</p>
+
+<p><strong>Note:</strong>
+A BehaviorSubject is commonly used because it has a <code>getValue()</code> function. That would also be considered a bad practice.
+When we are trying to fetch a specific value it usually means we are not thinking reactive.</p>
+
+<h2 id="clean-code-practices">Clean code practices</h2>
+<p>Consistent code indentation and formatting can improve the readability of complex streams:</p>
+<ul>
+  <li>Align operators below each other</li>
+</ul>
+
+<pre><code class="language-typescript">    foo$.pipe(
+        map(...)
+        filter(...)
+        tap(...)
+    )
+</code></pre>
+
+<ul>
+  <li>Extract into different streams when it becomes unreadable</li>
+  <li>Put complexer functionality in private methods (make the reactive flow clear)</li>
+  <li>Avoid the use of brackets for readability, that’s personal preference.</li>
+</ul>
+
+<h2 id="angular-embraces-rxjs">Angular embraces RxJS</h2>
+
+<p>We already saw a glimpse of why Angular is a framework that really embraces the use of RxJS.
+Therefore it’s recommended to use the functionality that Angular provides.</p>
+<ul>
+  <li>The <code>ActivatedRoute</code> has exposes a params stream.</li>
+  <li>The Http and HttpClient both return streams</li>
+  <li>The <code>Form</code> and <code>FormControl</code> both have a <code>valueChanges</code> property that returns a stream</li>
+  <li>The async pipe is an awesome feature that really helps us to use the streams in our templates</li>
+  <li>Using the <code>ngOnInit()</code> lifecycle function to initialize streams can help us for mocking purposes</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Still here? Awesome! We learned a lot! If this article interests you, you might want to check out the “Advanced RxJS in Angular workshop” from <a href="https://strongbrew.io">Strongbrew</a>, where me and <a href="blog.kwintenp.com">Kwinten Pisman</a> teach how to use advanced RxJS in real Angular applications.</p>
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+                
+                    
+                        <figure class="author-image">
+                            <a class="img" href="/author/brechtbilliet" style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
+                        </figure>
+                    
+
+                    <section class="author">
+                        <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                        
+                            <p> Software architect/trainer/coach/speaker/blogger</p>
+                        
+                        <div class="author-meta">
+                            <span class="author-location icon-location"> Belgium</span>
+                            <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        </div>
+                    </section>
+
+                    <!-- /author  -->
+
+                    <section class="share">
+                        <h4>Share this post</h4>
+                        <a class="icon-twitter" href="http://twitter.com/share?text=RxJS best practices in Angular&amp;url=rxjs-best-practices-in-angular"
+                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                            <span class="hidden">Twitter</span>
+                        </a>
+                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=rxjs-best-practices-in-angular"
+                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                            <span class="hidden">Facebook</span>
+                        </a>
+                        <a class="icon-google-plus" href="https://plus.google.com/share?url=rxjs-best-practices-in-angular"
+                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                            <span class="hidden">Google+</span>
+                        </a>
+                    </section>
+                
+            
+                
+            
+
+            <!-- Add Disqus Comments -->
+            
+                
+                    <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+            
+
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover8.jpg)" href="/safe-image-requests-in-angular">
+            <section class="post">
+                <h2>Safe image requests in angular</h2>
+                <p>We all know how to load images in a web-application right? We would just make...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-76318751-3', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>

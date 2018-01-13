@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Strongbrew blog</title>
+    <title>Strongbrew</title>
     <meta name="description" content="" />
 
     <!-- Mobile Meta -->
@@ -25,21 +25,21 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="//" />
+        <link rel="canonical" href="//tag/Angular/page3/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Strongbrew blog" />
+    <meta property="og:title" content="Strongbrew" />
     <meta property="og:description" content="" />
-    <meta property="og:url" content="//" />
+    <meta property="og:url" content="//tag/Angular/page3/" />
     <meta property="og:image" content="/assets/images/bg-gradient.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Strongbrew blog" />
+    <meta name="twitter:title" content="Strongbrew" />
     <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="//" />
+    <meta name="twitter:url" content="//tag/Angular/page3/" />
     <meta name="twitter:image:src" content="/assets/images/bg-gradient.jpg" />
 
     <script type="application/ld+json">
@@ -47,8 +47,8 @@
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Strongbrew blog",
-    "url": "//",
+    "name": "Strongbrew",
+    "url": "//tag/Angular/page3/",
     "image": "/assets/images/bg-gradient.jpg",
     "description": ""
 }
@@ -59,7 +59,7 @@
 
 
 </head>
-<body class="home-template nav-closed">
+<body class="paged archive-template nav-closed">
 
     <!-- The blog navigation links -->
     <div class="nav">
@@ -68,7 +68,7 @@
         <span class="hidden">Close</span>
     </a>
     <ul>
-        <li class="nav-home  nav-current" role="presentation"><a
+        <li class="nav-home " role="presentation"><a
                 href="/">Home</a></li>
         <li class="nav-about " role="presentation"><a
                 href="/about">About</a></li>
@@ -96,12 +96,14 @@
     <div class="site-wrapper">
 
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
-        <!-- < default -->
+        <!-- dynamically overriding backgrounds for tags as well as descriptions -->
+
+
+<!-- default -->
 <!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<!-- The big featured header  -->
-<header class="main-header "
-        style="background-image: url(/assets/images/bg-gradient.jpg) ">
+<!-- If we have a tag cover, display that - else blog cover - else nothing -->
+<header class="main-header tag-head " style="background-image: url(/assets/images/bg-gradient.jpg) ">
     <nav class="main-nav overlay clearfix">
         <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
         
@@ -110,11 +112,14 @@
     </nav>
     <div class="vertical">
         <div class="main-header-content inner">
-            <h1 class="page-title">Strongbrew</h1>
-            <h2 class="page-description"></h2>
+            <h1 class="page-title">Angular</h1>
+            <h2 class="page-description">
+            
+			    A 11-post collection
+            
+            </h2>
         </div>
     </div>
-    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">Scroll Down</span></a>
 </header>
 
 <!-- The main content area on the homepage -->
@@ -126,9 +131,11 @@
         
             <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 5 </span>
-     
-        <a class="older-posts" href="/page2/" title="Next Page">Older Posts &raquo;</a>
+        
+            <a class="newer-posts" href="/tag/Angular/page2/" title="Previous Page">&laquo; Newer Posts</a>
+      
+    
+    <span class="page-number"> Page 3 of 3 </span>
      
 </nav>
         
@@ -137,78 +144,10 @@
     
     <article class="post">
         <header class="post-header">
-            <h2 class="post-title"><a href="/rxjs-best-practices-in-angular">RxJS best practices in Angular</a></h2>
+            <h2 class="post-title"><a href="/how-the-hell-do-zones-really-work">How the hell does zone.js really work?</a></h2>
         </header>
         <section class="post-excerpt">
-            <p>This article is all about the do’s and don’ts when it comes to writing reactive applications with RxJS in Angular applications. The best practices described in... <a class="read-more" href="/rxjs-best-practices-in-angular">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/brechtbilliet'>Brecht Billiet</a>
-
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/RxJS'>Rxjs</a>,
-                    
-                
-                    
-                       <a href='/tag/Angular'>Angular</a>
-                    
-                
-            
-            <time class="post-date" datetime="2018-01-04">04 Jan 2018</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/safe-image-requests-in-angular">Safe image requests in angular</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we... <a class="read-more" href="/safe-image-requests-in-angular">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/brechtbilliet'>Brecht Billiet</a>
-
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/Angular'>Angular</a>
-                    
-                
-            
-            <time class="post-date" datetime="2017-10-24">24 Oct 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/code-formatting-with-rxjs">Code formatting and RxJS</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>One of the main benefits of RxJS to me is that it provides code that is ‘readable’. It provides us with a declarative programming approach where... <a class="read-more" href="/code-formatting-with-rxjs">&raquo;</a></p>
+            <p>If you’ve read about Angular 2 change detection, you will probably have heard about zones. Zones is a feature that was ported from Dart and is... <a class="read-more" href="/how-the-hell-do-zones-really-work">&raquo;</a></p>
         </section>
         <footer class="post-meta">
             
@@ -227,75 +166,11 @@
                 on
                 
                     
-                       <a href='/tag/RxJS'>Rxjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2017-09-08">08 Sep 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/multicasting-operators-in-rxjs">Multicasting operators in RxJS</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>With the arrival of RxJS 5.4 a while back, the RxJS team has given us yet another way to support multicasting in our applications. They introduced... <a class="read-more" href="/multicasting-operators-in-rxjs">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
-
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/RxJS'>Rxjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2017-08-20">20 Aug 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/A-scalable-angular-architecture-part2">A scalable angular architecture (part 2)</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>The sandbox pattern Introduction A while ago I released a blogpost called “A scalable angular 2 architecture” which was all about creating large scale enterprise webapplications.... <a class="read-more" href="/A-scalable-angular-architecture-part2">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/brechtbilliet'>Brecht Billiet</a>
-
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
                        <a href='/tag/Angular'>Angular</a>
                     
                 
             
-            <time class="post-date" datetime="2017-08-13">13 Aug 2017</time>
+            <time class="post-date" datetime="2016-06-09">09 Jun 2016</time>
         </footer>
     </article>
     
@@ -304,9 +179,11 @@
     
         <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 5 </span>
-     
-        <a class="older-posts" href="/page2/" title="Next Page">Older Posts &raquo;</a>
+        
+            <a class="newer-posts" href="/tag/Angular/page2/" title="Previous Page">&laquo; Newer Posts</a>
+      
+    
+    <span class="page-number"> Page 3 of 3 </span>
      
 </nav>
     
