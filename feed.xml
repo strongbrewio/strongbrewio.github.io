@@ -8,22 +8,6 @@
     
       
       <item>
-        <title>RxJS best practices in Angular</title>
-        
-          <description>&lt;p&gt;This article is all about the do’s and don’ts when it comes to writing reactive applications with &lt;a href=&quot;http://reactivex.io/&quot;&gt;RxJS&lt;/a&gt; in &lt;a href=&quot;https://angular.io/&quot;&gt;Angular&lt;/a&gt; applications. 
-The best practices described in this article are based on personal experiences and can be assumed as personal opinions.&lt;/p&gt;
-
-</description>
-        
-        <pubDate>Thu, 04 Jan 2018 00:00:00 +0000</pubDate>
-        <link>
-        /rxjs-best-practices-in-angular/</link>
-        <guid isPermaLink="true">/rxjs-best-practices-in-angular/</guid>
-      </item>
-      
-    
-      
-      <item>
         <title>Safe image requests in angular</title>
         
           <description>&lt;p&gt;We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.&lt;/p&gt;
