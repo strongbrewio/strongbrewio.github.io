@@ -1,6 +1,6 @@
 ---
 title: RxJS best practices in Angular
-published: false
+published: true
 author: brechtbilliet
 description: This article is all about the do's and don'ts when it comes to writing reactive applications with RxJS in Angular applications. 
 layout: post
@@ -177,7 +177,7 @@ class AppComponent implements OnInit, OnDestroy {
     }
 }
 ```
-// TODO: is niet helemaal duidelijk dat als je next op je subject dat die takeUntil een complete zal sturen naar je originele stream
+
 However, when we are using a bunch of subscriptions, it can become quite dirty. Before, we talked about the fact that a subscription will live until we manually unsubscribe (like we just did in the snippet above), but also until the stream gets **completed**. A cool way to handle this issue is to use a Subject that we next in the `ngOnDestroy()` lifecycle hook of Angular:
 
 ```typescript 
