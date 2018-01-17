@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "strongbrew-blog"
+    "default": "strongbrew-blog",
+    "strongbrew-blog": "strongbrew-blog"
   }
 }
