@@ -11,6 +11,7 @@ categories: 'brechtbilliet'
 disqus: true
 tags: Angular
 cover: 'assets/images/cover/cover8.jpg'
+navigation: true
 ---
 
 # The sandbox pattern
