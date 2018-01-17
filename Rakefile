@@ -69,6 +69,7 @@ namespace :site do
             git add --all .;
             git commit -m 'Updating to #{USERNAME}/#{REPO}@#{sha}.';
             git push --quiet origin #{DESTINATION_BRANCH};
+            firebase deploy --token=${FIREBASE_TOKEN}
          fi"
       puts "Pushed updated branch #{DESTINATION_BRANCH} to GitHub Pages"
     end
