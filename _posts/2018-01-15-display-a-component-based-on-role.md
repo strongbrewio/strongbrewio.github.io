@@ -44,7 +44,7 @@ Our directive needs several things to make it work properly. First of all, we ne
 
 #### Getting a reference to the element that needs to be added
 
-To get a reference to the element we need to add, we can use a 'template directive'. We can make any directive a 'template directive' by prefixing the directive with an asterisk when we use it. This is syntactic sugar for the angular compiler. If we do this, this is what the compiler actually sees:
+To get a reference to the element we need to add, we can use a 'template directive' (or structural directive). We can make any directive a 'template directive' by prefixing the directive with an asterisk when we use it. This is syntactic sugar for the angular compiler. If we do this, this is what the compiler actually sees:
 
 ```html
 <!-- what we write -->
@@ -60,7 +60,7 @@ To get a reference to the element we need to add, we can use a 'template directi
 We can see that the compiler puts our directive onto an `ng-template`. This is ideal because it allows our directive to inject the `TemplateRef` containing the element we need to add (if the user has the role), which is what we want.
 
 #### Finding the DOM entry point
-To know where we can inject the `TemplateRef`, our directive can just inject the `ViewContainerRef`. This represents the container where we can attach one or more views. 
+To know where we can inject the `TemplateRef`, our directive can just inject the `ViewContainerRef`. This represents the container where we can attach one or more views. For more information on the `ViewContainerRef` you can read <a href="https://netbasal.com/angular-2-understanding-viewcontainerref-acc183f3b682" target="blank">this</a> post.
 
 #### Knowing the roles the user has
 To know the roles a certain user has, we could leverage a service (in the example code `rolesService`) that exposes a stream with all the roles the user has.
