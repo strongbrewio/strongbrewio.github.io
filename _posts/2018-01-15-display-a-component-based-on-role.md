@@ -19,7 +19,6 @@ At some moment in time, almost every application will have certain parts that ne
 But what if it's only a single component that cannot be rendered when the user does not have the proper role? Angular does not provide something out of the box for this. Luckily this is something we can pretty easily implement using directives. 
 
 <iframe src="https://player.vimeo.com/video/251380600" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-<p><a href="https://vimeo.com/251380600">Displaying components based on the role of a user</a> from <a href="https://vimeo.com/user79085465">Kwinten Pisman</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
 
 ### Defining what we want
 We want to create a directive that accepts a role. This is the role the user must have to see this specific component.
@@ -66,7 +65,7 @@ To know where we can inject the `TemplateRef`, our directive can just inject the
 To know the roles a certain user has, we could leverage a service (in the example code `rolesService`) that exposes a stream with all the roles the user has.
 
 ### The hasRole directive end result
-Now that we have identified all the different things we need to properly implement our directve, we can start. See the comments for more information.
+Now that we have identified all the different things we need to properly implement our directive, we can start. See the comments for more information.
 
 ```typescript
 @Directive({
