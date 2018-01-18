@@ -16,7 +16,7 @@ cover: 'assets/images/cover/cover4.jpg'
 ---
 At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.
 
-But what if it's only a single component that cannot be rendered when the user does not have the proper role? Angular does not provide something out of the box for this. Luckily this is something we can pretty easily implement using directives. 
+But what if it's only a single component that cannot be rendered when the user does not have the proper role? Angular does not provide something out of the box for this. Luckily this is something we can easily implement using directives. 
 
 <iframe src="https://player.vimeo.com/video/251380600" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
@@ -32,18 +32,18 @@ It might look something like this:
 
 ### Defining how it should work
 
-Lets define the characteristics for our directive:
-* If the user has the proper role, the component should be shown
-* If the user does not have the proper role, the component shouldn't be added to the DOM
+Let's define the characteristics for our directive:
+* If the user has the proper role, the component should be shown.
+* If the user does not have the proper role, the component shouldn't be added to the DOM.
 
-If you think about it, that's pretty much what an `*ngIf` directive does. Based on a certain condition, a component or native element must be added or removed from the DOM.
+If you think about it, that's pretty much what an `*ngIf` directive does. Based on a certain condition, a component or native element must be added to the DOM or removed from the DOM.
 
-### What does our directive need to make it work
-Our directive needs several things to make it work properly. First of all, we need a reference to the element that needs to be added to the DOM. Secondly, we need a place where we can insert the element to the DOM if needed. And lastly, we need to know the roles the user has.
+### What does our directive need to make it work?
+Our directive needs several things to make it work properly. First of all, we need a reference to the element that needs to be added to the DOM. On a secondary note, we need a place where we can insert the element to the DOM if needed. And lastly, we need to know the roles the user has.
 
 #### Getting a reference to the element that needs to be added
 
-To get a reference to the element we need to add, we can use a 'template directive' (or structural directive). We can make any directive a 'template directive' by prefixing the directive with an asterisk when we use it. This is syntactic sugar for the angular compiler. If we do this, this is what the compiler actually sees:
+To get a reference to the element we need to add, we can use a 'template directive' (or <a href="https://angular.io/guide/structural-directives" target="blank">structural directive</a>). We can make any directive a 'template directive' by prefixing the directive with an asterisk (`*`) when we use it. This is syntactic sugar for the angular compiler. If we do this, this is what the compiler actually sees:
 
 ```html
 <!-- what we write -->
@@ -61,8 +61,8 @@ We can see that the compiler puts our directive onto an `ng-template`. This is i
 #### Finding the DOM entry point
 To know where we can inject the `TemplateRef`, our directive can just inject the `ViewContainerRef`. This represents the container where we can attach one or more views. For more information on the `ViewContainerRef` you can read <a href="https://netbasal.com/angular-2-understanding-viewcontainerref-acc183f3b682" target="blank">this</a> post.
 
-#### Knowing the roles the user has
-To know the roles a certain user has, we could leverage a service (in the example code `rolesService`) that exposes a stream with all the roles the user has.
+#### Knowing the roles a user has
+To know the roles a certain user has, we could leverage a service (in the example code `rolesService`) that exposes a stream with all the roles that user has.
 
 ### The hasRole directive end result
 Now that we have identified all the different things we need to properly implement our directive, we can start. See the comments for more information.
