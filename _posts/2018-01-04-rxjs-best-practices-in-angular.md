@@ -19,7 +19,7 @@ The best practices described in this article are based on personal experiences a
 
 The topics we will tackle in this article are:
 - [Learning how to think reactive](#learning-how-to-think-reactive)
-- [Lettable operators](#lettable-operators)
+- [Pipeable operators](#pipeable-operators)
 - [ASCII marble diagrams](#ascii-marble-diagrams)
 - [Using pure functions](#using-pure-functions)
 - [Avoiding memory leaks](#avoiding-memory-leaks)
@@ -47,9 +47,9 @@ We want to **stop thinking in specific actions** and we want to **start thinking
 It requires us to forget a part of practices that we already know (at least for a moment).
 In [this article](http://blog.brecht.io/Creating-reactive-calendar-in-angular4/) we can find some tips and practical examples on how to start thinking reactive in RxJS.
 
-## Lettable operators
+## Pipeable operators
 
-The first best practice is the use of lettable operators. The operators being used in this article are lettable.
+The first best practice is the use of pipeable operators. The operators being used in this article are pipeable.
 Since version 5.5 RxJS has introduced these so called lettable operators which are easier to import than patch operators, and
 also have [treeshaking](https://webpack.js.org/guides/tree-shaking/) advantages. More information about lettable operators can be found [here](https://blog.angularindepth.com/rxjs-understanding-lettable-operators-fe74dda186d3) and [here](https://blog.hackages.io/rxjs-5-5-piping-all-the-things-9d469d1b3f44).
 
