@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Displaying components based on the role of a user</title>
+        
+          <description>&lt;p&gt;At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 15 Jan 2018 00:00:00 +0000</pubDate>
+        <link>
+        /display-a-component-based-on-role/</link>
+        <guid isPermaLink="true">/display-a-component-based-on-role/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>RxJS best practices in Angular</title>
         
           <description>&lt;p&gt;This article is all about the do’s and don’ts when it comes to writing reactive applications with &lt;a href=&quot;http://reactivex.io/&quot;&gt;RxJS&lt;/a&gt; in &lt;a href=&quot;https://angular.io/&quot;&gt;Angular&lt;/a&gt; applications. 

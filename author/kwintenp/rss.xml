@@ -12,6 +12,140 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Displaying components based on the role of a user</title>
+	  <link>//display-a-component-based-on-role/</link>
+	  <author></author>
+	  <pubDate>2018-01-15T00:00:00+00:00</pubDate>
+	  <guid>//display-a-component-based-on-role/</guid>
+	  <description><![CDATA[
+	     <p>At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.</p>
+
+<p>But what if it’s only a single component that cannot be rendered when the user does not have the proper role? Angular does not provide something out of the box for this. Luckily this is something we can easily implement using directives.</p>
+
+<iframe src="https://player.vimeo.com/video/251380600" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+
+<h3 id="defining-what-we-want">Defining what we want</h3>
+<p>We want to create a directive that accepts a role. This is the role the user must have to see this specific component.
+It might look something like this:</p>
+
+<pre><code class="language-html">&lt;app-normal-users-can-view *appHasRole="'user'"&gt;
+&lt;/app-normal-users-can-view&gt;
+</code></pre>
+
+<h3 id="defining-how-it-should-work">Defining how it should work</h3>
+
+<p>Let’s define the characteristics for our directive:</p>
+<ul>
+  <li>If the user has the proper role, the component should be shown.</li>
+  <li>If the user does not have the proper role, the component shouldn’t be added to the DOM.</li>
+</ul>
+
+<p>If you think about it, that’s pretty much what an <code>*ngIf</code> directive does. Based on a certain condition, a component or native element must be added to the DOM or removed from the DOM.</p>
+
+<h3 id="what-does-our-directive-need-to-make-it-work">What does our directive need to make it work?</h3>
+<p>Our directive needs several things to make it work properly. First of all, we need a reference to the element that needs to be added to the DOM. On a secondary note, we need a place where we can insert the element to the DOM if needed. And lastly, we need to know the roles the user has.</p>
+
+<h4 id="getting-a-reference-to-the-element-that-needs-to-be-added">Getting a reference to the element that needs to be added</h4>
+
+<p>To get a reference to the element we need to add, we can use a ‘template directive’ (or <a href="https://angular.io/guide/structural-directives" target="blank">structural directive</a>). We can make any directive a ‘template directive’ by prefixing the directive with an asterisk (<code>*</code>) when we use it. This is syntactic sugar for the angular compiler. If we do this, this is what the compiler actually sees:</p>
+
+<pre><code class="language-html">&lt;!-- what we write --&gt;
+&lt;app-normal-users-can-view *appHasRole="'user'"&gt;
+&lt;/app-normal-users-can-view&gt;
+
+&lt;!-- how the compiler interprets it --&gt;
+&lt;ng-template [appHasRole]="'user'"&gt;
+      &lt;app-normal-users-can-view&gt;&lt;/app-normal-users-can-view&gt;
+&lt;/ng-template&gt;
+</code></pre>
+
+<p>We can see that the compiler puts our directive onto an <code>ng-template</code>. This is ideal because it allows our directive to inject the <code>TemplateRef</code> containing the element we need to add (if the user has the role), which is what we want.</p>
+
+<h4 id="finding-the-dom-entry-point">Finding the DOM entry point</h4>
+<p>To know where we can inject the <code>TemplateRef</code>, our directive can just inject the <code>ViewContainerRef</code>. This represents the container where we can attach one or more views. For more information on the <code>ViewContainerRef</code> you can read <a href="https://netbasal.com/angular-2-understanding-viewcontainerref-acc183f3b682" target="blank">this</a> post.</p>
+
+<h4 id="knowing-the-roles-a-user-has">Knowing the roles a user has</h4>
+<p>To know the roles a certain user has, we could leverage a service (in the example code <code>rolesService</code>) that exposes a stream with all the roles that user has.</p>
+
+<h3 id="the-hasrole-directive-end-result">The hasRole directive end result</h3>
+<p>Now that we have identified all the different things we need to properly implement our directive, we can start. See the comments for more information.</p>
+
+<pre><code class="language-typescript">@Directive({
+  selector: '[appHasRole]'
+})
+export class HasRoleDirective implements OnInit, OnDestroy {
+  // the role the user must have 
+  @Input() appHasRole: string;
+
+  stop$ = new Subject();
+
+  isVisible = false;
+
+  /**
+   * @param {ViewContainerRef} viewContainerRef 
+   * 	-- the location where we need to render the templateRef
+   * @param {TemplateRef&lt;any&gt;} templateRef 
+   *   -- the templateRef to be potentially rendered
+   * @param {RolesService} rolesService 
+   *   -- will give us access to the roles a user has
+   */
+  constructor(
+    private viewContainerRef: ViewContainerRef,
+    private templateRef: TemplateRef&lt;any&gt;,
+    private rolesService: RolesService
+  ) {}
+
+  ngOnInit() {
+    //  We subscribe to the roles$ to know the roles the user has
+    this.rolesService.roles$.pipe(
+    	takeUntil(this.stop$)
+    ).subscribe(roles =&gt; {
+      // If he doesn't have any roles, we clear the viewContainerRef
+      if (!roles) {
+        this.viewContainerRef.clear();
+      }
+      // If the user has the role needed to 
+      // render this component we can add it
+      if (roles.includes(this.appHasRole)) {
+        // If it is already visible (which can happen if
+        // his roles changed) we do not need to add it a second time
+        if (!this.isVisible) {
+          // We update the `isVisible` property and add the 
+          // templateRef to the view using the 
+          // 'createEmbeddedView' method of the viewContainerRef
+          this.isVisible = true;
+          this.viewContainerRef.createEmbeddedView(this.templateRef);
+        }
+      } else {
+        // If the user does not have the role, 
+        // we update the `isVisible` property and clear
+        // the contents of the viewContainerRef
+        this.isVisible = false;
+        this.viewContainerRef.clear();
+      }
+    });
+  }
+  
+  // Clear the subscription on destroy
+  ngOnDestroy() {
+    this.stop$.next();
+  }
+}
+
+</code></pre>
+<p>You can find the full source code <a href="https://github.com/KwintenP/display-or-hide-components-based-on-role" target="_blank">here</a>. You can play with a live example <a href="" target="_blank">here</a>. You can change the roles on top by clicking the checkboxes. If a role is granted, a new element is added to the DOM.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>Leveraging a few somewhat more advanced concepts as ‘template directives’, <code>viewContainerRef</code> and <code>TemplateRef</code>, we were able to easily implement our own <code>*ngIf</code> like directive that works based on the roles with a limited amount of code.</p>
+
+<p><strong>Note:</strong> In this example I’m using roles. Applying a role based strategy for authorization poses some problems. There will always be cases where a user should have role ‘X’ but should also be able to see a portion of the functionality that users with role ‘Y’ see. In that case, you would have to create a new role, ‘Z’, that holds properties of ‘X’ and ‘Y’.</p>
+
+<p>In growing applications, this will mean a lot of roles, that might be only used by a single person. With that in mind, it’s always better to give the user certain ‘rights’. If the user can see the ‘User management’ part of the application, he should have the ‘right’ ‘user_mgmt’ for example. Using ‘rights’ avoids the problem described above with the roles.</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Code formatting and RxJS</title>
 	  <link>//code-formatting-with-rxjs/</link>
 	  <author></author>
@@ -1251,166 +1385,6 @@ case ActionTypes.SET_ID:
 <p>Using some of TypeScript 2’s powerful typing system, you can make the actions in your reducers type safe with little effort.</p>
 
 <p><strong>Note:</strong> Thanks to <a href="https://twitter.com/PascalPrecht" target="_blank">Pascal Precht</a>, <a href="https://twitter.com/toddmotto" target="_blank">Todd Motto</a>, <a href="https://twitter.com/basarat" target="_blank">Basarat</a> and <a href="https://twitter.com/SamVerschueren" target="_blank">Sam Verschueren</a> for reviewing!</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>combineReducers enhanced</title>
-	  <link>//combinereducers-enhanced/</link>
-	  <author></author>
-	  <pubDate>2016-09-15T00:00:00+00:00</pubDate>
-	  <guid>//combinereducers-enhanced/</guid>
-	  <description><![CDATA[
-	     <p>When working with redux or ngrx/store, you get a lovely utillity method called <code>combineReducers</code> that solves a pretty annoying problem for you. This method could however be further improved and we’ll see why in a bit.</p>
-
-<p><strong>Note: some knowledge of the redux architecture is required to continue with this blogpost. Checkout <a href="http://redux.js.org/" target="_blank">this</a> for more info on Redux.</strong></p>
-
-<p><strong>Note: Since the PR still isn’t merged in the @ngrx/store library, I created a separate npm module with the functionality described below. You can find the github repo <a href="https://github.com/KwintenP/combine-reducers-enhanced" target="_blank">here</a>.</strong></p>
-
-<p><strong>TL;DR Go to the <a href="#conclusion">conclusion</a></strong></p>
-
-<h3 id="current-situation">Current situation</h3>
-<p>Take a look at the following state design.</p>
-
-<pre><code class="language-typescript">{
-	"ui": {
-		"topBarCollapsed": true,
-		"sideBarCollapsed": true
-	},
-	"data": {
-		"tweets": [],
-		"users": []
-	}
-}
-</code></pre>
-
-<p>Let’s try to translate this into reducers.</p>
-
-<h5 id="without-combinereducers">Without combineReducers</h5>
-
-<p>Remember, when your store is being initialised, you can only pass it a single reducer. To avoid a single reducer with all the logic, we are going to use the concept of reducer composition. Your reducer tree could look like this:</p>
-
-<p><img src="https://www.dropbox.com/s/gglg3j3ama5affo/Screenshot%202016-09-14%2016.35.12.png?raw=1" /></p>
-
-<p>You can then create your store like this:</p>
-
-<pre><code class="language-typescript">// pseudo code
-new Store(rootReducer);
-</code></pre>
-
-<p>The function of the rootReducer is:</p>
-
-<ul>
-  <li>Delegate the actions towards the dataReducer and the uiReducer with the correct state slice.</li>
-  <li>Assure that the reference of the data does not change if changes are made to the ui property and vice versa.</li>
-</ul>
-
-<p>The ‘rootReducer’ doesn’t do that much and it’s a PITA to have to write this every time. Every time a new action is added, you need to add it to the rootReducer as well.
-Enter <code>combineReducers</code>!</p>
-
-<h5 id="with-combinereducers">With combineReducers</h5>
-<p><code>combineReducers</code> removes the need to write this reducer yourself. When creating your store, you can pass it, not only a reducer function, but also an object like this:</p>
-
-<pre><code class="language-typescript">const rootReducer = {
-	ui: uiReducer,
-	data: dataReducer
-}
-
-new Store(rootReducer);
-</code></pre>
-
-<p>The store will see this is not a function, and thus not a ‘rootReducer’. Internally it will  pass this object to the <code>combineReducers</code> method. This will generate a ‘meta-reducer’ for you that does exactly the same as the ‘rootReducer’ we’ve described before.
-Conceptually speaking it looks like this:</p>
-
-<p><img src="https://www.dropbox.com/s/i1mh7frvr8tddg0/Screenshot%202016-09-15%2007.42.26.png?raw=1" /></p>
-
-<p>The advantage is that you do not need to write the ‘rootReducer’ yourself.
-Pretty neat right!</p>
-
-<h3 id="problem-description">Problem description</h3>
-<p>Let’s say, you have a state tree that looks more like this.</p>
-
-<pre><code class="language-typescript">{
-	"ui": {
-		"mainPage": {
-				"topBarCollapsed": true
-		},
-		"loginPage": {
-			"sideBarCollapsed": true
-		}
-	},
-	"data": {
-		"tweets": [],
-		"users": []
-	}
-}
-</code></pre>
-
-<p>As you can see, we have a second nested level for our ui property and maybe we want to split the data into two different reducers, a tweets- and usersReducer.
-Let’s take a look at how we can implement this.</p>
-
-<h3 id="current-possible-solutions">Current possible solutions</h3>
-<p>The <code>combineReducers</code> method only allows a single level of nesting, so we’ll have to see how we can fix this.</p>
-
-<h5 id="create-the-intermediary-reducers-yourself">Create the intermediary reducers yourself</h5>
-<p>You can always decide to just implement the intermediate reducers yourself.</p>
-
-<p><img src="https://www.dropbox.com/s/e2gjsrcp03cxzq9/Screenshot%202016-09-15%2020.11.55.png?raw=1" /></p>
-
-<p>However, writing these reducers yourself is the same PITA as it was for the first level so it’s not the preferred solution</p>
-
-<h5 id="use-a-third-party-library-which-handles-this-for-you">Use a third-party library which handles this for you</h5>
-<p>There is a third-party library created by Brecht Billiet that does exactly this. Check it out <a href="https://github.com/brechtbilliet/create-reducer-tree">here</a>.
-You can pass it an object and it will create all the intermediate reducers for you. This is an awesome solution, but unfortunately, it requires us to depend an yet another third-party library.</p>
-
-<h5 id="nest-the-combinereducers-method-yourself">Nest the combineReducers method yourself</h5>
-
-<p>Since we have the <code>combineReducers</code> method, we might as well leverage it fully and use it for every intermediary reducer. You can do this by passing an object like this to your store at creation time.</p>
-
-<pre><code class="language-typescript">const rootReducer = {
-	"ui": combineReducers({
-		"mainPage": mainPageReducer
-		"loginPage": loginReducer
-	}),
-	"data": combineReducers({
-		"tweets": tweetsReducer
-		"users": usersReducer
-	})
-}
-</code></pre>
-
-<p>It will generate all the intermediary reducers for you but the ‘rootReducer’ definition doesn’t look clean. For people just starting with Redux, this will probably look a little confusing as well.</p>
-
-<p>It turns out, the <code>combineReducers</code> method can be changed to fix this pretty easily.
-<a name="conclusion"></a></p>
-
-<h3 id="proposed-solution">Proposed solution</h3>
-<p>I’ve created a <a href="https://github.com/ngrx/store/pull/214" target="_blank">PR</a> towards the ngrx/store library where I extended the <code>combineReducers</code> method to work with nested objects as well. This allows you to create an object like this:</p>
-
-<pre><code class="language-typescript">const rootReducer = {
-	"ui": {
-		"mainPage": mainPageReducer
-		"loginPage": loginReducer
-	},
-	"data": {
-		"tweets": tweetsReducer
-		"users": usersReducer
-	}
-}
-
-new Store(rootReducer);
-</code></pre>
-
-<p>which will create this:</p>
-
-<p><img src="https://www.dropbox.com/s/lpd3io77pqemecp/Screenshot%202016-09-15%2007.42.41.png?raw=1" /></p>
-
-<p>It’s actually a change of only two LOC and semantically does exactly the same as nesting the <code>combineReducers</code> method yourself or the third-party library, but it’s a lot cleaner to implement and use.
-If you feel this feature might help you in the future, be sure to ‘like’ the PR it so it could be added to the library asap.</p>
-
-<p><strong>Note: As soon as the PR is being approved for the NGRX/Store library, I’ll submit a similar one to Redux.js</strong></p>
 
 
 	  ]]></description>

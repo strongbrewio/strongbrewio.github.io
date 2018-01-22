@@ -12,6 +12,140 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Displaying components based on the role of a user</title>
+	  <link>//display-a-component-based-on-role/</link>
+	  <author></author>
+	  <pubDate>2018-01-15T00:00:00+00:00</pubDate>
+	  <guid>//display-a-component-based-on-role/</guid>
+	  <description><![CDATA[
+	     <p>At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.</p>
+
+<p>But what if it’s only a single component that cannot be rendered when the user does not have the proper role? Angular does not provide something out of the box for this. Luckily this is something we can easily implement using directives.</p>
+
+<iframe src="https://player.vimeo.com/video/251380600" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+
+<h3 id="defining-what-we-want">Defining what we want</h3>
+<p>We want to create a directive that accepts a role. This is the role the user must have to see this specific component.
+It might look something like this:</p>
+
+<pre><code class="language-html">&lt;app-normal-users-can-view *appHasRole="'user'"&gt;
+&lt;/app-normal-users-can-view&gt;
+</code></pre>
+
+<h3 id="defining-how-it-should-work">Defining how it should work</h3>
+
+<p>Let’s define the characteristics for our directive:</p>
+<ul>
+  <li>If the user has the proper role, the component should be shown.</li>
+  <li>If the user does not have the proper role, the component shouldn’t be added to the DOM.</li>
+</ul>
+
+<p>If you think about it, that’s pretty much what an <code>*ngIf</code> directive does. Based on a certain condition, a component or native element must be added to the DOM or removed from the DOM.</p>
+
+<h3 id="what-does-our-directive-need-to-make-it-work">What does our directive need to make it work?</h3>
+<p>Our directive needs several things to make it work properly. First of all, we need a reference to the element that needs to be added to the DOM. On a secondary note, we need a place where we can insert the element to the DOM if needed. And lastly, we need to know the roles the user has.</p>
+
+<h4 id="getting-a-reference-to-the-element-that-needs-to-be-added">Getting a reference to the element that needs to be added</h4>
+
+<p>To get a reference to the element we need to add, we can use a ‘template directive’ (or <a href="https://angular.io/guide/structural-directives" target="blank">structural directive</a>). We can make any directive a ‘template directive’ by prefixing the directive with an asterisk (<code>*</code>) when we use it. This is syntactic sugar for the angular compiler. If we do this, this is what the compiler actually sees:</p>
+
+<pre><code class="language-html">&lt;!-- what we write --&gt;
+&lt;app-normal-users-can-view *appHasRole="'user'"&gt;
+&lt;/app-normal-users-can-view&gt;
+
+&lt;!-- how the compiler interprets it --&gt;
+&lt;ng-template [appHasRole]="'user'"&gt;
+      &lt;app-normal-users-can-view&gt;&lt;/app-normal-users-can-view&gt;
+&lt;/ng-template&gt;
+</code></pre>
+
+<p>We can see that the compiler puts our directive onto an <code>ng-template</code>. This is ideal because it allows our directive to inject the <code>TemplateRef</code> containing the element we need to add (if the user has the role), which is what we want.</p>
+
+<h4 id="finding-the-dom-entry-point">Finding the DOM entry point</h4>
+<p>To know where we can inject the <code>TemplateRef</code>, our directive can just inject the <code>ViewContainerRef</code>. This represents the container where we can attach one or more views. For more information on the <code>ViewContainerRef</code> you can read <a href="https://netbasal.com/angular-2-understanding-viewcontainerref-acc183f3b682" target="blank">this</a> post.</p>
+
+<h4 id="knowing-the-roles-a-user-has">Knowing the roles a user has</h4>
+<p>To know the roles a certain user has, we could leverage a service (in the example code <code>rolesService</code>) that exposes a stream with all the roles that user has.</p>
+
+<h3 id="the-hasrole-directive-end-result">The hasRole directive end result</h3>
+<p>Now that we have identified all the different things we need to properly implement our directive, we can start. See the comments for more information.</p>
+
+<pre><code class="language-typescript">@Directive({
+  selector: '[appHasRole]'
+})
+export class HasRoleDirective implements OnInit, OnDestroy {
+  // the role the user must have 
+  @Input() appHasRole: string;
+
+  stop$ = new Subject();
+
+  isVisible = false;
+
+  /**
+   * @param {ViewContainerRef} viewContainerRef 
+   * 	-- the location where we need to render the templateRef
+   * @param {TemplateRef&lt;any&gt;} templateRef 
+   *   -- the templateRef to be potentially rendered
+   * @param {RolesService} rolesService 
+   *   -- will give us access to the roles a user has
+   */
+  constructor(
+    private viewContainerRef: ViewContainerRef,
+    private templateRef: TemplateRef&lt;any&gt;,
+    private rolesService: RolesService
+  ) {}
+
+  ngOnInit() {
+    //  We subscribe to the roles$ to know the roles the user has
+    this.rolesService.roles$.pipe(
+    	takeUntil(this.stop$)
+    ).subscribe(roles =&gt; {
+      // If he doesn't have any roles, we clear the viewContainerRef
+      if (!roles) {
+        this.viewContainerRef.clear();
+      }
+      // If the user has the role needed to 
+      // render this component we can add it
+      if (roles.includes(this.appHasRole)) {
+        // If it is already visible (which can happen if
+        // his roles changed) we do not need to add it a second time
+        if (!this.isVisible) {
+          // We update the `isVisible` property and add the 
+          // templateRef to the view using the 
+          // 'createEmbeddedView' method of the viewContainerRef
+          this.isVisible = true;
+          this.viewContainerRef.createEmbeddedView(this.templateRef);
+        }
+      } else {
+        // If the user does not have the role, 
+        // we update the `isVisible` property and clear
+        // the contents of the viewContainerRef
+        this.isVisible = false;
+        this.viewContainerRef.clear();
+      }
+    });
+  }
+  
+  // Clear the subscription on destroy
+  ngOnDestroy() {
+    this.stop$.next();
+  }
+}
+
+</code></pre>
+<p>You can find the full source code <a href="https://github.com/KwintenP/display-or-hide-components-based-on-role" target="_blank">here</a>. You can play with a live example <a href="" target="_blank">here</a>. You can change the roles on top by clicking the checkboxes. If a role is granted, a new element is added to the DOM.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>Leveraging a few somewhat more advanced concepts as ‘template directives’, <code>viewContainerRef</code> and <code>TemplateRef</code>, we were able to easily implement our own <code>*ngIf</code> like directive that works based on the roles with a limited amount of code.</p>
+
+<p><strong>Note:</strong> In this example I’m using roles. Applying a role based strategy for authorization poses some problems. There will always be cases where a user should have role ‘X’ but should also be able to see a portion of the functionality that users with role ‘Y’ see. In that case, you would have to create a new role, ‘Z’, that holds properties of ‘X’ and ‘Y’.</p>
+
+<p>In growing applications, this will mean a lot of roles, that might be only used by a single person. With that in mind, it’s always better to give the user certain ‘rights’. If the user can see the ‘User management’ part of the application, he should have the ‘right’ ‘user_mgmt’ for example. Using ‘rights’ avoids the problem described above with the roles.</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>RxJS best practices in Angular</title>
 	  <link>//rxjs-best-practices-in-angular/</link>
 	  <author></author>
@@ -2615,315 +2749,6 @@ public post(@Req()req: Request, @Res() res: Response): void {
 <p>The data that is managed by redux can be easily made real-time by making the backend dispatch redux actions to the frontend. 
 That way, we can make our application real-time in matter of minutes.
 If you want to learn more about these technologies: Be sure to checkout our workshop at <a href="http://ng-be.org">ngbe</a>.</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Modals in Angular 2</title>
-	  <link>//Modals-in-angular2/</link>
-	  <author></author>
-	  <pubDate>2016-08-24T00:00:00+00:00</pubDate>
-	  <guid>//Modals-in-angular2/</guid>
-	  <description><![CDATA[
-	     <p><strong>Updated at 3 september 2016 (RC.6 compliant)</strong></p>
-
-<p>Since one of my late New Year’s resolutions is blogging, behold my very first blogpost.
-For a customer of mine I had to implement modal-dialog functionality in Angular 2.
-As most developers would do in this scenario, I crawled the web searching for existing solutions.</p>
-
-<p>Since Angular 2 has made some big breaking changes in its latest release candidates, most of these solutions were deprecated. The ones that weren’t deprecated weren’t stable enough and/or very bloated.</p>
-
-<p>What I needed was actually very simple… I just needed a service that would open modals in Angular 2 and I only needed a few features:</p>
-<ul>
-<li>Multiple modals that could be placed above each other</li>
-<li>Custom modals</li>
-<li>The ability to destroy modals inside and outside the custom modal-component</li>
-</ul>
-
-<p><strong>Note:</strong> I’m using bootstrap as css framework so I don’t have to worry about the styling.</p>
-
-<p>What I needed was a simple service where I could pass a component that would get rendered on the page, without memory leaks of course. Basically, I needed something like this:</p>
-
-<pre><code class="language-typescript">
-// this was possible in RC.5
-this.modalService.create(MyCustomModalComponent, {foo: "bar"});
-
-
-// this is what we need to do in RC.6
-this.modalService.create(MyModule, MyCustomModalComponent, {foo: "bar"});
-
-</code></pre>
-
-<p>Since I didn’t found any viable solutions, I decided to write it myself.</p>
-
-<p>Writing this piece of functionality myself, actually made me realise a few things:</p>
-<ul>
-<li>It wasn't difficult to write this functionality on my own</li>
-<li>It was way more flexible than the solutions I found on the internet</li>
-<li>It wasn't bloated at all</li>
-<li>I wrote very few lines of code</li>
-<li><strong>We use too much dependencies from the net</strong></li>
-</ul>
-
-<p>Don’t get me wrong, I don’t think we should reinvent the wheel everytime. I’m just saying that sometimes it’s better to write something your self, when it doesn’t cost you to much effort and saves you a lot of bloat.</p>
-
-<p>The thing about a lot of open-source libraries is they want to make everybody happy, which mostly comes with a lot of bloat and features you don’t really need. And…, with a big codebase, comes a big issuelist…</p>
-
-<p><strong>Enough about that, let’s see how I implemented my requirements with very little code…</strong></p>
-
-<h2 id="a-brief-overview-of-the-flow">A brief overview of the flow</h2>
-<p>First of all the modal-placeholder will register the Injector and ViewContainerRef (see later) to the UserModalService. At that time we can create modals using the UserModalService. These modals will be rendered into the modal-placeholder.</p>
-
-<p><img src="https://github.com/brechtbilliet/brechtbilliet.github.io/raw/master/_posts/angular2modal.png" alt="Image of Angular 2 modal scheme" /></p>
-
-<h2 id="the-modal-placeholder">The modal placeholder</h2>
-
-<p>In Angular 2, you can not just compile stuff to the DOM, you need a placeholder.
-That’s why I created a <strong>modal-placeholder</strong>, that I can use like this. This will be the placeholder where our modals will be rendered in.</p>
-
-<pre><code class="language-typescript">@Component({
-    selector: "application",
-    template: `    
-       ...
-       &lt;modal-placeholder&gt;&lt;/modal-placeholder&gt;
-       ...
-`
-})
-export class ApplicationContainer {
-	...
-}
-</code></pre>
-
-<p><strong>Let’s look at the implementation</strong></p>
-
-<p>The modal-placeholder has 3 goals:</p>
-<ul>
-<li>Create a placeholder (see the # symbol)</li>
-<li>It should register that placeholder to a service where we can render modals into it (see ViewContainerRef)</li>
-<li>It should register the injector to that service. Our modals will need DI as well...</li>
-</ul>
-
-<pre><code class="language-typescript">@Component({
-    selector: "modal-placeholder",
-    template: `&lt;div #modalplaceholder&gt;&lt;/div&gt;`
-})
-export class ModalPlaceholderComponent implements OnInit {
-    @ViewChild("modalplaceholder", {read: ViewContainerRef}) 
-    	viewContainerRef;
-
-    constructor(
-    	private modalService: ModalService, 
-    	private injector: Injector) {
-    }
-    ngOnInit(): void {
-        this.modalService.registerViewContainerRef(this.viewContainerRef);
-        this.modalService.registerInjector(this.injector);
-    }
-}
-</code></pre>
-<p>As you can see above the ViewContainerRef holds a reference to the #modalplaceholder</p>
-
-<h2 id="the-modal-service">The modal service</h2>
-<p>This is the service that will dynamically generate custom components.</p>
-
-<pre><code class="language-typescript">export class ModalService {
-    // here we hold our placeholder
-    private vcRef: ViewContainerRef; 
-    // here we hold our injector
-    private injector: Injector; 
-    // we can use this to determine z-index of multiple modals
-    public activeInstances: number = 0;
-    
-    constructor(private compiler: Compiler) {
-    }
-
-    registerViewContainerRef(vcRef: ViewContainerRef): void {
-        this.vcRef = vcRef;
-    }
-
-    registerInjector(injector: Injector): void {
-        this.injector = injector;
-    }
-
-	// update: as of rc6 we have to pass the module as well
-    create&lt;T&gt;(module: any, component: any, parameters?: Object):
-     	Observable&lt;ComponentRef&lt;T&gt;&gt; {
-     	// we return a stream so we can  access the componentref
-        let componentRef$ = new ReplaySubject(); 
-        // compile the component based on its type and
-        // create a component factory
-        this.compiler.compileModuleAndAllComponentsAsync(module)
-            .then(factory =&gt; {
-            	// look for the componentfactory in the modulefactory
-             	let componentFactory = factory.componentFactories
-             		.filter(item =&gt; item.componentType === component)[0];
-            	// the injector will be needed for DI in 
-            	// the custom component
-                const childInjector = ReflectiveInjector
-                	.resolveAndCreate([], this.injector);
-            	// create the actual component
-                let componentRef = this.vcRef
-                	.createComponent(componentFactory, 0, childInjector);
-                // pass the @Input parameters to the instance
-                Object.assign(componentRef.instance, parameters); 
-                this.activeInstances ++;
-                // add a destroy method to the modal instance
-                componentRef.instance["destroy"] = () =&gt; {
-                    this.activeInstances --;
-                    // this will destroy the component
-                    componentRef.destroy(); 
-                };
-                // the component is rendered into the ViewContainerRef
-                // so we can update and complete the stream
-                componentRef$.next(componentRef);
-                componentRef$.complete();
-            });
-        return componentRef$;
-    }
-}
-</code></pre>
-
-<h2 id="the-custom-modal">The Custom modal</h2>
-
-<p>As we saw above, every modal component will have a destroy method. That method is dynamically added (see logic above) to the instance of the modalcomponent. This will call the <strong>componentRef.destroy()</strong> behind the scenes which will safely destroy the component. I also found it convenient to have a closeModal function on the modal as well. Therefore every custom modal component we create should inherit this class:</p>
-
-<pre><code class="language-typescript">export class ModalContainer {
-    destroy: Function;
-    closeModal(): void {
-        this.destroy();
-    }
-}
-</code></pre>
-
-<p>This means, a custom modal could look like this: (ideally you could also create a generic modal component)</p>
-
-<pre><code class="language-typescript">@Component({
-	selector: "my-custom-modal",
-	template: `
-	&lt;div modal="" class="modal fade in"&gt;
-		&lt;div class="modal-dialog"&gt;
-			&lt;div class="modal-content"&gt;
-				 &lt;button type="button" class="close" 
-				 	(click)="closeModal()"&gt;×&lt;/button&gt;
-				...
-			&lt;/div&gt;
-		&lt;/div&gt;
-	&lt;/div&gt;
-	&lt;div class="modal-backdrop fade in"&gt;&lt;/div&gt;
-`
-})
-export class MyCustomModalComponent extends ModalContainer {
-	@Input() foo;
-	onSave(): Function;
-	constructor(){
-		super();
-	}
-	// the closeModal function will be available 
-	// on the ModalContainer parent class
-}
-</code></pre>
-
-<p>I love typescript decorators, and I didn’t want to inherit this ModalContainer everytime.
-I wanted to create modal components like this:</p>
-
-<pre><code class="language-typescript">@Component({
-	selector: "my-custom-modal",
-	template: `
-	...
-`
-})
-@Modal() // this decorator is all it takes
-export class MyCustomComponent {
-	@Input() foo;
-	onSave(): Function;
-}
-</code></pre>
-
-<p>This is basically the same thing as the inheritance example above, but much cleaner right?</p>
-
-<p>Here’s the code for the custom decorator: (How easy is that?!)</p>
-
-<pre><code class="language-typescript">export function Modal() {
-    return function (target) {
-        Object.assign(target.prototype,  ModalContainer.prototype);
-    };
-}
-</code></pre>
-
-<p>Ok, so what we have now is:</p>
-<ul>
-<li>modal-placeholder</li>
-<li>modal-service</li>
-<li>Modal container class with destroy delegation</li>
-<li>modal-decorator to make the inheritance cleaner</li>
-</ul>
-
-<p>And… that’s it folks. That’s the only code I had to write (cleaned up a bit but still…)
-It’s flexible, maintainable and easy to use… Let me show you…</p>
-
-<h2 id="how-to-use-it">How to use it</h2>
-
-<p>I want to create a modal of Type “MyCustomComponent”, pass it the property foo (@input) and pass a callback for the onSave function.</p>
-
-<p><strong>Update: Since RC.6 we have to pass the module as well</strong></p>
-
-<pre><code class="language-typescript">this.modalService.create&lt;MyCustomComponent&gt;(MyModule, MyCustomComponent, 
-{ 
-	foo: "bar", 
-	onSave: () =&gt; alert('save me')
-});
-</code></pre>
-
-<p>But wait? What if we want to destroy it outside of the component, you said you needed control over de lifetime of the component right?</p>
-
-<p>That’s why the create function returns an observable that contains the componentRef, which has a destroy function.</p>
-
-<pre><code class="language-typescript">this.modalService.create&lt;MyCustomComponent&gt;(MyModule, MyCustomComponent, 
-	{ 
-		foo: "bar", 
-		onSave: () =&gt; alert('save me')
-	})
-	.subscribe((ref: ComponentRef&lt;MyCustomComponent&gt;) =&gt; {
-		//destroy after 1 second
-		setTimeout(() =&gt; ref.destroy(), 1000);
-	});
-</code></pre>
-
-<h2 id="aot">AOT</h2>
-
-<p><a href="http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">Ahead-time-compilation</a> in angular2 breaks this pattern (because the compiler will not be available in production in that scenario). For AOT to work you just need to use the generated factory and update the modalservice like below.</p>
-
-<pre><code class="language-typescript">createFromFactory&lt;T&gt;(componentFactory: ComponentFactory&lt;T&gt;, 
-	parameters?: Object): Observable&lt;ComponentRef&lt;T&gt;&gt; {
-    let componentRef$ = new ReplaySubject();
-    const childInjector = ReflectiveInjector.resolveAndCreate([], this.injector);
-    let componentRef = this.vcRef.createComponent(componentFactory, 0, childInjector);
-    // pass the @Input parameters to the instance
-    Object.assign(componentRef.instance, parameters); 
-    this.activeInstances++;
-    componentRef.instance["destroy"] = () =&gt; {
-        this.activeInstances--;
-        componentRef.destroy();
-    };
-    componentRef$.next(componentRef);
-    componentRef$.complete();
-    return componentRef$.asObservable();
-}
-
-// you can call it like that
-this.modalService.createFromFactory(myCustomModalNgFactory);
-</code></pre>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>With very little code I created a flexible way to create custom modal’s. Don’t <strong>always</strong> blindly rely on open source solutions. Think about the complexity and flexibility first.</p>
-
-<p>Thanks for reading! I Hope you enjoyed it</p>
-
-<h2 id="plunk">Plunk</h2>
-
-<p><a href="https://plnkr.co/edit/0c2YuGt7n7Fti0uup6Gs?p=info">Checkout this plunk I’ve created</a></p>
 
 	  ]]></description>
 	</item>

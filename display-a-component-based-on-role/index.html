@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Displaying components based on the role of a user</title>
+    <meta name="description" content="This article demonstrates how we can show or hide certain parts of the application if a user has the right to see it or not" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="//display-a-component-based-on-role/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Displaying components based on the role of a user" />
+    <meta property="og:description" content="This article demonstrates how we can show or hide certain parts of the application if a user has the right to see it or not" />
+    <meta property="og:url" content="//display-a-component-based-on-role/" />
+    <meta property="og:image" content="/assets/images/cover/cover4.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Displaying components based on the role of a user" />
+    <meta name="twitter:description" content="This article demonstrates how we can show or hide certain parts of the application if a user has the right to see it or not" />
+    <meta name="twitter:url" content="//display-a-component-based-on-role/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover4.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "Displaying components based on the role of a user",
+    "url": "//display-a-component-based-on-role/",
+    "image": "/assets/images/cover/cover4.jpg",
+    "description": "This article demonstrates how we can show or hide certain parts of the application if a user has the right to see it or not"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover4.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+    <h5>Want to work with Strongbrew?</h5>
+    <button onclick="location.href='mailto:info@strongbrew.io';">Hire us</button>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">Displaying components based on the role of a user</h1>
+            <section class="post-meta">
+            <!-- <a href='/'></a> -->
+
+            
+                
+            
+                
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                
+            
+            <time class="post-date" datetime="2018-01-15">15 Jan 2018</time>
+                <!-- [[tags prefix=" on "]] -->
+                
+                on
+                
+                    
+                       <a href='/tag/Angular'>Angular</a>
+                    
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+
+            <p>At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.</p>
+
+<p>But what if it’s only a single component that cannot be rendered when the user does not have the proper role? Angular does not provide something out of the box for this. Luckily this is something we can easily implement using directives.</p>
+
+<iframe src="https://player.vimeo.com/video/251380600" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+
+<h3 id="defining-what-we-want">Defining what we want</h3>
+<p>We want to create a directive that accepts a role. This is the role the user must have to see this specific component.
+It might look something like this:</p>
+
+<pre><code class="language-html">&lt;app-normal-users-can-view *appHasRole="'user'"&gt;
+&lt;/app-normal-users-can-view&gt;
+</code></pre>
+
+<h3 id="defining-how-it-should-work">Defining how it should work</h3>
+
+<p>Let’s define the characteristics for our directive:</p>
+<ul>
+  <li>If the user has the proper role, the component should be shown.</li>
+  <li>If the user does not have the proper role, the component shouldn’t be added to the DOM.</li>
+</ul>
+
+<p>If you think about it, that’s pretty much what an <code>*ngIf</code> directive does. Based on a certain condition, a component or native element must be added to the DOM or removed from the DOM.</p>
+
+<h3 id="what-does-our-directive-need-to-make-it-work">What does our directive need to make it work?</h3>
+<p>Our directive needs several things to make it work properly. First of all, we need a reference to the element that needs to be added to the DOM. On a secondary note, we need a place where we can insert the element to the DOM if needed. And lastly, we need to know the roles the user has.</p>
+
+<h4 id="getting-a-reference-to-the-element-that-needs-to-be-added">Getting a reference to the element that needs to be added</h4>
+
+<p>To get a reference to the element we need to add, we can use a ‘template directive’ (or <a href="https://angular.io/guide/structural-directives" target="blank">structural directive</a>). We can make any directive a ‘template directive’ by prefixing the directive with an asterisk (<code>*</code>) when we use it. This is syntactic sugar for the angular compiler. If we do this, this is what the compiler actually sees:</p>
+
+<pre><code class="language-html">&lt;!-- what we write --&gt;
+&lt;app-normal-users-can-view *appHasRole="'user'"&gt;
+&lt;/app-normal-users-can-view&gt;
+
+&lt;!-- how the compiler interprets it --&gt;
+&lt;ng-template [appHasRole]="'user'"&gt;
+      &lt;app-normal-users-can-view&gt;&lt;/app-normal-users-can-view&gt;
+&lt;/ng-template&gt;
+</code></pre>
+
+<p>We can see that the compiler puts our directive onto an <code>ng-template</code>. This is ideal because it allows our directive to inject the <code>TemplateRef</code> containing the element we need to add (if the user has the role), which is what we want.</p>
+
+<h4 id="finding-the-dom-entry-point">Finding the DOM entry point</h4>
+<p>To know where we can inject the <code>TemplateRef</code>, our directive can just inject the <code>ViewContainerRef</code>. This represents the container where we can attach one or more views. For more information on the <code>ViewContainerRef</code> you can read <a href="https://netbasal.com/angular-2-understanding-viewcontainerref-acc183f3b682" target="blank">this</a> post.</p>
+
+<h4 id="knowing-the-roles-a-user-has">Knowing the roles a user has</h4>
+<p>To know the roles a certain user has, we could leverage a service (in the example code <code>rolesService</code>) that exposes a stream with all the roles that user has.</p>
+
+<h3 id="the-hasrole-directive-end-result">The hasRole directive end result</h3>
+<p>Now that we have identified all the different things we need to properly implement our directive, we can start. See the comments for more information.</p>
+
+<pre><code class="language-typescript">@Directive({
+  selector: '[appHasRole]'
+})
+export class HasRoleDirective implements OnInit, OnDestroy {
+  // the role the user must have 
+  @Input() appHasRole: string;
+
+  stop$ = new Subject();
+
+  isVisible = false;
+
+  /**
+   * @param {ViewContainerRef} viewContainerRef 
+   * 	-- the location where we need to render the templateRef
+   * @param {TemplateRef&lt;any&gt;} templateRef 
+   *   -- the templateRef to be potentially rendered
+   * @param {RolesService} rolesService 
+   *   -- will give us access to the roles a user has
+   */
+  constructor(
+    private viewContainerRef: ViewContainerRef,
+    private templateRef: TemplateRef&lt;any&gt;,
+    private rolesService: RolesService
+  ) {}
+
+  ngOnInit() {
+    //  We subscribe to the roles$ to know the roles the user has
+    this.rolesService.roles$.pipe(
+    	takeUntil(this.stop$)
+    ).subscribe(roles =&gt; {
+      // If he doesn't have any roles, we clear the viewContainerRef
+      if (!roles) {
+        this.viewContainerRef.clear();
+      }
+      // If the user has the role needed to 
+      // render this component we can add it
+      if (roles.includes(this.appHasRole)) {
+        // If it is already visible (which can happen if
+        // his roles changed) we do not need to add it a second time
+        if (!this.isVisible) {
+          // We update the `isVisible` property and add the 
+          // templateRef to the view using the 
+          // 'createEmbeddedView' method of the viewContainerRef
+          this.isVisible = true;
+          this.viewContainerRef.createEmbeddedView(this.templateRef);
+        }
+      } else {
+        // If the user does not have the role, 
+        // we update the `isVisible` property and clear
+        // the contents of the viewContainerRef
+        this.isVisible = false;
+        this.viewContainerRef.clear();
+      }
+    });
+  }
+  
+  // Clear the subscription on destroy
+  ngOnDestroy() {
+    this.stop$.next();
+  }
+}
+
+</code></pre>
+<p>You can find the full source code <a href="https://github.com/KwintenP/display-or-hide-components-based-on-role" target="_blank">here</a>. You can play with a live example <a href="" target="_blank">here</a>. You can change the roles on top by clicking the checkboxes. If a role is granted, a new element is added to the DOM.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>Leveraging a few somewhat more advanced concepts as ‘template directives’, <code>viewContainerRef</code> and <code>TemplateRef</code>, we were able to easily implement our own <code>*ngIf</code> like directive that works based on the roles with a limited amount of code.</p>
+
+<p><strong>Note:</strong> In this example I’m using roles. Applying a role based strategy for authorization poses some problems. There will always be cases where a user should have role ‘X’ but should also be able to see a portion of the functionality that users with role ‘Y’ see. In that case, you would have to create a new role, ‘Z’, that holds properties of ‘X’ and ‘Y’.</p>
+
+<p>In growing applications, this will mean a lot of roles, that might be only used by a single person. With that in mind, it’s always better to give the user certain ‘rights’. If the user can see the ‘User management’ part of the application, he should have the ‘right’ ‘user_mgmt’ for example. Using ‘rights’ avoids the problem described above with the roles.</p>
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+                
+            
+                
+                    
+                        <figure class="author-image">
+                            <a class="img" href="/author/kwintenp" style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                        </figure>
+                    
+
+                    <section class="author">
+                        <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                        
+                            <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                        
+                        <div class="author-meta">
+                            <span class="author-location icon-location"> Belgium</span>
+                            <span class="author-link icon-link"><a href="https://twitter.com/kwintenp"> twitter.com/kwintenp</a></span>
+                        </div>
+                    </section>
+
+                    <!-- /author  -->
+
+                    <section class="share">
+                        <h4>Share this post</h4>
+                        <a class="icon-twitter" href="http://twitter.com/share?text=Displaying components based on the role of a user&amp;url=display-a-component-based-on-role"
+                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                            <span class="hidden">Twitter</span>
+                        </a>
+                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=display-a-component-based-on-role"
+                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                            <span class="hidden">Facebook</span>
+                        </a>
+                        <a class="icon-google-plus" href="https://plus.google.com/share?url=display-a-component-based-on-role"
+                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                            <span class="hidden">Google+</span>
+                        </a>
+                    </section>
+                
+            
+
+            <!-- Add Disqus Comments -->
+            
+                
+                
+                    <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+            
+
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover4.jpg)" href="/rxjs-best-practices-in-angular">
+            <section class="post">
+                <h2>RxJS best practices in Angular</h2>
+                <p>This article is all about the do’s and don’ts when it comes to writing reactive...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-112030289-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>
