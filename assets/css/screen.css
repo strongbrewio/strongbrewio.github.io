@@ -290,6 +290,9 @@ th {
 .icon-link:before {
   content: "\f608";
 }
+.icon-twitter:before {
+  content: "\f602";
+}
 .icon-menu:before {
   content: "\f609";
 }
