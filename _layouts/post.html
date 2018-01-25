@@ -80,6 +80,7 @@ class: 'post-template'
                         <div class="author-meta">
                             {% if author[1].location %}<span class="author-location icon-location"> {{ author[1].location }}</span>{% endif %}
                             {% if author[1].url %}<span class="author-link icon-link"><a href="{{ author[1].url_full }}"> {{ author[1].url }}</a></span>{% endif %}
+                            {% if author[1].twitter %}<span class="author-link icon-twitter"><a href="{{ author[1].twitter }}"> {{ author[1].twitter }}</a></span>{% endif %}
                         </div>
                     </section>
 

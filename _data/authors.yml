@@ -4,13 +4,13 @@ brechtbilliet:
   location: Belgium
   url_full: http://www.brecht.io/
   url: brecht.io
+  twitter: https://twitter.com/brechtbilliet
   bio: Software architect/trainer/coach/speaker/blogger
   assets: assets/images/brecht.jpg
 kwintenp:
   username: kwintenp
   name: Kwinten Pisman
   location: Belgium
-  url_full: https://twitter.com/kwintenp
-  url: twitter.com/kwintenp
+  twitter: https://twitter.com/kwintenp
   bio: Freelance frontend architect. Occasional blogger. Reactive fan.
   assets: assets/images/kwintenp.jpg
