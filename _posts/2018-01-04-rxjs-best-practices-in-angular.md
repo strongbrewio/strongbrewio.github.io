@@ -50,8 +50,8 @@ In [this article](http://blog.brecht.io/Creating-reactive-calendar-in-angular4/)
 ## Pipeable operators
 
 The first best practice is the use of pipeable operators. The operators being used in this article are pipeable.
-Since version 5.5 RxJS has introduced these so called lettable operators which are easier to import than patch operators, and
-also have [treeshaking](https://webpack.js.org/guides/tree-shaking/) advantages. More information about lettable operators can be found [here](https://blog.angularindepth.com/rxjs-understanding-lettable-operators-fe74dda186d3) and [here](https://blog.hackages.io/rxjs-5-5-piping-all-the-things-9d469d1b3f44).
+Since version 5.5 RxJS has introduced these so called pipeable operators which are easier to import than patch operators, and
+also have [treeshaking](https://webpack.js.org/guides/tree-shaking/) advantages. More information about pipeable operators can be found [here](https://blog.angularindepth.com/rxjs-understanding-lettable-operators-fe74dda186d3) and [here](https://blog.hackages.io/rxjs-5-5-piping-all-the-things-9d469d1b3f44).
 
 This example illustrates the difference between doing it the old way and the new way.
 
@@ -500,7 +500,7 @@ A Subject is both a hot observable and an observer at the same time. This gives 
 Subjects tend to be overused by people that didn't make the mind switch towards reactive programming yet.
 
 Only use them when really needed, for instance it's ok to use Subjects in the following scenarios:
-### When mocking streams in tests
+#### When mocking streams in tests
 
 ```typescript
 const fetchAll$ = new Subject(); // use a Subject as a mock
@@ -508,7 +508,7 @@ usersServiceMock.fetchAll.mockReturnValue(fetchAll$);
 fetchAll$.next(fakeUser);
 ```
 
-### When we want to create streams from outputs in Angular
+#### When we want to create streams from outputs in Angular
 
 ```typescript
 @Component({
@@ -522,7 +522,7 @@ search$ = new Subject(); // ----t-----te-----ter----term...
 }
 ```
 
-### When handling circular references
+#### When handling circular references
 
 I'm not going to dive in this to deep, but [Dominic Elm]() does an awesome job explaining this in [this great article](https://blog.thoughtram.io/rxjs/2017/08/24/taming-snakes-with-reactive-streams.html#behaviorsubject-to-the-rescue)
 
