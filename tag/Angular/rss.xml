@@ -190,8 +190,8 @@ In <a href="http://blog.brecht.io/Creating-reactive-calendar-in-angular4/">this 
 <h2 id="pipeable-operators">Pipeable operators</h2>
 
 <p>The first best practice is the use of pipeable operators. The operators being used in this article are pipeable.
-Since version 5.5 RxJS has introduced these so called lettable operators which are easier to import than patch operators, and
-also have <a href="https://webpack.js.org/guides/tree-shaking/">treeshaking</a> advantages. More information about lettable operators can be found <a href="https://blog.angularindepth.com/rxjs-understanding-lettable-operators-fe74dda186d3">here</a> and <a href="https://blog.hackages.io/rxjs-5-5-piping-all-the-things-9d469d1b3f44">here</a>.</p>
+Since version 5.5 RxJS has introduced these so called pipeable operators which are easier to import than patch operators, and
+also have <a href="https://webpack.js.org/guides/tree-shaking/">treeshaking</a> advantages. More information about pipeable operators can be found <a href="https://blog.angularindepth.com/rxjs-understanding-lettable-operators-fe74dda186d3">here</a> and <a href="https://blog.hackages.io/rxjs-5-5-piping-all-the-things-9d469d1b3f44">here</a>.</p>
 
 <p>This example illustrates the difference between doing it the old way and the new way.</p>
 
@@ -634,14 +634,14 @@ class AppComponent {
 Subjects tend to be overused by people that didn’t make the mind switch towards reactive programming yet.</p>
 
 <p>Only use them when really needed, for instance it’s ok to use Subjects in the following scenarios:</p>
-<h3 id="when-mocking-streams-in-tests">When mocking streams in tests</h3>
+<h4 id="when-mocking-streams-in-tests">When mocking streams in tests</h4>
 
 <pre><code class="language-typescript">const fetchAll$ = new Subject(); // use a Subject as a mock
 usersServiceMock.fetchAll.mockReturnValue(fetchAll$);
 fetchAll$.next(fakeUser);
 </code></pre>
 
-<h3 id="when-we-want-to-create-streams-from-outputs-in-angular">When we want to create streams from outputs in Angular</h3>
+<h4 id="when-we-want-to-create-streams-from-outputs-in-angular">When we want to create streams from outputs in Angular</h4>
 
 <pre><code class="language-typescript">@Component({
     ...
@@ -654,7 +654,7 @@ search$ = new Subject(); // ----t-----te-----ter----term...
 }
 </code></pre>
 
-<h3 id="when-handling-circular-references">When handling circular references</h3>
+<h4 id="when-handling-circular-references">When handling circular references</h4>
 
 <p>I’m not going to dive in this to deep, but <a href="">Dominic Elm</a> does an awesome job explaining this in <a href="https://blog.thoughtram.io/rxjs/2017/08/24/taming-snakes-with-reactive-streams.html#behaviorsubject-to-the-rescue">this great article</a></p>
 
