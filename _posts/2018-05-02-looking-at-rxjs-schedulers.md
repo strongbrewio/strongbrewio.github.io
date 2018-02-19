@@ -67,7 +67,7 @@ There you have it, this is how async works in javascript! Might be a little to q
 
 ## Schedulers
 
-In RxJS there are different schedulers that all schedule work on a different (a)sync technique behind the scenes. Let's take a look at an example to learn a few of them.
+In RxJS there are different schedulers that all schedule work on a different (a)sync technique behind the scenes. Let's take a look at an example to learn a few of them. There are three statement logged on different schedulers.
 
 ```typescript
 const asyncScheduler = Rx.Observable.of('')
@@ -102,7 +102,7 @@ async
 As you can see, the 'queue' is the only statement logged synchronously. We can conclude this because it is the only statement logged before the 'after subscription' statement is logged. 
 Next we can see that the 'asap' is logged before the 'async'. That is because the `asap` scheduler uses the micro task queue and the `async` uses the macrotask queue.
 
-Now, to list all of them, we can look at the table below. In the example I didn't cover the 'animationFrame' and the 'virtualTime' scheduler.
+Now, to list all of them, we can look at the table below. In the example I didn't cover the 'animationFrame' and the 'virtualTime' scheduler. The 'animationFrame' scheduler allows you to schedule work to be executed when there is a repaint. The 'virtualTime' scheduler is something you can use to test your code in a synchronous fashion using marble diagrams.
 
 | Scheduler | Approach |
 | --- | --- |
