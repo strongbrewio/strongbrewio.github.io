@@ -67,7 +67,7 @@ There you have it, this is how async works in javascript! Might be a little to q
 
 ## Schedulers
 
-In RxJS there are different schedulers that all schedule work on a different (a)sync technique behind the scenes. Let's take a look at an example to learn a few of them. There are three statement logged on different schedulers.
+In RxJS there are different schedulers that all schedule work using a different (a)sync technique behind the scenes. Let's take a look at an example to learn a few of them. There are three statement logged on different schedulers.
 
 ```typescript
 const asyncScheduler = Rx.Observable.of('')
