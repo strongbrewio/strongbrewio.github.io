@@ -53,7 +53,23 @@ promise2
 setTimeout
 ```
 If you know how the event loop works, you understand that the 'script start' and 'script end' were logged first. The 'setTimeout' and 'promises' that get triggered were put on a queue to be executed when the call stack cleared. 
+
 But what's a lesser know fact is that there are different queues. There is a microtask and a macrotask queue. 
+
+A promise gets added to the microtask queue and a setTimeout to the macrotask queue.
+Whenever the call stack is cleared, the microtasks queue gets cleared first. Hence the 'promise1' gets logged. 
+
+When a microtask is finished, the rest of the microtasks queue gets executed until it is empty. That's the reason 'promise2' is logged next. So even the fact that the second promise gets scheduled during the execution of the first, it still gets executed before the setTimeout. 
+
+Lastly, when the microtask queue is cleared, the next task is picked from the macrotask, and the setTimeout is logged.
+
+There you have it, this is how async works in javascript! Might be a little to quick but since it's not part of this post to explain everything in detail, I'll leave it at that. And also because Jake Archibald basically explained it in perfect detail right <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank">here</a>.
+
+
+## Schedulers
+
+
+
 
 
 
