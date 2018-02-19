@@ -113,11 +113,17 @@ Now, to list all of them, we can look at the table below. In the example I didn'
 | `VirtualTime` | Will execute everything synchronous ordered by delay and mainly used in testing |
 
 
+### Using schedulers in RxJS
+Some operators, like 'startWith' in the example above, allow you to pass in an optional scheduler to influence when a certain task gets executed. Every operator that has this option, will also have a default value.
 
+For example, the `debounceTime` operator uses the 'async' scheduler as a default as you can see below.
 
+```typescript
+export function debounceTime<T>(dueTime: number, scheduler: IScheduler = async)
+```
 
-
-
+## Conclusion
+Schedulers influence the timing on which tasks get executed. You can change the default schedulers of some operators by passing in an extra scheduler argument.
 
 
 
