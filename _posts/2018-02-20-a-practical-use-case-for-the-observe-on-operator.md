@@ -122,4 +122,35 @@ We use a 'BehaviorSubject' because this has an initial value. This will make sur
 You can try it out here: 
 <a class="jsbin-embed" href="http://jsbin.com/yehoyen/embed?js,console,output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.1.2"></script>
 
-If you try it out, you'll probably notice that it doesn't work the first time. After the first time, it does work as expected. The reason here is because 
+If you try it out, you'll probably notice that it doesn't work the first time. After the first time, it does work as expected. The reason here is because the events are being handled in the wrong order.
+
+### Using observeOn to order event listeners
+
+Let's investigate what is happening here by writing in out in different steps. For this, I added some logs to the example code as you can see here: 
+
+<a class="jsbin-embed" href="http://jsbin.com/femezop/embed?js,console,output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.1.2"></script>
+
+1. The stream is created.
+2. The stream is subscribed.
+3. We are subscribing to the `clicks$` twice. Once via our `trigger$` and once in our 'main' stream.
+4. As the `click$` is cold, both subscriptions register an event listener.
+5. When you click once, you can see that the 'buffer click' is triggered before the 'main click'. You can see this from the log statement. 
+6. When you've click three times, the trigger stream will fire since you have clicked three times.
+7. This will cause the 'buffer' to fire and emit an event. BUT, it will emit an array with only '2' clicks. The click listener in the 'main stream' has not fired yet, the 'buffer click' was first!
+8. Next we filter out all the arrays that have a length smaller than 3, hence our first 'triple click' is not detected.
+9. As our `trigger$` gets reset, the event listener is removed and added again. The side effect from this action is that the 'main click' is now the first.
+10. Since for subsequent 'triple clicks' the 'main click' is triggered first, the buffer will emit array events with the correct number of clicks and the stream works.
+
+To fix it, we would need to be 100% sure that the event listener for our 'main' stream always fires BEFORE the click in our `trigger$`. Here comes the 'observeOn' operator into play. By adding the operator we can make sure a certain event only gets handled on a certain scheduler. Let's see how we can change the code:
+
+
+
+
+
+
+
+
+
+
+
+
