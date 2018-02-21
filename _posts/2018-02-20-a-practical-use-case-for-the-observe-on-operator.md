@@ -141,11 +141,22 @@ Let's investigate what is happening here by writing in out in different steps. F
 9. As our `trigger$` gets reset, the event listener is removed and added again. The side effect from this action is that the 'main click' is now the first.
 10. Since for subsequent 'triple clicks' the 'main click' is triggered first, the buffer will emit array events with the correct number of clicks and the stream works.
 
-To fix it, we would need to be 100% sure that the event listener for our 'main' stream always fires BEFORE the click in our `trigger$`. Here comes the 'observeOn' operator into play. By adding the operator we can make sure a certain event only gets handled on a certain scheduler. Let's see how we can change the code:
+To fix it, we would need to be 100% sure that the event listener for our 'main' stream always fires BEFORE the click in our `trigger$`. Here comes the 'observeOn' operator into play. By adding the operator we can make sure the click event gets executed async instead of sync. For this, I chose to use the 'asap' scheduler which uses the microtask queue (insert link to scheduler article). The 'main click' still gets handled sync so we are sure that it gets fired first. Let's see how we can change the code:
 
+```typescript 
+clicks$
+        .observeOn(Rx.Scheduler.asap)
+        .do(val => console.log('buffer click triggered'))
+        .scan((acc, curr) => ++acc, 0)
+        .filter(x => x > 2)
+        .merge(clicks$.debounceTime(250))
+````
 
+Live example:
+<a class="jsbin-embed" href="http://jsbin.com/hikejab/embed?js,console,output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.1.2"></script>
 
-
+### Conclusion
+When two streams use the same 'source' the order in which they fire can be quite important. Using the 'observeOn' operator you can make sure that one stream always fires after the other by making it execute a 'more' async scheduler.
 
 
 
