@@ -12,6 +12,143 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>What are schedulers in RxJS</title>
+	  <link>//what-are-schedulers-in-rxjs/</link>
+	  <author></author>
+	  <pubDate>2018-02-05T00:00:00+00:00</pubDate>
+	  <guid>//what-are-schedulers-in-rxjs/</guid>
+	  <description><![CDATA[
+	     <p>One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used to execute tasks. The main reason for this is that the authors of RxJS did a great job in abstracting this logic. They used the principle of least concurrency as the default scheduling strategy which makes sure that in most cases, we don’t have to think about changing the default.</p>
+
+<p>This post will examine the different schedulers and explain the differences between them.</p>
+
+<h2 id="async-in-javascript">Async in javascript</h2>
+<p>To understand the difference between the different schedulers, we must first examine how async works in javascript. No worries, we won’t go in too deep :).</p>
+
+<p>Javascript is a single threaded language that uses an event loop to handle asynchronous operations. One of my favorite talks ever covers this topic really well. It’s by Philip Roberts and you can find a recording <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>. Be sure to check it out if you are unsure what the event loop is and how it works.</p>
+
+<h3 id="understanding-by-example">Understanding by example</h3>
+
+<p>Let’s look at an example.</p>
+
+<pre><code class="language-typescript">console.log('script start');
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('promise1');
+}).then(function() {
+  console.log('promise2');
+});
+
+console.log('script end');
+</code></pre>
+
+<p>If you run this piece of code, the result will look like this:</p>
+
+<pre><code class="language-typescript">script start
+script end
+promise1
+promise2
+setTimeout
+</code></pre>
+<p>If you know how the event loop works, you understand that ‘script start’ and ‘script end’ were logged first. The ‘setTimeout’ and ‘promises’ that get triggered were put on a queue to be executed when the call stack cleared.</p>
+
+<p>But what’s a lesser known fact is that there are different queues. There is a microtask and a macrotask queue. A promise gets added to the microtask queue and a setTimeout to the macrotask queue.
+Whenever the call stack is cleared, the microtasks queue gets cleared first. Hence the ‘promise1’ is the next log statement we see.</p>
+
+<p>When a microtask is finished, the rest of the microtasks queue gets executed until the microtask queue is empty. That’s the reason ‘promise2’ is logged next. So even if the second promise gets scheduled during the execution of the first, it still gets executed before the setTimeout.</p>
+
+<p>Lastly, when the microtask queue is cleared, the next task is picked from the macrotask queue, and the ‘setTimeout’ is logged.</p>
+
+<p>There you have it, this is how async works in javascript! Might be a little to quick but since it’s not part of this post to explain everything in detail, I’ll leave it at that. And also because Jake Archibald basically explained it in perfect detail right <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank">here</a>.</p>
+
+<h2 id="schedulers">Schedulers</h2>
+
+<p>In RxJS there are different schedulers that all schedule work using a different (a)sync technique behind the scenes. Let’s take a look at an example to learn a few of them. There are three statement logged on different schedulers.</p>
+
+<pre><code class="language-typescript">const asyncScheduler = Rx.Observable.of('')
+  .startWith('async', Rx.Scheduler.async);
+
+const asapScheduler = Rx.Observable.of('')
+  .startWith('asap', Rx.Scheduler.asap);
+
+const queueScheduler = Rx.Observable.of('')
+  .startWith('queue', Rx.Scheduler.queue);
+
+
+Rx.Observable.merge(
+    asyncScheduler,
+    asapScheduler,
+    queueScheduler)
+  .filter(x =&gt; !!x)
+  .subscribe(console.log);
+
+console.log('after subscription')
+</code></pre>
+
+<p>The results of running this code is:</p>
+
+<pre><code class="language-typescript">queue
+after subscription
+asap
+async
+</code></pre>
+
+<p>As you can see, the ‘queue’ is the only statement logged synchronously. We can conclude this because it is the only statement logged before the ‘after subscription’ statement is logged. 
+Next we can see that the ‘asap’ is logged before the ‘async’. That is because the <code>asap</code> scheduler uses the micro task queue and the <code>async</code> uses the macrotask queue.</p>
+
+<p>Now, to list all of them, we can look at the table below. In the example I didn’t cover the ‘animationFrame’ and the ‘virtualTime’ scheduler. The ‘animationFrame’ scheduler allows you to schedule work to be executed when there is a repaint. The ‘virtualTime’ scheduler is something you can use to test your code in a synchronous fashion using marble diagrams.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scheduler</th>
+      <th>Approach</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Queue</code></td>
+      <td>Executes task synchronously but waits for current task to be finished</td>
+    </tr>
+    <tr>
+      <td><code>Asap</code></td>
+      <td>Schedules on the micro task queue</td>
+    </tr>
+    <tr>
+      <td><code>Async</code></td>
+      <td>Schedules on the macro task queue</td>
+    </tr>
+    <tr>
+      <td><code>AnimationFrame</code></td>
+      <td>Relies on ‘requestAnimationFrame’</td>
+    </tr>
+    <tr>
+      <td><code>VirtualTime</code></td>
+      <td>Will execute everything synchronous ordered by delay and mainly used in testing</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="using-schedulers-in-rxjs">Using schedulers in RxJS</h3>
+<p>Some operators, like ‘startWith’ in the example above, allow you to pass in an optional scheduler to influence when a certain task gets executed. Every operator that has this option, will also have a default value.</p>
+
+<p>For example, the <code>debounceTime</code> operator uses the ‘async’ scheduler as a default as you can see below.</p>
+
+<pre><code class="language-typescript">export function debounceTime&lt;T&gt;(dueTime: number, scheduler: IScheduler = async)
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Schedulers influence the timing on which tasks get executed. You can change the default schedulers of some operators by passing in an extra scheduler argument.</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>RxJS best practices in Angular</title>
 	  <link>//rxjs-best-practices-in-angular/</link>
 	  <author></author>
@@ -2150,288 +2287,6 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
   <li>Cold observable 		-&gt; 		Movie with netflix</li>
   <li>‘Warm’ observable 	-&gt; 		Movie with friends</li>
 </ul>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Infinite scroll in Angular an RxJS</title>
-	  <link>//infinite-scroll-with-rxjs-and-angular2/</link>
-	  <author></author>
-	  <pubDate>2016-12-21T00:00:00+00:00</pubDate>
-	  <guid>//infinite-scroll-with-rxjs-and-angular2/</guid>
-	  <description><![CDATA[
-	     <h2 id="about-this-article">About this article</h2>
-
-<p>This article explains how the “reactive-programming” approach helps us to create an awesome <strong>infinite-scroll-list</strong> in only a few lines of code. For this article, we are going to use <a href="http://reactivex.io/rxjs/">RxJS</a> and <a href="http://angular.io">Angular</a>. If <a href="http://reactivex.io/rxjs/">RxJS</a> is completely new, it might be a good idea to read the documentation first. Whether we use <a href="http://angular.io">Angular</a> or something else like <a href="https://facebook.github.io/react/">React</a>, it shouldn’t really interfere with the clarity of this article.</p>
-
-<h2 id="reactive-programming">Reactive programming</h2>
-
-<p>Reactive programming is a rather old but very powerful approach of solving problems. However, we can run into problems when trying to think in a completely reactive manner. Thinking reactively is a huge mind switch that we must make to completely accept this “new” way of coding things. The whole “Our application reacts to a state-management-layer like <a href="http://redux.js.org/">redux</a>” principle is grasped quite quickly (it’s reactive programming too), but when it comes to <a href="http://freecontent.manning.com/reactive-fundamentals-thinking-in-streams/">thinking in streams</a> it can become quite difficult in the beginning.</p>
-
-<h3 id="why-reactive-programming">Why reactive programming?</h3>
-
-<p>Reactive programming has some advantages over imperative programming.</p>
-
-<ul>
-  <li>No more “if this, then that” scenario’s</li>
-  <li>We can forget about a ton of edge-cases&lt;</li>
-  <li>It’s easy to separate presentation logic from other logic (The presentation layer will just react to streams)</li>
-  <li>It’s a standard: widely supported by tons of languages</li>
-  <li>When we grasp the concepts, we write complex logic in a few lines of code in a very simple manner</li>
-</ul>
-
-<p>A few days back a colleague of mine came to me with this problem: He wanted to create an <strong>infinite-scroll in Angular</strong> but he had bumped into the  boundaries of imperative programming. It turned out that an infinite-scroll-solution was actually a great use-case to explain how reactive programming can help you write better code.</p>
-
-<h2 id="the-infinite-scroll">The infinite scroll</h2>
-
-<h3 id="what-should-it-do">What should it do?</h3>
-
-<p>An infinite-scroll-list, is a list where the data is being loaded asynchronosly when the user scrolls further down the application. It’s a great way to avoid a pager (where the user had to click on every time) and it can really keep the application performant. It’s an efficient way to keep bandwidth low and increase the user-experience.</p>
-
-<p>For this scenario, let’s say that every page contains 10 results and that all the pages with results are being shown as one long scrollable list =&gt; the infinite-scroll-list.</p>
-
-<p>Let’s list the features of what our infinite-scroll-list must do:</p>
-
-<ul>
-  <li>It should load the first page by default</li>
-  <li>When the results of the first page don’t fill the page completely, it should fill page 2, and so on, until the page is full</li>
-  <li>When the user scrolls down, it should load page 3, and so on…</li>
-  <li>When the user resizes it’s window, and more space is being freed for results, it should load the next page</li>
-  <li>It should make sure that it doesn’t load the same pages more than once (caching)</li>
-</ul>
-
-<h2 id="lets-draw-it-first">Let’s draw it first</h2>
-
-<p>Like most coding decisions, drawing them on a whiteboard first might be a good idea. That might be a personal approach, but it helps us not to write code that will be removed/refactored later.</p>
-
-<p>Based on the feature-list, there are three actions that will trigger the application to load data: Scrolling, resizing, and a manual action that will be triggered to manually fetch pages. When thinking reactively we can see 3 sources of events happening, let’s call them streams:</p>
-
-<ul>
-  <li>A stream of scroll events: <strong>scroll$</strong></li>
-  <li>A stream of resize events: <strong>resize$</strong></li>
-  <li>A manual stream where we can manually decide what page to load: <strong>pageByManual$</strong></li>
-</ul>
-
-<p><strong>Note: We will suffix the streams with $ to indicate that they are streams, this is a convention (personal preference)</strong></p>
-
-<p>Let’s draw these streams on a whiteboard:
-<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/infinite-scroll/whiteboard1.png" alt="Whiteboard 1" /></p>
-
-<p>These streams would contain certain values over time:
-<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/infinite-scroll/whiteboard2.png" alt="Whiteboard 2" /></p>
-
-<p>The scroll$ stream has Y values, which we can use to calculate the page number.</p>
-
-<p>The resize$ stream has event values. We don’t need the values but we do need to know when the user resizes its window.</p>
-
-<p>The pageByManual$ will contain page numbers, which we can set directly since this is a subject (more on that later).</p>
-
-<p>What if we could map all these streams, to streams that would contain page numbers? That would be awesome, because based on the page number, we could load a specific page. How we map the current streams to page number-streams is not something that we need to think about right now (we are just drawing remember?).
-The next drawing might look something like this:</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/infinite-scroll/whiteboard3.png" alt="Whiteboard 3" /></p>
-
-<p>We can see that we have created the following streams based on our initial streams:</p>
-
-<ul>
-  <li><strong>pageByScroll$</strong>: which contains page numbers based on the scroll-events</li>
-  <li><strong>pageByResize$</strong>: which contains page numbers based on the resize-events</li>
-  <li><strong>pageByManual$</strong>: which contains page numbers based on manual events (for instance, if there is still whitespace on the screen, we have to load the next page)</li>
-</ul>
-
-<p>What if we could merge these 3 page-number streams in an efficient manner, than we would get a new stream called <strong>pageToLoad$</strong>, that would contain page numbers created by scrolling-events, resize-events, and manual events.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/infinite-scroll/whiteboard4.png" alt="Whiteboard 4" /></p>
-
-<p>If we subscribe to the pageToLoad$ stream and than fetch data from the service, part of our infinite scroll would work. However, we were thinking reactively right? That also means, avoid subscriptions as much as possible… 
-We actually need a new stream based on the pageToLoad$ stream that contains the results of our infinite scroll list…</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/infinite-scroll/whiteboard5.png" alt="Whiteboard 5" /></p>
-
-<p>Now let’s throw this in one big schema.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/infinite-scroll/whiteboard6.png" alt="Whiteboard 6" /></p>
-
-<p>As we can see above we have 3 input streams: one for scrolling, one for resizing and a manual one.
-Afterwards we have 3 page streams that are based on the input streams. When merging these streams we can create a pageToLoad$ stream. Based on that pageToLoad$ stream, we will fetch the data.</p>
-
-<h2 id="lets-code">Let’s code</h2>
-
-<p>We have drawn more than enough, we have a clear vision of what our inifinte-scroll-list should do, so let’s start shall we?</p>
-
-<p>To calculate which page needs to be loaded we need 2 properties:</p>
-
-<pre><code class="language-typescript">private itemHeight = 40;
-private numberOfItems = 10;// number of items in a page
-</code></pre>
-
-<h3 id="pagebyscroll">pageByScroll$</h3>
-
-<p>The pageByScroll$ stream might look something like this:</p>
-
-<pre><code class="language-typescript"> private pageByScroll$ = 
- 	// first of all, we want to create a stream that contains 
- 	// all the scroll events that are happening in the window object
-	Observable.fromEvent(window, "scroll") 
-	// we are only interested in the scrollY value of these events
-	// let's create a stream with only these values
-	.map(() =&gt; window.scrollY)
-	// create a stream with the filtered values
-	// we only need the values from when we are scrolling outside
-	// our viewport
-	.filter(current =&gt; current &gt;=  document.body.clientHeight - window.innerHeight)
-	// Only when the user stops scrolling for 200 ms, we can continue
-	// so let's debounce this stream for 200 ms
-	.debounceTime(200) 
-	// filter out double values
-	.distinct() 
-	// calculate the page number
-	.map(y =&gt; Math.ceil((y + window.innerHeight)/ (this.itemHeight * this.numberOfItems)));
-	
-	// --------1---2----3------2...
-</code></pre>
-
-<p><strong>note: In real applications you might want to use injected services for window and document</strong></p>
-
-<h3 id="pagebyresize">pageByResize$</h3>
-
-<p>The pageByResize$ looks like this:</p>
-
-<pre><code class="language-typescript">  private pageByResize$ = 
-  	// Now, we want to create a new stream that contains 
- 	// all the resize events that are happening in the window object
-	Observable.fromEvent(window, "resize")
-	// when the user stops resizing for 200 ms, then we can continue
-	.debounceTime(200) 
-	// calculate the page number based on the window
-   .map(_ =&gt; Math.ceil(
-	   	(window.innerHeight + document.body.scrollTop) / 
-	   	(this.itemHeight * this.numberOfItems)
-   	));
-   
-	// --------1---2----3------2...
-</code></pre>
-
-<h3 id="pagebymanual">pageByManual$</h3>
-
-<p>The pageByManual$ is the stream we use to have an initial value (initial page to load), but it’s also something that we need to control manually. A <a href="http://reactivex.io/documentation/subject.html">Behavior subject</a> looks perfect for the job, because we need a stream that has an initial value where we can also manually add values. A behavior subject is just a stream that has an initial value and can be manipulated over time.</p>
-
-<pre><code class="language-typescript">private pageByManual$ = new BehaviorSubject(1);
-
-// 1---2----3------...
-</code></pre>
-
-<h3 id="pagetoload">pageToLoad$</h3>
-
-<p>Awesome, we have the 3 streams with page inputs, now let’s create a pageToLoad$ stream.</p>
-
-<pre><code class="language-typescript">private pageToLoad$ = 
-	// merge all the page streams and create a new stream of those
-	Observable.merge(this.pageByManual$, this.pageByScroll$, this.pageByResize$)
-	// create a new stream where the double values are filtered out
-	.distinct() 
-	// check if the page is already in the cache (just an array property in our component)
-	.filter(page =&gt; this.cache[page-1] === undefined); 
-</code></pre>
-
-<h3 id="itemresults">itemResults$</h3>
-
-<p>The hard part is over. We now have a stream with the page we have to load in there, which is super useful. We don’t need to care anymore about corner cases or other complex logic. Every time a new value in that stream is added, we just need to load the data. <strong>That’s it!!</strong></p>
-
-<p>We will use <a href="http://reactivex.io/documentation/operators/flatmap.html">flatmap</a> for this because the fetch-data-call will return a stream as well. FlatMap (or MergeMap) will merge these 2 streams as one.</p>
-
-<pre><code class="language-typescript">itemResults$ = this.pageToLoad$ 
-	// based on that stream, load our asynchronosly data
-	// flatmap is an alias for mergemap
-	.flatMap((page: number) =&gt; {
-		// load me some starwars characters
-		return this.http.get(`https://swapi.co/api/people?page=${page}`)
-			// create a stream that contains the results
-			.map(resp =&gt; resp.json().results)
-			.do(resp =&gt; {
-				// add the page to the cache
-				this.cache[page -1] = resp;
-				// if the page contains enough white space, load some more data :)
-				if((this.itemHeight * this.numberOfItems * page) &lt; window.innerHeight){
-					this.pageByManual$.next(page + 1);
-				}
-			})
-		})
-	// eventually, just return a stream that contains the cache
-	.map(_ =&gt; flatMap(this.cache)); 
-</code></pre>
-
-<h3 id="the-result">The result</h3>
-
-<p>the complete result might look like this:  <strong>Note the <a href="https://angular.io/docs/ts/latest/guide/pipes.html#!#async-pipe">async pipe</a> that puts the whole subscription process into play</strong></p>
-
-<pre><code class="language-typescript">@Component({
-  selector: 'infinite-scroll-list',
-  template: `
-  &lt;table&gt;
-   &lt;tbody&gt;
-    &lt;tr *ngFor="let item of itemResults$|async" [style.height]="itemHeight + 'px'"&gt;
-      &lt;td&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-   &lt;/tbody&gt;
-   &lt;/table&gt;
-  `
-})
-export class InfiniteScrollListComponent {
-  private cache = []; 
-  private pageByManual$ = new BehaviorSubject(1);
-  private itemHeight = 40;
-  private numberOfItems = 10; 
-  private pageByScroll$ = Observable.fromEvent(window, "scroll")
-      .map(() =&gt; window.scrollY)
-      .filter(current =&gt; current &gt;=  document.body.clientHeight - window.innerHeight)
-      .debounceTime(200) 
-      .distinct() 
-      .map(y =&gt; Math.ceil((y + window.innerHeight)/ (this.itemHeight * this.numberOfItems)));
-       
-  private pageByResize$ = 
-	Observable.fromEvent(window, "resize")
-	.debounceTime(200) 
-	.map(_ =&gt; Math.ceil(
-	   	(window.innerHeight + document.body.scrollTop) / 
-	   	(this.itemHeight * this.numberOfItems)
-   	));
-
-    
-  private pageToLoad$ = Observable
-    .merge(this.pageByManual$, this.pageByScroll$, this.pageByResize$)
-    .distinct() 
-    .filter(page =&gt; this.cache[page-1] === undefined); 
-    
-  itemResults$ = this.pageToLoad$ 
-    .do(_ =&gt; this.loading = true)
-    .flatMap((page: number) =&gt; {
-      return this.http.get(`https://swapi.co/api/people?page=${page}`)
-          .map(resp =&gt; resp.json().results)
-      		.do(resp =&gt; {
-				this.cache[page -1] = resp;
-				if((this.itemHeight * this.numberOfItems * page) &lt; window.innerHeight){
-					this.pageByManual$.next(page + 1);
-				}
-          })
-    })
-    .map(_ =&gt; flatMap(this.cache)); 
-  
-  constructor(private http: Http){ 
-  } 
-}
-</code></pre>
-
-<p>Here is a <a href="http://plnkr.co/edit/WewXnQRj9xBA7yPveWLQ?p=preview">working plunk</a></p>
-
-<iframe src="https://embed.plnkr.co/plunk/WewXnQRj9xBA7yPveWLQ?show=app,preview&amp;deferRun" frameborder="0" width="100%" height="480px">
-</iframe>
-
-<p>Again, (like I try to prove in previous articles) We don’t need to use third party solutions for everything. The infinite-scroll-list doesn’t contain that much code, and it’s very flexible.
-Let’s say that we would like to free up DOM-elements and use only 100 items at a time, we could just create a new stream for that :)</p>
-
-<p>Thanks for reading, I hope you enjoyed it.</p>
 
 	  ]]></description>
 	</item>

@@ -12,6 +12,143 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>What are schedulers in RxJS</title>
+	  <link>//what-are-schedulers-in-rxjs/</link>
+	  <author></author>
+	  <pubDate>2018-02-05T00:00:00+00:00</pubDate>
+	  <guid>//what-are-schedulers-in-rxjs/</guid>
+	  <description><![CDATA[
+	     <p>One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used to execute tasks. The main reason for this is that the authors of RxJS did a great job in abstracting this logic. They used the principle of least concurrency as the default scheduling strategy which makes sure that in most cases, we don’t have to think about changing the default.</p>
+
+<p>This post will examine the different schedulers and explain the differences between them.</p>
+
+<h2 id="async-in-javascript">Async in javascript</h2>
+<p>To understand the difference between the different schedulers, we must first examine how async works in javascript. No worries, we won’t go in too deep :).</p>
+
+<p>Javascript is a single threaded language that uses an event loop to handle asynchronous operations. One of my favorite talks ever covers this topic really well. It’s by Philip Roberts and you can find a recording <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>. Be sure to check it out if you are unsure what the event loop is and how it works.</p>
+
+<h3 id="understanding-by-example">Understanding by example</h3>
+
+<p>Let’s look at an example.</p>
+
+<pre><code class="language-typescript">console.log('script start');
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('promise1');
+}).then(function() {
+  console.log('promise2');
+});
+
+console.log('script end');
+</code></pre>
+
+<p>If you run this piece of code, the result will look like this:</p>
+
+<pre><code class="language-typescript">script start
+script end
+promise1
+promise2
+setTimeout
+</code></pre>
+<p>If you know how the event loop works, you understand that ‘script start’ and ‘script end’ were logged first. The ‘setTimeout’ and ‘promises’ that get triggered were put on a queue to be executed when the call stack cleared.</p>
+
+<p>But what’s a lesser known fact is that there are different queues. There is a microtask and a macrotask queue. A promise gets added to the microtask queue and a setTimeout to the macrotask queue.
+Whenever the call stack is cleared, the microtasks queue gets cleared first. Hence the ‘promise1’ is the next log statement we see.</p>
+
+<p>When a microtask is finished, the rest of the microtasks queue gets executed until the microtask queue is empty. That’s the reason ‘promise2’ is logged next. So even if the second promise gets scheduled during the execution of the first, it still gets executed before the setTimeout.</p>
+
+<p>Lastly, when the microtask queue is cleared, the next task is picked from the macrotask queue, and the ‘setTimeout’ is logged.</p>
+
+<p>There you have it, this is how async works in javascript! Might be a little to quick but since it’s not part of this post to explain everything in detail, I’ll leave it at that. And also because Jake Archibald basically explained it in perfect detail right <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank">here</a>.</p>
+
+<h2 id="schedulers">Schedulers</h2>
+
+<p>In RxJS there are different schedulers that all schedule work using a different (a)sync technique behind the scenes. Let’s take a look at an example to learn a few of them. There are three statement logged on different schedulers.</p>
+
+<pre><code class="language-typescript">const asyncScheduler = Rx.Observable.of('')
+  .startWith('async', Rx.Scheduler.async);
+
+const asapScheduler = Rx.Observable.of('')
+  .startWith('asap', Rx.Scheduler.asap);
+
+const queueScheduler = Rx.Observable.of('')
+  .startWith('queue', Rx.Scheduler.queue);
+
+
+Rx.Observable.merge(
+    asyncScheduler,
+    asapScheduler,
+    queueScheduler)
+  .filter(x =&gt; !!x)
+  .subscribe(console.log);
+
+console.log('after subscription')
+</code></pre>
+
+<p>The results of running this code is:</p>
+
+<pre><code class="language-typescript">queue
+after subscription
+asap
+async
+</code></pre>
+
+<p>As you can see, the ‘queue’ is the only statement logged synchronously. We can conclude this because it is the only statement logged before the ‘after subscription’ statement is logged. 
+Next we can see that the ‘asap’ is logged before the ‘async’. That is because the <code>asap</code> scheduler uses the micro task queue and the <code>async</code> uses the macrotask queue.</p>
+
+<p>Now, to list all of them, we can look at the table below. In the example I didn’t cover the ‘animationFrame’ and the ‘virtualTime’ scheduler. The ‘animationFrame’ scheduler allows you to schedule work to be executed when there is a repaint. The ‘virtualTime’ scheduler is something you can use to test your code in a synchronous fashion using marble diagrams.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scheduler</th>
+      <th>Approach</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Queue</code></td>
+      <td>Executes task synchronously but waits for current task to be finished</td>
+    </tr>
+    <tr>
+      <td><code>Asap</code></td>
+      <td>Schedules on the micro task queue</td>
+    </tr>
+    <tr>
+      <td><code>Async</code></td>
+      <td>Schedules on the macro task queue</td>
+    </tr>
+    <tr>
+      <td><code>AnimationFrame</code></td>
+      <td>Relies on ‘requestAnimationFrame’</td>
+    </tr>
+    <tr>
+      <td><code>VirtualTime</code></td>
+      <td>Will execute everything synchronous ordered by delay and mainly used in testing</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="using-schedulers-in-rxjs">Using schedulers in RxJS</h3>
+<p>Some operators, like ‘startWith’ in the example above, allow you to pass in an optional scheduler to influence when a certain task gets executed. Every operator that has this option, will also have a default value.</p>
+
+<p>For example, the <code>debounceTime</code> operator uses the ‘async’ scheduler as a default as you can see below.</p>
+
+<pre><code class="language-typescript">export function debounceTime&lt;T&gt;(dueTime: number, scheduler: IScheduler = async)
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Schedulers influence the timing on which tasks get executed. You can change the default schedulers of some operators by passing in an extra scheduler argument.</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Displaying components based on the role of a user</title>
 	  <link>//display-a-component-based-on-role/</link>
 	  <author></author>
@@ -1225,166 +1362,6 @@ Let’s see what this does:</p>
 </ul>
 
 <p><strong>NOTE:</strong> Thanks to <a href="https://twitter.com/juristr">@juristr</a> for the review!</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Type safe actions in reducers</title>
-	  <link>//type-safe-actions-in-reducers/</link>
-	  <author></author>
-	  <pubDate>2016-11-21T00:00:00+00:00</pubDate>
-	  <guid>//type-safe-actions-in-reducers/</guid>
-	  <description><![CDATA[
-	     <p>I’ve been using TypeScript and Redux for a while now. One thing that’s been bothering me from day one is the lack of typing on actions, or so I thought. Until the following twitter conversation last week caught my eye.</p>
-
-<p><img src="https://www.dropbox.com/s/28omnkkkn1o2rm1/Screenshot%202016-11-16%2016.45.43.png?raw=1" alt="twitter" /></p>
-
-<p>It’s about an exhaustive switch statement in flowtype and the option to do the same in TypeScript. But the real interesting part for me was the link from Mike Ryan. He pointed out they used some kind of pattern in the ngrx example app. Having never checked it out before, I decided to do so, and I found this cool idea to use classes for your actions.</p>
-
-<p>I loved it so much, I decided to blog about it :). All credits to Mike Ryan of course who came up with the idea.</p>
-
-<h3 id="my-previous-situation">My previous situation</h3>
-<p>This is what my old code looked like (see comments).</p>
-
-<pre><code class="language-typescript">// Create string constants for the action types
-const SET_ID: string = "SET_ID";
-const REMOVE_ID: string = "REMOVE_ID";
-
-// Create action creators for every action
-function setId(id): Action {
-	return { type: SET_ID, payload: { id } };
-}
-
-function removeId(): Action {
-	return { type: REMOVE_ID };
-}
-
-function test(state: string = "", action: Action): string {
-    // switch on the action type
-	switch (action.type) {
-		case SET_ID:
-		     // have absolutely no type safety on the
-		     // payload here since payload is
-		     // defined as 'any'
-		     return action.payload.id;
-		case REMOVE_ID:
-	         return "";
-		default:
-		     return state;
-	}
-}
-
-</code></pre>
-<p>While this is perfectly valid code, it doesn’t provide me with any code completion or type safety regarding the payload.
-Just check out this <a href="http://bit.ly/2fVxE7C" target="_blank">TypeScript playground</a> example and try to change the <code>action.payload.id</code> into <code>action.payload.whatever</code>. You will see no compile errors.</p>
-
-<p>Let’s see how this can be improved.</p>
-
-<h3 id="use-classes-to-define-actions">Use classes to define actions</h3>
-<p>In the following code snippet I used classes for actions instead of action creators. These classes extend from the Action interface. This means, every class will have the <code>type</code> property.
-I also created a new <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#union-types" target="blank">Union type</a> called <code>Actions</code> which combines all the possible action classes.</p>
-
-<p>Our switch statement works on the common denominator between all our actions, being the <code>type</code> property. This way the TypeScript compiler can
-know that, if the type is for example <code>"SET_ID"</code>, the only possible class in that specific ‘case’ part of the switch statement is the <code>SetId</code> class. It can then use the type information in that class to determine what the payload looks like. Check the code below if this is unclear.</p>
-
-<p>This is a concept called <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions" target="_blank">Discriminated Unions</a>.</p>
-
-<pre><code class="language-typescript">// Instead of using action creators, classes are used.
-class SetId implements Action {
-	type: "SET_ID" = "SET_ID";
-	// here we declare the type of the payload for the
-	// SetId class to be an object with a property 'id'
-	payload: { id: string };
-
-	public constructor(id: string) {
-		this.payload = { id };
-	}
-}
-
-class RemoveId implements Action {
-	type: "REMOVE_ID" = "REMOVE_ID";
-
-	public constructor() { }
-}
-
-// Create a union type that contains all the possible actions.
-type Actions = SetId | RemoveId;
-
-function test(state: string = "", action: Actions): string {
-    // The switch case statements use discriminated unions
-	switch (action.type) {
-		case "SET_ID":
-		    // The compiler knows this can only be the
-		    // class SetId so it can use the type
-		    // information in that class
-		    // to know the payload has an id property.
-			return action.payload.id;
-		case "REMOVE_ID":
-			return "";
-		default:
-			return state;
-	}
-}
-
-</code></pre>
-
-<p>You can try this <a href="http://bit.ly/2fXYiPB" target="_blank">TypeScript playground example</a>. If you remove the id property in the switch statement, you’ll see that you have autocompletion</p>
-
-<p><img src="https://www.dropbox.com/s/1s4zyh01xbp8g2a/Screenshot%202016-11-16%2020.31.03.png?raw=1" alt="autocomplete" /></p>
-
-<p>and type safety!</p>
-
-<p><img src="https://www.dropbox.com/s/6wtt9oupqr8290z/Screenshot%202016-11-16%2020.45.46.png?raw=1" alt="type safety" /></p>
-
-<p>Just try to change the property <code>id</code> into <code>whatever</code>, you’ll get a compilation error. You can even click on the <code>id</code> property and directly be redirected to the <code>SetId</code> class.</p>
-
-<p>Awesome right!</p>
-
-<h3 id="the-finishing-touch">The finishing touch</h3>
-<p>The way the type property in the classes were defined before, are a little strange.</p>
-
-<pre><code class="language-typescript">type: "REMOVE_ID";
-</code></pre>
-<p>This is actually called a <a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#string-literal-types" target="_blank">String literal type</a>.
-There’s a better way to do this using a utility method that coerces a string you pass to it to a string literal type. It also remembers every action type you’ve passed to it to avoid duplicates in your app.</p>
-
-<pre><code class="language-typescript">let typeCache: { [label: string]: boolean } = {};
-export function type&lt;T&gt;(label: T | ''): T {
-  // this actually checks whether your action type
-  // name is unique!
-  if (typeCache[&lt;string&gt;label]) {
-    throw new Error(`Action type "${label}" is not unqiue"`);
-  }
-
-  typeCache[&lt;string&gt;label] = true;
-
-  return &lt;T&gt;label;
-}
-</code></pre>
-
-<p>Using this function, you can declare your action types like this:</p>
-
-<pre><code class="language-typescript">export const ActionTypes = {
-	SET_ID: type&lt;"SET_ID"&gt;("SET_ID"),
-	REMOVE_ID: type&lt;"REMOVE_ID"&gt;("REMOVE_ID")
-}
-</code></pre>
-
-<p>and use them everywhere like this:</p>
-
-<pre><code class="language-typescript">type = ActionTypes.SET_ID;
-// or
-case ActionTypes.SET_ID:
-</code></pre>
-
-<p>Checkout the finished <a href="http://bit.ly/2m7nG7S" target="blank">TypeScript playground example</a>. It’s basically the same as the previous one, but cleaner.</p>
-
-<h3 id="conclusion">Conclusion</h3>
-<p>Using some of TypeScript 2’s powerful typing system, you can make the actions in your reducers type safe with little effort.</p>
-
-<p><strong>Note:</strong> Thanks to <a href="https://twitter.com/PascalPrecht" target="_blank">Pascal Precht</a>, <a href="https://twitter.com/toddmotto" target="_blank">Todd Motto</a>, <a href="https://twitter.com/basarat" target="_blank">Basarat</a> and <a href="https://twitter.com/SamVerschueren" target="_blank">Sam Verschueren</a> for reviewing!</p>
 
 
 	  ]]></description>

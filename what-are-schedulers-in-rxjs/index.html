@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>What are schedulers in RxJS</title>
+    <meta name="description" content="A deep dive into what RxJS schedulers are" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="//what-are-schedulers-in-rxjs/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What are schedulers in RxJS" />
+    <meta property="og:description" content="A deep dive into what RxJS schedulers are" />
+    <meta property="og:url" content="//what-are-schedulers-in-rxjs/" />
+    <meta property="og:image" content="/assets/images/cover/cover3.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="What are schedulers in RxJS" />
+    <meta name="twitter:description" content="A deep dive into what RxJS schedulers are" />
+    <meta name="twitter:url" content="//what-are-schedulers-in-rxjs/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover3.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "What are schedulers in RxJS",
+    "url": "//what-are-schedulers-in-rxjs/",
+    "image": "/assets/images/cover/cover3.jpg",
+    "description": "A deep dive into what RxJS schedulers are"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover3.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>Want to work us?</h5>
+<a href="https://strongbrew.io" target="_blank">Learn more</button>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">What are schedulers in RxJS</h1>
+            <section class="post-meta">
+            <!-- <a href='/'></a> -->
+
+            
+                
+            
+                
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                
+            
+            <time class="post-date" datetime="2018-02-05">05 Feb 2018</time>
+                <!-- [[tags prefix=" on "]] -->
+                
+                on
+                
+                    
+                       <a href='/tag/RxJS'>Rxjs</a>
+                    
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+
+            <p>One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used to execute tasks. The main reason for this is that the authors of RxJS did a great job in abstracting this logic. They used the principle of least concurrency as the default scheduling strategy which makes sure that in most cases, we don’t have to think about changing the default.</p>
+
+<p>This post will examine the different schedulers and explain the differences between them.</p>
+
+<h2 id="async-in-javascript">Async in javascript</h2>
+<p>To understand the difference between the different schedulers, we must first examine how async works in javascript. No worries, we won’t go in too deep :).</p>
+
+<p>Javascript is a single threaded language that uses an event loop to handle asynchronous operations. One of my favorite talks ever covers this topic really well. It’s by Philip Roberts and you can find a recording <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>. Be sure to check it out if you are unsure what the event loop is and how it works.</p>
+
+<h3 id="understanding-by-example">Understanding by example</h3>
+
+<p>Let’s look at an example.</p>
+
+<pre><code class="language-typescript">console.log('script start');
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('promise1');
+}).then(function() {
+  console.log('promise2');
+});
+
+console.log('script end');
+</code></pre>
+
+<p>If you run this piece of code, the result will look like this:</p>
+
+<pre><code class="language-typescript">script start
+script end
+promise1
+promise2
+setTimeout
+</code></pre>
+<p>If you know how the event loop works, you understand that ‘script start’ and ‘script end’ were logged first. The ‘setTimeout’ and ‘promises’ that get triggered were put on a queue to be executed when the call stack cleared.</p>
+
+<p>But what’s a lesser known fact is that there are different queues. There is a microtask and a macrotask queue. A promise gets added to the microtask queue and a setTimeout to the macrotask queue.
+Whenever the call stack is cleared, the microtasks queue gets cleared first. Hence the ‘promise1’ is the next log statement we see.</p>
+
+<p>When a microtask is finished, the rest of the microtasks queue gets executed until the microtask queue is empty. That’s the reason ‘promise2’ is logged next. So even if the second promise gets scheduled during the execution of the first, it still gets executed before the setTimeout.</p>
+
+<p>Lastly, when the microtask queue is cleared, the next task is picked from the macrotask queue, and the ‘setTimeout’ is logged.</p>
+
+<p>There you have it, this is how async works in javascript! Might be a little to quick but since it’s not part of this post to explain everything in detail, I’ll leave it at that. And also because Jake Archibald basically explained it in perfect detail right <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank">here</a>.</p>
+
+<h2 id="schedulers">Schedulers</h2>
+
+<p>In RxJS there are different schedulers that all schedule work using a different (a)sync technique behind the scenes. Let’s take a look at an example to learn a few of them. There are three statement logged on different schedulers.</p>
+
+<pre><code class="language-typescript">const asyncScheduler = Rx.Observable.of('')
+  .startWith('async', Rx.Scheduler.async);
+
+const asapScheduler = Rx.Observable.of('')
+  .startWith('asap', Rx.Scheduler.asap);
+
+const queueScheduler = Rx.Observable.of('')
+  .startWith('queue', Rx.Scheduler.queue);
+
+
+Rx.Observable.merge(
+    asyncScheduler,
+    asapScheduler,
+    queueScheduler)
+  .filter(x =&gt; !!x)
+  .subscribe(console.log);
+
+console.log('after subscription')
+</code></pre>
+
+<p>The results of running this code is:</p>
+
+<pre><code class="language-typescript">queue
+after subscription
+asap
+async
+</code></pre>
+
+<p>As you can see, the ‘queue’ is the only statement logged synchronously. We can conclude this because it is the only statement logged before the ‘after subscription’ statement is logged. 
+Next we can see that the ‘asap’ is logged before the ‘async’. That is because the <code>asap</code> scheduler uses the micro task queue and the <code>async</code> uses the macrotask queue.</p>
+
+<p>Now, to list all of them, we can look at the table below. In the example I didn’t cover the ‘animationFrame’ and the ‘virtualTime’ scheduler. The ‘animationFrame’ scheduler allows you to schedule work to be executed when there is a repaint. The ‘virtualTime’ scheduler is something you can use to test your code in a synchronous fashion using marble diagrams.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scheduler</th>
+      <th>Approach</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Queue</code></td>
+      <td>Executes task synchronously but waits for current task to be finished</td>
+    </tr>
+    <tr>
+      <td><code>Asap</code></td>
+      <td>Schedules on the micro task queue</td>
+    </tr>
+    <tr>
+      <td><code>Async</code></td>
+      <td>Schedules on the macro task queue</td>
+    </tr>
+    <tr>
+      <td><code>AnimationFrame</code></td>
+      <td>Relies on ‘requestAnimationFrame’</td>
+    </tr>
+    <tr>
+      <td><code>VirtualTime</code></td>
+      <td>Will execute everything synchronous ordered by delay and mainly used in testing</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="using-schedulers-in-rxjs">Using schedulers in RxJS</h3>
+<p>Some operators, like ‘startWith’ in the example above, allow you to pass in an optional scheduler to influence when a certain task gets executed. Every operator that has this option, will also have a default value.</p>
+
+<p>For example, the <code>debounceTime</code> operator uses the ‘async’ scheduler as a default as you can see below.</p>
+
+<pre><code class="language-typescript">export function debounceTime&lt;T&gt;(dueTime: number, scheduler: IScheduler = async)
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Schedulers influence the timing on which tasks get executed. You can change the default schedulers of some operators by passing in an extra scheduler argument.</p>
+
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+                
+            
+                
+                    
+                        <figure class="author-image">
+                            <a class="img" href="/author/kwintenp" style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                        </figure>
+                    
+
+                    <section class="author">
+                        <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                        
+                            <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                        
+                        <div class="author-meta">
+                            <span class="author-location icon-location"> Belgium</span>
+                            
+                            <span class="author-link icon-twitter"><a href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                        </div>
+                    </section>
+
+                    <!-- /author  -->
+
+                    <section class="share">
+                        <h4>Share this post</h4>
+                        <a class="icon-twitter" href="http://twitter.com/share?text=What are schedulers in RxJS&amp;url=what-are-schedulers-in-rxjs"
+                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                            <span class="hidden">Twitter</span>
+                        </a>
+                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=what-are-schedulers-in-rxjs"
+                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                            <span class="hidden">Facebook</span>
+                        </a>
+                        <a class="icon-google-plus" href="https://plus.google.com/share?url=what-are-schedulers-in-rxjs"
+                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                            <span class="hidden">Google+</span>
+                        </a>
+                    </section>
+                
+            
+
+            <!-- Add Disqus Comments -->
+            
+                
+                
+                    <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+            
+
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover4.jpg)" href="/display-a-component-based-on-role">
+            <section class="post">
+                <h2>Displaying components based on the role of a user</h2>
+                <p>At some moment in time, almost every application will have certain parts that need to...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-112030289-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>
