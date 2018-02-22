@@ -1,5 +1,5 @@
 ---
-title: What are those schedulers in RxJS
+title: What are schedulers in RxJS
 published: true
 author: kwintenp
 description: A deep dive into what RxJS schedulers are
@@ -20,7 +20,7 @@ One topic in RxJS for which it is quite hard to find proper documentation/blogpo
 This post will examine the different schedulers and explain the differences between them. 
 
 ## Async in javascript
-To understand the difference between the different schedulers, we must first examine how async works in javascript. No worries, we won't go in to deep :).
+To understand the difference between the different schedulers, we must first examine how async works in javascript. No worries, we won't go in too deep :).
 
 Javascript is a single threaded language that uses an event loop to handle asynchronous operations. One of my favorite talks ever covers this topic really well. It's by Philip Roberts and you can find a recording <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>. Be sure to check it out if you are unsure what the event loop is and how it works. 
 
@@ -55,7 +55,7 @@ setTimeout
 ```
 If you know how the event loop works, you understand that 'script start' and 'script end' were logged first. The 'setTimeout' and 'promises' that get triggered were put on a queue to be executed when the call stack cleared. 
 
-But what's a lesser know fact is that there are different queues. There is a microtask and a macrotask queue. A promise gets added to the microtask queue and a setTimeout to the macrotask queue.
+But what's a lesser known fact is that there are different queues. There is a microtask and a macrotask queue. A promise gets added to the microtask queue and a setTimeout to the macrotask queue.
 Whenever the call stack is cleared, the microtasks queue gets cleared first. Hence the 'promise1' is the next log statement we see. 
 
 When a microtask is finished, the rest of the microtasks queue gets executed until the microtask queue is empty. That's the reason 'promise2' is logged next. So even if the second promise gets scheduled during the execution of the first, it still gets executed before the setTimeout. 
