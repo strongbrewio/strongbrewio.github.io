@@ -18,8 +18,8 @@
 
     <!-- Styles'n'Scripts -->
     <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
 
     <!-- highlight.js -->
     <link href="/assets/css/prism.css" rel="stylesheet">
@@ -60,6 +60,22 @@
 
 </head>
 <body class="tag-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <div class="logo-wrapper">
+                <img src="/assets/images/logo_website.png" alt="">
+            </div>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <!-- The blog navigation links -->
     <div class="nav">
@@ -105,7 +121,6 @@
 <!-- If we have a tag cover, display that - else blog cover - else nothing -->
 <header class="main-header tag-head " style="background-image: url(/assets/images/bg-gradient.jpg) ">
     <nav class="main-nav overlay clearfix">
-        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
         
             <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         

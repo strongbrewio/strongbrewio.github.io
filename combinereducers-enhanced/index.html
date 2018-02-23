@@ -18,8 +18,8 @@
 
     <!-- Styles'n'Scripts -->
     <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
 
     <!-- highlight.js -->
     <link href="/assets/css/prism.css" rel="stylesheet">
@@ -60,6 +60,22 @@
 
 </head>
 <body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <div class="logo-wrapper">
+                <img src="/assets/images/logo_website.png" alt="">
+            </div>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <!-- The blog navigation links -->
     <div class="nav">
@@ -105,7 +121,6 @@
 
 <header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover7.jpg) ">
     <nav class="main-nav  overlay  clearfix">
-        <a class="blog-logo" href="/"><img src="/assets/images/strongbrewlogo.png" alt="Blog Logo" /></a>
         
             <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         
@@ -113,8 +128,8 @@
 </header>
 
 <div class="followme followme-abs" id="followme">
-<h5>Want to work us?</h5>
-<a href="https://strongbrew.io" target="_blank">Learn more</button>
+<h5>Want to work with us?</h5>
+<a href="https://strongbrew.io/about" class="button" rel="noopener">Learn more</a>
 </div>
 
 
@@ -122,7 +137,7 @@
     var followMe = document.getElementById('followme');
     var header = document.getElementById('header');
     window.addEventListener('scroll', function() {
-        if(window.scrollY > header.offsetHeight) {
+        if(window.scrollY > header.offsetHeight + 113) {
             followMe.classList.remove('followme-abs');
             followMe.classList.add('followme-fixed');
         } else {
@@ -136,7 +151,7 @@
 <main class="content" role="main">
 
     <article class="post">
-
+        <div class="post-inner">
         <header class="post-header">
             <h1 class="post-title">combineReducers enhanced</h1>
             <section class="post-meta">
@@ -409,6 +424,7 @@ If you feel this feature might help you in the future, be sure to ‘like’ the
             
 
         </footer>
+        </div>
 
     </article>
 
