@@ -8,7 +8,7 @@
     var followMe = document.getElementById('followme');
     var header = document.getElementById('header');
     window.addEventListener('scroll', function() {
-        if(window.scrollY > header.offsetHeight) {
+        if(window.scrollY > header.offsetHeight + 113) {
             followMe.classList.remove('followme-abs');
             followMe.classList.add('followme-fixed');
         } else {
