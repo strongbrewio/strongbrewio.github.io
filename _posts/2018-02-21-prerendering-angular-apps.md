@@ -31,5 +31,120 @@ Enough chit chat! Let's dive into some code!
 I've created this [github repository](https://github.com/strongbrewio/prerender-angular-example) just for you! It's a simple website with a few pages that doesn't know how to prerender yet.
 Checkout the branch `runtime` by running the command `git checkout runtime`. When running `npm i && npm run start` the application should install all its NPM dependencies and get hosted on http://localhost:4000, just like any default Angular-CLI application
 
-## Angular Universal
-todo
+## Angular platform server
+npm i @angular/platform-server -D
+
+Update the app.module to enable server transition
+
+```typescript
+@NgModule({
+  ...
+  imports: [
+    BrowserModule.withServerTransition(
+        { appId: 'prerender-angular-example' }
+    ),
+    ...
+  ],
+  ...
+})
+export class AppModule { }
+```
+
+Create a app.prerender.module
+```typescript
+// src/app/app.server.module
+import { NgModule } from '@angular/core';
+import { ServerModule, ServerTransferStateModule } from '@angular/platform-server';
+
+import { AppModule } from './app.module';
+import { AppComponent } from './app.component';
+
+@NgModule({
+  imports: [
+    AppModule,
+    ServerModule,
+    ServerTransferStateModule
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppPrerenderModule {
+}
+```
+
+Create a main.prerender.ts
+```typescript
+// src/app/app.server.module.ts
+import { enableProdMode } from '@angular/core';
+export { AppPrerenderModule } from './app/app.prerender.module';
+
+enableProdMode();
+```
+
+Create a tsconfig.prerender.json
+```json
+/* src/tsconfig.prerender.json */
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/prerender",
+    /* node only understands commonjs for now*/
+    "module": "commonjs"
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts"
+  ],
+  /* Additional informations to bootstrap Angular */
+  "angularCompilerOptions": {
+    "entryModule": "app/app.prerender.module#AppPrerenderModule"
+  }
+}
+
+```
+
+create an app in the angular-cli.json and refer to the main.server.ts and the tsconfig.server.json
+
+```json
+{
+      "name": "prerender",
+      "platform": "server",
+      "root": "src",
+      "outDir": "dist-prerender",
+      "main": "main.prerender.ts",
+      "tsconfig": "tsconfig.prerender.json",
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    }
+```
+
+Update the package json so it builds both the normal package and the server package. Set the output-hashing to none so that the build generates a clean main.bundle.js
+```
+    "build": "ng build --prod && ng build --prod --app prerender --output-hashing=none",
+```
+when running npm run build the following files should be created:
+- dist (this contains the normal build)
+- dist-prerender/main.bundle.js
+
+## Generating the static files
+To generate the static files we need to create a prerender script. Since I'm a typescript enthusiast I want to create the prerender script in typescript and use ts-node to run it.
+
+Let's start with creating an empty prerender.ts file in the root folder and installing ts-node with ```npm i -D ts-node```
+
+Now we can update the scripts section of the package.json so that the render function is called when the build is completed:
+
+UPDATE TO TYPESCRIPT 2.6.2
+```json
+ "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build --prod && ng build --prod --app prerender --output-hashing=none",
+    "postbuild": "npm run render",
+    "render": "ts-node prerender.ts",
+    ...
+  },
+  ```
+
+  ### Completing the prerender.ts file
