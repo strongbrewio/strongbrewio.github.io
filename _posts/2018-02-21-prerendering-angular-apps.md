@@ -3,26 +3,30 @@ layout: post
 title: Prerendering angular applications
 published: false
 author: brechtbilliet
-description: 
+description: Learn how to use Server-side rendering to prerender our Angular application at build time.
 comments: true
 ---
 
 ## Foreword
 
-There are several ways of optimizing Angular applications. For instance, we could compile them [ahead-of-time](https://angular.io/guide/aot-compiler) through AOT-compilation.
-We could use service-workers to optimize caching. And there are plenty of other PWA (progressive web-app) features as well that can increase the quality of our Angular applications.
+At the moment of writing, there are several ways of optimizing Angular applications. We could compile them [ahead-of-time](https://angular.io/guide/aot-compiler) through AOT-compilation.
+We could use service-workers to optimize caching. And there are plenty of other PWA (progressive web-app) features as well that can increase the quality and overall performane of our Angular applications.
 
 However, there are a still a few problems that these optimizations won't fix:
-- SEO (Search engine optimization): At the time of writing the application is harder to index by search engines because the content isn't available on load time. Therefore the application is likely to fail on several SEO requirements.
-- Initial page load: Since the application still needs to be bootstrapped after the pageload, there is an initial waiting time untill the user can use the application. This results in lesser user experience.
+- SEO (Search engine optimization): At the time of writing SPA's (Single-page-applications) are harder to index by search engines because the content isn't available on load time. Therefore the application is likely to fail on several SEO requirements.
+- Initial page load could be faster: Since the application still needs to be bootstrapped after the page is loaded, there is an initial waiting time untill the user can use the application. This results in lesser user experience.
 
-These two problems can be fixed by SSR (Server side rendering). SSR takes the best of both worlds: We still have an SPA (single page application) that gives us the native feeling but the page is still rendered instantly. So the application is rich and fast at the same time!
+These two problems can be fixed by [SSR](https://angular.io/guide/universal) (Server-side rendering). SSR executes the angular application on the server, that way the server will actually serve the compiled content in a way that search engine crawlers can read it. This is really the best of both worlds: The server will render the application on the server, but when the javascript bundle is loaded it will turn into a SPA. That way the application is rich and fast at the same time!
 
-To optimize our [StrongBrew](https://strongbrew.io) website we started by using this approach. It was pretty great when we ran it locally, however the StrongBrew website is hosted on [Firebase](https://firebase.google.com) and the SSR part was hosted by Firebase functions. We really love Firebase and everything it stands for, but for us, SSR on Firebase functions was just too slow. Sometimes it took 4 seconds to serve the content...
+To optimize our [StrongBrew](https://strongbrew.io) website we started using this approach. It was pretty fast when we ran it locally, however the StrongBrew website is hosted on [Firebase](https://firebase.google.com) and the SSR part was hosted by Firebase functions. 
 
-Since the loading time of a website is very important if we want to keep our visitors, we had to find another way to serve the content in a more effective manner. The key to SSR is Angular Universal, and so it turns out we can use just that to prerender all the html at build-time instead of at run-time. 
+We really love Firebase and everything it stands for, but for us, SSR on Firebase functions was just too slow. Sometimes it took 4 seconds to serve the content... Since the loading time of a website is very important if we want to keep our visitors, we had to find another way to serve the content in a more effective manner. 
+
+SSR works like this: A user navigates to a url => the server compiles the application and serves it.
+But instead of compiling every route when it the server receives a request, what if we could execute the SSR logic for every route at build time? That would certainly fix our problem.
+
 That way we would run generated static html files which is insanely fast, and when the javascript bundles are loaded the browser would take over.
-This also uses the best of both worlds: Ultra fast loading time + we don't need to give up a rich experience.
+This also uses the best of both worlds: Ultra fast loading time + we don't need to give up our rich SPA experience.
 The result went from several seconds to 30 miliseconds.
 
 This is a super fast and super effective improvement but it has one very important limitation.
@@ -156,15 +160,15 @@ when running npm run build the following files should be created:
 
 ## Generating the static files
 
-We have just created the `main.bundle.js`. this file could be used to perform server side rendering. However we don't want to do server side rendering in this case, we want to prerender the html at build time. To do that we need a script that will complete the following steps.
+We have just created the `main.bundle.js`, the file that we need to perform server side rendering. However we don't want to do server side rendering in this case, we want to prerender the html at build time. To do that we need a script that will complete the following steps.
 
-- Create an array with routes (you could automate this if you want)
+- Create an array with routes (we could automate this if we want)
 - Loop over that array and for every entry: 
   - create a folder in the dist map with that route name 
   - use the ```main.bundle.js``` to render the html and store that html as an ```ìndex.html``` in the folder we just created.
 
-Let's call that script prerender.ts. Since I'm a typescript enthusiast I want to create the prerender script in typescript and use ts-node to run it.
-We can start with creating an empty prerender.ts file in the root folder and installing ts-node with ```npm i -D ts-node```
+Let's call that script prerender.ts. Since I'm a typescript enthusiast I want to create the prerender script in typescript and use [ts-node](https://www.npmjs.com/package/ts-node) to run it.
+We can start with creating an empty `prerender.ts` file in the root folder and installing ts-node with ```npm i -D ts-node```
 
 Now we can update the scripts section of the package.json so that the render function is called when the build is completed:
 
@@ -179,6 +183,62 @@ Now we can update the scripts section of the package.json so that the render fun
   },
   ```
 
-Right now everything is bootstrapped to finish the whole cycle. The only thing that rests us is implementing the prerender functionality.
-Let's go!
-  ### Completing the prerender.ts file
+If we run `npm run build`, the `main.bundle.js` should be created in the dist-prerender directory. This file exports a module called `AppPrerenderModuleNgFactory`. This is the module that we can use to prerender the whole thing.
+
+The only puzzle piece that is now missing, is implementing the `prerender.ts` file.
+
+### Completing the prerender.ts file
+// todo
+```typescript
+import 'zone.js/dist/zone-node';
+import * as path from 'path';
+import * as fs from 'fs';
+import { enableProdMode } from '@angular/core';
+import { renderModuleFactory } from '@angular/platform-server';
+import { AppPrerenderModuleNgFactory } from './dist-prerender/main.bundle';
+
+const distFolder = './dist';
+const index = fs
+    .readFileSync(path.resolve(__dirname, `${distFolder}/index.html`), 'utf8')
+    .toString();
+
+// you could automate this based on the app.routes.ts file but
+// to keep it simple let's just create an array with the routes we want
+// to prerender
+const paths = [
+    '/about',
+    '/brews',
+    '/consultancy'];
+enableProdMode();
+
+// for every route render the html and save it in the correct folder
+paths.forEach(p => renderToHtml(p, distFolder + p));
+
+// don't forget to overwrite the index.html as well
+renderToHtml('/index.html', distFolder);
+
+function renderToHtml(url: string, folderPath: string): void {
+    // Render the module with the correct url just 
+    // as the server would do
+    renderModuleFactory(AppPrerenderModuleNgFactory, {
+        url,
+        document: index
+    }).then(html => {
+        // create the route directory
+        if (url !== '/index.html') {
+            fs.mkdirSync(folderPath);
+        }
+        fs.writeFile(folderPath + '/index.html', html,  (err =>  {
+            if (err) {
+                throw err;
+            }
+            console.log(`success`);
+        });
+    });
+}
+
+```
+
+## Sources
+
+[deploy angular universal with firebase](https://hackernoon.com/deploy-angular-universal-w-firebase-ad70ea2413a1)
