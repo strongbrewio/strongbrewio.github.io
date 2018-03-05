@@ -16,11 +16,11 @@ cover: 'assets/images/cover/cover11.jpg'
 ## Foreword
 
 At the moment of writing this article, there are several ways of optimizing Angular applications. We could compile them [ahead-of-time](https://angular.io/guide/aot-compiler) through AOT-compilation.
-We could use [service-workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) to optimize caching. And there are plenty of other PWA (progressive web-app) features as well that can increase the quality and overall performane of our Angular applications.
+We could use [service-workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) to optimize caching. And there are plenty of other PWA (progressive web-app) features as well that can increase the quality and overall performance of our Angular applications.
 
 However, there are a still a few problems that these optimizations won't fix:
 - **SEO** (Search engine optimization): At the time of writing SPA's (Single-page-applications) are harder to index by search engines because the content isn't available on load time. Therefore the application is likely to fail on several SEO requirements.
-- **Initial page load** could be faster: Since the application still needs to be bootstrapped after the page is loaded, there is an initial waiting time untill the user can use the application. This results in a lesser user experience.
+- **Initial page load** could be faster: Since the application still needs to be bootstrapped after the page is loaded, there is an initial waiting time until the user can use the application. This results in a bad user experience.
 
 These two problems can be fixed by [SSR (Server-side rendering)](https://angular.io/guide/universal). SSR executes the angular application on the server, that way the server will actually serve the compiled content in a way that search engine crawlers can read it. This is really the best of both worlds: The server will render the application on the server, but when the javascript bundle is loaded it will turn into a SPA. That way the application is rich and fast at the same time!
 
@@ -33,20 +33,20 @@ But instead of compiling every route when the server receives a request, what if
 
 That way we would run generated static html files which is insanely fast, and when the javascript bundles are loaded the browser would take over.
 This also uses the best of both worlds: Ultra fast loading time + we don't need to give up our rich SPA experience.
-The result went from several seconds to 30 miliseconds.
+The result went from several seconds to 30 milliseconds.
 ![SSR vs Prerender](/assets/images/posts/prerendering-angular-apps/ssr-vs-prerender.png)
 
 
 This is a super fast and super effective improvement but it has one very important limitation.
 **It's not possible to prerender dynamic content**. The data in the StrongBrew website isn't fetched by AJAX calls (at least not the data that has to be indexed), it rather works with simple webpack imports of JSON files. These are inserted at build time.
 
-This does not mean that loading content dynamically isn't possible anymore, it just won't get prerendered.
+This does not mean that loading content dynamically isn't possible at all, it just won't get prerendered.
 
 ## Let's dive in
 
 Enough chit chat! Let's dive into some code!
 I've created this [github repository](https://github.com/strongbrewio/prerender-angular-example) just for you! It's a simple website with a few pages and the build system doesn't know how to prerender yet.
-Checkout the branch `runtime` by running the command `git checkout runtime`. When running `npm i && npm run start` the bash should install all the NPM dependencies and host the application on `http://localhost:4000`, just like any default Angular-CLI application.
+Checkout the branch `runtime` by running the command `git checkout runtime`. When running `npm i && npm run start` the bash should install all the NPM dependencies and host the application on `http://localhost:4200`, just like any default Angular-CLI application.
 
 ### Installing the dependencies
 
@@ -113,7 +113,7 @@ enableProdMode();
 ```
 ### A prerender tsconfig.json
 
-We are almost there I promise, but we need a few more things. We need a specific tsconfig file that compiles the bundle to something that the node server can read. It's important that the compiler compiles to a commonjs package. So we need to create a `tsconfig.prerender.json` file
+We are almost there I promise, but we need a few more things. We need a specific tsconfig file that compiles the bundle to something that the node server can read. It's important that the compiler compiles to a commonjs package. This is because node.js uses this by default. So we need to create a `tsconfig.prerender.json` file:
 
 ```json
 /* src/tsconfig.prerender.json */
@@ -211,7 +211,7 @@ const index = fs
     .readFileSync(path.resolve(__dirname, `${distFolder}/index.html`), 'utf8')
     .toString();
 
-// you could automate this based on the app.routes.ts file but
+// we could automate this based on the app.routes.ts file but
 // to keep it simple let's just create an array with the routes we want
 // to prerender
 const paths = [
@@ -227,40 +227,67 @@ paths.forEach(p => renderToHtml(p, distFolder + p));
 renderToHtml('/index.html', distFolder);
 
 function renderToHtml(url: string, folderPath: string): void {
+  // Render the module with the correct url just 
+  // as the server would do
+  renderModuleFactory(AppPrerenderModuleNgFactory, {
+    url,
+    document: index
+  }).then(html => {
+    // create the route directory
+    if (url !== '/index.html') {
+    fs.mkdirSync(folderPath);
+    }
+    fs.writeFile(folderPath + '/index.html', html,  (err =>  {
+      if (err) {
+        throw err;
+      }
+      console.log(`success`);
+    });
+  });
+}
+
+```
+### Testing the prerendered application
+
+To test the website we can build the project with `npm run build`. To serve it we can use http-server. We can install http-server by running `npm i -g http-server`. By navigating into the `dist` directory and running `http-server` the application will be hosted on port 8080.
+
+If we navigate to http://localhost:8080 in the browser we will see the prerendered application. We can test the SPA experience by navigating between the different pages and we can test the prerendered part by looking at the source code.
+
+![SSR sourcecode](/assets/images/posts/prerendering-angular-apps/sourcecode.png)
+
+## Closing words
+
+I hope you liked this article and learned something.
+We can find the full prerendered version by checking out branch `prerendered` by running `git checkout prerendered`. To test this example checkout the previous section.
+
+Note: to optimize the html even more we could use an html minifier like [this one](https://www.npmjs.com/package/html-minifier) to shrink the html where possible. The example could look something like this:
+
+```typescript
+const minify = require('html-minifier').minify;
+function renderToHtml(url: string, folderPath: string): void {
     // Render the module with the correct url just 
     // as the server would do
     renderModuleFactory(AppPrerenderModuleNgFactory, {
         url,
         document: index
     }).then(html => {
-        // create the route directory
-        if (url !== '/index.html') {
-            fs.mkdirSync(folderPath);
-        }
-        fs.writeFile(folderPath + '/index.html', html,  (err =>  {
-            if (err) {
-                throw err;
-            }
-            console.log(`success`);
+        ...
+        // minify the html
+        fs.writeFile(folderPath + '/index.html', minify(html),  (err =>  {
+          ...
         });
     });
 }
-
 ```
-### Testing the prerendered application
-
-To test the website we can build the project with `npm run build`. To serve it we can use http-server. You can install http-server by running `npm i -g http-server`. By naviging into the `dist` directory and running `http-server` the application will be hosted on port 8080.
-
-If we navigate to http://localhost:8080 in the browser we will see the prerendered application. You can test the SPA experience by navigating between the different pages and you can test the prerendered part by looking at the source code.
-
-![SSR sourcecode](/assets/images/posts/prerendering-angular-apps/sourcecode.png)
-
-## Closing words
-
-You can find the full prerendered version by checking out branch `prerendered` by running `git checkout prerendered`. To test this example checkout the previous section.
 
 ## Special thanks
-todo
+
+A very special thanks to the awesome people that have helped me with their reviews:
+
+- Laurant Duveau [@laurentduveau](https://twitter.com/laurentduveau)
+- Dominic Elm [@elmd_](https://twitter.com/elmd_)
+- Sam Vloeberghs [@samvloeberghs](https://twitter.com/samvloeberghs)
+- Ana Cidre [@anaCidre_](https://twitter.com/anacidre_)
 
 ## Sources
 
