@@ -22,7 +22,7 @@ However, there are a still a few problems that these optimizations won't fix:
 - **SEO** (search engine optimization): At the time of writing, SPAs (single-page applications) are harder to index by search engines because the content isn't available on load time. Therefore, the application is likely to fail on several SEO requirements.
 - **Initial page load** could be faster: Since the application still needs to be bootstrapped after the page is loaded, there is an initial waiting time until the user can use the application. This results in a bad user experience.
 
-These two problems can be fixed by implementing [SSR (server-side rendering)](https://angular.io/guide/universal). SSR executes the Angular application on the server. That way the server will actually serve the compiled content in a way that search engine crawlers can read it. This is really the best of both worlds: The application will be rendered on the server, but when the JavaScript bundle is loaded, it will turn into an SPA. That way the application is rich and fast at the same time!
+These two problems can be fixed by implementing [SSR (server-side rendering)](https://angular.io/guide/universal). SSR executes the Angular application on the server. That way the server will actually serve the compiled content in a way that search engine crawlers can read it. This is really the best of both worlds: The application will be rendered on the server, but when the JavaScript bundle is loaded, it will turn into a SPA. That way the application is rich and fast at the same time!
 
 To optimize our [StrongBrew](https://strongbrew.io) website, we started using this approach. It was pretty fast when we ran it locally. However, the StrongBrew website is hosted on [Firebase](https://firebase.google.com) and the SSR part was hosted by Firebase functions. 
 
@@ -197,7 +197,9 @@ Now we can update the scripts section of the package.json so that the render fun
 The only puzzle piece that is still missing is implementing the `prerender.ts` file.
 
 ### Completing the prerender.ts file
-// todo
+
+The following code should be self-explanatory:
+
 ```typescript
 import 'zone.js/dist/zone-node';
 import * as path from 'path';
