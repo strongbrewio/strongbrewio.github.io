@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Pre-rendering Angular Applications</title>
+        
+          <description>&lt;h2 id=&quot;why-should-we-pre-render-angular-applications&quot;&gt;Why should we pre-render Angular applications?&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Sun, 04 Mar 2018 00:00:00 +0000</pubDate>
+        <link>
+        /prerendering-angular-apps/</link>
+        <guid isPermaLink="true">/prerendering-angular-apps/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>What are schedulers in RxJS</title>
         
           <description>&lt;p&gt;One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used to execute tasks. The main reason for this is that the authors of RxJS did a great job in abstracting this logic. They used the principle of least concurrency as the default scheduling strategy which makes sure that in most cases, we don’t have to think about changing the default.&lt;/p&gt;

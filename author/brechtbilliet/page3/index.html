@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Strongbrew</title>
+    <title>Author</title>
     <meta name="description" content="" />
 
     <!-- Mobile Meta -->
@@ -25,31 +25,31 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="//tag/Angular/page3/" />
+        <link rel="canonical" href="//author/brechtbilliet/page3/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Strongbrew" />
+    <meta property="og:title" content="Author" />
     <meta property="og:description" content="" />
-    <meta property="og:url" content="//tag/Angular/page3/" />
-    <meta property="og:image" content="/assets/images/bg-gradient.jpg" />
+    <meta property="og:url" content="//author/brechtbilliet/page3/" />
+    <meta property="og:image" content="/assets/images/cover4.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Strongbrew" />
+    <meta name="twitter:title" content="Author" />
     <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="//tag/Angular/page3/" />
-    <meta name="twitter:image:src" content="/assets/images/bg-gradient.jpg" />
+    <meta name="twitter:url" content="//author/brechtbilliet/page3/" />
+    <meta name="twitter:image:src" content="/assets/images/cover4.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Strongbrew",
-    "url": "//tag/Angular/page3/",
-    "image": "/assets/images/bg-gradient.jpg",
+    "name": "Author",
+    "url": "//author/brechtbilliet/page3/",
+    "image": "/assets/images/cover4.jpg",
     "description": ""
 }
     </script>
@@ -112,42 +112,59 @@
     <div class="site-wrapper">
 
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
-        <!-- dynamically overriding backgrounds for tags as well as descriptions -->
-
-
-<!-- default -->
+        <!-- < default}} -->
 <!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<!-- If we have a tag cover, display that - else blog cover - else nothing -->
-<header class="main-header tag-head " style="background-image: url(/assets/images/bg-gradient.jpg) ">
-    <nav class="main-nav overlay clearfix">
-        
-            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
-        
-    </nav>
-    <div class="vertical">
-        <div class="main-header-content inner">
-            <h1 class="page-title">Angular</h1>
-            <h2 class="page-description">
+<!-- The big featured header -->
+
+<!-- Everything inside the #author tags pulls data from the author -->
+<!-- #author  -->
+    <header class="main-header author-head " style="background-image: url(/assets/images/cover4.jpg) ">
+        <nav class="main-nav overlay clearfix">
             
-			    A 13-post collection
+                <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
             
-            </h2>
-        </div>
-    </div>
-</header>
+        </nav>
+    </header>
+
+    <section class="author-profile inner">
+        
+            
+                
+                <figure class="author-image">
+                    <div class="img" style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">Brecht Billiet's Picture</span></div>
+                </figure>
+                
+                <h1 class="author-title">Brecht Billiet</h1>
+                
+                    <div style="display:inline; text-align: justify; text-justify: inter-word;">
+                        <h2 class="author-bio">Software architect/trainer/coach/speaker/blogger</h2>
+                    </div>
+                
+                <div class="author-meta">
+                    <span class="author-location icon-location">Belgium</span>
+                    <span class="author-link icon-link"><a href="http://www.brecht.io/">brecht.io</a></span>
+                    <!-- <span class="author-stats"><i class="icon-stats"></i> [[plural ../pagination.total empty='No posts' singular='% post' plural='% posts']]</span> -->
+                    <span class="author-stats"><i class="icon-stats"></i>11 posts</span>
+                </div>
+            
+        
+            
+        
+    </section>
+<!-- /author -->
 
 <!-- The main content area on the homepage -->
 <main id="content" class="content" role="main">
 
-    <!-- The tag below includes the post loop - partials/loop.hbs -->
+    <!-- The tag below includes the post loop - partials/loop.hbs  -->
         <!-- Previous/next page links - only displayed on page 2+ -->
     <div class="extra-pagination inner">
         
             <nav class="pagination" role="pagination">
     
         
-            <a class="newer-posts" href="/tag/Angular/page2/" title="Previous Page">&laquo; Newer Posts</a>
+            <a class="newer-posts" href="/author//page2/" title="Previous Page">&laquo; Newer Posts</a>
       
     
     <span class="page-number"> Page 3 of 3 </span>
@@ -156,38 +173,6 @@
         
     </div>
     <!-- This is the post loop - each post will be output using this markup -->
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/How-we-made-our-app-real-time-in-6-lines-of-code">How we made our app real-time in 6 lines of code</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>Kwinten Pisman and me were working on a workshop this weekend with the focus on Reactive applications with Angular 2, RXJS and @ngrx. Something that can’t... <a class="read-more" href="/How-we-made-our-app-real-time-in-6-lines-of-code">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/brechtbilliet'>Brecht Billiet</a>
-
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/Angular'>Angular</a>
-                    
-                
-            
-            <time class="post-date" datetime="2016-09-11">11 Sep 2016</time>
-        </footer>
-    </article>
     
     <article class="post">
         <header class="post-header">
@@ -221,45 +206,13 @@
         </footer>
     </article>
     
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/how-the-hell-do-zones-really-work">How the hell does zone.js really work?</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>If you’ve read about Angular 2 change detection, you will probably have heard about zones. Zones is a feature that was ported from Dart and is... <a class="read-more" href="/how-the-hell-do-zones-really-work">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
-
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/Angular'>Angular</a>
-                    
-                
-            
-            <time class="post-date" datetime="2016-06-09">09 Jun 2016</time>
-        </footer>
-    </article>
-    
 
     <!-- Previous/next page links - displayed on every page -->
     
         <nav class="pagination" role="pagination">
     
         
-            <a class="newer-posts" href="/tag/Angular/page2/" title="Previous Page">&laquo; Newer Posts</a>
+            <a class="newer-posts" href="/author//page2/" title="Previous Page">&laquo; Newer Posts</a>
       
     
     <span class="page-number"> Page 3 of 3 </span>
