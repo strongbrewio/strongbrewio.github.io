@@ -293,6 +293,7 @@ function renderToHtml(url: string, folderPath: string): void {
   <li>Dominic Elm <a href="https://twitter.com/elmd_">@elmd_</a></li>
   <li>Sam Vloeberghs <a href="https://twitter.com/samvloeberghs">@samvloeberghs</a></li>
   <li>Ana Cidre <a href="https://twitter.com/anacidre_">@AnaCidre_</a></li>
+  <li>Ruben Vermeulen <a href="https://twitter.com/CrushTheButton">@CrushTheButton</a></li>
 </ul>
 
 <h2 id="sources">Sources</h2>
