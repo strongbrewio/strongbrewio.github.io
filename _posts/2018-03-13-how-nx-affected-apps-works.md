@@ -74,8 +74,69 @@ export function getProjectNodes(config) {
 ```
 They fetch all the apps, loop over them, and create an object containing information about this app, the name, the root folder, is it a real App or a Lib and all the files it holds.
 
+### Knowing which are an apps' dependencies
+
+Now that the apps are identified, it's time to identify the dependencies of those apps. To do that, they loop over every file in every project and parse those files using typescript. Then they visit every typescript node and if they encounter an import or a 'loadChildren' property they call the `addDeppIfNeeded` since this might indicate a depencency.
 
 
+```typescript
+ private processAllFiles() {
+    this.projects.forEach(p => {
+      p.files.forEach(f => {
+        this.processFile(p.name, f);
+      });
+    });
+  }
+
+  private processFile(projectName: string, filePath: string): void {
+    if (path.extname(filePath) === '.ts') {
+      const tsFile = ts.createSourceFile(filePath, this.fileRead(filePath), ts.ScriptTarget.Latest, true);
+      this.processNode(projectName, tsFile);
+    }
+  }
+  
+private processNode(projectName: string, node: ts.Node): void {
+    if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+      const imp = this.getStringLiteralValue((node as ts.ImportDeclaration).moduleSpecifier);
+      this.addDepIfNeeded(imp, projectName, DependencyType.es6Import);
+      return; // stop traversing downwards
+    }
+
+    if (node.kind === ts.SyntaxKind.PropertyAssignment) {
+      const name = this.getPropertyAssignmentName((node as ts.PropertyAssignment).name);
+      if (name === 'loadChildren') {
+        const init = (node as ts.PropertyAssignment).initializer;
+        if (init.kind === ts.SyntaxKind.StringLiteral) {
+          const childrenExpr = this.getStringLiteralValue(init);
+          this.addDepIfNeeded(childrenExpr, projectName, DependencyType.loadChildren);
+          return; // stop traversing downwards
+        }
+      }
+    }
+    /**
+     * Continue traversing down the AST from the current node
+     */
+    ts.forEachChild(node, child => this.processNode(projectName, child));
+  }  
+```
+Let's look at the 'addDepIfNeeded' method.
+
+```typescript 
+ private addDepIfNeeded(expr: string, projectName: string, depType: DependencyType) {
+    const matchingProject = this.projectNames.filter(
+      a =>
+        expr === `@${this.npmScope}/${a}` ||
+        expr.startsWith(`@${this.npmScope}/${a}#`) ||
+        expr.startsWith(`@${this.npmScope}/${a}/`)
+    )[0];
+
+    if (matchingProject) {
+      this.deps[projectName].push({projectName: matchingProject, type: depType});
+    }
+  }
+```
+
+This method checks if the 
 
 
 
