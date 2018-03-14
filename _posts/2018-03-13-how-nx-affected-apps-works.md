@@ -15,7 +15,7 @@ disqus: true
 cover: 'assets/images/cover/cover10.jpg'
 ---
 
-Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo and all the benefits that brings. In essense, Nx is a set of schematics that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project, which is supported by default. Nx leverages this feature and makes the process a little easier.
+Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo and all the benefits that brings. In essence, Nx is a set of schematics that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project, which is supported by default. Nx leverages this feature and makes the process a little easier.
 
 This post however is not about the basic working of Nx. For that, go to their official website <a href="https://nrwl.io/nx" target="_blank">here</a> or watch this <a target="_blank" href="https://www.youtube.com/watch?v=bMkKz8AedHc">very informative talk</a> by <a href="https://twitter.com/MrJamesHenry">James Henry</a> at NgVikings.
 
@@ -27,7 +27,7 @@ Let's take a look at the following Nx workspace. It has 2 apps and 2 libs.
 
 ![nx-workspace-image](https://www.dropbox.com/s/4qohmskumvwa8k2/Screenshot%202018-03-13%2019.04.20.png?raw=1)
 
-As you can see 'app1' depends on 'lib1' and 'lib2' and 'app2' only depends on 'lib1'. So when we changed something to 'lib2' we only need to rebuild our 'app1'. Nx provides us with a script that will, based on two git commit hashes, tell us all the apps that need to be build. You can run the script like this:
+As you can see 'app1' depends on 'lib1' and 'lib2' and 'app2' only depends on 'lib1'. When we change something to 'lib2' we only need to rebuild our 'app1'. Nx provides us with a script that will, based on two git commit hashes, tell us all the apps that need to be build. You can run the script like this:
 
 ```bash
 ./node_modules/.bin/nx affected apps SHA1 SHA2
