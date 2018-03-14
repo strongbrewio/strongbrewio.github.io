@@ -15,7 +15,7 @@ disqus: true
 cover: 'assets/images/cover/cover10.jpg'
 ---
 
-Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essense, Nx is a set of schematics that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project, which is supported by default. Nx leverages this feature and makes the process a little easier.
+Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo and all the benefits that brings. In essense, Nx is a set of schematics that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project, which is supported by default. Nx leverages this feature and makes the process a little easier.
 
 This post however is not about the basic working of Nx. For that, go to their official website <a href="https://nrwl.io/nx" target="_blank">here</a> or watch this <a target="_blank" href="https://www.youtube.com/watch?v=bMkKz8AedHc">very informative talk</a> by <a href="https://twitter.com/MrJamesHenry">James Henry</a> at NgVikings.
 
@@ -30,9 +30,9 @@ Let's take a look at the following Nx workspace. It has 2 apps and 2 libs.
 As you can see 'app1' depends on 'lib1' and 'lib2' and 'app2' only depends on 'lib1'. So when we changed something to 'lib2' we only need to rebuild our 'app1'. Nx provides us with a script that will, based on two git commit hashes, tell us all the apps that need to be build. You can run the script like this:
 
 ```bash
-./node_modules/.bin/nx affected apps sha1 sha2
+./node_modules/.bin/nx affected apps SHA1 SHA2
 ```
-Where SHA1 is the previous commit hash and sha2 is the next commit hash. If, in our example, we change something to lib2, this script will output:
+SHA1 is the previous commit hash and SHA2 is the next commit hash. If, in our example, we change something to lib2, this script will output:
 
 ```typescript
 app1
@@ -44,7 +44,7 @@ In this post, we will take a look at the script you can use for this and look at
 
 ### Knowing what files are changed
 
-To know the files that have changed, they leverage the 'git diff' command. Let's look at the code:
+To know the files that have changed, they leverage the `git diff` command. Let's look at the code:
 
 ```typescript
 function getFilesFromShash(sha1: string, sha2: string): string[] {
@@ -56,11 +56,11 @@ function getFilesFromShash(sha1: string, sha2: string): string[] {
 }
 ```
 
-The 'git diff' command returns all the files that have changed between two commits. This is transformed into a list of files.
+The `git diff` command returns all the files that have changed between two commits. This is transformed into a list of files.
 
 ### Knowing the apps these touched files belong to
 
-Now it is clear which files are touched, it's time to identify the 'projects' these files belong to. In the code, both Nx apps and libs are referenced to as projects. They implement this using the following code.
+Now it is clear which files are touched, it's time to identify the 'projects' these files belong to. In the script, both Nx apps and libs are referenced to as projects. They implement this using the following code.
 
 ```typescript
 export function touchedProjects(projects: ProjectNode[], touchedFiles: string[]) {
@@ -105,7 +105,7 @@ They fetch all the apps, loop over them, and create an object containing informa
 
 ### Knowing the dependencies of the apps and libs
 
-Now that the apps are identified and we know the files inside those apps, it's time to identify the dependencies of those apps. To do that, they loop over every file in every project and parse those files using typescript. Then they visit every typescript node and if they encounter an import or a 'loadChildren' property they call the `addDeppIfNeeded` method since these are indicators that we might have a dependency.
+Now that the apps are identified and we know the files inside those apps, it's time to identify the dependencies the apps have on the different libs in the Nx workspace. To do that, they loop over every file in every project and parse those files using typescript. Then they visit every typescript node and if they encounter an import declaration or a `loadChildren` property they call the `addDeppIfNeeded` method since these are indicators that we might have a dependency on a lib in the monorepo.
 
 
 ```typescript
@@ -165,7 +165,7 @@ Let's look at the 'addDepIfNeeded' method.
   }
 ```
 
-This method checks if the 'loadChildren' property or the 'import' declaration is linked to one of our own libs. In that case, we add the dependency to the list of dependencies per project using the 'projectName' identifier.
+This method checks if the `loadChildren` property or the import declaration is linked to one of our own libs. In that case, we add the dependency to the list of dependencies per project using the 'projectName' identifier.
 
 ### Putting the pieces together
 
@@ -182,15 +182,24 @@ We found the files that were changed and to which projects they belong to. We fi
   }
 ```
 
-There is an interesting part in this snippet. There is a check to see if 'null' is in the 'touchedProjects'. This happens when there is a change to a file that is changed outside of the 'apps' or 'libs' directory. In that case, every 'app' needs to be rebuild.
+There is an interesting part in this snippet. There is a check to see if 'null' is in the 'touchedProjects'. This happens when there is a change to a file that is changed outside of the 'apps' or 'libs' directory. This can happen if the package.json file has been updated. In that case, every 'app' needs to be rebuild.
 
-Finally, we can look at the 'hasDependencyOnTouchedProjects' function.
+Finally, we can look at the `hasDependencyOnTouchedProjects` function.
 
 ```typescript
 function hasDependencyOnTouchedProjects(project: string, touchedProjects: string[], deps: { [projectName: string]: Dependency[] }, visisted: string[]) {
   if (touchedProjects.indexOf(project) > -1) return true;
   if (visisted.indexOf(project) > -1) return false;
-  return deps[project].map(d => d.projectName).filter(k => hasDependencyOnTouchedProjects(k, touchedProjects, deps, [...visisted, project])).length > 0;
+  return deps[project]
+  	.map(d => d.projectName)
+  	.filter(k => 
+  		hasDependencyOnTouchedProjects(
+  			k, 
+  			touchedProjects, 
+  			deps, 
+  			[...visisted, project]
+  		)
+  	).length > 0;
 }
 ```
 
