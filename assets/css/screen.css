@@ -2636,39 +2636,53 @@ body.page-template .post-title {
 
 /* spotlight */
 .rxjs-spotlight {
+    background: #375ba2;
+    padding: 10px;
+    color: #fff;
+    display: flex;
+    margin-right: 200px;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+.rxjs-spotlight-bottom {
+    display: flex;
+    flex-direction: row;
     background: #fff;
-    padding: 20px;
-    display: block;
-    color: #1a100a;
-    max-width: 400px;
+    align-items:center;
+    align-content: center;
 }
 .rxjs-spotlight h2 {
     font-size: 1.5em;
+    color: #fff;
+}
+.rxjs-spotlight a {
+    text-decoration: none;
 }
 .rxjs-spotlight .techlogos {
     background: #fff;
     display: flex;
     justify-content: space-between;
-    position: absolute;
     margin-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin-left: 10px;
+    align-content: center;
 }
 .rxjs-spotlight .techlogos  li {
     list-style-type: none;
+    display: flex;
 }
 .rxjs-spotlight .techlogos li img {
-    max-width: 70px;
+    max-width: 100px;
+    max-height: 100px;
 }
 .rxjs-spotlight .img-wrapper {
     display: flex;
     flex-direction: column;
     cursor: pointer;
 }
-.rxjs-spotlight .img-wrapper .button{
-    margin-top: -57px;
-    border-radius: 0;
-}
-.rxjs-spotlight .img-wrapper img {
-    width: 100%;
-    height: auto;
+@media all and (max-width: 1000px) {
+    .rxjs-spotlight {
+        margin-right: 0px;
+    }
 }
