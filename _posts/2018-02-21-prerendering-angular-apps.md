@@ -6,6 +6,7 @@ author: brechtbilliet
 description: Learn how to use Server-side rendering to prerender our Angular application at build time.
 comments: true
 date: 2018-03-4
+navigation: true
 subclass: 'post'
 categories: 'brechtbilliet'
 disqus: true

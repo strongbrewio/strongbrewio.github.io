@@ -2632,3 +2632,43 @@ body.page-template .post-title {
 .button:disabled {
     background: #efe9e6;
 }
+
+
+/* spotlight */
+.rxjs-spotlight {
+    background: #fff;
+    padding: 20px;
+    display: block;
+    color: #1a100a;
+    max-width: 400px;
+}
+.rxjs-spotlight h2 {
+    font-size: 1.5em;
+}
+.rxjs-spotlight .techlogos {
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+.rxjs-spotlight .techlogos  li {
+    list-style-type: none;
+}
+.rxjs-spotlight .techlogos li img {
+    max-width: 70px;
+}
+.rxjs-spotlight .img-wrapper {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+.rxjs-spotlight .img-wrapper .button{
+    margin-top: -57px;
+    border-radius: 0;
+}
+.rxjs-spotlight .img-wrapper img {
+    width: 100%;
+    height: auto;
+}
