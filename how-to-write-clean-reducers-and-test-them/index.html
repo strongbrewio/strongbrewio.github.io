@@ -62,9 +62,9 @@
 <body class="home-template nav-closed">
     <div class="topbar">
         <div class="container">
-            <div class="logo-wrapper">
+            <a class="logo-wrapper" href="https://strongbrew.io">
                 <img src="/assets/images/logo_website.png" alt="">
-            </div>
+            </a>
             <div class="menu-wrapper">
                 <ul class="menu">
                     <li><a href="https://strongbrew.io/about">Home</a></li>
@@ -114,29 +114,17 @@
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
         <!-- default -->
 <!-- The comment above "< default" means - insert everything in this file into -->
-    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
 
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover4.jpg) ">
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover4.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         
-            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         
-        <a class="rxjs-spotlight" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
-            <h2>Advanced RxJS in Angular workshop</h2>
-            <ul  class="techlogos">
-                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
-                <li><span><img alt="Rxjs" src="/assets/images/rxjs.png"></span></li>
-            </ul>
-            <div  class="img-wrapper">
-                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
-                <span class="button">
-                    <span >Get your ticket: June 15th or June 16th GHENT</span>&nbsp;<i  class="fa fa-chevron-right"></i>
-                </span>
-            </div>
-        </a>
     </nav>
 </header>
 
@@ -164,35 +152,51 @@
 <main class="content" role="main">
 
     <article class="post">
+        <div class="rxjs-spotlight">
+            <div class="rxjs-spotlight-top">
+                <h2>Advanced RxJS in Angular workshop</h2>
+            </div>
+            <div class="rxjs-spotlight-bottom">
+                <ul class="techlogos">
+                    <li><img alt="Angular" src="/assets/images/angular.png"/></li>
+                    <li><img alt="Rxjs" src="/assets/images/rxjs.png"/></li>
+                </ul>
+                <a class="button" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
+                    Get your ticket: <br/>June 15th or June 16th GHENT
+                </a>
+            </div>
+
+        </div>
         <div class="post-inner">
-        <header class="post-header">
-            <h1 class="post-title">How to write clean reducers (and test them!)</h1>
-            <section class="post-meta">
-            <!-- <a href='/'></a> -->
+            <header class="post-header">
+                <h1 class="post-title">How to write clean reducers (and test them!)</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
 
-            
-                
-            
-                
+                    
+                    
+                    
+                    
                     <a href='/author/kwintenp'>Kwinten Pisman</a>
-                
-            
-            <time class="post-date" datetime="2016-08-22">22 Aug 2016</time>
-                <!-- [[tags prefix=" on "]] -->
-                
-                on
-                
                     
-                       <a href='/tag/Redux'>Redux</a>
                     
-                
-                
-            </section>
-        </header>
+                    <time class="post-date" datetime="2016-08-22">22 Aug 2016
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Redux'>Redux</a>
+                    
+                    
+                    
+                </section>
+            </header>
 
-        <section class="post-content">
+            <section class="post-content">
 
-            <p>Last week, someone asked me how I kept my reducers clean and how to properly test them. Since it wasn’t the first time someone asked me that, I decided to write it down for future reference.
+                <p>Last week, someone asked me how I kept my reducers clean and how to properly test them. Since it wasn’t the first time someone asked me that, I decided to write it down for future reference.
 Here it is!</p>
 
 <p><strong>NOTE: Reducers are a part of the Redux architecture. If you do not know what I’m talking about, checkout <a href="http://redux.js.org/" target="_blank">this</a>.</strong></p>
@@ -460,61 +464,67 @@ export function tweetReducer(state: Tweet = {}, action: Action) {
 </ul>
 
 
-        </section>
+            </section>
 
-        <footer class="post-footer">
+            <footer class="post-footer">
 
-            <!-- Everything inside the #author tags pulls data from the author -->
-            <!-- #author-->
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
 
-            
                 
-            
                 
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
                     
-                        <figure class="author-image">
-                            <a class="img" href="/author/kwintenp" style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
-                        </figure>
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
                     
-
-                    <section class="author">
-                        <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
-
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
                         
-                            <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
-                        
-                        <div class="author-meta">
-                            <span class="author-location icon-location"> Belgium</span>
-                            
-                            <span class="author-link icon-twitter"><a href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
-                        </div>
-                    </section>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
 
-                    <!-- /author  -->
+                <!-- /author  -->
 
-                    <section class="share">
-                        <h4>Share this post</h4>
-                        <a class="icon-twitter" href="http://twitter.com/share?text=How to write clean reducers (and test them!)&amp;url=how-to-write-clean-reducers-and-test-them"
-                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-                            <span class="hidden">Twitter</span>
-                        </a>
-                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=how-to-write-clean-reducers-and-test-them"
-                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-                            <span class="hidden">Facebook</span>
-                        </a>
-                        <a class="icon-google-plus" href="https://plus.google.com/share?url=how-to-write-clean-reducers-and-test-them"
-                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-                            <span class="hidden">Google+</span>
-                        </a>
-                    </section>
-                
-            
-
-            <!-- Add Disqus Comments -->
-            
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=How to write clean reducers (and test them!)&amp;url=how-to-write-clean-reducers-and-test-them"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=how-to-write-clean-reducers-and-test-them"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=how-to-write-clean-reducers-and-test-them"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
                 
                 
-                    <div id="disqus_thread"></div>
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
 <script>
     /**
      *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
@@ -551,9 +561,9 @@ export function tweetReducer(state: Tweet = {}, action: Action) {
     </a>
 </noscript>
                 
-            
+                
 
-        </footer>
+            </footer>
         </div>
 
     </article>
@@ -564,22 +574,26 @@ export function tweetReducer(state: Tweet = {}, action: Action) {
 
     <!-- [[! next_post ]] -->
     
-        <a class="read-next-story " style="background-image: url(/assets/images/cover/cover11.jpg)" href="/Modals-in-angular2">
-            <section class="post">
-                <h2>Modals in Angular 2</h2>
-                <p>**Updated at 3 september 2016 (RC.6 compliant)** Since one of my late New Year's resolutions...</p>
-            </section>
-        </a>
+    <a class="read-next-story "
+       style="background-image: url(/assets/images/cover/cover11.jpg)"
+       href="/Modals-in-angular2">
+        <section class="post">
+            <h2>Modals in Angular 2</h2>
+            <p>**Updated at 3 september 2016 (RC.6 compliant)** Since one of my late New Year's resolutions...</p>
+        </section>
+    </a>
     
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
-        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover3.jpg)" href="/how-the-hell-do-zones-really-work">
-            <section class="post">
-                <h2>How the hell does zone.js really work?</h2>
-                <p>If you’ve read about Angular 2 change detection, you will probably have heard about zones....</p>
-            </section>
-        </a>
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover3.jpg)"
+       href="/how-the-hell-do-zones-really-work">
+        <section class="post">
+            <h2>How the hell does zone.js really work?</h2>
+            <p>If you’ve read about Angular 2 change detection, you will probably have heard about zones....</p>
+        </section>
+    </a>
     
     <!-- [[! /prev_post ]] -->
 </aside>

@@ -62,9 +62,9 @@
 <body class="home-template nav-closed">
     <div class="topbar">
         <div class="container">
-            <div class="logo-wrapper">
+            <a class="logo-wrapper" href="https://strongbrew.io">
                 <img src="/assets/images/logo_website.png" alt="">
-            </div>
+            </a>
             <div class="menu-wrapper">
                 <ul class="menu">
                     <li><a href="https://strongbrew.io/about">Home</a></li>
@@ -114,29 +114,17 @@
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
         <!-- default -->
 <!-- The comment above "< default" means - insert everything in this file into -->
-    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
 
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover1.jpg) ">
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover1.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         
-            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         
-        <a class="rxjs-spotlight" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
-            <h2>Advanced RxJS in Angular workshop</h2>
-            <ul  class="techlogos">
-                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
-                <li><span><img alt="Rxjs" src="/assets/images/rxjs.png"></span></li>
-            </ul>
-            <div  class="img-wrapper">
-                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
-                <span class="button">
-                    <span >Get your ticket: June 15th or June 16th GHENT</span>&nbsp;<i  class="fa fa-chevron-right"></i>
-                </span>
-            </div>
-        </a>
     </nav>
 </header>
 
@@ -164,39 +152,55 @@
 <main class="content" role="main">
 
     <article class="post">
+        <div class="rxjs-spotlight">
+            <div class="rxjs-spotlight-top">
+                <h2>Advanced RxJS in Angular workshop</h2>
+            </div>
+            <div class="rxjs-spotlight-bottom">
+                <ul class="techlogos">
+                    <li><img alt="Angular" src="/assets/images/angular.png"/></li>
+                    <li><img alt="Rxjs" src="/assets/images/rxjs.png"/></li>
+                </ul>
+                <a class="button" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
+                    Get your ticket: <br/>June 15th or June 16th GHENT
+                </a>
+            </div>
+
+        </div>
         <div class="post-inner">
-        <header class="post-header">
-            <h1 class="post-title">Using decorators and observables to implement retry</h1>
-            <section class="post-meta">
-            <!-- <a href='/'></a> -->
+            <header class="post-header">
+                <h1 class="post-title">Using decorators and observables to implement retry</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
 
-            
-                
-            
-                
+                    
+                    
+                    
+                    
                     <a href='/author/kwintenp'>Kwinten Pisman</a>
-                
-            
-            <time class="post-date" datetime="2017-02-15">15 Feb 2017</time>
-                <!-- [[tags prefix=" on "]] -->
-                
-                on
-                
                     
-                       <a href='/tag/RxJS'>Rxjs</a>,
                     
-                
+                    <time class="post-date" datetime="2017-02-15">15 Feb 2017
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
                     
-                       <a href='/tag/Typescript'>Typescript</a>
+                    on
                     
-                
-                
-            </section>
-        </header>
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>,
+                    
+                    
+                    
+                    <a href='/tag/Typescript'>Typescript</a>
+                    
+                    
+                    
+                </section>
+            </header>
 
-        <section class="post-content">
+            <section class="post-content">
 
-            <p>Last week, I was at a meetup in Ghent where I was talking with <a href="https://twitter.com/stefanlapers" target="_blank">Stefan Lapers</a> about programming languages in general. We started talking about writing your backend using either Java or node.js. We agreed that node.js has massive potential but in a lot of situations companies choose Java because of it’s maturity. If you’re using a microservices based architecture for example, you can rely heavily on spring cloud which does a whole bunch of stuff for you so you can focus on functionality.
+                <p>Last week, I was at a meetup in Ghent where I was talking with <a href="https://twitter.com/stefanlapers" target="_blank">Stefan Lapers</a> about programming languages in general. We started talking about writing your backend using either Java or node.js. We agreed that node.js has massive potential but in a lot of situations companies choose Java because of it’s maturity. If you’re using a microservices based architecture for example, you can rely heavily on spring cloud which does a whole bunch of stuff for you so you can focus on functionality.
 One element in spring cloud is hystrix. When you’re doing a network call which is protected by hystrix, you can, by just adding an annotation, tell how many times you want to retry this if it fails and even provide a fallback if it fails entirely.</p>
 
 <p>When I was driving home later that night, I was thinking to myself that using observables and typescript decorators, it should be possible to implement something similar myself. The next morning I tried it out and about 30 minutes later I had a working version. Here it is.</p>
@@ -334,61 +338,67 @@ public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
 <p>Using the ease of composing of observables and decorators in typescript, we were able to create something really fast which can be reused throughout our entire application. It shouldn’t stop with a retry decorator. We could apply this principle to a whole bunch of RxJS related issues like catching errors for example.</p>
 
 
-        </section>
+            </section>
 
-        <footer class="post-footer">
+            <footer class="post-footer">
 
-            <!-- Everything inside the #author tags pulls data from the author -->
-            <!-- #author-->
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
 
-            
                 
-            
                 
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
                     
-                        <figure class="author-image">
-                            <a class="img" href="/author/kwintenp" style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
-                        </figure>
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
                     
-
-                    <section class="author">
-                        <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
-
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
                         
-                            <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
-                        
-                        <div class="author-meta">
-                            <span class="author-location icon-location"> Belgium</span>
-                            
-                            <span class="author-link icon-twitter"><a href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
-                        </div>
-                    </section>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
 
-                    <!-- /author  -->
+                <!-- /author  -->
 
-                    <section class="share">
-                        <h4>Share this post</h4>
-                        <a class="icon-twitter" href="http://twitter.com/share?text=Using decorators and observables to implement retry&amp;url=decorators-and-observables-to-implement-retry-logic"
-                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-                            <span class="hidden">Twitter</span>
-                        </a>
-                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=decorators-and-observables-to-implement-retry-logic"
-                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-                            <span class="hidden">Facebook</span>
-                        </a>
-                        <a class="icon-google-plus" href="https://plus.google.com/share?url=decorators-and-observables-to-implement-retry-logic"
-                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-                            <span class="hidden">Google+</span>
-                        </a>
-                    </section>
-                
-            
-
-            <!-- Add Disqus Comments -->
-            
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Using decorators and observables to implement retry&amp;url=decorators-and-observables-to-implement-retry-logic"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=decorators-and-observables-to-implement-retry-logic"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=decorators-and-observables-to-implement-retry-logic"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
                 
                 
-                    <div id="disqus_thread"></div>
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
 <script>
     /**
      *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
@@ -425,9 +435,9 @@ public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
     </a>
 </noscript>
                 
-            
+                
 
-        </footer>
+            </footer>
         </div>
 
     </article>
@@ -438,22 +448,26 @@ public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
 
     <!-- [[! next_post ]] -->
     
-        <a class="read-next-story " style="background-image: url(/assets/images/cover/cover8.jpg)" href="/how-to-setup-marble-testing">
-            <section class="post">
-                <h2>How to setup marble testing</h2>
-                <p>In an earlier blogpost, I showed you guys how to do client side filtering with...</p>
-            </section>
-        </a>
+    <a class="read-next-story "
+       style="background-image: url(/assets/images/cover/cover8.jpg)"
+       href="/how-to-setup-marble-testing">
+        <section class="post">
+            <h2>How to setup marble testing</h2>
+            <p>In an earlier blogpost, I showed you guys how to do client side filtering with...</p>
+        </section>
+    </a>
     
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
-        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover8.jpg)" href="/client-side-filtering-with-streams">
-            <section class="post">
-                <h2>Client side filtering using streams</h2>
-                <p>I have been coaching people in using RxJS for a while now. During this time,...</p>
-            </section>
-        </a>
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover8.jpg)"
+       href="/client-side-filtering-with-streams">
+        <section class="post">
+            <h2>Client side filtering using streams</h2>
+            <p>I have been coaching people in using RxJS for a while now. During this time,...</p>
+        </section>
+    </a>
     
     <!-- [[! /prev_post ]] -->
 </aside>

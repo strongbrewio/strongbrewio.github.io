@@ -62,9 +62,9 @@
 <body class="home-template nav-closed">
     <div class="topbar">
         <div class="container">
-            <div class="logo-wrapper">
+            <a class="logo-wrapper" href="https://strongbrew.io">
                 <img src="/assets/images/logo_website.png" alt="">
-            </div>
+            </a>
             <div class="menu-wrapper">
                 <ul class="menu">
                     <li><a href="https://strongbrew.io/about">Home</a></li>
@@ -114,27 +114,15 @@
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
         <!-- default -->
 <!-- The comment above "< default" means - insert everything in this file into -->
-    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
 
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover6.jpg) ">
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover6.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         
-        <a class="rxjs-spotlight" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
-            <h2>Advanced RxJS in Angular workshop</h2>
-            <ul  class="techlogos">
-                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
-                <li><span><img alt="Rxjs" src="/assets/images/rxjs.png"></span></li>
-            </ul>
-            <div  class="img-wrapper">
-                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
-                <span class="button">
-                    <span >Get your ticket: June 15th or June 16th GHENT</span>&nbsp;<i  class="fa fa-chevron-right"></i>
-                </span>
-            </div>
-        </a>
     </nav>
 </header>
 
@@ -162,39 +150,55 @@
 <main class="content" role="main">
 
     <article class="post">
+        <div class="rxjs-spotlight">
+            <div class="rxjs-spotlight-top">
+                <h2>Advanced RxJS in Angular workshop</h2>
+            </div>
+            <div class="rxjs-spotlight-bottom">
+                <ul class="techlogos">
+                    <li><img alt="Angular" src="/assets/images/angular.png"/></li>
+                    <li><img alt="Rxjs" src="/assets/images/rxjs.png"/></li>
+                </ul>
+                <a class="button" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
+                    Get your ticket: <br/>June 15th or June 16th GHENT
+                </a>
+            </div>
+
+        </div>
         <div class="post-inner">
-        <header class="post-header">
-            <h1 class="post-title">Cancellable optimistic updates in Angular 2 and Redux</h1>
-            <section class="post-meta">
-            <!-- <a href='/'></a> -->
+            <header class="post-header">
+                <h1 class="post-title">Cancellable optimistic updates in Angular 2 and Redux</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
 
-            
-                
+                    
+                    
                     <a href='/author/brechtbilliet'>Brecht Billiet</a>
-                
-            
-                
-            
-            <time class="post-date" datetime="2016-09-23">23 Sep 2016</time>
-                <!-- [[tags prefix=" on "]] -->
-                
-                on
-                
                     
-                       <a href='/tag/Angular'>Angular</a>,
                     
-                
                     
-                       <a href='/tag/Redux'>Redux</a>
                     
-                
-                
-            </section>
-        </header>
+                    <time class="post-date" datetime="2016-09-23">23 Sep 2016
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>,
+                    
+                    
+                    
+                    <a href='/tag/Redux'>Redux</a>
+                    
+                    
+                    
+                </section>
+            </header>
 
-        <section class="post-content">
+            <section class="post-content">
 
-            <p><a href="https://angular.io/">Angular 2</a> and <a href="https://github.com/reactjs/redux">redux</a> are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the <a href="https://github.com/ngrx/store">@ngrx/store</a> variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the <a href="http://redux.js.org/">documentation</a> first.</p>
+                <p><a href="https://angular.io/">Angular 2</a> and <a href="https://github.com/reactjs/redux">redux</a> are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the <a href="https://github.com/ngrx/store">@ngrx/store</a> variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the <a href="http://redux.js.org/">documentation</a> first.</p>
 
 <h2 id="optimistic-updates">Optimistic updates</h2>
 
@@ -358,60 +362,66 @@ The reason why you would do optimistic updates is that your application becomes 
 <p>Let me know if you enjoyed this article!</p>
 
 
-        </section>
+            </section>
 
-        <footer class="post-footer">
+            <footer class="post-footer">
 
-            <!-- Everything inside the #author tags pulls data from the author -->
-            <!-- #author-->
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
 
-            
                 
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
                     
-                        <figure class="author-image">
-                            <a class="img" href="/author/brechtbilliet" style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
-                        </figure>
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
                     
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
 
-                    <section class="author">
-                        <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+                <!-- /author  -->
 
-                        
-                            <p> Software architect/trainer/coach/speaker/blogger</p>
-                        
-                        <div class="author-meta">
-                            <span class="author-location icon-location"> Belgium</span>
-                            <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
-                            <span class="author-link icon-twitter"><a href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
-                        </div>
-                    </section>
-
-                    <!-- /author  -->
-
-                    <section class="share">
-                        <h4>Share this post</h4>
-                        <a class="icon-twitter" href="http://twitter.com/share?text=Cancellable optimistic updates in Angular 2 and Redux&amp;url=Cancellable-optimistic-updates-in-Angular2-and-Redux"
-                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-                            <span class="hidden">Twitter</span>
-                        </a>
-                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=Cancellable-optimistic-updates-in-Angular2-and-Redux"
-                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-                            <span class="hidden">Facebook</span>
-                        </a>
-                        <a class="icon-google-plus" href="https://plus.google.com/share?url=Cancellable-optimistic-updates-in-Angular2-and-Redux"
-                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-                            <span class="hidden">Google+</span>
-                        </a>
-                    </section>
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Cancellable optimistic updates in Angular 2 and Redux&amp;url=Cancellable-optimistic-updates-in-Angular2-and-Redux"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=Cancellable-optimistic-updates-in-Angular2-and-Redux"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=Cancellable-optimistic-updates-in-Angular2-and-Redux"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
                 
-            
                 
-            
+                
+                
 
-            <!-- Add Disqus Comments -->
-            
+                <!-- Add Disqus Comments -->
                 
-                    <div id="disqus_thread"></div>
+                
+                <div id="disqus_thread"></div>
 <script>
     /**
      *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
@@ -449,9 +459,9 @@ The reason why you would do optimistic updates is that your application becomes 
 </noscript>
                 
                 
-            
+                
 
-        </footer>
+            </footer>
         </div>
 
     </article>
@@ -462,22 +472,26 @@ The reason why you would do optimistic updates is that your application becomes 
 
     <!-- [[! next_post ]] -->
     
-        <a class="read-next-story " style="background-image: url(/assets/images/cover/cover4.jpg)" href="/A-scalable-angular2-architecture">
-            <section class="post">
-                <h2>A scalable Angular 2 architecture</h2>
-                <p>## Foreword This article might be more relevant for [Angular 2](http://angular.io) developers, but I believe...</p>
-            </section>
-        </a>
+    <a class="read-next-story "
+       style="background-image: url(/assets/images/cover/cover4.jpg)"
+       href="/A-scalable-angular2-architecture">
+        <section class="post">
+            <h2>A scalable Angular 2 architecture</h2>
+            <p>## Foreword This article might be more relevant for [Angular 2](http://angular.io) developers, but I believe...</p>
+        </section>
+    </a>
     
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
-        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover7.jpg)" href="/combinereducers-enhanced">
-            <section class="post">
-                <h2>combineReducers enhanced</h2>
-                <p>When working with redux or ngrx/store, you get a lovely utillity method called combineReducers that...</p>
-            </section>
-        </a>
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover7.jpg)"
+       href="/combinereducers-enhanced">
+        <section class="post">
+            <h2>combineReducers enhanced</h2>
+            <p>When working with redux or ngrx/store, you get a lovely utillity method called combineReducers that...</p>
+        </section>
+    </a>
     
     <!-- [[! /prev_post ]] -->
 </aside>

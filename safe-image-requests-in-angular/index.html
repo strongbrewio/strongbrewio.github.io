@@ -62,9 +62,9 @@
 <body class="home-template nav-closed">
     <div class="topbar">
         <div class="container">
-            <div class="logo-wrapper">
+            <a class="logo-wrapper" href="https://strongbrew.io">
                 <img src="/assets/images/logo_website.png" alt="">
-            </div>
+            </a>
             <div class="menu-wrapper">
                 <ul class="menu">
                     <li><a href="https://strongbrew.io/about">Home</a></li>
@@ -114,27 +114,15 @@
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
         <!-- default -->
 <!-- The comment above "< default" means - insert everything in this file into -->
-    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
 
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header id="header" class="main-header post-head " style="background-image: url(/assets/images/cover/cover8.jpg) ">
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover8.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         
-        <a class="rxjs-spotlight" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
-            <h2>Advanced RxJS in Angular workshop</h2>
-            <ul  class="techlogos">
-                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
-                <li><span><img alt="Rxjs" src="/assets/images/rxjs.png"></span></li>
-            </ul>
-            <div  class="img-wrapper">
-                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
-                <span class="button">
-                    <span >Get your ticket: June 15th or June 16th GHENT</span>&nbsp;<i  class="fa fa-chevron-right"></i>
-                </span>
-            </div>
-        </a>
     </nav>
 </header>
 
@@ -162,35 +150,51 @@
 <main class="content" role="main">
 
     <article class="post">
+        <div class="rxjs-spotlight">
+            <div class="rxjs-spotlight-top">
+                <h2>Advanced RxJS in Angular workshop</h2>
+            </div>
+            <div class="rxjs-spotlight-bottom">
+                <ul class="techlogos">
+                    <li><img alt="Angular" src="/assets/images/angular.png"/></li>
+                    <li><img alt="Rxjs" src="/assets/images/rxjs.png"/></li>
+                </ul>
+                <a class="button" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
+                    Get your ticket: <br/>June 15th or June 16th GHENT
+                </a>
+            </div>
+
+        </div>
         <div class="post-inner">
-        <header class="post-header">
-            <h1 class="post-title">Safe image requests in angular</h1>
-            <section class="post-meta">
-            <!-- <a href='/'></a> -->
+            <header class="post-header">
+                <h1 class="post-title">Safe image requests in angular</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
 
-            
-                
+                    
+                    
                     <a href='/author/brechtbilliet'>Brecht Billiet</a>
-                
-            
-                
-            
-            <time class="post-date" datetime="2017-10-24">24 Oct 2017</time>
-                <!-- [[tags prefix=" on "]] -->
-                
-                on
-                
                     
-                       <a href='/tag/Angular'>Angular</a>
                     
-                
-                
-            </section>
-        </header>
+                    
+                    
+                    <time class="post-date" datetime="2017-10-24">24 Oct 2017
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>
+                    
+                    
+                    
+                </section>
+            </header>
 
-        <section class="post-content">
+            <section class="post-content">
 
-            <p>We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.</p>
+                <p>We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.</p>
 
 <p>Take this hypothetical application for instance: We have an app that is used to manage pictures and this particular app can have multiple users. It makes sense that every user owns their own images, right? For privacy reasons user A could never consume the images of user B. Since images are loaded through the DOM with the img DOM-element, it might be hard to add authorization there. Take this angular snippet for instance:</p>
 
@@ -416,60 +420,66 @@ He also has an amazing egghead course on that subject.</p>
 <p>I hope you all liked this article, if you have questions, shoot!</p>
 
 
-        </section>
+            </section>
 
-        <footer class="post-footer">
+            <footer class="post-footer">
 
-            <!-- Everything inside the #author tags pulls data from the author -->
-            <!-- #author-->
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
 
-            
                 
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
                     
-                        <figure class="author-image">
-                            <a class="img" href="/author/brechtbilliet" style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
-                        </figure>
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
                     
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
 
-                    <section class="author">
-                        <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+                <!-- /author  -->
 
-                        
-                            <p> Software architect/trainer/coach/speaker/blogger</p>
-                        
-                        <div class="author-meta">
-                            <span class="author-location icon-location"> Belgium</span>
-                            <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
-                            <span class="author-link icon-twitter"><a href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
-                        </div>
-                    </section>
-
-                    <!-- /author  -->
-
-                    <section class="share">
-                        <h4>Share this post</h4>
-                        <a class="icon-twitter" href="http://twitter.com/share?text=Safe image requests in angular&amp;url=safe-image-requests-in-angular"
-                            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-                            <span class="hidden">Twitter</span>
-                        </a>
-                        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=safe-image-requests-in-angular"
-                            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-                            <span class="hidden">Facebook</span>
-                        </a>
-                        <a class="icon-google-plus" href="https://plus.google.com/share?url=safe-image-requests-in-angular"
-                           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-                            <span class="hidden">Google+</span>
-                        </a>
-                    </section>
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Safe image requests in angular&amp;url=safe-image-requests-in-angular"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=safe-image-requests-in-angular"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=safe-image-requests-in-angular"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
                 
-            
                 
-            
+                
+                
 
-            <!-- Add Disqus Comments -->
-            
+                <!-- Add Disqus Comments -->
                 
-                    <div id="disqus_thread"></div>
+                
+                <div id="disqus_thread"></div>
 <script>
     /**
      *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
@@ -507,9 +517,9 @@ He also has an amazing egghead course on that subject.</p>
 </noscript>
                 
                 
-            
+                
 
-        </footer>
+            </footer>
         </div>
 
     </article>
@@ -520,22 +530,26 @@ He also has an amazing egghead course on that subject.</p>
 
     <!-- [[! next_post ]] -->
     
-        <a class="read-next-story " style="background-image: url(/assets/images/cover/cover4.jpg)" href="/rxjs-best-practices-in-angular">
-            <section class="post">
-                <h2>RxJS best practices in Angular</h2>
-                <p>This article is all about the do's and don'ts when it comes to writing reactive...</p>
-            </section>
-        </a>
+    <a class="read-next-story "
+       style="background-image: url(/assets/images/cover/cover4.jpg)"
+       href="/rxjs-best-practices-in-angular">
+        <section class="post">
+            <h2>RxJS best practices in Angular</h2>
+            <p>This article is all about the do's and don'ts when it comes to writing reactive...</p>
+        </section>
+    </a>
     
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
-        <a class="read-next-story prev " style="background-image: url(/assets/images/cover/cover4.jpg)" href="/code-formatting-with-rxjs">
-            <section class="post">
-                <h2>Code formatting and RxJS</h2>
-                <p>One of the main benefits of RxJS to me is that it provides code that...</p>
-            </section>
-        </a>
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover4.jpg)"
+       href="/code-formatting-with-rxjs">
+        <section class="post">
+            <h2>Code formatting and RxJS</h2>
+            <p>One of the main benefits of RxJS to me is that it provides code that...</p>
+        </section>
+    </a>
     
     <!-- [[! /prev_post ]] -->
 </aside>
