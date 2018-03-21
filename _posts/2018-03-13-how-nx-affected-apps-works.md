@@ -1,5 +1,5 @@
 ---
-title: Understanding how Nx identifies updated apps
+title: Nx on your CI, how does it work?
 published: true
 author: kwintenp
 description: A deep dive into the implementation of how Nx knows which apps are affected by a PR
