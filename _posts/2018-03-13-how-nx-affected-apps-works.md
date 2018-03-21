@@ -15,7 +15,7 @@ disqus: true
 cover: 'assets/images/cover/cover10.jpg'
 ---
 
-Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo and all the benefits that brings. In essence, Nx is a set of schematics that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project, which is supported by default. Nx leverages this feature and makes the process a little easier.
+Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo and all the benefits that brings. In essence, Nx is a set of schematics that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.
 
 This post however is not about the basic working of Nx. For that, go to their official website <a href="https://nrwl.io/nx" target="_blank">here</a> or watch this <a target="_blank" href="https://www.youtube.com/watch?v=bMkKz8AedHc">very informative talk</a> by <a href="https://twitter.com/MrJamesHenry">James Henry</a> at NgVikings.
 
@@ -72,7 +72,7 @@ export function touchedProjects(projects: ProjectNode[], touchedFiles: string[])
   });
 }
 ```
-This will give us all the projects that have files that have changed, aka the 'touchedProjects'.
+This will give us all the projects that have files that have changed, a.k.a. the 'touchedProjects'.
 
 ### Identifying all the apps
 
@@ -182,7 +182,7 @@ We found the files that were changed and to which projects they belong to. We fi
   }
 ```
 
-There is an interesting part in this snippet. There is a check to see if 'null' is in the 'touchedProjects'. This happens when there is a change to a file that is changed outside of the 'apps' or 'libs' directory. This can happen if the package.json file has been updated. In that case, every 'app' needs to be rebuild.
+There is an interesting part in this snippet. There is a check to see if 'null' is in the 'touchedProjects'. This happens when there is a change to a file outside of the 'apps' or 'libs' directory. This can happen if, for example, the package.json file has been updated. In that case, every 'app' needs to be rebuild.
 
 Finally, we can look at the `hasDependencyOnTouchedProjects` function.
 
@@ -203,9 +203,11 @@ function hasDependencyOnTouchedProjects(project: string, touchedProjects: string
 }
 ```
 
+Using recursion, they cross-reference the affected files and the projects they belong to with the dependencies all the projects have. This will return a list of all the apps that need to build.
+
 ### Conclusion
 
-Using git, typescript and a little javascript code, the guys at Nx created a script that can help us to only rebuild apps that are needed by a certain change.
+Using git, typescript and a little javascript code, the guys at Nx created a script that can help us to only rebuild apps that are affected by a PR reducing the build time on our CI environments.
 
 
 
