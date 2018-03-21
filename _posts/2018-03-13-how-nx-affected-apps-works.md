@@ -15,11 +15,11 @@ disqus: true
 cover: 'assets/images/cover/cover10.jpg'
 ---
 
-Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo and all the benefits that brings. In essence, Nx is a set of schematics that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.
+Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of <a href="https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2" target="_blank">schematics</a> that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.
 
-This post however is not about the basic working of Nx. For that, go to their official website <a href="https://nrwl.io/nx" target="_blank">here</a> or watch this <a target="_blank" href="https://www.youtube.com/watch?v=bMkKz8AedHc">very informative talk</a> by <a href="https://twitter.com/MrJamesHenry">James Henry</a> at NgVikings.
+This post however is not about the basic working of Nx. If you want to learn more about Nx itself, go to their official website <a href="https://nrwl.io/nx" target="_blank">here</a> or watch this <a target="_blank" href="https://www.youtube.com/watch?v=bMkKz8AedHc">very informative talk</a> by <a href="https://twitter.com/MrJamesHenry">James Henry</a> at NgVikings.
 
-This post will cover a different aspect of Nx. When all your applications are in the same repository, this poses some problems for your CI environment. Whenever a PR is merged into the master, the CI environment must rebuild your applications and ideally publish them to your DEV environment. But how do you handle it if you have a lot of apps in the same monorepo and you only want to build the apps that were affected by a certain PR? Nx provides us with a script to handle this situation. 
+This post will cover a different aspect of Nx. When all our applications are in the same repository, this poses some problems for your CI environment. Whenever a PR is merged into the master, the CI environment must rebuild your applications and ideally publish them to your DEV environment. But how do we handle it if we have a lot of apps in the same monorepo and we only want to build the apps that were affected by a certain PR? Nx provides us with a script to handle this situation. 
 
 ## Problem description
 
@@ -27,7 +27,7 @@ Let's take a look at the following Nx workspace. It has 2 apps and 2 libs.
 
 ![nx-workspace-image](https://www.dropbox.com/s/4qohmskumvwa8k2/Screenshot%202018-03-13%2019.04.20.png?raw=1)
 
-As you can see 'app1' depends on 'lib1' and 'lib2' and 'app2' only depends on 'lib1'. When we change something to 'lib2' we only need to rebuild our 'app1'. Nx provides us with a script that will, based on two git commit hashes, tell us all the apps that need to be build. You can run the script like this:
+As we can see 'app1' depends on 'lib1' and 'lib2' and 'app2' only depends on 'lib1'. When we change something to 'lib2' we only need to rebuild our 'app1'. Nx provides us with a script that will, based on two git commit hashes, tell us all the apps that need to be build. You can run the script like this:
 
 ```bash
 ./node_modules/.bin/nx affected apps SHA1 SHA2
