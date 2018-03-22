@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Nx on your CI, how does it work?</title>
+    <meta name="description" content="A deep dive into the implementation of how Nx knows which apps are affected by a PR" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="//how-nx-affected-apps-works/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Nx on your CI, how does it work?" />
+    <meta property="og:description" content="A deep dive into the implementation of how Nx knows which apps are affected by a PR" />
+    <meta property="og:url" content="//how-nx-affected-apps-works/" />
+    <meta property="og:image" content="/assets/images/cover/cover10.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Nx on your CI, how does it work?" />
+    <meta name="twitter:description" content="A deep dive into the implementation of how Nx knows which apps are affected by a PR" />
+    <meta name="twitter:url" content="//how-nx-affected-apps-works/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover10.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "Nx on your CI, how does it work?",
+    "url": "//how-nx-affected-apps-works/",
+    "image": "/assets/images/cover/cover10.jpg",
+    "description": "A deep dive into the implementation of how Nx knows which apps are affected by a PR"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover10.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>Want to work with us?</h5>
+<a href="https://strongbrew.io/about" class="button" rel="noopener">Learn more</a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="rxjs-spotlight">
+            <div class="rxjs-spotlight-top">
+                <h2>Advanced RxJS in Angular workshop</h2>
+            </div>
+            <div class="rxjs-spotlight-bottom">
+                <ul class="techlogos">
+                    <li><img alt="Angular" src="/assets/images/angular.png"/></li>
+                    <li><img alt="Rxjs" src="/assets/images/rxjs.png"/></li>
+                </ul>
+                <a class="button" href="https://strongbrew.io/advanced-rxjs-in-angular-ghent">
+                    Get your ticket: <br/>June 15th or June 16th GHENT
+                </a>
+            </div>
+
+        </div>
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Nx on your CI, how does it work?</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2018-03-13">13 Mar 2018
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>,
+                    
+                    
+                    
+                    <a href='/tag/Nx'>Nx</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of <a href="https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2" target="_blank">schematics</a> that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.</p>
+
+<p>This post however is not about the basic working of Nx. If you want to learn more about Nx itself, go to their official website <a href="https://nrwl.io/nx" target="_blank">here</a> or watch this <a target="_blank" href="https://www.youtube.com/watch?v=bMkKz8AedHc">very informative talk</a> by <a href="https://twitter.com/MrJamesHenry">James Henry</a> at NgVikings.</p>
+
+<p>This post will cover a different aspect of Nx. When all our applications are in the same repository, this poses some problems for your CI environment. Whenever a PR is merged into the master, the CI environment must rebuild your applications and ideally publish them to your DEV environment. But how do we handle it if we have a lot of apps in the same monorepo and we only want to build the apps that were affected by a certain PR? Nx provides us with a script to handle this situation.</p>
+
+<h2 id="problem-description">Problem description</h2>
+
+<p>Let’s take a look at the following Nx workspace. It has 2 apps and 2 libs.</p>
+
+<p><img src="https://www.dropbox.com/s/4qohmskumvwa8k2/Screenshot%202018-03-13%2019.04.20.png?raw=1" alt="nx-workspace-image" /></p>
+
+<p>As we can see ‘app1’ depends on ‘lib1’ and ‘lib2’ and ‘app2’ only depends on ‘lib1’. When we change something to ‘lib2’ we only need to rebuild our ‘app1’. Nx provides us with a script that will, based on two git commit hashes, tell us all the apps that need to be build. You can run the script like this:</p>
+
+<pre><code class="language-bash">./node_modules/.bin/nx affected apps SHA1 SHA2
+</code></pre>
+<p>SHA1 is the previous commit hash and SHA2 is the next commit hash. If, in our example, we change something to lib2, this script will output:</p>
+
+<pre><code class="language-typescript">app1
+</code></pre>
+
+<p>In this post, we will take a look at the script you can use for this and look at some code snippets to understand how it works.</p>
+
+<h2 id="how-do-they-know-what-apps-to-build">How do they know what apps to build</h2>
+
+<h3 id="knowing-what-files-are-changed">Knowing what files are changed</h3>
+
+<p>To know the files that have changed, they leverage the <code>git diff</code> command. Let’s look at the code:</p>
+
+<pre><code class="language-typescript">function getFilesFromShash(sha1: string, sha2: string): string[] {
+  return execSync(`git diff --name-only ${sha1} ${sha2}`)
+    .toString('utf-8')
+    .split('\n')
+    .map(a =&gt; a.trim())
+    .filter(a =&gt; a.length &gt; 0);
+}
+</code></pre>
+
+<p>The <code>git diff</code> command returns all the files that have changed between two commits. This is transformed into a list of files.</p>
+
+<h3 id="knowing-the-apps-these-touched-files-belong-to">Knowing the apps these touched files belong to</h3>
+
+<p>Now it is clear which files are touched, it’s time to identify the ‘projects’ these files belong to. In the script, both Nx apps and libs are referenced to as projects. They implement this using the following code.</p>
+
+<pre><code class="language-typescript">export function touchedProjects(projects: ProjectNode[], touchedFiles: string[]) {
+  projects = normalizeProjects(projects);
+  touchedFiles = normalizeFiles(touchedFiles);
+  return touchedFiles.map(f =&gt; {
+    const p = projects.filter(project =&gt; project.files.indexOf(f) &gt; -1)[0];
+    return p ? p.name : null;
+  });
+}
+</code></pre>
+<p>This will give us all the projects that have files that have changed, a.k.a. the ‘touchedProjects’.</p>
+
+<h3 id="identifying-all-the-apps">Identifying all the apps</h3>
+
+<p>Next step is identifying the different apps of the project. For this, they simply parse the ‘.angular-cli.json’ file which has an entry with all the apps. Notice that ‘apps’ in this context means entries in the ‘.angular-cli.json’. Both the ‘apps’ and ‘libs’ in Nx terminology are ‘apps’ in the ‘.angular-cli.json’.</p>
+
+<pre><code class="language-typescript">export function getAffectedApps(touchedFiles: string[]): string[] {
+  const config = JSON.parse(fs.readFileSync('.angular-cli.json', 'utf-8'));
+  const projects = getProjectNodes(config);
+  
+  ...
+} 
+
+export function getProjectNodes(config) {
+  return (config.apps ? config.apps : []).filter(p =&gt; p.name !== '$workspaceRoot').map(p =&gt; {
+    return {
+      name: p.name,
+      root: p.root,
+      type: p.root.startsWith('apps/') ? ProjectType.app : ProjectType.lib,
+      files: allFilesInDir(path.dirname(p.root))
+    };
+  });
+}
+</code></pre>
+<p>They fetch all the apps, loop over them, and create an object containing information about this app:</p>
+<ul>
+  <li>the name</li>
+  <li>the root folder</li>
+  <li>is it a real App or a Lib</li>
+  <li>all the files it holds.</li>
+</ul>
+
+<h3 id="knowing-the-dependencies-of-the-apps-and-libs">Knowing the dependencies of the apps and libs</h3>
+
+<p>Now that the apps are identified and we know the files inside those apps, it’s time to identify the dependencies the apps have on the different libs in the Nx workspace. To do that, they loop over every file in every project and parse those files using typescript. Then they visit every typescript node and if they encounter an import declaration or a <code>loadChildren</code> property they call the <code>addDeppIfNeeded</code> method since these are indicators that we might have a dependency on a lib in the monorepo.</p>
+
+<pre><code class="language-typescript"> private processAllFiles() {
+    this.projects.forEach(p =&gt; {
+      p.files.forEach(f =&gt; {
+        this.processFile(p.name, f);
+      });
+    });
+  }
+
+  private processFile(projectName: string, filePath: string): void {
+    if (path.extname(filePath) === '.ts') {
+      const tsFile = ts.createSourceFile(filePath, this.fileRead(filePath), ts.ScriptTarget.Latest, true);
+      this.processNode(projectName, tsFile);
+    }
+  }
+  
+private processNode(projectName: string, node: ts.Node): void {
+    if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+      const imp = this.getStringLiteralValue((node as ts.ImportDeclaration).moduleSpecifier);
+      this.addDepIfNeeded(imp, projectName, DependencyType.es6Import);
+      return; // stop traversing downwards
+    }
+
+    if (node.kind === ts.SyntaxKind.PropertyAssignment) {
+      const name = this.getPropertyAssignmentName((node as ts.PropertyAssignment).name);
+      if (name === 'loadChildren') {
+        const init = (node as ts.PropertyAssignment).initializer;
+        if (init.kind === ts.SyntaxKind.StringLiteral) {
+          const childrenExpr = this.getStringLiteralValue(init);
+          this.addDepIfNeeded(childrenExpr, projectName, DependencyType.loadChildren);
+          return; // stop traversing downwards
+        }
+      }
+    }
+    /**
+     * Continue traversing down the AST from the current node
+     */
+    ts.forEachChild(node, child =&gt; this.processNode(projectName, child));
+  }  
+</code></pre>
+<p>Let’s look at the ‘addDepIfNeeded’ method.</p>
+
+<pre><code class="language-typescript"> private addDepIfNeeded(expr: string, projectName: string, depType: DependencyType) {
+    const matchingProject = this.projectNames.filter(
+      a =&gt;
+        expr === `@${this.npmScope}/${a}` ||
+        expr.startsWith(`@${this.npmScope}/${a}#`) ||
+        expr.startsWith(`@${this.npmScope}/${a}/`)
+    )[0];
+
+    if (matchingProject) {
+      this.deps[projectName].push({projectName: matchingProject, type: depType});
+    }
+  }
+</code></pre>
+
+<p>This method checks if the <code>loadChildren</code> property or the import declaration is linked to one of our own libs. In that case, we add the dependency to the list of dependencies per project using the ‘projectName’ identifier.</p>
+
+<h3 id="putting-the-pieces-together">Putting the pieces together</h3>
+
+<p>We found the files that were changed and to which projects they belong to. We figured out all the dependencies the different projects have. Now it just a matter of cross referencing these to figure out which ‘apps’ need to be rebuild. Let’s look at the code:</p>
+
+<pre><code class="language-typescript">  if (tp.indexOf(null) &gt; -1) {
+    return projects.filter(p =&gt; p.type === ProjectType.app).map(p =&gt; p.name);
+  } else {
+    return projects
+    			.filter(p =&gt; p.type === ProjectType.app)
+    			.map(p =&gt; p.name)
+    			.filter(name =&gt; hasDependencyOnTouchedProjects(name, tp, deps, []));
+  }
+</code></pre>
+
+<p>There is an interesting part in this snippet. There is a check to see if ‘null’ is in the ‘touchedProjects’. This happens when there is a change to a file outside of the ‘apps’ or ‘libs’ directory. This can happen if, for example, the package.json file has been updated. In that case, every ‘app’ needs to be rebuild.</p>
+
+<p>Finally, we can look at the <code>hasDependencyOnTouchedProjects</code> function.</p>
+
+<pre><code class="language-typescript">function hasDependencyOnTouchedProjects(project: string, touchedProjects: string[], deps: { [projectName: string]: Dependency[] }, visisted: string[]) {
+  if (touchedProjects.indexOf(project) &gt; -1) return true;
+  if (visisted.indexOf(project) &gt; -1) return false;
+  return deps[project]
+  	.map(d =&gt; d.projectName)
+  	.filter(k =&gt; 
+  		hasDependencyOnTouchedProjects(
+  			k, 
+  			touchedProjects, 
+  			deps, 
+  			[...visisted, project]
+  		)
+  	).length &gt; 0;
+}
+</code></pre>
+
+<p>Using recursion, they cross-reference the affected files and the projects they belong to with the dependencies all the projects have. This will return a list of all the apps that need to build.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Using git, typescript and a little javascript code, the guys at Nx created a script that can help us to only rebuild apps that are affected by a PR reducing the build time on our CI environments.</p>
+
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Nx on your CI, how does it work?&amp;url=how-nx-affected-apps-works"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=how-nx-affected-apps-works"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=how-nx-affected-apps-works"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover11.jpg)"
+       href="/prerendering-angular-apps">
+        <section class="post">
+            <h2>Pre-rendering Angular Applications</h2>
+            <p>Why should we pre-render Angular applications? At the moment of writing this article, there are...</p>
+        </section>
+    </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-112030289-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>

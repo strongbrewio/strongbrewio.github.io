@@ -12,6 +12,203 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Nx on your CI, how does it work?</title>
+	  <link>//how-nx-affected-apps-works/</link>
+	  <author></author>
+	  <pubDate>2018-03-13T00:00:00+00:00</pubDate>
+	  <guid>//how-nx-affected-apps-works/</guid>
+	  <description><![CDATA[
+	     <p>Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of <a href="https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2" target="_blank">schematics</a> that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.</p>
+
+<p>This post however is not about the basic working of Nx. If you want to learn more about Nx itself, go to their official website <a href="https://nrwl.io/nx" target="_blank">here</a> or watch this <a target="_blank" href="https://www.youtube.com/watch?v=bMkKz8AedHc">very informative talk</a> by <a href="https://twitter.com/MrJamesHenry">James Henry</a> at NgVikings.</p>
+
+<p>This post will cover a different aspect of Nx. When all our applications are in the same repository, this poses some problems for your CI environment. Whenever a PR is merged into the master, the CI environment must rebuild your applications and ideally publish them to your DEV environment. But how do we handle it if we have a lot of apps in the same monorepo and we only want to build the apps that were affected by a certain PR? Nx provides us with a script to handle this situation.</p>
+
+<h2 id="problem-description">Problem description</h2>
+
+<p>Let’s take a look at the following Nx workspace. It has 2 apps and 2 libs.</p>
+
+<p><img src="https://www.dropbox.com/s/4qohmskumvwa8k2/Screenshot%202018-03-13%2019.04.20.png?raw=1" alt="nx-workspace-image" /></p>
+
+<p>As we can see ‘app1’ depends on ‘lib1’ and ‘lib2’ and ‘app2’ only depends on ‘lib1’. When we change something to ‘lib2’ we only need to rebuild our ‘app1’. Nx provides us with a script that will, based on two git commit hashes, tell us all the apps that need to be build. You can run the script like this:</p>
+
+<pre><code class="language-bash">./node_modules/.bin/nx affected apps SHA1 SHA2
+</code></pre>
+<p>SHA1 is the previous commit hash and SHA2 is the next commit hash. If, in our example, we change something to lib2, this script will output:</p>
+
+<pre><code class="language-typescript">app1
+</code></pre>
+
+<p>In this post, we will take a look at the script you can use for this and look at some code snippets to understand how it works.</p>
+
+<h2 id="how-do-they-know-what-apps-to-build">How do they know what apps to build</h2>
+
+<h3 id="knowing-what-files-are-changed">Knowing what files are changed</h3>
+
+<p>To know the files that have changed, they leverage the <code>git diff</code> command. Let’s look at the code:</p>
+
+<pre><code class="language-typescript">function getFilesFromShash(sha1: string, sha2: string): string[] {
+  return execSync(`git diff --name-only ${sha1} ${sha2}`)
+    .toString('utf-8')
+    .split('\n')
+    .map(a =&gt; a.trim())
+    .filter(a =&gt; a.length &gt; 0);
+}
+</code></pre>
+
+<p>The <code>git diff</code> command returns all the files that have changed between two commits. This is transformed into a list of files.</p>
+
+<h3 id="knowing-the-apps-these-touched-files-belong-to">Knowing the apps these touched files belong to</h3>
+
+<p>Now it is clear which files are touched, it’s time to identify the ‘projects’ these files belong to. In the script, both Nx apps and libs are referenced to as projects. They implement this using the following code.</p>
+
+<pre><code class="language-typescript">export function touchedProjects(projects: ProjectNode[], touchedFiles: string[]) {
+  projects = normalizeProjects(projects);
+  touchedFiles = normalizeFiles(touchedFiles);
+  return touchedFiles.map(f =&gt; {
+    const p = projects.filter(project =&gt; project.files.indexOf(f) &gt; -1)[0];
+    return p ? p.name : null;
+  });
+}
+</code></pre>
+<p>This will give us all the projects that have files that have changed, a.k.a. the ‘touchedProjects’.</p>
+
+<h3 id="identifying-all-the-apps">Identifying all the apps</h3>
+
+<p>Next step is identifying the different apps of the project. For this, they simply parse the ‘.angular-cli.json’ file which has an entry with all the apps. Notice that ‘apps’ in this context means entries in the ‘.angular-cli.json’. Both the ‘apps’ and ‘libs’ in Nx terminology are ‘apps’ in the ‘.angular-cli.json’.</p>
+
+<pre><code class="language-typescript">export function getAffectedApps(touchedFiles: string[]): string[] {
+  const config = JSON.parse(fs.readFileSync('.angular-cli.json', 'utf-8'));
+  const projects = getProjectNodes(config);
+  
+  ...
+} 
+
+export function getProjectNodes(config) {
+  return (config.apps ? config.apps : []).filter(p =&gt; p.name !== '$workspaceRoot').map(p =&gt; {
+    return {
+      name: p.name,
+      root: p.root,
+      type: p.root.startsWith('apps/') ? ProjectType.app : ProjectType.lib,
+      files: allFilesInDir(path.dirname(p.root))
+    };
+  });
+}
+</code></pre>
+<p>They fetch all the apps, loop over them, and create an object containing information about this app:</p>
+<ul>
+  <li>the name</li>
+  <li>the root folder</li>
+  <li>is it a real App or a Lib</li>
+  <li>all the files it holds.</li>
+</ul>
+
+<h3 id="knowing-the-dependencies-of-the-apps-and-libs">Knowing the dependencies of the apps and libs</h3>
+
+<p>Now that the apps are identified and we know the files inside those apps, it’s time to identify the dependencies the apps have on the different libs in the Nx workspace. To do that, they loop over every file in every project and parse those files using typescript. Then they visit every typescript node and if they encounter an import declaration or a <code>loadChildren</code> property they call the <code>addDeppIfNeeded</code> method since these are indicators that we might have a dependency on a lib in the monorepo.</p>
+
+<pre><code class="language-typescript"> private processAllFiles() {
+    this.projects.forEach(p =&gt; {
+      p.files.forEach(f =&gt; {
+        this.processFile(p.name, f);
+      });
+    });
+  }
+
+  private processFile(projectName: string, filePath: string): void {
+    if (path.extname(filePath) === '.ts') {
+      const tsFile = ts.createSourceFile(filePath, this.fileRead(filePath), ts.ScriptTarget.Latest, true);
+      this.processNode(projectName, tsFile);
+    }
+  }
+  
+private processNode(projectName: string, node: ts.Node): void {
+    if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+      const imp = this.getStringLiteralValue((node as ts.ImportDeclaration).moduleSpecifier);
+      this.addDepIfNeeded(imp, projectName, DependencyType.es6Import);
+      return; // stop traversing downwards
+    }
+
+    if (node.kind === ts.SyntaxKind.PropertyAssignment) {
+      const name = this.getPropertyAssignmentName((node as ts.PropertyAssignment).name);
+      if (name === 'loadChildren') {
+        const init = (node as ts.PropertyAssignment).initializer;
+        if (init.kind === ts.SyntaxKind.StringLiteral) {
+          const childrenExpr = this.getStringLiteralValue(init);
+          this.addDepIfNeeded(childrenExpr, projectName, DependencyType.loadChildren);
+          return; // stop traversing downwards
+        }
+      }
+    }
+    /**
+     * Continue traversing down the AST from the current node
+     */
+    ts.forEachChild(node, child =&gt; this.processNode(projectName, child));
+  }  
+</code></pre>
+<p>Let’s look at the ‘addDepIfNeeded’ method.</p>
+
+<pre><code class="language-typescript"> private addDepIfNeeded(expr: string, projectName: string, depType: DependencyType) {
+    const matchingProject = this.projectNames.filter(
+      a =&gt;
+        expr === `@${this.npmScope}/${a}` ||
+        expr.startsWith(`@${this.npmScope}/${a}#`) ||
+        expr.startsWith(`@${this.npmScope}/${a}/`)
+    )[0];
+
+    if (matchingProject) {
+      this.deps[projectName].push({projectName: matchingProject, type: depType});
+    }
+  }
+</code></pre>
+
+<p>This method checks if the <code>loadChildren</code> property or the import declaration is linked to one of our own libs. In that case, we add the dependency to the list of dependencies per project using the ‘projectName’ identifier.</p>
+
+<h3 id="putting-the-pieces-together">Putting the pieces together</h3>
+
+<p>We found the files that were changed and to which projects they belong to. We figured out all the dependencies the different projects have. Now it just a matter of cross referencing these to figure out which ‘apps’ need to be rebuild. Let’s look at the code:</p>
+
+<pre><code class="language-typescript">  if (tp.indexOf(null) &gt; -1) {
+    return projects.filter(p =&gt; p.type === ProjectType.app).map(p =&gt; p.name);
+  } else {
+    return projects
+    			.filter(p =&gt; p.type === ProjectType.app)
+    			.map(p =&gt; p.name)
+    			.filter(name =&gt; hasDependencyOnTouchedProjects(name, tp, deps, []));
+  }
+</code></pre>
+
+<p>There is an interesting part in this snippet. There is a check to see if ‘null’ is in the ‘touchedProjects’. This happens when there is a change to a file outside of the ‘apps’ or ‘libs’ directory. This can happen if, for example, the package.json file has been updated. In that case, every ‘app’ needs to be rebuild.</p>
+
+<p>Finally, we can look at the <code>hasDependencyOnTouchedProjects</code> function.</p>
+
+<pre><code class="language-typescript">function hasDependencyOnTouchedProjects(project: string, touchedProjects: string[], deps: { [projectName: string]: Dependency[] }, visisted: string[]) {
+  if (touchedProjects.indexOf(project) &gt; -1) return true;
+  if (visisted.indexOf(project) &gt; -1) return false;
+  return deps[project]
+  	.map(d =&gt; d.projectName)
+  	.filter(k =&gt; 
+  		hasDependencyOnTouchedProjects(
+  			k, 
+  			touchedProjects, 
+  			deps, 
+  			[...visisted, project]
+  		)
+  	).length &gt; 0;
+}
+</code></pre>
+
+<p>Using recursion, they cross-reference the affected files and the projects they belong to with the dependencies all the projects have. This will return a list of all the apps that need to build.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Using git, typescript and a little javascript code, the guys at Nx created a script that can help us to only rebuild apps that are affected by a PR reducing the build time on our CI environments.</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Pre-rendering Angular Applications</title>
 	  <link>//prerendering-angular-apps/</link>
 	  <author></author>
@@ -2751,179 +2948,6 @@ I hope you enjoyed the article.</p>
 
 <h2 id="a-very-special-thanks">A very special thanks</h2>
 <p>I want to thank the people who have reviewed this article and gave me their valuable input. Thank you so much <a href="http://twitter.com/jvandemo">Jurgen Van de Moere</a>, <a href="http://twitter.com/carmenpopoviciu">Carmen Popoviciu</a>, <a href="http://twitter.com/manfredsteyer">Manfred Steyer</a> and <a href="http://twitter.com/juristr">Juri Strumpflohner</a>!!!</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Cancellable optimistic updates in Angular 2 and Redux</title>
-	  <link>//Cancellable-optimistic-updates-in-Angular2-and-Redux/</link>
-	  <author></author>
-	  <pubDate>2016-09-23T00:00:00+00:00</pubDate>
-	  <guid>//Cancellable-optimistic-updates-in-Angular2-and-Redux/</guid>
-	  <description><![CDATA[
-	     <p><a href="https://angular.io/">Angular 2</a> and <a href="https://github.com/reactjs/redux">redux</a> are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the <a href="https://github.com/ngrx/store">@ngrx/store</a> variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the <a href="http://redux.js.org/">documentation</a> first.</p>
-
-<h2 id="optimistic-updates">Optimistic updates</h2>
-
-<p>Redux has a client-side store that has all the data and state your client-side application needs. Therefore, it is the single source of truth for your frontend. When something in that store changes, your components get updated automatically. Let’s say that we are implementing a winecellar application which will obviously contain an array of wines.</p>
-
-<p><strong>Scenario: we want to remove a wine from the winecellar.</strong></p>
-
-<p>A user goes to the index page of our application, clicks a delete button in the datagrid which will call an angular service to remove a wine. The service does an HTTP call to a server, and when the wine finally gets deleted, the service responds with a 200 response (ok). When that happens we can update the redux store and our view gets updated.
-<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario1.png" alt="Scenario 1" /></p>
-
-<p>The code explained above might look like this:</p>
-
-<pre><code class="language-typescript">remove(wine: Wine): void {
-    this.http.delete(`${API_URL}/wines/${wine._id}`).subscribe(() =&gt; {
-    	// dispatch the action to the store, when the call was successful
-    	this.store.dispatch({type: REMOVE_WINE, payload: {_id: wine._id}});
-    });
-}
-</code></pre>
-
-<p>This is the traditional way of doing things, but I think we can do it better. What if we would update the store, regardless of the HTTP response the server returns? We click the delete button in the datagrid, call the angular service like we already did. But in that service we update the store directly (parallel with the http call)</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario2.png" alt="Scenario 2" /></p>
-
-<p>The code explained above might look like this:</p>
-
-<pre><code class="language-typescript">remove(wine: Wine): void {
-	// dispatch directly to the store
-	this.store.dispatch({type: REMOVE_WINE, payload: {_id: wine._id}};
-	// we still have to subscribe because http calls return cold observables
-    this.http.delete(`${API_URL}/wines/${wine._id}`).subscribe();
-}
-</code></pre>
-
-<p>This is a pretty nice change: Our application has just gotten a lot <strong>faster and snappier</strong>. Every time the user does an action, the store gets updated immediately, which means that the components will get updated immediately as well. We never have to wait for http responses again.</p>
-
-<p>There is one exception to this rule: When <strong>adding</strong> data, the backend has to return an ID which means that for POST calls we will have to postpone the store update until we get a 200 response. (otherwise we would have id-less wines in our store, and we can’t have that)</p>
-
-<h2 id="what-if-the-server-call-fails">What if the server-call fails?</h2>
-
-<p>What if the user’s internet-connection is lost? Or the backend doesn’t return a 200 response but an error. Our store will already be updated, the wine will be lost when it’s in fact still in the database. In some scenarios you want to prevent that kind of behavior. In those cases we want to rollback that specific action, but not interfere with the rest of the actions. It has to be completely safe.</p>
-
-<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario3.png" alt="Scenario 3" /></p>
-
-<p>We would like to implement something like this:</p>
-
-<pre><code class="language-typescript">remove(wine: Wine): void {
-	// create an action
-	let action = {type: REMOVE_WINE, payload: {_id: wine._id}};
-	//dispatch the action to the store
-	this.store.dispatch(action);
-	// call the backend
-    this.http.delete(`${API_URL}/wines/${wine._id}`)
-    	.subscribe(
-    		// on success, do nothing
-    		() =&gt; {}, 
-	    	// on error, rollback the action
-	    	() =&gt; {
-	    		this.store.dispatch({type: "UNDO_ACTION", payload: action});
-	    	// maybe show somekind of errormessage to show the user that it's action failed
-    	});
-}
-</code></pre>
-
-<p>It turns out that when using the redux pattern, this only takes 12 lines of code (without comments :-)). We will have to create a parent reducer that will delegate to our root reducer. The parent reducer will keep track of all the actions, so they can be rolled back.
-The implementation looks like this:</p>
-
-<pre><code class="language-typescript">import {ApplicationState} from "../statemanagement/state/ApplicationState";
-import {Action, ActionReducer} from "@ngrx/store";
-
-export function handleUndo(rootReducer: ActionReducer&lt;ApplicationState&gt;)
-	: ActionReducer&lt;ApplicationState&gt; {
-	// keep the executedActions
-    let executedActions: Array&lt;Action&gt; = [];
-    return (state: ApplicationState, action: Action) =&gt; {
-        if (action.type === "UNDO_ACTION") {
-        	// if the action is UNDO_ACTION, 
-        	// then call all the actions again on the rootReducer, 
-        	// except the one we want to rollback
-            let newState: any = {};
-            executedActions = executedActions.filter(eAct =&gt; eAct !== action.payload);
-            // update the state for every action untill we get the
-            // exact same state as before, but without the action we want to rollback
-            executedActions.forEach(executedAction =&gt; 
-            	newState = rootReducer(newState, executedAction));
-            return newState;
-        }
-        // push every action that isn't an UNDO_ACTION to the executedActions property
-        executedActions.push(action);
-        // just delegate
-        return rootReducer(state, action);
-    };
-}
-</code></pre>
-
-<p>So basically, when an action is being rolled back, every action that has been taken before is being executed on a piece of state again. When that piece of state is updated, it will return it and the store will be updated with the same state, except the one that our rolled back action created.</p>
-
-<p>To make sure the actions can be undone, we have to make redux use the piece of code above. This is how you could use it in Angular 2.</p>
-
-<pre><code class="language-typescript">@NgModule({
-	// instead of passing the rootReducer directly
-	// like we would have done before, wrap it in the handleUndo function
-    imports: [StoreModule.provideStore(handleUndo(rootReducer))/*, ...*/],
-    /* ... */
-})
-export class AppModule {
-}
-</code></pre>
-
-<h2 id="possible-improvements">Possible improvements</h2>
-
-<p>Won’t it become slow after a while, replaying all these actions?
-Some facts:</p>
-<ul>
-<li>Actions are very cheap</li>
-<li>They will update the store only once, we execute the actions ourselves, so ui won't get updated</li>
-<li>Actions only get replayed when there is an error</li>
-<li>The devtools also work like that, enables [timetraveling](https://onsen.io/blog/react-redux-devtools-with-time-travel)</li>
-</ul>
-<p>What if it would become slow?
-We can implement a buffer. Let’s say that we only want the last 100 actions to be kept.</p>
-
-<pre><code class="language-typescript">export function handleUndo(rootReducer: ActionReducer&lt;ApplicationState&gt;, 
-	bufferSize = 100): ActionReducer&lt;ApplicationState&gt; {
-    let executedActions: Array&lt;Action&gt; = [];
-    let initialState = undefined;
-    return (state: ApplicationState, action: Action) =&gt; {
-        if (action.type === "UNDO_ACTION") {
-        	// if the action is UNDO_ACTION, 
-        	// then call all the actions again on the rootReducer, 
-        	// except the one we want to rollback
-            let newState: any = initialState;
-            executedActions = executedActions.filter(eAct =&gt; eAct !== action.payload);
-            // update the state for every action untill we get the
-            // exact same state as before, but without the action we want to rollback
-            executedActions.forEach(executedAction =&gt; 
-            	newState = rootReducer(newState, executedAction));
-            return newState;
-        }
-       	// push every action that isn't an UNDO_ACTION to the executedActions property
-		executedActions.push(action);
-        let updatedState =  rootReducer(state, action);
-        if (executedActions.length === bufferSize + 1) {
-            let firstAction = executedActions[0];
-            // calculate the state x (buffersize) actions ago
-            initialState = rootReducer(initialState, firstAction);
-            // keep the correct actions
-            executedActions = executedActions.slice(1, bufferSize + 1);
-        }
-        return updatedState;
-    };
-}
-</code></pre>
-
-<h3 id="conclusion">Conclusion</h3>
-<p>The redux pattern has opened amazing doors for frontend development. Just like <a href="http://blog.brecht.io/How-we-made-our-app-real-time-in-6-lines-of-code/">realtime</a> became a breeze we can do optimistic updates with almost no effort.
-The reason why you would do optimistic updates is that your application becomes amazingly fast and snappy! When implementing optimistic updates, the user will experience a native, mobile feeling.</p>
-
-<p>Here you can find the npm package I’ve created for angular, called <a href="https://www.npmjs.com/package/ngrx-undo">ngrx-undo</a></p>
-
-<p>Let me know if you enjoyed this article!</p>
 
 	  ]]></description>
 	</item>
