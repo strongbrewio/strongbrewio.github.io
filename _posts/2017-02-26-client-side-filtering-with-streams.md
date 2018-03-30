@@ -59,10 +59,12 @@ filterChanged(value: string)
     this.filteredCharacters = this.characters;
   } else {
     this.filteredCharacters =
-       this.characters.filter(
+       this.characters.pipe(
+          filter(
             (character: StarWarsCharacter) => {
                character.gender.toLowerCase() === value.toLowerCase()
             }
+          ),
        );
   }
 }
@@ -155,7 +157,8 @@ export class ClientSideFilterComponent implements OnInit {
     // here changes value, the project function is re-executed and
     // the result stream will get a new value. In our case this is
     // a new array with all the filtered characters.
-    return characters$.combineLatest(
+    return combineLatest(
+      characters$,
       filter$, (characters: StarWarsCharacter[], filter: string) => {
         // this is the project function where we imperatively
         // implement the filtering logic
