@@ -6,6 +6,7 @@ author: brechtbilliet
 description: Learn how to use Server-side rendering to prerender our Angular application at build time.
 comments: true
 date: 2018-03-4
+navigation: true
 subclass: 'post'
 categories: 'brechtbilliet'
 disqus: true
@@ -174,7 +175,7 @@ We have just generated the `main.bundle.js`, the file that we need to perform se
 - Create an array with routes (we could automate this if we want)
 - Loop over that array and for every entry: 
   - create a folder in the dist map with that route name 
-  - use the ```main.bundle.js``` to render the html and store that html as an ```ìndex.html``` in the folder we just created.
+  - use the ```main.bundle.js``` to render the html and store that html as an ```index.html``` in the folder we just created.
   - Overwrite the `dist/index.html` file.
 
 Let's call that script `prerender.ts`. Since I'm a typescript enthusiast, I want to develop the prerender script in typescript and use [ts-node](https://www.npmjs.com/package/ts-node) to run it.
@@ -291,6 +292,7 @@ A very special thanks to the awesome people that have helped me with their revie
 - Sam Vloeberghs [@samvloeberghs](https://twitter.com/samvloeberghs)
 - Ana Cidre [@AnaCidre_](https://twitter.com/anacidre_)
 - Ruben Vermeulen [@CrushTheButton](https://twitter.com/CrushTheButton)
+- Klaas Cuvelier [@klaascuvelier](https://twitter.com/klaascuvelier)
 
 ## Sources
 
