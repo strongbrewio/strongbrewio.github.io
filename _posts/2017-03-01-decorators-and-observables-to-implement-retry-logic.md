@@ -25,7 +25,7 @@ In the example below, we have a service which fetches a number of Star Wars char
 
 ```typescript
 public getCharactersAndFail(): Observable<StarWarsCharacter[]> {
-    return Observable.throw('Failing on purpose');
+    return throw('Failing on purpose');
 }
 ```
 Instead of actually doing a backend call, I'm just returning an observable which will throw as soon as it's subscribed to. This is of course not to handy but for demonstration purposes, it's quite ideal.
@@ -34,7 +34,7 @@ Using the decorator I created myself, we can make this code a little more resill
 ```typescript
 @retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
 public getCharactersAndFail(): Observable<StarWarsCharacter[]> {
-    return Observable.throw('Failing on purpose');
+    return throw('Failing on purpose');
 }
 ```
 
@@ -53,7 +53,9 @@ The code for this backend call looks like this:
 @retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
 public getCharacters(): Observable<StarWarsCharacter[]> {
     return this.http.get('https://swapi.co/api/people/')
-      .map((response: Response) => response.json().results);
+      .pipe(
+         map((response: Response) => response.json().results)
+      );
 }
 ```
 
@@ -79,19 +81,21 @@ characters$: Observable<StarWarsCharacter> =
 	this.starWarsService
 		.getCharacters()
 		// we use the retryWhen operator to retry a number of times
-		.retryWhen((errors: Observable<any>) => {
-		  // we use the scan operator to count the number of tries
-          return errors.scan((errorCount, err) => {
-            console.log('Try ' + (errorCount + 1));
-            if (errorCount >= 3) {
-              throw err;
-            }
-            return errorCount + 1;
-          }, 0).delay(1000);
-        })
-        // we catch the error if it keeps on failing and return
-        // the fallback
-        .catch(() => Observable.of(fallback));
+		.pipe(
+		    retryWhen((errors: Observable<any>) => {
+		       // we use the scan operator to count the number of tries
+               return errors.scan((errorCount, err) => {
+                 console.log('Try ' + (errorCount + 1));
+                 if (errorCount >= 3) {
+                    throw err;
+                 }
+                 return errorCount + 1;
+               }, 0).delay(1000);
+             }),
+            // we catch the error if it keeps on failing and return
+            // the fallback
+          catchError(() => of(fallback))
+      );
 ```
 I'm not going to go into the details of the RxJS implementation, that whould require a totally separate post.
 What this code does however, is create an observable that, once subscribed to, will try to execute the backend call. If it fails, which it will in our case, it will re-execute it 2 more times with a single second delay in between. If it still fails, it will return the fallback we can define.
@@ -125,16 +129,18 @@ export function retry(times = 3, fallback: any) {
       // with the retry and fallback mechanism
       // we defined above
       return originalMethod.apply(this)
-        .retryWhen((errors) => {
-          return errors.scan((errorCount, err) => {
-            console.log('Try ' + (errorCount + 1));
-            if (errorCount >= times - 1) {
-              throw err;
-            }
-            return errorCount + 1;
-          }, 0).delay(1000);
-        })
-        .catch(() => Observable.of(fallback));
+        .pipe(
+           retryWhen((errors) => {
+             return errors.scan((errorCount, err) => {
+               console.log('Try ' + (errorCount + 1));
+               if (errorCount >= times - 1) {
+                 throw err;
+               }
+               return errorCount + 1;
+             }, 0).delay(1000);
+           }),
+           catchError(() => of(fallback));
+        )
     };
     // return edited descriptor as opposed to
     // overwriting the descriptor
@@ -149,7 +155,7 @@ Once you've understood the syntax of the method decorator, this implementation i
 ```typescript
 @retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
 public getCharactersAndFail(): Observable<StarWarsCharacter[]> {
-    return Observable.throw('Failing on purpose');
+    return throw('Failing on purpose');
 }
 ```
 
