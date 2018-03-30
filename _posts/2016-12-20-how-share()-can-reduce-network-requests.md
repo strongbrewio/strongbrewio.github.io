@@ -37,7 +37,9 @@ The StarWarsService uses Angular's Http and returns a character from the series 
 // star-wars.service.ts
 public getCharacter(id: number): Observable< StarWarsCharacter > {
     return this.http.get('https://swapi.co/api/people/' + id)
-      .map((response: Response) => response.json());
+      .pipe(
+      	   map((response: Response) => response.json())
+      );
 }
 ```
 
@@ -46,9 +48,15 @@ The app component creates three new observables by mapping the `character$` sour
 
 ```typescript
 // app.component.ts
-this.name$ = this.character$.map(character => character.name);
-this.birthDate$ = this.character$.map(character => character.birth_year);
-this.gender$ = this.character$.map(character => character.gender);
+this.name$ = this.character$.pipe(
+   map(character => character.name)
+);
+this.birthDate$ = this.character$.pipe(
+   map(character => character.birth_year)
+);
+this.gender$ = this.character$.pipe(
+   map(character => character.gender)
+);
 ```
 
 The data is passed to the dumb components using the `async` pipe.
@@ -85,8 +93,10 @@ Let's change the observable that the StarWarsService returns like this:
 
 ```typescript
 return this.http.get('https://swapi.co/api/people/' + id)
-      .map((response: Response) => response.json())
-      .share();
+      .pipe(
+          map((response: Response) => response.json()),
+          share()
+      );
 ```
 
 We added the `share()` operator. This is an alias for doing `publish().refCount()`. This will make the `character$` a hot observable that starts emitting events as soon as the first one subscribes. The `character$` observable will be a 'shared' one. Let's first see what this means and explain afterwards:
@@ -107,8 +117,10 @@ Let's change the observable from the StarWarsService one more time:
 ```typescript
 let obs$: ConnectableObservable<StarWarsCharacter> =
      this.http.get('https://swapi.co/api/people/' + id)
-         .map((response: Response) => response.json())
-         .publishReplay();
+         .pipe(
+            map((response: Response) => response.json()),
+            publishReplay(),
+         );
 obs$.connect();
 return obs$;
 ```
