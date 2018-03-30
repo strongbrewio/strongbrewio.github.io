@@ -23,18 +23,20 @@ One problem that I face regularly when looking at other peoples code is that the
 One thing I see all the time is something like this:
 
 ```typescript
-Rx.Observable.interval(1000).map(x => x*2).filter(x => x%2 === 0)
-	.mergeMap(x => someBackendCall(x)).map(res => res.json()).subscribe();
+Rx.Observable.pipe(interval(1000),map(x => x*2),filter(x => x%2 === 0),
+	mergeMap(x => someBackendCall(x)),map(res => res.json()).subscribe();
 ```
 
 Here we can see a simple stream. Looking at what is does is a little more difficult however because of the outlining of the operators. If you format the code like this, it makes it so much easier:
 
 ```typescript
 Rx.Observable.interval(1000)
-	.map(x => x*2)
-	.filter(x => x%2 === 0)
-	.mergeMap(x => someBackendCall(x))
-	.map(res => res.json())
+   .pipe(
+	   map(x => x*2),
+	   filter(x => x%2 === 0),
+	   mergeMap(x => someBackendCall(x)),
+	   map(res => res.json())
+	)
 	.subscribe();
 ```
 
@@ -51,21 +53,23 @@ private data$: Observable<Array<Data>>;
 // A function that uses this data$ 
 doSomething() {
     this.data$
-    	.take(1)
-        .map((data) => {
-            if (data && data.length > 0) {
-                	return data.forEach(datum => {
-                    datum.active = false;
-                	});
-            } else {
+    	.pipe(
+    	   take(1),
+           map((data) => {
+               if (data && data.length > 0) {
+                   	return data.forEach(datum => {
+                       datum.active = false;
+                    });
+               } else {
             		return [];
-            }
-        })
-        .mergeMap((data) => {
-            data.forEach(datum => {
-                this.whateverService.update(data);
-            });
-        })
+               }
+           }),
+           mergeMap((data) => {
+               data.forEach(datum => {
+                   this.whateverService.update(data);
+               });
+           })
+        )
         .subscribe();
 }
 ```
@@ -96,10 +100,11 @@ doSomething() {
     }; 
 
     this.data$
-    	.take(1)
-        .map(mapAllTheElementsActiveFlagToFalse)
-        .mergeMap(callTheWhateverServiceForEveryElement)
-        .subscribe();
+    	.pipe(
+    	  take(1),
+          map(mapAllTheElementsActiveFlagToFalse),
+          mergeMap(callTheWhateverServiceForEveryElement)
+       ).subscribe();
 }
 ```
 
@@ -118,11 +123,15 @@ result$: Observable<any>;
 
 doSomething() {
 	 // we combine the data$ and data2$ with combineLatest
-    this.result$ = Observable.combineLatest(
+    this.result$ = combineLatest(
         this.data$
-            .map(data => data.length),
+            .pipe(
+               map(data => data.length),
+            ),
         this.data2$
-            .mergeMap(val => this.whateverService.call(val)),
+            .pipe(
+               mergeMap(val => this.whateverService.call(val)),
+            ),
         (val1, val2) => {
             // handle the values here   
         }
@@ -140,12 +149,16 @@ result$: Observable<any>;
 
 doSomething() {
     const dataLength$ = this.data$
-        .map(data => data.length); 
+        .pipe(
+           map(data => data.length),
+        ); 
     const whateverData$ = this.data2$
-        .mergeMap(val => this.whateverService.call(val));
+        .pipe(
+           map(val => this.whateverService.call(val))
+        );
 
 	 // we combine the data$ and data2$ with combineLatest
-    this.result$ = Observable.combineLatest(
+    this.result$ = combineLatest(
         dataLength$,
         whateverData$,
         (val1, val2) => {
