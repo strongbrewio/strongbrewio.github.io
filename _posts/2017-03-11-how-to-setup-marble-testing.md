@@ -42,7 +42,7 @@ We have a stream containing the characters (which will come from the backend) an
 public createFilterCharacters(
         filter$: Observable<string>,
         characters$: Observable<StarWarsCharacter[]>) {
-  return characters$.combineLatest(filter$,
+  return combineLatest(characters$, filter$,
      (characters: StarWarsCharacter[], filter: string) => {
       if (filter === 'All') {
         return characters;
