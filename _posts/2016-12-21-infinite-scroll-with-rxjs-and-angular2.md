@@ -118,24 +118,29 @@ private numberOfItems = 10;// number of items in a page
 The pageByScroll$ stream might look something like this:
 
 ```typescript
- private pageByScroll$ = 
- 	// first of all, we want to create a stream that contains 
- 	// all the scroll events that are happening in the window object
-	Observable.fromEvent(window, "scroll") 
+ 
+// first of all, we want to create a stream that contains 
+// all the scroll events that are happening in the window object
+private pageByScroll$ = fromEvent(window, "scroll")
+  .pipe(
 	// we are only interested in the scrollY value of these events
 	// let's create a stream with only these values
-	.map(() => window.scrollY)
+	map(() => window.scrollY),
 	// create a stream with the filtered values
 	// we only need the values from when we are scrolling outside
 	// our viewport
-	.filter(current => current >=  document.body.clientHeight - window.innerHeight)
+	filter(current => 
+	  current >=  document.body.clientHeight - window.innerHeight),
 	// Only when the user stops scrolling for 200 ms, we can continue
 	// so let's debounce this stream for 200 ms
-	.debounceTime(200) 
+	debounceTime(200),
 	// filter out double values
-	.distinct() 
+	distinct(), 
 	// calculate the page number
-	.map(y => Math.ceil((y + window.innerHeight)/ (this.itemHeight * this.numberOfItems)));
+	map(y => Math.ceil(
+		(y + window.innerHeight)/ (this.itemHeight * this.numberOfItems))
+	)
+  );
 	
 	// --------1---2----3------2...
 ```
@@ -147,18 +152,19 @@ The pageByScroll$ stream might look something like this:
 The pageByResize$ looks like this:
 
 ```typescript
-  private pageByResize$ = 
-  	// Now, we want to create a new stream that contains 
- 	// all the resize events that are happening in the window object
-	Observable.fromEvent(window, "resize")
-	// when the user stops resizing for 200 ms, then we can continue
-	.debounceTime(200) 
-	// calculate the page number based on the window
-   .map(_ => Math.ceil(
-	   	(window.innerHeight + document.body.scrollTop) / 
-	   	(this.itemHeight * this.numberOfItems)
-   	));
-   
+private pageByResize$ = 
+  // Now, we want to create a new stream that contains 
+  // all the resize events that are happening in the window object
+  fromEvent(window, "resize")
+	.pipe()
+		// when the user stops resizing for 200 ms, then we can continue
+		debounceTime(200),
+		// calculate the page number based on the window
+		map(_ => Math.ceil(
+			(window.innerHeight + document.body.scrollTop) / 
+			(this.itemHeight * this.numberOfItems)
+		))
+	);
 	// --------1---2----3------2...
 ```
 
@@ -178,12 +184,15 @@ Awesome, we have the 3 streams with page inputs, now let's create a pageToLoad$ 
 
 ```typescript
 private pageToLoad$ = 
-	// merge all the page streams and create a new stream of those
-	Observable.merge(this.pageByManual$, this.pageByScroll$, this.pageByResize$)
-	// create a new stream where the double values are filtered out
-	.distinct() 
-	// check if the page is already in the cache (just an array property in our component)
-	.filter(page => this.cache[page-1] === undefined); 
+  // merge all the page streams and create a new stream of those
+  merge(this.pageByManual$, this.pageByScroll$, this.pageByResize$)
+	.pipe(
+		// create a new stream where the double values are filtered out
+		distinct(),
+		// check if the page is already in the cache 
+		// (just an array property in our component)
+		filter(page => this.cache[page-1] === undefined)
+	);
 ```
 
 ### itemResults$
@@ -193,25 +202,31 @@ The hard part is over. We now have a stream with the page we have to load in the
 We will use [flatmap](http://reactivex.io/documentation/operators/flatmap.html) for this because the fetch-data-call will return a stream as well. FlatMap (or MergeMap) will merge these 2 streams as one.
 
 ```typescript
-itemResults$ = this.pageToLoad$ 
-	// based on that stream, load our asynchronosly data
-	// flatmap is an alias for mergemap
-	.flatMap((page: number) => {
-		// load me some starwars characters
-		return this.http.get(`https://swapi.co/api/people?page=${page}`)
-			// create a stream that contains the results
-			.map(resp => resp.json().results)
-			.do(resp => {
-				// add the page to the cache
-				this.cache[page -1] = resp;
-				// if the page contains enough white space, load some more data :)
-				if((this.itemHeight * this.numberOfItems * page) < window.innerHeight){
-					this.pageByManual$.next(page + 1);
-				}
-			})
-		})
-	// eventually, just return a stream that contains the cache
-	.map(_ => flatMap(this.cache)); 
+itemResults$ = this.pageToLoad$
+  .pipe(
+    // based on that stream, load our asynchronosly data
+    // flatmap is an alias for mergemap
+    flatMap((page: number) => {
+      // load me some starwars characters
+      return this.httpClient.get(`https://swapi.co/api/people?page=${page}`)
+        .pipe(
+          // create a stream that contains the results
+          map(resp => resp.results),
+          tap(resp => {
+            // add the page to the cache
+            this.cache[page -1] = resp;
+            // if the page contains enough white space
+            // load some more data :)
+            if((this.itemHeight * this.numberOfItems * page) 
+			  < window.innerHeight) {
+              this.pageByManual$.next(page + 1);
+            }
+          })
+        )
+      }),
+      // eventually, just return a stream that contains the cache
+      map(_ => flatMap(this.cache))
+  ); 
 ```
 
 ### The result
@@ -220,15 +235,23 @@ the complete result might look like this:  **Note the [async pipe](https://angul
 
 
 ```typescript
+import {Component} from '@angular/core';
+import {Observable, BehaviorSubject} from 'rxjs';
+import { fromEvent } from 'rxjs/observable/fromEvent';
+import { merge } from 'rxjs/observable/merge';
+import {distinct, filter, map, debounceTime, tap, flatMap} from 'rxjs/operators';
+import {HttpClient} from '@angular/common/http';
+import * as _ from 'lodash';
 @Component({
   selector: 'infinite-scroll-list',
   template: `
   <table>
-   <tbody>
-    <tr *ngFor="let item of itemResults$|async" [style.height]="itemHeight + 'px'">
-      <td>{{item?.name}}</td>
-    </tr>
-   </tbody>
+    <tbody>
+      <tr *ngFor="let item of itemResults$|async" 
+	  	[style.height]="itemHeight + 'px'">
+        <td>{{item.name}}</td>
+      </tr>
+    </tbody>
    </table>
   `
 })
@@ -237,50 +260,67 @@ export class InfiniteScrollListComponent {
   private pageByManual$ = new BehaviorSubject(1);
   private itemHeight = 40;
   private numberOfItems = 10; 
-  private pageByScroll$ = Observable.fromEvent(window, "scroll")
-      .map(() => window.scrollY)
-      .filter(current => current >=  document.body.clientHeight - window.innerHeight)
-      .debounceTime(200) 
-      .distinct() 
-      .map(y => Math.ceil((y + window.innerHeight)/ (this.itemHeight * this.numberOfItems)));
+  private pageByScroll$ = fromEvent(window, "scroll")
+    .pipe(
+        map(() => window.scrollY),
+        filter(current => 
+			current >=  document.body.clientHeight - window.innerHeight),
+        debounceTime(200),
+        distinct(),
+        map(y => Math.ceil(
+			(y + window.innerHeight)/ (this.itemHeight * this.numberOfItems)
+			)
+		)
+    );
        
-  private pageByResize$ = 
-	Observable.fromEvent(window, "resize")
-	.debounceTime(200) 
-	.map(_ => Math.ceil(
-	   	(window.innerHeight + document.body.scrollTop) / 
-	   	(this.itemHeight * this.numberOfItems)
-   	));
+  private pageByResize$ = fromEvent(window, "resize")
+    .pipe(
+      debounceTime(200),
+	    map(_ => Math.ceil(
+        (window.innerHeight + document.body.scrollTop) / 
+        (this.itemHeight * this.numberOfItems)
+      ))
+    )
+    
+  private pageToLoad$ = merge(
+	  this.pageByManual$, 
+	  this.pageByScroll$, 
+	  this.pageByResize$)
+    .pipe(
+      distinct(),
+      filter(page => this.cache[page-1] === undefined)
+    );
 
+  loading = false;
     
-  private pageToLoad$ = Observable
-    .merge(this.pageByManual$, this.pageByScroll$, this.pageByResize$)
-    .distinct() 
-    .filter(page => this.cache[page-1] === undefined); 
-    
-  itemResults$ = this.pageToLoad$ 
-    .do(_ => this.loading = true)
-    .flatMap((page: number) => {
-      return this.http.get(`https://swapi.co/api/people?page=${page}`)
-          .map(resp => resp.json().results)
-      		.do(resp => {
-				this.cache[page -1] = resp;
-				if((this.itemHeight * this.numberOfItems * page) < window.innerHeight){
-					this.pageByManual$.next(page + 1);
-				}
-          })
-    })
-    .map(_ => flatMap(this.cache)); 
+  itemResults$ = this.pageToLoad$
+    .pipe(
+      tap(_ => this.loading = true),
+      flatMap((page: number) => {
+        return this.httpClient.get(`https://swapi.co/api/people?page=${page}`)
+          .pipe(
+            map((resp: any) => resp.results),
+            tap(resp => {
+              this.cache[page -1] = resp;
+              if((this.itemHeight * this.numberOfItems * page) 
+			  	< window.innerHeight) {
+                this.pageByManual$.next(page + 1);
+              }
+            })
+          )
+      }),
+      map(() => _.flatMap(this.cache))
+    ); 
   
-  constructor(private http: Http){ 
+  constructor(private httpClient: HttpClient){ 
   } 
 }
 ```
 
-Here is a [working plunk](http://plnkr.co/edit/WewXnQRj9xBA7yPveWLQ?p=preview)
+Here is a [working stackblitz](https://stackblitz.com/edit/angular-qszxoh?file=app%2Finfinite-scroll-list.component.ts)
 
 <iframe
-  src="https://embed.plnkr.co/plunk/WewXnQRj9xBA7yPveWLQ?show=app,preview&deferRun"
+  src="https://stackblitz.com/edit/angular-qszxoh?embed=1&file=app/infinite-scroll-list.component.ts"
   frameborder="0"
   width="100%"
   height="480px">
