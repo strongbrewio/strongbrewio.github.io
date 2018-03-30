@@ -224,7 +224,7 @@ import { hot, cold, expectObservable }
 <pre><code class="language-typescript">public createFilterCharacters(
         filter$: Observable&lt;string&gt;,
         characters$: Observable&lt;StarWarsCharacter[]&gt;) {
-  return characters$.combineLatest(filter$,
+  return combineLatest(characters$, filter$,
      (characters: StarWarsCharacter[], filter: string) =&gt; {
       if (filter === 'All') {
         return characters;

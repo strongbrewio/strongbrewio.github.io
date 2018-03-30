@@ -494,17 +494,19 @@ export class HasRoleDirective implements OnInit, OnDestroy {
 
 <p>One thing I see all the time is something like this:</p>
 
-<pre><code class="language-typescript">Rx.Observable.interval(1000).map(x =&gt; x*2).filter(x =&gt; x%2 === 0)
-	.mergeMap(x =&gt; someBackendCall(x)).map(res =&gt; res.json()).subscribe();
+<pre><code class="language-typescript">Rx.Observable.pipe(interval(1000),map(x =&gt; x*2),filter(x =&gt; x%2 === 0),
+	mergeMap(x =&gt; someBackendCall(x)),map(res =&gt; res.json()).subscribe();
 </code></pre>
 
 <p>Here we can see a simple stream. Looking at what is does is a little more difficult however because of the outlining of the operators. If you format the code like this, it makes it so much easier:</p>
 
 <pre><code class="language-typescript">Rx.Observable.interval(1000)
-	.map(x =&gt; x*2)
-	.filter(x =&gt; x%2 === 0)
-	.mergeMap(x =&gt; someBackendCall(x))
-	.map(res =&gt; res.json())
+   .pipe(
+	   map(x =&gt; x*2),
+	   filter(x =&gt; x%2 === 0),
+	   mergeMap(x =&gt; someBackendCall(x)),
+	   map(res =&gt; res.json())
+	)
 	.subscribe();
 </code></pre>
 
@@ -520,21 +522,23 @@ private data$: Observable&lt;Array&lt;Data&gt;&gt;;
 // A function that uses this data$ 
 doSomething() {
     this.data$
-    	.take(1)
-        .map((data) =&gt; {
-            if (data &amp;&amp; data.length &gt; 0) {
-                	return data.forEach(datum =&gt; {
-                    datum.active = false;
-                	});
-            } else {
+    	.pipe(
+    	   take(1),
+           map((data) =&gt; {
+               if (data &amp;&amp; data.length &gt; 0) {
+                   	return data.forEach(datum =&gt; {
+                       datum.active = false;
+                    });
+               } else {
             		return [];
-            }
-        })
-        .mergeMap((data) =&gt; {
-            data.forEach(datum =&gt; {
-                this.whateverService.update(data);
-            });
-        })
+               }
+           }),
+           mergeMap((data) =&gt; {
+               data.forEach(datum =&gt; {
+                   this.whateverService.update(data);
+               });
+           })
+        )
         .subscribe();
 }
 </code></pre>
@@ -564,10 +568,11 @@ doSomething() {
     }; 
 
     this.data$
-    	.take(1)
-        .map(mapAllTheElementsActiveFlagToFalse)
-        .mergeMap(callTheWhateverServiceForEveryElement)
-        .subscribe();
+    	.pipe(
+    	  take(1),
+          map(mapAllTheElementsActiveFlagToFalse),
+          mergeMap(callTheWhateverServiceForEveryElement)
+       ).subscribe();
 }
 </code></pre>
 
@@ -585,11 +590,15 @@ result$: Observable&lt;any&gt;;
 
 doSomething() {
 	 // we combine the data$ and data2$ with combineLatest
-    this.result$ = Observable.combineLatest(
+    this.result$ = combineLatest(
         this.data$
-            .map(data =&gt; data.length),
+            .pipe(
+               map(data =&gt; data.length),
+            ),
         this.data2$
-            .mergeMap(val =&gt; this.whateverService.call(val)),
+            .pipe(
+               mergeMap(val =&gt; this.whateverService.call(val)),
+            ),
         (val1, val2) =&gt; {
             // handle the values here   
         }
@@ -606,12 +615,16 @@ result$: Observable&lt;any&gt;;
 
 doSomething() {
     const dataLength$ = this.data$
-        .map(data =&gt; data.length); 
+        .pipe(
+           map(data =&gt; data.length),
+        ); 
     const whateverData$ = this.data2$
-        .mergeMap(val =&gt; this.whateverService.call(val));
+        .pipe(
+           map(val =&gt; this.whateverService.call(val))
+        );
 
 	 // we combine the data$ and data2$ with combineLatest
-    this.result$ = Observable.combineLatest(
+    this.result$ = combineLatest(
         dataLength$,
         whateverData$,
         (val1, val2) =&gt; {
@@ -909,7 +922,7 @@ import { hot, cold, expectObservable }
 <pre><code class="language-typescript">public createFilterCharacters(
         filter$: Observable&lt;string&gt;,
         characters$: Observable&lt;StarWarsCharacter[]&gt;) {
-  return characters$.combineLatest(filter$,
+  return combineLatest(characters$, filter$,
      (characters: StarWarsCharacter[], filter: string) =&gt; {
       if (filter === 'All') {
         return characters;
@@ -1060,7 +1073,7 @@ One element in spring cloud is hystrix. When you’re doing a network call which
 <p>In the example below, we have a service which fetches a number of Star Wars characters from the backend, at least it tries. It seems I kind of screwed up the implementation a little :).</p>
 
 <pre><code class="language-typescript">public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
-    return Observable.throw('Failing on purpose');
+    return throw('Failing on purpose');
 }
 </code></pre>
 <p>Instead of actually doing a backend call, I’m just returning an observable which will throw as soon as it’s subscribed to. This is of course not to handy but for demonstration purposes, it’s quite ideal.
@@ -1068,7 +1081,7 @@ Using the decorator I created myself, we can make this code a little more resill
 
 <pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
 public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
-    return Observable.throw('Failing on purpose');
+    return throw('Failing on purpose');
 }
 </code></pre>
 
@@ -1086,7 +1099,9 @@ The code for this backend call looks like this:</p>
 <pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
 public getCharacters(): Observable&lt;StarWarsCharacter[]&gt; {
     return this.http.get('https://swapi.co/api/people/')
-      .map((response: Response) =&gt; response.json().results);
+      .pipe(
+         map((response: Response) =&gt; response.json().results)
+      );
 }
 </code></pre>
 
@@ -1111,19 +1126,21 @@ characters$: Observable&lt;StarWarsCharacter&gt; =
 	this.starWarsService
 		.getCharacters()
 		// we use the retryWhen operator to retry a number of times
-		.retryWhen((errors: Observable&lt;any&gt;) =&gt; {
-		  // we use the scan operator to count the number of tries
-          return errors.scan((errorCount, err) =&gt; {
-            console.log('Try ' + (errorCount + 1));
-            if (errorCount &gt;= 3) {
-              throw err;
-            }
-            return errorCount + 1;
-          }, 0).delay(1000);
-        })
-        // we catch the error if it keeps on failing and return
-        // the fallback
-        .catch(() =&gt; Observable.of(fallback));
+		.pipe(
+		    retryWhen((errors: Observable&lt;any&gt;) =&gt; {
+		       // we use the scan operator to count the number of tries
+               return errors.scan((errorCount, err) =&gt; {
+                 console.log('Try ' + (errorCount + 1));
+                 if (errorCount &gt;= 3) {
+                    throw err;
+                 }
+                 return errorCount + 1;
+               }, 0).delay(1000);
+             }),
+            // we catch the error if it keeps on failing and return
+            // the fallback
+          catchError(() =&gt; of(fallback))
+      );
 </code></pre>
 <p>I’m not going to go into the details of the RxJS implementation, that whould require a totally separate post.
 What this code does however, is create an observable that, once subscribed to, will try to execute the backend call. If it fails, which it will in our case, it will re-execute it 2 more times with a single second delay in between. If it still fails, it will return the fallback we can define.</p>
@@ -1156,16 +1173,18 @@ export function retry(times = 3, fallback: any) {
       // with the retry and fallback mechanism
       // we defined above
       return originalMethod.apply(this)
-        .retryWhen((errors) =&gt; {
-          return errors.scan((errorCount, err) =&gt; {
-            console.log('Try ' + (errorCount + 1));
-            if (errorCount &gt;= times - 1) {
-              throw err;
-            }
-            return errorCount + 1;
-          }, 0).delay(1000);
-        })
-        .catch(() =&gt; Observable.of(fallback));
+        .pipe(
+           retryWhen((errors) =&gt; {
+             return errors.scan((errorCount, err) =&gt; {
+               console.log('Try ' + (errorCount + 1));
+               if (errorCount &gt;= times - 1) {
+                 throw err;
+               }
+               return errorCount + 1;
+             }, 0).delay(1000);
+           }),
+           catchError(() =&gt; of(fallback));
+        )
     };
     // return edited descriptor as opposed to
     // overwriting the descriptor
@@ -1179,7 +1198,7 @@ export function retry(times = 3, fallback: any) {
 
 <pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
 public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
-    return Observable.throw('Failing on purpose');
+    return throw('Failing on purpose');
 }
 </code></pre>
 
@@ -1241,10 +1260,12 @@ filterChanged(value: string)
     this.filteredCharacters = this.characters;
   } else {
     this.filteredCharacters =
-       this.characters.filter(
+       this.characters.pipe(
+          filter(
             (character: StarWarsCharacter) =&gt; {
                character.gender.toLowerCase() === value.toLowerCase()
             }
+          ),
        );
   }
 }
@@ -1335,7 +1356,8 @@ The resulting stream looks like this:</p>
     // here changes value, the project function is re-executed and
     // the result stream will get a new value. In our case this is
     // a new array with all the filtered characters.
-    return characters$.combineLatest(
+    return combineLatest(
+      characters$,
       filter$, (characters: StarWarsCharacter[], filter: string) =&gt; {
         // this is the project function where we imperatively
         // implement the filtering logic
