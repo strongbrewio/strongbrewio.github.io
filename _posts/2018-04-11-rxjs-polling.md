@@ -16,13 +16,16 @@ cover: 'assets/images/cover/cover10.jpg'
 ---
 
 
-### RxJS polling
-
 Polling is a common scenario in a lot of Single Page Applications. You want your user to see the latest data without them taking any actions. In some scenarios, you might even want to display this data realtime. In most cases however, this is overkill and requires changes at the backend of your application. Polling is a really good 'near immediate' alternative.
 
 Polling is something where RxJS really shines. We will look at different polling strategies and how we can implement them.
 
 **Note:** The examples in this post will use Angular but the concepts can be ported everywhere.
+
+- [Simple polling](#simple-polling)
+- [Combining polling with refresh button](#polling-and-refresh-button)
+- [Polling and reset](#polling-and-reset)
+- [Polling when data is resolved]
 
 ### Simple polling
 
@@ -102,7 +105,65 @@ We have our `trigger$` where we map the values to the `bitcoin$`. The `concatMap
 
 The live example can be found here:
 
-<iframe src="https://stackblitz.com/edit/angular-abcqen?embed=1&file=app/app.component.ts"></iframe>
+<iframe style="width: 100%; height: 500px" src="httsps://stackblitz.com/edit/angular-abcqen?embed=1&file=app/app.component.ts"></iframe>
+ 
+### Polling and refresh button
+
+Sometimes, users can be pretty impatient and want to have the control to fetch the data. We can accomplish this by adding a button that, when clicked, will fetch the data as well. But we want to keep our polling as well.
+
+Lets first try to think reactive on how we can accomplish this. We already have a stream that polls the data. We can create a stream that fetches the data whenever the button is clicked. When we have both of these streams, we can actually just combine them using the `merge` operator to get one stream that is both triggered by the polling and the button click.
+
+We can simply add a button to our example and a click listener. When the button is clicked, we need to convert this click into a stream, since we will need a stream to 'start with'. For this we can leverage a `Subject`.
+
+```typescript
+manualRefresh = new Subject();
+
+refreshDataClick() {
+    this.manualRefresh.next('');
+}
+```
+
+Now that we have a stream that is fired every time the button is clicked, we can simply use the same way of working that we had before. Just know, our 'source' stream is not a `timer` but a `subject`.
+
+```typescript
+this.manualRefresh
+	.pipe(
+       concatMap(_ => bitcoin	$),
+   );
+```
+
+Next thing we need to do is combine both of our streams that can trigger a backend call.
+
+```typescript
+this.polledBitcoin$ = timer(0, 10000)
+	.pipe(
+        concatMap(_ => bitcoin$),
+        merge(
+          this.manualRefresh.pipe(
+            concatMap(_ => bitcoin$),
+          )
+        ),
+        map((response: {EUR: {}}) => response.EUR),
+        map((EUR: {last: number}) => EUR.last),
+   );
+```
+
+That's it. Now whenever the button is clicked or the timer triggers, a backend call will be done. 
+
+The live code example can be found here:
+
+<iframe src="https://stackblitz.com/edit/angular-zytccc?embed=1&file=app/app.component.ts" style="height: 500px; width:100%"></iframe>
+
+**Note:** You can open the devtools on the network tab to see the network requests.
+
+### Polling and reset
+
+The previous polling strategy can introduce some unnecessary backend calls. Lets think abo
+
+
+
+
+
 
 
 
