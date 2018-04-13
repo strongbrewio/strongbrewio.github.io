@@ -25,7 +25,7 @@ Polling is something where RxJS really shines. We will look at different polling
 - [Simple polling](#simple-polling)
 - [Combining polling with refresh button](#polling-and-refresh-button)
 - [Polling and reset](#polling-and-reset)
-- [Polling when data is resolved]
+- [Polling when data is resolved](#poll-when-data-is-resolved)
 
 ### Simple polling
 
@@ -132,20 +132,15 @@ this.manualRefresh
    );
 ```
 
-Next thing we need to do is combine both of our streams that can trigger a backend call.
+Next thing we need to do is combine both of our streams that can trigger a backend call (and remove the double `concatMap` operator).
 
 ```typescript
-this.polledBitcoin$ = timer(0, 10000)
-	.pipe(
+this.polledBitcoin$ = timer(0, 10000).pipe(
+        merge(this.manualRefresh),
         concatMap(_ => bitcoin$),
-        merge(
-          this.manualRefresh.pipe(
-            concatMap(_ => bitcoin$),
-          )
-        ),
         map((response: {EUR: {}}) => response.EUR),
         map((EUR: {last: number}) => EUR.last),
-   );
+      );
 ```
 
 That's it. Now whenever the button is clicked or the timer triggers, a backend call will be done. 
@@ -158,9 +153,46 @@ The live code example can be found here:
 
 ### Polling and reset
 
-The previous polling strategy can introduce some unnecessary backend calls. Lets think abo
+The previous polling strategy can introduce some unnecessary backend calls. Lets think about the following scenario. Our timer stream triggers every 10s. After the app has started and has been running for 19s, the user clicks the button, triggering a backend call. And after 20s our timer stream fires as well, also triggering a backend call. This means that at both the 19th and the 20th second, we are fetching the data. This might be a little overkill.
 
+Lets think about how we can fix this. We already have a stream that will fetch the data immediately and then again and again with 10s in between. And actually, that's all we need. When we have this stream, and the user clicks the button, we can just restart this stream. Becuase, when we restart this stream, we are fetching the data immediately (which is what we want when the user clicks), and again after 10 seconds. The ASCII marble diagram looks like this:
 
+```
+bitcoin:            -(b|)
+user clicks:                            C 
+trigger$:           0------1------2-----|0------1------2-----|
+                    \      \      \      \      \      \      
+                     -(b|)  -(b|)  -(b|)  -(b|)  -(b|)  -(b|)
+ 
+ 
+polledBitcoin$     ----b------b------b------b------b------b-- 
+```
+
+In the marble diagram above, 'C' denotes the user click. In that case, we want to unsubscribe from the previous execution of our `trigger$` and execute it again. Lets see how we can do this in the code:
+
+```
+manualRefresh$ = new BehaviorSubject('');
+
+this.polledBitcoin$ = this.manualRefresh$.pipe(
+      switchMap(_ => timer(0, 10000).pipe(
+         concatMap(_ => bitcoin$),
+         map((response: {EUR: {}}) => response.EUR),
+         map((EUR: {last: number}) => EUR.last),
+      )
+   )
+);
+```
+First thing we need to change is move from a `Subject` to a `BehaviorSubject`. A `BehaviorSubject` has an inital value and will replay the last value when subscribed to. Here, we are interested in the fact that it has an initial value.
+
+Next thing we do is use this subject to create our `polledBitcoin$`. We wrapped the stream from our previous examples in a `switchMap`. Whenever the `manualRefresh$` emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that's exactly what we need.
+
+Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! Nice right!
+
+### Polling when data is resolved
+
+The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus 'x' seconds. Lets say we are polling every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.
+
+To
 
 
 
