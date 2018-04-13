@@ -1,5 +1,5 @@
 ---
-title: RxJS polling
+title: RxJS polling strategies
 published: true
 author: kwintenp
 description: An overview of different polling strategies with RxJS
@@ -15,8 +15,7 @@ disqus: true
 cover: 'assets/images/cover/cover10.jpg'
 ---
 
-
-Polling is a common scenario in a lot of Single Page Applications. You want your user to see the latest data without them taking any actions. In some scenarios, you might even want to display this data realtime. In most cases however, this is overkill and requires changes at the backend of your application. Polling is a really good 'near immediate' alternative.
+Polling is a common scenario in a lot of Single Page Applications. You want your user to see the latest data without them taking any actions. In some scenarios, you might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of your application. Polling is a really good 'near immediate' alternative.
 
 Polling is something where RxJS really shines. We will look at different polling strategies and how we can implement them.
 
@@ -185,15 +184,15 @@ this.polledBitcoin$ = this.manualRefresh$.pipe(
    )
 );
 ```
-First thing we need to change is move from a `Subject` to a `BehaviorSubject`. A `BehaviorSubject` has an inital value and will replay the last value when subscribed to. Here, we are interested in the fact that it has an initial value.
+First thing we need to change is move from a `Subject` to a `BehaviorSubject`. A `BehaviorSubject` has an initial value and will replay the last value when subscribed to. Here, we are interested in the fact that it has an initial value.
 
-Next thing we do is use this subject to create our `polledBitcoin$`. We wrapped the stream from our previous examples in a `switchMap`. Whenever the `manualRefresh$` emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that's exactly what we need. Thanks to the initial value in the `BehaviorSubject`, we know that the stream will be started whenever the stream is initialy subscribed to.
+Next thing we do is use this subject to create our `polledBitcoin$`. We wrapped the stream from our previous examples in a `switchMap`. Whenever the `manualRefresh$` emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that's exactly what we need. Thanks to the initial value in the `BehaviorSubject`, we know that the stream will be started whenever the stream is initially subscribed to.
 
 Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! You can use this technique in different scenarios as well. For example, when the user swipes down on a mobile device. Nice right!
 
 ### Polling when data is resolved
 
-The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus 'x' seconds. This can be helpfull in some cases. 
+The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus 'x' seconds. This can be helpful in some cases.
 
 With the previous example in mind, lets say we poll every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.
 
@@ -240,7 +239,7 @@ fetchData$:       f-------------f-------------f....
 polledBitcoin$:   ------b-------------b-------....
 ```
 
-You can see that, whenever the first backend call was started, we wait 5000ms (here an amount of '-') before nexting the `fetchData$` to start the thing again.
+You can see that, whenever the first backend call was started, we wait 5000ms (here an amount of '-') before next'ing the `fetchData$` to start the thing again.
 
 A live example of the code can be found here:
 
@@ -250,7 +249,7 @@ A live example of the code can be found here:
 
 ### Conclusion
 
-RxJS and polling is a match made in heaven. There a number of different ways to implement polling which all have there tradeoffs. Understanding the differences between the ones described above will get you a long way.
+RxJS and polling is a match made in heaven. There a number of different ways to implement polling which all have there trade offs. Understanding the differences between the ones described above will get you a long way.
 
 
 
