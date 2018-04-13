@@ -231,7 +231,7 @@ Drawn out into an ASCII marble diagram, it looks like this.
 bitcoin$:         -----(b|)
 load$:       f-------------f-------------f....
                                 \
-                  \              -----b-------N....    N === the moment the load$ was nexted;
+                  \              -----b-------N....
                    -----b-------N
                    
                    
