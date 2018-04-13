@@ -28,7 +28,7 @@ Polling is something where RxJS really shines. We will look at different polling
 
 ### Simple polling
 
-First we will take a look at a simple example where we want to fetch new data every 5 seconds. Lets first try and think about what we need. 
+First we will take a look at a simple example where we want to fetch new data every 5 seconds. Let's first try and think about what we need. 
 
 - a backend call
 - a trigger that tells us when we need to execute our backend call
@@ -112,7 +112,7 @@ The live example can be found here:
 
 Sometimes, users can be pretty impatient and want to have the control to fetch the data. We can accomplish this by adding a button that, when clicked, will fetch the data as well. But we want also want to keep our polling.
 
-Lets first try to think reactive on how we can accomplish this. We already have a stream that polls the data. We can create a stream that fetches the data whenever the button is clicked. When we have both of these streams, we can actually just combine them using the `merge` operator to get one stream that is both triggered by the polling and the button click.
+Let's first try to think reactive on how we can accomplish this. We already have a stream that polls the data. We can create a stream that fetches the data whenever the button is clicked. When we have both of these streams, we can actually just combine them using the `merge` operator to get one stream that is both triggered by the polling and the button click.
 
 We can simply add a button to our example and a click listener. When the button is clicked, we need to convert this click into a stream, since we will need a stream to 'start with'. For this we can leverage a `Subject`.
 
@@ -153,9 +153,9 @@ The live code example can be found here:
 
 ### Polling and reset
 
-The previous polling strategy can introduce some unnecessary backend calls. Lets think about the following scenario. Our timer stream triggers every 10s. After the app has started and has been running for 19s, the user clicks the button, triggering a backend call. And after 20s our timer stream fires as well, also triggering a backend call. This means that at both the 19th and the 20th second, we are fetching the data. This might be a little overkill.
+The previous polling strategy can introduce some unnecessary backend calls. Let's think about the following scenario. Our timer stream triggers every 10s. After the app has started and has been running for 19s, the user clicks the button, triggering a backend call. And after 20s our timer stream fires as well, also triggering a backend call. This means that at both the 19th and the 20th second, we are fetching the data. This might be a little overkill.
 
-Lets think about how we can fix this. We already have a stream that will fetch the data immediately and then again and again with 10s in between. And actually, that's all we need. When we have this stream, and the user clicks the button, we can just restart this stream. Since, when we restart this stream, we are fetching the data immediately (which is what we want when the user clicks), and again after 10 seconds. The ASCII marble diagram looks like this:
+Let's think about how we can fix this. We already have a stream that will fetch the data immediately and then again and again with 10s in between. And actually, that's all we need. When we have this stream, and the user clicks the button, we can just restart this stream. Since, when we restart this stream, we are fetching the data immediately (which is what we want when the user clicks), and again after 10 seconds. The ASCII marble diagram looks like this:
 
 ```
 bitcoin:            -(b|)
@@ -170,7 +170,7 @@ polledBitcoin$     ----b------b------b------b------b------b--
 
 **Note:** In ASCII marble diagrams, the '!' means that the stream is unsubscribed from.
 
-In the marble diagram above, 'C' denotes the user click. In that case, we want to unsubscribe from the previous execution of our `trigger$` and execute it again. Lets see how we can do this in the code:
+In the marble diagram above, 'C' denotes the user click. In that case, we want to unsubscribe from the previous execution of our `trigger$` and execute it again. Let's see how we can do this in the code:
 
 ```
 manualRefresh$ = new BehaviorSubject('');
@@ -194,11 +194,11 @@ Now, whenever the user clicks on the reload button, the data will be fetched and
 
 The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus 'x' seconds. This can be helpful in some cases.
 
-With the previous example in mind, lets say we poll every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.
+With the previous example in mind, Let's say we poll every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.
 
-Again, lets start by thinking about what we want in a reactive way. First of all, we need to know when our backend call has ended. When it has ended, we need to wait 'x' seconds before starting the next one. Lets break it down.
+Again, Let's start by thinking about what we want in a reactive way. First of all, we need to know when our backend call has ended. When it has ended, we need to wait 'x' seconds before starting the next one. Let's break it down.
 
-Knowing when our backend call has ended is pretty easy. Whenever a value passes the `bitcoin$`, we know the backend call is done. After that has happened, we need to create a stream that, waits 'x' seconds and then triggers a new call. Lets try and create a stream that, when subscribed to, waits 5 seconds, has the option to trigger a new call and then completes.
+Knowing when our backend call has ended is pretty easy. Whenever a value passes the `bitcoin$`, we know the backend call is done. After that has happened, we need to create a stream that, waits 'x' seconds and then triggers a new call. Let's try and create a stream that, when subscribed to, waits 5 seconds, has the option to trigger a new call and then completes.
 
 ```typescript
 fetchData$ = new BehaviorSubject('');
@@ -212,7 +212,7 @@ const whenToRefresh$ = of('').pipe(
 
 We created a stream using the static `of`. This will fire an event immediately when subscribed to. We then delay this event with 5000ms by using the `delay` operator. We then use a `tap` where we can actually trigger the next request, and finally `skip` since we do not want to use the `''` event anywhere, it was just a trigger.
 
-Next thing we need to do is integrate this into our other code. Lets see how we can accomplish this:
+Next thing we need to do is integrate this into our other code. Let's see how we can accomplish this:
 
 ```typescript
 this.polledBitcoin$ = this.fetchData$.pipe(
