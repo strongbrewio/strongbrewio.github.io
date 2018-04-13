@@ -85,7 +85,7 @@ this.polledBitcoin$ = timer(0, 1000).pipe(
         map((EUR: {last: number}) => EUR.last),
       );
 ```
-We create a new stream, `this.polledBitcoin$` by mapping every event that the `trigger$` emits to our `bitcoin$`. The `concatMap` operator will subscribe to the the `bitcoin$` internally and emit the result of that stream as events on the `polledBitcoin$`.
+We create a new stream, `this.polledBitcoin$` by mapping every event that the `trigger$` emits to our `bitcoin$`. The `concatMap` operator will subscribe to the `bitcoin$` internally and emit the result of that stream as events on the `polledBitcoin$`.
 
 When we draw this out into a ASCII marble diagram, it looks like this:
 
@@ -107,11 +107,11 @@ The live example can be found here:
 
 <iframe style="width: 100%; height: 500px" src="https://stackblitz.com/edit/angular-abcqen?embed=1&file=app/app.component.ts"></iframe>
 
-**Note:** You can open the devtools on the network tab to see the network requests. There are other Stackblitz demos in this post so you might want to open it in Stackblitz to be sure of the results.
+**Note:** You can open the devtools on the network tab to see the network requests. There are other Stackblitz demos in this post so you might want to open it in Stackblitz to be sure that the network tab only shows requests from a single demo.
  
 ### Polling and refresh button
 
-Sometimes, users can be pretty impatient and want to have the control to fetch the data. We can accomplish this by adding a button that, when clicked, will fetch the data as well. But we want to keep our polling as well.
+Sometimes, users can be pretty impatient and want to have the control to fetch the data. We can accomplish this by adding a button that, when clicked, will fetch the data as well. But we want also want to keep our polling.
 
 Lets first try to think reactive on how we can accomplish this. We already have a stream that polls the data. We can create a stream that fetches the data whenever the button is clicked. When we have both of these streams, we can actually just combine them using the `merge` operator to get one stream that is both triggered by the polling and the button click.
 
@@ -130,7 +130,7 @@ Now that we have a stream that is fired every time the button is clicked, we can
 ```typescript
 this.manualRefresh
 	.pipe(
-       concatMap(_ => bitcoin	$),
+       concatMap(_ => bitcoin$),
    );
 ```
 
@@ -187,15 +187,15 @@ this.polledBitcoin$ = this.manualRefresh$.pipe(
 ```
 First thing we need to change is move from a `Subject` to a `BehaviorSubject`. A `BehaviorSubject` has an inital value and will replay the last value when subscribed to. Here, we are interested in the fact that it has an initial value.
 
-Next thing we do is use this subject to create our `polledBitcoin$`. We wrapped the stream from our previous examples in a `switchMap`. Whenever the `manualRefresh$` emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that's exactly what we need. Thanks to the initial value in the `BehaviorSubject`, we know that the stream will be started whenever the application started.
+Next thing we do is use this subject to create our `polledBitcoin$`. We wrapped the stream from our previous examples in a `switchMap`. Whenever the `manualRefresh$` emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that's exactly what we need. Thanks to the initial value in the `BehaviorSubject`, we know that the stream will be started whenever the stream is initialy subscribed to.
 
-Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! You can use this technique to add more requests as well. For example, when the user swipes down on a mobile device. Nice right!
+Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! You can use this technique in different scenarios as well. For example, when the user swipes down on a mobile device. Nice right!
 
 ### Polling when data is resolved
 
-The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus 'x' seconds. 
+The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus 'x' seconds. This can be helpfull in some cases. 
 
-This can be helpfull. With the previous example in mind, lets say we poll every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.
+With the previous example in mind, lets say we poll every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.
 
 Again, lets start by thinking about what we want in a reactive way. First of all, we need to know when our backend call has ended. When it has ended, we need to wait 'x' seconds before starting the next one. Lets break it down.
 
@@ -240,7 +240,7 @@ fetchData$:       f-------------f-------------f....
 polledBitcoin$:   ------b-------------b-------....
 ```
 
-You can see that, whenever the first backend call was started, we wait 5000ms (here a random number of '-') and we then next the fetchData$ (denoted by the 'N') and the whole thing is restarted.
+You can see that, whenever the first backend call was started, we wait 5000ms (here an amount of '-') before nexting the `fetchData$` to start the thing again.
 
 A live example of the code can be found here:
 
