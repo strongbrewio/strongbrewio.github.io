@@ -15,7 +15,7 @@ disqus: true
 cover: 'assets/images/cover/cover10.jpg'
 ---
 
-Polling is a common scenario in a lot of Single Page Applications. You want your user to see the latest data without them taking any actions. In some scenarios, you might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of your application. Polling is a really good 'near immediate' alternative.
+Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good 'near immediate' alternative.
 
 Polling is something where RxJS really shines. We will look at different polling strategies and how we can implement them.
 
@@ -73,7 +73,7 @@ const trigger$ = timer(0, 1000);
 
 #### Combine to polling stream
 
-Now we have the two streams that we need, it is time to combine them. If you think about it, we basically want to re-execute our `bitcoin$` to refetch the data, every time our `trigger$` fires. We want to map our trigger value to another observable/async action. To do that, we need to use a flattening operator. As flattening operators are not part of this post, you can read more about them <a href="https://blog.angularindepth.com/switchmap-bugs-b6de69155524" target="_blank">here</a>. 
+Now we have the two streams that we need, it is time to combine them. If we think about it, we basically want to re-execute our `bitcoin$` to refetch the data, every time our `trigger$` fires. We want to map our trigger value to another observable/async action. To do that, we need to use a flattening operator. As flattening operators are not part of this post, you can read more about them <a href="https://blog.angularindepth.com/switchmap-bugs-b6de69155524" target="_blank">here</a>.
 
 In our case, we are going to use the `concatMap` operator. This operator will execute all the `bitcoin$` without cancelling them. Let's take a look at the code:
 
@@ -188,7 +188,7 @@ First thing we need to change is move from a `Subject` to a `BehaviorSubject`. A
 
 Next thing we do is use this subject to create our `polledBitcoin$`. We wrapped the stream from our previous examples in a `switchMap`. Whenever the `manualRefresh$` emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that's exactly what we need. Thanks to the initial value in the `BehaviorSubject`, we know that the stream will be started whenever the stream is initially subscribed to.
 
-Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! You can use this technique in different scenarios as well. For example, when the user swipes down on a mobile device. Nice right!
+Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! We can use this technique in different scenarios as well. For example, when the user swipes down on a mobile device. Nice right!
 
 ### Polling when data is resolved
 
@@ -239,7 +239,7 @@ fetchData$:       f-------------f-------------f....
 polledBitcoin$:   ------b-------------b-------....
 ```
 
-You can see that, whenever the first backend call was started, we wait 5000ms (here an amount of '-') before next'ing the `fetchData$` to start the thing again.
+We can see that, whenever the first backend call was started, we wait 5000ms (here an amount of '-') before next'ing the `fetchData$` to start the thing again.
 
 A live example of the code can be found here:
 
