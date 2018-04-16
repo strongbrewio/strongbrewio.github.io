@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>My favorite metaphor for hot vs cold observables</title>
-    <meta name="description" content="" />
+    <title>Do we really need Redux or @ngrx/store</title>
+    <meta name="description" content="This article explains the cases when Redux is a good idea or when it is overkill for your application" />
 
     <!-- Mobile Meta -->
     <meta name="HandheldFriendly" content="True" />
@@ -25,32 +25,32 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="//my-favorite-metaphor-for-hot-vs-cold-observables/" />
+        <link rel="canonical" href="//do-we-really-need-redux/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="My favorite metaphor for hot vs cold observables" />
-    <meta property="og:description" content="" />
-    <meta property="og:url" content="//my-favorite-metaphor-for-hot-vs-cold-observables/" />
-    <meta property="og:image" content="/assets/images/cover/cover4.jpg" />
+    <meta property="og:title" content="Do we really need Redux or @ngrx/store" />
+    <meta property="og:description" content="This article explains the cases when Redux is a good idea or when it is overkill for your application" />
+    <meta property="og:url" content="//do-we-really-need-redux/" />
+    <meta property="og:image" content="/assets/images/cover/cover1.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="My favorite metaphor for hot vs cold observables" />
-    <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="//my-favorite-metaphor-for-hot-vs-cold-observables/" />
-    <meta name="twitter:image:src" content="/assets/images/cover/cover4.jpg" />
+    <meta name="twitter:title" content="Do we really need Redux or @ngrx/store" />
+    <meta name="twitter:description" content="This article explains the cases when Redux is a good idea or when it is overkill for your application" />
+    <meta name="twitter:url" content="//do-we-really-need-redux/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover1.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "My favorite metaphor for hot vs cold observables",
-    "url": "//my-favorite-metaphor-for-hot-vs-cold-observables/",
-    "image": "/assets/images/cover/cover4.jpg",
-    "description": ""
+    "name": "Do we really need Redux or @ngrx/store",
+    "url": "//do-we-really-need-redux/",
+    "image": "/assets/images/cover/cover1.jpg",
+    "description": "This article explains the cases when Redux is a good idea or when it is overkill for your application"
 }
     </script>
 
@@ -122,10 +122,8 @@
 <!-- #post -->
 
 <header id="header" class="main-header post-head "
-        style="background-image: url(/assets/images/cover/cover4.jpg) ">
+        style="background-image: url(/assets/images/cover/cover1.jpg) ">
     <nav class="main-nav  overlay  clearfix">
-        
-        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         
     </nav>
 </header>
@@ -171,25 +169,25 @@
         </div>
         <div class="post-inner">
             <header class="post-header">
-                <h1 class="post-title">My favorite metaphor for hot vs cold observables</h1>
+                <h1 class="post-title">Do we really need Redux or @ngrx/store</h1>
                 <section class="post-meta">
                     <!-- <a href='/'></a> -->
 
                     
                     
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
                     
                     
-                    <a href='/author/kwintenp'>Kwinten Pisman</a>
                     
                     
-                    <time class="post-date" datetime="2017-01-10">10 Jan 2017
+                    <time class="post-date" datetime="2016-12-21">21 Dec 2016
                     </time>
                     <!-- [[tags prefix=" on "]] -->
                     
                     on
                     
                     
-                    <a href='/tag/RxJS'>Rxjs</a>
+                    <a href='/tag/Redux'>Redux</a>
                     
                     
                     
@@ -198,56 +196,102 @@
 
             <section class="post-content">
 
-                <p>A few weeks ago, I was at NG-BE (best conference of the year btw), where I was giving a workshop on RxJS and @ngrx/store in Angular 2 applications. In this course, we also explain hot vs cold observables.
-When I try to explain new concepts to people, I either try to start from a known concept and build my way up to the new thing or use a metaphor. I’ve been looking for a similar approach to explain the hot vs cold observables concept but didn’t found one myself.
-At the conference, I started talking with <a href="https://www.linkedin.com/in/lander-verhack-a404a04b" target="_blank">Lander Verhack</a>. Lander gives trainings at U2U and he told me a great metaphor for this concept. I’ll try to explain it below but all credits go to him for coming up with it.</p>
+                <h2 id="about-this-article">About this article</h2>
 
-<h3 id="watching-a-movie">Watching a movie</h3>
-<p>When you want to watch a movie nowadays, you have a lot of different options. You can either go to the movies, rent out a dvd (do people still do this?) or use some service like Netflix.
-Lets first think about what happens when you watch a movie via Netflix.</p>
+<p>If you are writing Angular, Vue or React applications, chances are big that you have used or encountered the Redux pattern.
+Redux helps us to structure statemanagement in an immutable matter which is great, but in order to use it correctly, we have to write a bunch of boilerplate code.
+In this article I would like to tackle the question on when to use Redux and why.
+The referred plugins/code samples are written in an Angular context. But the principles explained in this articles work for other frameworks as well. This also means that we are using the <a href="https://github.com/ngrx/platform/blob/master/docs/store/README.md">@ngrx/store</a> package instead of the <a href="https://redux.js.org/">Redux</a> package</p>
 
-<h4 id="netflix">Netflix</h4>
-<p>First step in watching a movie on Netflix is looking one up in the catalogue. As soon as you have found one, you can decide to start watching it. A Netflix movie will, unless you’ve already watched a part, start from the beginning. It doesn’t matter how many other people are watching the movie, you will always start at the beginning. If the movie doesn’t live up to your expactations, you can decide to stop watching it.</p>
+<h2 id="to-redux-or-not-to-redux">To Redux or not to Redux?</h2>
 
-<p>It turns out that watching a movie on netflix is the perfect metaphor for a cold observable. Lets take a look at the common properties between these two:</p>
+<p>First of all it’s important to note that Redux solves certain problems for us. If we are not experiencing those problems, then there is a big chance that the Redux pattern
+is overkill for our application.</p>
 
+<p>The first question that we might want to ask ourselves is:
+<strong>Does My application have state?</strong> State can be the value of a pager that we want to remember, or the fact that a sidebar is collapsed or not. State could be a cached set of data coming from our backend, or user information that we need throughout the whole application.
+It could be a simple value that we want to remember in memory when we are navigating between pages.</p>
+
+<p>Let’s sum up some examples where the Redux principle might shine in our applications:</p>
 <ul>
-  <li>If no one is listening, the movie is not streamed. The movie stream is lazy, just like the cold observable.</li>
-  <li>For every listener, a new stream is started. It’s not because 5 people are already watching the movie somewhere else in the world, that your movie will not start from the beginning. The movie stream is unicast, just like a cold observable.</li>
+  <li>Storing state (like the value of a search filter so it’s still available when the user navigates back to a certain grid)</li>
+  <li>Sharing state between components that have their own route, and thus won’t have a parent component to pass them the state through inputs or properties</li>
+  <li>Optimistic updates: Check <a href="https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/">this article</a></li>
+  <li>Real-time updates: Check <a href="https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/">this article</a></li>
+  <li>When we want undo/redo logic</li>
+  <li>When we want to keep track of all the state changes and debug them with awesome tooling (Redux devtools)</li>
+  <li>When we want an organised way of handling session storage or localstorage. Check <a href="https://github.com/btroncone/ngrx-store-localstorage">this plugin</a></li>
 </ul>
 
-<h4 id="going-to-the-movies">Going to the movies</h4>
-<p>Another way of watching a movie is by going to the movies. In contrast with Netflix, it’s not you who decides when the movie will begin. It will begin at a predetermined time. When the movie starts, everyone who is present will see the same movie. If someone arrives too late, he will have missed the first part of the movie, but can follow everything afterwards the same way as the other people. If you decide to stop watching the movie because you don’t like it, the other people can keep on watching it. If everybody decides to walk out because it’s that bad, the movie will keep on playing.</p>
+<p>When we are writing Angular applications it’s a best-practice to work with immutable data structures. That way we can make use of the <a href="https://angular-2-training-book.rangle.io/handout/change-detection/change_detection_strategy_onpush.html">OnPush changedetectionstrategy</a> that angular provides us, which results in better performance and less unexpected behavior. In React we could use a <a href="https://reactjs.org/docs/react-api.html#reactpurecomponent">Pure component</a> for that. So, for this article let’s assume that immutable datastructures are the way to go and that our application needs it.</p>
 
-<p>Going to the movies is actually the perfect metaphor for a hot observable. Lets take a look at the common properties between the two:</p>
+<p>While we know that Redux forces you to use immutable datastructures, let’s still challenge the need of Redux shall we?
+If statemanagement is trivial to our applications and we just want to store values we could work with a state service instead of Redux.</p>
 
-<ul>
-  <li>As soon as the movie starts, everybody who is watching it, sees the same thing. If a person arrives 5 minutes late, the movie will not restart just for him. He will, from his moment of arrival, see the same things. So watching a movie at the movies is the same as a hot observable because it is multicast.</li>
-  <li>If the movie has already started, and you arrive 5 minutes later, you will have missed the first part. So just like a hot observable, the movie is not lazy.</li>
-</ul>
+<pre><code class="language-typescript">@Injectable()
+export class UsersService {
+    private _users$ = new BehaviorSubject([]);
 
-<h3 id="what-about-publishrefcount">What about <code>publish().refCount()</code></h3>
+    get users$(): Observable&lt;User[]&gt; {
+        return this._users$.asObservable();
+    }
 
-<p>Aside from hot and cold observables, you can also create an observable that starts emitting values as soon as there is one subscriber. You can accomplish this with the <code>publish().refCount()</code> operator or its alias <code>share()</code>. I’ve seen people calling this observable ‘warm’, ‘semi-hot’ or ‘semi-cold’.</p>
+    // IMPORTANT: since we use an immutable dataflow
+    // we have to make sure users is a new instance
+    setUsers(users: User[]): void {
+        this._users$.next(...users);
+    }
+}
 
-<h4 id="watching-a-movie-with-friends">Watching a movie with friends</h4>
-<p>You could think of this ‘type’ of observable as watching a movie with some (douchy) friends. Let’s say you decide to watch a movie together at 6PM at your friends place. Due to car trouble, you’ll be runnning 15 minutes late so you text your friend and ask him to wait.
-Because he is so excited about the movie, he decides to start anyway. As expected, you arrive 15 minutes late and you keep on watching the movie, having missed the first part.</p>
+</code></pre>
 
-<p>Let’s see how this maps to the ‘warm’ observable we described above.</p>
+<p>This example shows how we can set the simple value of an array of users by calling the <code>setUsers()</code>function. It will store the value into a BehaviorSubject which we will consume as an observable. The spread operator (<code>...</code>) will create a new instance of the <code>users</code> array. That way we know that we are working in an immutable manner. This was pretty easy and we don’t need Redux anymore, nor all the boilerplate that we would had to write. So if the state of our application only contains a few simple properties, the Redux pattern might be overkill.</p>
 
-<ul>
-  <li>Since your (douchy) friend decides to start watching the movie, you missed the first part. So, as soon as he starts watching the movie, the movie stream starts and all your friends that were on time, see the same values. Since you arrive too late, you’ll miss the first part. This is exactly the same as our ‘warm’ observable.</li>
-</ul>
+<p>But what if we need to do more then just set the value of <code>users</code>. What if we want to add and remove users from that stream, and we would have to do it in an immutable manner? Checkout the following example for instance.</p>
 
-<h3 id="conclusion">Conclusion</h3>
-<p>So, if you ever have to explain the concept yourself, or just as a way to better remember it, think of observables like this:</p>
+<pre><code class="language-typescript">@Injectable()
+export class UsersService {
+    private _users$ = new BehaviorSubject([]);
 
-<ul>
-  <li>Hot observable 		-&gt; 		Movie at the movies</li>
-  <li>Cold observable 		-&gt; 		Movie with netflix</li>
-  <li>‘Warm’ observable 	-&gt; 		Movie with friends</li>
-</ul>
+    get users$(): Observable&lt;User[]&gt; {
+        return this._users$.asObservable();
+    }
+
+    setUsers(users: User[]): void {
+        this._users$.next(...users);
+    }
+
+    addUser(user: User): void {
+        // We cannot use array.push because we only want to
+        // pass immutable data to the streame
+        // for the OnPush strategy remmber?
+        this._users$.next([...this._users$.getValue(), user])
+    }
+
+    removeUser(id: string) {
+        // Again, we have to create a new Array instance to not break the
+        // immutable dataflow
+        this._users$.next(this._users$.getValue().filter(v =&gt; v.id !== id));
+    }
+}
+
+</code></pre>
+<p>The code above is starting to feel a bit weird, and it seems like we are writing reducer logic inside of this state service to keep it immutable. We have also created our own observable implementation so we could subscribe to the changes of our state service. While it could still be overkill to use redux if this is the only state in our application, it might become complex if we are working with multiple states, nested states, etc.</p>
+
+<p>Another example is caching. People use redux to cache data results. A simple <code>shareReplay</code> operator might to the trick as well.</p>
+
+<pre><code class="language-typescript">fetchUsers(): Observable&lt;User[]&gt; {
+    ...
+    return this.httpClient.get('').pipe(shareReplay(1));
+}
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>I would suggest to not use Redux untill we actually need it, and in my experience most applications that I have written in the past did need redux at a certain point. That being said I also wrote a bunch of applications that didn’t need it at all (CRUD applications for instance.</p>
+
+<p>It’s up to you if you want to use Redux or not, <strong>but keep your applications immutable at all times</strong>.
+It will save you a lot of energy in debugging and it makes sure that you can optimise the change detection cycle in your applications.</p>
 
 
             </section>
@@ -260,26 +304,24 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
                 
                 
                 
-                
-                
                 <figure class="author-image">
-                    <a class="img" href="/author/kwintenp"
-                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
                 </figure>
                 
 
                 <section class="author">
-                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
 
                     
-                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
                     
                     <div class="author-meta">
                         <span
                             class="author-location icon-location"> Belgium</span>
-                        
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
                         <span class="author-link icon-twitter"><a
-                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
                     </div>
                 </section>
 
@@ -288,26 +330,27 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
                 <section class="share">
                     <h4>Share this post</h4>
                     <a class="icon-twitter"
-                       href="http://twitter.com/share?text=My favorite metaphor for hot vs cold observables&amp;url=my-favorite-metaphor-for-hot-vs-cold-observables"
+                       href="http://twitter.com/share?text=Do we really need Redux or @ngrx/store&amp;url=do-we-really-need-redux"
                        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                         <span class="hidden">Twitter</span>
                     </a>
                     <a class="icon-facebook"
-                       href="https://www.facebook.com/sharer/sharer.php?u=my-favorite-metaphor-for-hot-vs-cold-observables"
+                       href="https://www.facebook.com/sharer/sharer.php?u=do-we-really-need-redux"
                        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                         <span class="hidden">Facebook</span>
                     </a>
                     <a class="icon-google-plus"
-                       href="https://plus.google.com/share?url=my-favorite-metaphor-for-hot-vs-cold-observables"
+                       href="https://plus.google.com/share?url=do-we-really-need-redux"
                        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
                         <span class="hidden">Google+</span>
                     </a>
                 </section>
                 
                 
+                
+                
 
                 <!-- Add Disqus Comments -->
-                
                 
                 
                 <div id="disqus_thread"></div>
@@ -334,7 +377,7 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
         var d = document, s = d.createElement('script');
 
         // IMPORTANT: Replace EXAMPLE with your forum shortname!
-        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
 
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
@@ -346,6 +389,7 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
         comments powered by Disqus.
     </a>
 </noscript>
+                
                 
                 
 
@@ -361,11 +405,11 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
     <!-- [[! next_post ]] -->
     
     <a class="read-next-story "
-       style="background-image: url(/assets/images/cover/cover8.jpg)"
-       href="/client-side-filtering-with-streams">
+       style="background-image: url(/assets/images/cover/cover4.jpg)"
+       href="/my-favorite-metaphor-for-hot-vs-cold-observables">
         <section class="post">
-            <h2>Client side filtering using streams</h2>
-            <p>I have been coaching people in using RxJS for a while now. During this time,...</p>
+            <h2>My favorite metaphor for hot vs cold observables</h2>
+            <p>A few weeks ago, I was at NG-BE (best conference of the year btw), where...</p>
         </section>
     </a>
     
@@ -373,11 +417,11 @@ Because he is so excited about the movie, he decides to start anyway. As expecte
     <!-- [[! prev_post ]] -->
     
     <a class="read-next-story prev "
-       style="background-image: url(/assets/images/cover/cover1.jpg)"
-       href="/do-we-really-need-redux">
+       style="background-image: url(/assets/images/cover/cover12.jpg)"
+       href="/infinite-scroll-with-rxjs-and-angular2">
         <section class="post">
-            <h2>Do we really need Redux or @ngrx/store</h2>
-            <p>About this article If you are writing Angular, Vue or React applications, chances are big...</p>
+            <h2>Infinite scroll in Angular an RxJS</h2>
+            <p>About this article This article explains how the “reactive-programming” approach helps us to create an...</p>
         </section>
     </a>
     
