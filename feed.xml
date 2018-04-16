@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Do we really need Redux or @ngrx/store</title>
+        
+          <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Fri, 13 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        /do-we-really-need-redux/</link>
+        <guid isPermaLink="true">/do-we-really-need-redux/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Nx on your CI, how does it work?</title>
         
           <description>&lt;p&gt;Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of &lt;a href=&quot;https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2&quot; target=&quot;_blank&quot;&gt;schematics&lt;/a&gt; that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.&lt;/p&gt;
@@ -232,21 +247,6 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         <link>
         /my-favorite-metaphor-for-hot-vs-cold-observables/</link>
         <guid isPermaLink="true">/my-favorite-metaphor-for-hot-vs-cold-observables/</guid>
-      </item>
-      
-    
-      
-      <item>
-        <title>Do we really need Redux or @ngrx/store</title>
-        
-          <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;
-
-</description>
-        
-        <pubDate>Wed, 21 Dec 2016 00:00:00 +0000</pubDate>
-        <link>
-        /do-we-really-need-redux/</link>
-        <guid isPermaLink="true">/do-we-really-need-redux/</guid>
       </item>
       
     

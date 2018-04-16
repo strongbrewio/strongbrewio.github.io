@@ -12,6 +12,113 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Do we really need Redux or @ngrx/store</title>
+	  <link>//do-we-really-need-redux/</link>
+	  <author></author>
+	  <pubDate>2018-04-13T00:00:00+00:00</pubDate>
+	  <guid>//do-we-really-need-redux/</guid>
+	  <description><![CDATA[
+	     <h2 id="about-this-article">About this article</h2>
+
+<p>If you are writing Angular, Vue or React applications, chances are big that you have used or encountered the Redux pattern.
+Redux helps us to structure statemanagement in an immutable matter which is great, but in order to use it correctly, we have to write a bunch of boilerplate code.
+In this article I would like to tackle the question on when to use Redux and why.
+The referred plugins/code samples are written in an Angular context. But the principles explained in this articles work for other frameworks as well. This also means that we are using the <a href="https://github.com/ngrx/platform/blob/master/docs/store/README.md">@ngrx/store</a> package instead of the <a href="https://redux.js.org/">Redux</a> package</p>
+
+<h2 id="to-redux-or-not-to-redux">To Redux or not to Redux?</h2>
+
+<p>First of all it’s important to note that Redux solves certain problems for us. If we are not experiencing those problems, then there is a big chance that the Redux pattern
+is overkill for our application.</p>
+
+<p>The first question that we might want to ask ourselves is:
+<strong>Does My application have state?</strong> State can be the value of a pager that we want to remember, or the fact that a sidebar is collapsed or not. State could be a cached set of data coming from our backend, or user information that we need throughout the whole application.
+It could be a simple value that we want to remember in memory when we are navigating between pages.</p>
+
+<p>Let’s sum up some examples where the Redux principle might shine in our applications:</p>
+<ul>
+  <li>Storing state (like the value of a search filter so it’s still available when the user navigates back to a certain grid)</li>
+  <li>Sharing state between components that have their own route, and thus won’t have a parent component to pass them the state through inputs or properties</li>
+  <li>Optimistic updates: Check <a href="https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/">this article</a></li>
+  <li>Real-time updates: Check <a href="https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/">this article</a></li>
+  <li>When we want undo/redo logic</li>
+  <li>When we want to keep track of all the state changes and debug them with awesome tooling (Redux devtools)</li>
+  <li>When we want an organised way of handling session storage or localstorage. Check <a href="https://github.com/btroncone/ngrx-store-localstorage">this plugin</a></li>
+</ul>
+
+<p>When we are writing Angular applications it’s a best-practice to work with immutable data structures. That way we can make use of the <a href="https://angular-2-training-book.rangle.io/handout/change-detection/change_detection_strategy_onpush.html">OnPush changedetectionstrategy</a> that angular provides us, which results in better performance and less unexpected behavior. In React we could use a <a href="https://reactjs.org/docs/react-api.html#reactpurecomponent">Pure component</a> for that. So, for this article let’s assume that immutable datastructures are the way to go and that our application needs it.</p>
+
+<p>While we know that Redux forces you to use immutable datastructures, let’s still challenge the need of Redux shall we?
+If statemanagement is trivial to our applications and we just want to store values we could work with a state service instead of Redux.</p>
+
+<pre><code class="language-typescript">@Injectable()
+export class UsersService {
+    private _users$ = new BehaviorSubject([]);
+
+    get users$(): Observable&lt;User[]&gt; {
+        return this._users$.asObservable();
+    }
+
+    // IMPORTANT: since we use an immutable dataflow
+    // we have to make sure users is a new instance
+    setUsers(users: User[]): void {
+        this._users$.next(...users);
+    }
+}
+
+</code></pre>
+
+<p>This example shows how we can set the simple value of an array of users by calling the <code>setUsers()</code>function. It will store the value into a BehaviorSubject which we will consume as an observable. The spread operator (<code>...</code>) will create a new instance of the <code>users</code> array. That way we know that we are working in an immutable manner. This was pretty easy and we don’t need Redux anymore, nor all the boilerplate that we would had to write. So if the state of our application only contains a few simple properties, the Redux pattern might be overkill.</p>
+
+<p>But what if we need to do more then just set the value of <code>users</code>. What if we want to add and remove users from that stream, and we would have to do it in an immutable manner? Checkout the following example for instance.</p>
+
+<pre><code class="language-typescript">@Injectable()
+export class UsersService {
+    private _users$ = new BehaviorSubject([]);
+
+    get users$(): Observable&lt;User[]&gt; {
+        return this._users$.asObservable();
+    }
+
+    setUsers(users: User[]): void {
+        this._users$.next(...users);
+    }
+
+    addUser(user: User): void {
+        // We cannot use array.push because we only want to
+        // pass immutable data to the streame
+        // for the OnPush strategy remmber?
+        this._users$.next([...this._users$.getValue(), user])
+    }
+
+    removeUser(id: string) {
+        // Again, we have to create a new Array instance to not break the
+        // immutable dataflow
+        this._users$.next(this._users$.getValue().filter(v =&gt; v.id !== id));
+    }
+}
+
+</code></pre>
+<p>The code above is starting to feel a bit weird, and it seems like we are writing reducer logic inside of this state service to keep it immutable. We have also created our own observable implementation so we could subscribe to the changes of our state service. While it could still be overkill to use redux if this is the only state in our application, it might become complex if we are working with multiple states, nested states, etc.</p>
+
+<p>Another example is caching. People use redux to cache data results. A simple <code>shareReplay</code> operator might to the trick as well.</p>
+
+<pre><code class="language-typescript">fetchUsers(): Observable&lt;User[]&gt; {
+    ...
+    return this.httpClient.get('').pipe(shareReplay(1));
+}
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>I would suggest to not use Redux untill we actually need it, and in my experience most applications that I have written in the past did need redux at a certain point. That being said I also wrote a bunch of applications that didn’t need it at all (CRUD applications for instance.</p>
+
+<p>It’s up to you if you want to use Redux or not, <strong>but keep your applications immutable at all times</strong>.
+It will save you a lot of energy in debugging and it makes sure that you can optimise the change detection cycle in your applications.</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Pre-rendering Angular Applications</title>
 	  <link>//prerendering-angular-apps/</link>
 	  <author></author>
@@ -1939,113 +2046,6 @@ The situation of the problem goes like this:</p>
 </ul>
 
 <p>Thanks, guys! It means a lot!</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Do we really need Redux or @ngrx/store</title>
-	  <link>//do-we-really-need-redux/</link>
-	  <author></author>
-	  <pubDate>2016-12-21T00:00:00+00:00</pubDate>
-	  <guid>//do-we-really-need-redux/</guid>
-	  <description><![CDATA[
-	     <h2 id="about-this-article">About this article</h2>
-
-<p>If you are writing Angular, Vue or React applications, chances are big that you have used or encountered the Redux pattern.
-Redux helps us to structure statemanagement in an immutable matter which is great, but in order to use it correctly, we have to write a bunch of boilerplate code.
-In this article I would like to tackle the question on when to use Redux and why.
-The referred plugins/code samples are written in an Angular context. But the principles explained in this articles work for other frameworks as well. This also means that we are using the <a href="https://github.com/ngrx/platform/blob/master/docs/store/README.md">@ngrx/store</a> package instead of the <a href="https://redux.js.org/">Redux</a> package</p>
-
-<h2 id="to-redux-or-not-to-redux">To Redux or not to Redux?</h2>
-
-<p>First of all it’s important to note that Redux solves certain problems for us. If we are not experiencing those problems, then there is a big chance that the Redux pattern
-is overkill for our application.</p>
-
-<p>The first question that we might want to ask ourselves is:
-<strong>Does My application have state?</strong> State can be the value of a pager that we want to remember, or the fact that a sidebar is collapsed or not. State could be a cached set of data coming from our backend, or user information that we need throughout the whole application.
-It could be a simple value that we want to remember in memory when we are navigating between pages.</p>
-
-<p>Let’s sum up some examples where the Redux principle might shine in our applications:</p>
-<ul>
-  <li>Storing state (like the value of a search filter so it’s still available when the user navigates back to a certain grid)</li>
-  <li>Sharing state between components that have their own route, and thus won’t have a parent component to pass them the state through inputs or properties</li>
-  <li>Optimistic updates: Check <a href="https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/">this article</a></li>
-  <li>Real-time updates: Check <a href="https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/">this article</a></li>
-  <li>When we want undo/redo logic</li>
-  <li>When we want to keep track of all the state changes and debug them with awesome tooling (Redux devtools)</li>
-  <li>When we want an organised way of handling session storage or localstorage. Check <a href="https://github.com/btroncone/ngrx-store-localstorage">this plugin</a></li>
-</ul>
-
-<p>When we are writing Angular applications it’s a best-practice to work with immutable data structures. That way we can make use of the <a href="https://angular-2-training-book.rangle.io/handout/change-detection/change_detection_strategy_onpush.html">OnPush changedetectionstrategy</a> that angular provides us, which results in better performance and less unexpected behavior. In React we could use a <a href="https://reactjs.org/docs/react-api.html#reactpurecomponent">Pure component</a> for that. So, for this article let’s assume that immutable datastructures are the way to go and that our application needs it.</p>
-
-<p>While we know that Redux forces you to use immutable datastructures, let’s still challenge the need of Redux shall we?
-If statemanagement is trivial to our applications and we just want to store values we could work with a state service instead of Redux.</p>
-
-<pre><code class="language-typescript">@Injectable()
-export class UsersService {
-    private _users$ = new BehaviorSubject([]);
-
-    get users$(): Observable&lt;User[]&gt; {
-        return this._users$.asObservable();
-    }
-
-    // IMPORTANT: since we use an immutable dataflow
-    // we have to make sure users is a new instance
-    setUsers(users: User[]): void {
-        this._users$.next(...users);
-    }
-}
-
-</code></pre>
-
-<p>This example shows how we can set the simple value of an array of users by calling the <code>setUsers()</code>function. It will store the value into a BehaviorSubject which we will consume as an observable. The spread operator (<code>...</code>) will create a new instance of the <code>users</code> array. That way we know that we are working in an immutable manner. This was pretty easy and we don’t need Redux anymore, nor all the boilerplate that we would had to write. So if the state of our application only contains a few simple properties, the Redux pattern might be overkill.</p>
-
-<p>But what if we need to do more then just set the value of <code>users</code>. What if we want to add and remove users from that stream, and we would have to do it in an immutable manner? Checkout the following example for instance.</p>
-
-<pre><code class="language-typescript">@Injectable()
-export class UsersService {
-    private _users$ = new BehaviorSubject([]);
-
-    get users$(): Observable&lt;User[]&gt; {
-        return this._users$.asObservable();
-    }
-
-    setUsers(users: User[]): void {
-        this._users$.next(...users);
-    }
-
-    addUser(user: User): void {
-        // We cannot use array.push because we only want to
-        // pass immutable data to the streame
-        // for the OnPush strategy remmber?
-        this._users$.next([...this._users$.getValue(), user])
-    }
-
-    removeUser(id: string) {
-        // Again, we have to create a new Array instance to not break the
-        // immutable dataflow
-        this._users$.next(this._users$.getValue().filter(v =&gt; v.id !== id));
-    }
-}
-
-</code></pre>
-<p>The code above is starting to feel a bit weird, and it seems like we are writing reducer logic inside of this state service to keep it immutable. We have also created our own observable implementation so we could subscribe to the changes of our state service. While it could still be overkill to use redux if this is the only state in our application, it might become complex if we are working with multiple states, nested states, etc.</p>
-
-<p>Another example is caching. People use redux to cache data results. A simple <code>shareReplay</code> operator might to the trick as well.</p>
-
-<pre><code class="language-typescript">fetchUsers(): Observable&lt;User[]&gt; {
-    ...
-    return this.httpClient.get('').pipe(shareReplay(1));
-}
-</code></pre>
-
-<h2 id="summary">Summary</h2>
-
-<p>I would suggest to not use Redux untill we actually need it, and in my experience most applications that I have written in the past did need redux at a certain point. That being said I also wrote a bunch of applications that didn’t need it at all (CRUD applications for instance.</p>
-
-<p>It’s up to you if you want to use Redux or not, <strong>but keep your applications immutable at all times</strong>.
-It will save you a lot of energy in debugging and it makes sure that you can optimise the change detection cycle in your applications.</p>
 
 	  ]]></description>
 	</item>
