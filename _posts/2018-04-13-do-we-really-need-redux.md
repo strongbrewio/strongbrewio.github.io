@@ -5,7 +5,7 @@ published: true
 description: This article explains the cases when Redux is a good idea or when it is overkill for your application
 author: brechtbilliet
 comments: true
-date: 2016-12-21
+date: 2018-04-13
 subclass: 'post'
 categories: 'brechtbilliet'
 disqus: true
