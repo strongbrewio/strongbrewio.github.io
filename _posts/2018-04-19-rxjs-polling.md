@@ -5,7 +5,7 @@ author: kwintenp
 description: An overview of different polling strategies with RxJS
 layout: post
 navigation: True
-date:   2018-04-11
+date:   2018-04-19
 tags: RxJS Angular
 subclass: 'post'
 categories: 'kwintenp'
