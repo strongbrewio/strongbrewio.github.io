@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>RxJS polling strategies</title>
+        
+          <description>&lt;p&gt;Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Thu, 19 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        /rxjs-polling/</link>
+        <guid isPermaLink="true">/rxjs-polling/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Do we really need Redux or @ngrx/store</title>
         
           <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;
@@ -18,21 +33,6 @@
         <link>
         /do-we-really-need-redux/</link>
         <guid isPermaLink="true">/do-we-really-need-redux/</guid>
-      </item>
-      
-    
-      
-      <item>
-        <title>RxJS polling strategies</title>
-        
-          <description>&lt;p&gt;Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.&lt;/p&gt;
-
-</description>
-        
-        <pubDate>Wed, 11 Apr 2018 00:00:00 +0000</pubDate>
-        <link>
-        /rxjs-polling/</link>
-        <guid isPermaLink="true">/rxjs-polling/</guid>
       </item>
       
     
