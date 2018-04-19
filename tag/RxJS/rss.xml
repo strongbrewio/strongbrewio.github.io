@@ -12,6 +12,240 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>RxJS polling strategies</title>
+	  <link>//rxjs-polling/</link>
+	  <author></author>
+	  <pubDate>2018-04-11T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-polling/</guid>
+	  <description><![CDATA[
+	     <p>Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.</p>
+
+<p>Polling is something where RxJS really shines. We will look at different polling strategies and how we can implement them.</p>
+
+<p><strong>Note:</strong> The examples in this post will use Angular but the concepts can be ported everywhere.</p>
+
+<ul>
+  <li><a href="#simple-polling">Simple polling</a></li>
+  <li><a href="#polling-and-refresh-button">Combining polling with refresh button</a></li>
+  <li><a href="#polling-and-reset">Polling and reset</a></li>
+  <li><a href="#polling-when-data-is-resolved">Polling when data is resolved</a></li>
+</ul>
+
+<h3 id="simple-polling">Simple polling</h3>
+
+<p>First we will take a look at a simple example where we want to fetch new data every 5 seconds. Let’s first try and think about what we need.</p>
+
+<ul>
+  <li>a backend call</li>
+  <li>a trigger that tells us when we need to execute our backend call</li>
+</ul>
+
+<h4 id="backend-call">Backend call</h4>
+
+<p>Executing a backend call is easy. We can create a stream that will execute a backend call when subscribed to like this.</p>
+
+<pre><code class="language-typescript">const bitcoin$ = this.http.get('https://blockchain.info/ticker');
+</code></pre>
+
+<h4 id="trigger">Trigger</h4>
+
+<p>Next thing we need is a trigger that will tell us when it is time to fetch our data. In a world without RxJS we would probably use <code>setInterval</code>. This function allows us to pass it a callback that gets executed every ‘x’ seconds.
+With RxJS however, we have to change the way we think. We can no longer think in terms of callbacks, we have to think in terms of streams. If we apply this to the trigger we need, we want a stream that fires every ‘x’ seconds. 
+Drawn in a ASCII marble diagram, this is what we want:</p>
+
+<pre><code>----1----2----3----4----5...
+</code></pre>
+
+<p>RxJS has a static <code>interval</code> function that will create this streams for us. We can pass it a number which will denote the time between the events.</p>
+
+<pre><code class="language-typescript">const trigger$ = interval(1000);
+</code></pre>
+
+<p>This is not enough however. Our trigger stream should also trigger at start time. Otherwise, we would only fetch data after ‘1000ms’ (with the example above).</p>
+
+<p>RxJS provides another static function, ‘timer’, that will help us to create the following stream:</p>
+
+<pre><code>0----1----2----3----4----5...
+</code></pre>
+
+<p>Code wise, this looks like this:</p>
+
+<pre><code class="language-typescript">const trigger$ = timer(0, 1000);
+</code></pre>
+
+<h4 id="combine-to-polling-stream">Combine to polling stream</h4>
+
+<p>Now we have the two streams that we need, it is time to combine them. If we think about it, we basically want to re-execute our <code>bitcoin$</code> to refetch the data, every time our <code>trigger$</code> fires. We want to map our trigger value to another observable/async action. To do that, we need to use a flattening operator. As flattening operators are not part of this post, you can read more about them <a href="https://blog.angularindepth.com/switchmap-bugs-b6de69155524" target="_blank">here</a>.</p>
+
+<p>In our case, we are going to use the <code>concatMap</code> operator. This operator will execute all the <code>bitcoin$</code> without cancelling them. Let’s take a look at the code:</p>
+
+<pre><code class="language-typescript">this.polledBitcoin$ = timer(0, 1000).pipe(
+        concatMap(_ =&gt; bitcoin$),
+        map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
+      );
+</code></pre>
+<p>We create a new stream, <code>this.polledBitcoin$</code> by mapping every event that the <code>trigger$</code> emits to our <code>bitcoin$</code>. The <code>concatMap</code> operator will subscribe to the <code>bitcoin$</code> internally and emit the result of that stream as events on the <code>polledBitcoin$</code>.</p>
+
+<p>When we draw this out into a ASCII marble diagram, it looks like this:</p>
+
+<pre><code>bitcoin:            -(b|)
+trigger$:           0------1------2------3------4------5...
+                    \      \      \      \      \      \
+                     -(b|)  -(b|)  -(b|)  -(b|)  -(b|)  -(b|)
+ 
+ 
+polledBitcoin$     ----b------b------b------b------b------b 
+</code></pre>
+
+<p>We have our <code>bitcoin$</code> that will, when subscribed to, take some time, and then emit the event and complete.</p>
+
+<p>We have our <code>trigger$</code> where we map the values to the <code>bitcoin$</code>. The <code>concatMap</code> operator flattens the result and we get our <code>polledBitcoin$</code>. A stream that will fetch the value of bitcoin every second.</p>
+
+<p>The live example can be found here:</p>
+
+<iframe style="width: 100%; height: 500px" src="https://stackblitz.com/edit/angular-abcqen?embed=1&amp;file=app/app.component.ts"></iframe>
+
+<p><strong>Note:</strong> You can open the devtools on the network tab to see the network requests. There are other Stackblitz demos in this post so you might want to open it in Stackblitz to be sure that the network tab only shows requests from a single demo.</p>
+
+<h3 id="polling-and-refresh-button">Polling and refresh button</h3>
+
+<p>Sometimes, users can be pretty impatient and want to have the control to fetch the data. We can accomplish this by adding a button that, when clicked, will fetch the data as well. But we want also want to keep our polling.</p>
+
+<p>Let’s first try to think reactive on how we can accomplish this. We already have a stream that polls the data. We can create a stream that fetches the data whenever the button is clicked. When we have both of these streams, we can actually just combine them using the <code>merge</code> operator to get one stream that is both triggered by the polling and the button click.</p>
+
+<p>We can simply add a button to our example and a click listener. When the button is clicked, we need to convert this click into a stream, since we will need a stream to ‘start with’. For this we can leverage a <code>Subject</code>.</p>
+
+<pre><code class="language-typescript">manualRefresh = new Subject();
+
+refreshDataClick() {
+    this.manualRefresh.next('');
+}
+</code></pre>
+
+<p>Now that we have a stream that is fired every time the button is clicked, we can simply use the same way of working that we had before. But now, our ‘source’ stream is not a <code>timer</code> but a <code>subject</code>.</p>
+
+<pre><code class="language-typescript">this.manualRefresh
+	.pipe(
+       concatMap(_ =&gt; bitcoin$),
+   );
+</code></pre>
+
+<p>Next thing we need to do is combine both of our streams that can trigger a backend call (and remove the double <code>concatMap</code> operator).</p>
+
+<pre><code class="language-typescript">this.polledBitcoin$ = timer(0, 10000).pipe(
+        merge(this.manualRefresh),
+        concatMap(_ =&gt; bitcoin$),
+        map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
+      );
+</code></pre>
+
+<p>That’s it. Now whenever the button is clicked or the timer triggers, a backend call will be done.</p>
+
+<p>The live code example can be found here:</p>
+
+<iframe src="https://stackblitz.com/edit/angular-zytccc?embed=1&amp;file=app/app.component.ts" style="height: 500px; width:100%"></iframe>
+
+<h3 id="polling-and-reset">Polling and reset</h3>
+
+<p>The previous polling strategy can introduce some unnecessary backend calls. Let’s think about the following scenario. Our timer stream triggers every 10s. After the app has started and has been running for 19s, the user clicks the button, triggering a backend call. And after 20s our timer stream fires as well, also triggering a backend call. This means that at both the 19th and the 20th second, we are fetching the data. This might be a little overkill.</p>
+
+<p>Let’s think about how we can fix this. We already have a stream that will fetch the data immediately and then again and again with 10s in between. And actually, that’s all we need. When we have this stream, and the user clicks the button, we can just restart this stream. Since, when we restart this stream, we are fetching the data immediately (which is what we want when the user clicks), and again after 10 seconds. The ASCII marble diagram looks like this:</p>
+
+<pre><code>bitcoin:            -(b|)
+user clicks:                            C 
+trigger$:           0------1------2-----!0------1------2-----|
+                    \      \      \      \      \      \      
+                     -(b|)  -(b|)  -(b|)  -(b|)  -(b|)  -(b|)
+ 
+ 
+polledBitcoin$     ----b------b------b------b------b------b-- 
+</code></pre>
+
+<p><strong>Note:</strong> In ASCII marble diagrams, the ‘!’ means that the stream is unsubscribed from.</p>
+
+<p>In the marble diagram above, ‘C’ denotes the user click. In that case, we want to unsubscribe from the previous execution of our <code>trigger$</code> and execute it again. Let’s see how we can do this in the code:</p>
+
+<pre><code>load$ = new BehaviorSubject('');
+
+this.polledBitcoin$ = this.load$.pipe(
+      switchMap(_ =&gt; timer(0, 10000).pipe(
+         concatMap(_ =&gt; bitcoin$),
+         map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
+      )
+   )
+);
+</code></pre>
+<p>First thing we need to change is move from a <code>Subject</code> to a <code>BehaviorSubject</code>. A <code>BehaviorSubject</code> has an initial value and will replay the last value when subscribed to. Here, we are interested in the fact that it has an initial value.</p>
+
+<p>Next thing we do is use this subject to create our <code>polledBitcoin$</code>. We wrapped the stream from our previous examples in a <code>switchMap</code>. Whenever the <code>load$</code> emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that’s exactly what we need. Thanks to the initial value in the <code>BehaviorSubject</code>, we know that the stream will be started whenever the stream is initially subscribed to.</p>
+
+<p>Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! We can use this technique in different scenarios as well. For example, when the user swipes down on a mobile device. Nice right!</p>
+
+<p>You can find the example code here:</p>
+<iframe src="https://stackblitz.com/edit/angular-srtgmv" style="width: 100%; height: 500px"></iframe>
+
+<h3 id="polling-when-data-is-resolved">Polling when data is resolved</h3>
+
+<p>The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus ‘x’ seconds. This can be helpful in some cases.</p>
+
+<p>With the previous example in mind, Let’s say we poll every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.</p>
+
+<p>Again, Let’s start by thinking about what we want in a reactive way. First of all, we need to know when our backend call has ended. When it has ended, we need to wait ‘x’ seconds before starting the next one. Let’s break it down.</p>
+
+<p>Knowing when our backend call has ended is pretty easy. Whenever a value passes the <code>bitcoin$</code>, we know the backend call is done. After that has happened, we need to create a stream that, waits ‘x’ seconds and then triggers a new call. Let’s try and create a stream that, when subscribed to, waits 5 seconds, has the option to trigger a new call and then completes.</p>
+
+<pre><code class="language-typescript">load$ = new BehaviorSubject('');
+
+const whenToRefresh$ = of('').pipe(
+      delay(5000),
+      tap(_ =&gt; load$.next(''),
+      skip(1),
+);
+</code></pre>
+
+<p>We created a stream using the static <code>of</code>. This will fire an event immediately when subscribed to. We then delay this event with 5000ms by using the <code>delay</code> operator. We then use a <code>tap</code> where we can actually trigger the next request, and finally <code>skip</code> since we do not want to use the <code>''</code> event anywhere, it was just a trigger.</p>
+
+<p>Next thing we need to do is integrate this into our other code. Let’s see how we can accomplish this:</p>
+
+<pre><code class="language-typescript">this.polledBitcoin$ = this.load$.pipe(
+       concatMap(_ =&gt; bitcoin$.pipe(concat(whenToRefresh$))),
+       map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
+);
+</code></pre>
+
+<p>We removed the <code>timer</code> operator here and replaced it with our <code>BehaviorSubject</code>. We changed our stream inside the <code>concatMap</code> operator. Here we used <code>concat</code> to combine the <code>bitcoin$</code> with our <code>whenToRefresh$</code> we created above. What <code>concat</code> does is, execute the <code>bitcoin$</code> first and whenever that one completes, starts the other stream.</p>
+
+<p>This is ideal, since we need to wait for the <code>whenToRefresh$</code> to start till the backend call completes. When it completed, the <code>whenToRefresh$</code> is started and will wait 5000ms and then next the <code>load$</code> to start the whole thing again.</p>
+
+<p>Drawn out into an ASCII marble diagram, it looks like this.</p>
+
+<pre><code>bitcoin$:         -----(b|)
+load$:       f-------------f-------------f....
+                                \
+                  \              -----b-------N....
+                   -----b-------N
+                   
+                   
+polledBitcoin$:   ------b-------------b-------....
+</code></pre>
+
+<p>We can see that, whenever the first backend call was started, we wait 5000ms (here an amount of ‘-‘) before next’ing the <code>load$</code> to start the thing again.</p>
+
+<p>A live example of the code can be found here:</p>
+
+<iframe src="https://stackblitz.com/edit/angular-5mplks?file=app/app.component.ts" style="width: 100%; height: 500px"></iframe>
+
+<p><strong>Note:</strong> to really see that the next call is only scheduled 5000ms after the previous one finished, you can use the network tab and throttle the network to ‘slow 3g’.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>RxJS and polling is a match made in heaven. There a number of different ways to implement polling which all have there trade offs. Understanding the differences between the ones described above will get you a long way.</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>What are schedulers in RxJS</title>
 	  <link>//what-are-schedulers-in-rxjs/</link>
 	  <author></author>
@@ -2248,67 +2482,6 @@ We also don’t have to manually unsubscribe from the filteredCharacters$, the a
 <p>By thinking in input streams and output streams, we were able to map the inputs we had to a result. We bound the stream in the view layer. Using streams up until the html of our component, we eliminated the need for local copies of data and made our code more robust and open to changes. If we now want to add another filter on top of the list, it’s a piece of cake!</p>
 
 <p>You can find the code on <a href="https://github.com/KwintenP/blog-examples/tree/master/src/app/home/client-side-filter" target="_blank"> Github </a>.</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>My favorite metaphor for hot vs cold observables</title>
-	  <link>//my-favorite-metaphor-for-hot-vs-cold-observables/</link>
-	  <author></author>
-	  <pubDate>2017-01-10T00:00:00+00:00</pubDate>
-	  <guid>//my-favorite-metaphor-for-hot-vs-cold-observables/</guid>
-	  <description><![CDATA[
-	     <p>A few weeks ago, I was at NG-BE (best conference of the year btw), where I was giving a workshop on RxJS and @ngrx/store in Angular 2 applications. In this course, we also explain hot vs cold observables.
-When I try to explain new concepts to people, I either try to start from a known concept and build my way up to the new thing or use a metaphor. I’ve been looking for a similar approach to explain the hot vs cold observables concept but didn’t found one myself.
-At the conference, I started talking with <a href="https://www.linkedin.com/in/lander-verhack-a404a04b" target="_blank">Lander Verhack</a>. Lander gives trainings at U2U and he told me a great metaphor for this concept. I’ll try to explain it below but all credits go to him for coming up with it.</p>
-
-<h3 id="watching-a-movie">Watching a movie</h3>
-<p>When you want to watch a movie nowadays, you have a lot of different options. You can either go to the movies, rent out a dvd (do people still do this?) or use some service like Netflix.
-Lets first think about what happens when you watch a movie via Netflix.</p>
-
-<h4 id="netflix">Netflix</h4>
-<p>First step in watching a movie on Netflix is looking one up in the catalogue. As soon as you have found one, you can decide to start watching it. A Netflix movie will, unless you’ve already watched a part, start from the beginning. It doesn’t matter how many other people are watching the movie, you will always start at the beginning. If the movie doesn’t live up to your expactations, you can decide to stop watching it.</p>
-
-<p>It turns out that watching a movie on netflix is the perfect metaphor for a cold observable. Lets take a look at the common properties between these two:</p>
-
-<ul>
-  <li>If no one is listening, the movie is not streamed. The movie stream is lazy, just like the cold observable.</li>
-  <li>For every listener, a new stream is started. It’s not because 5 people are already watching the movie somewhere else in the world, that your movie will not start from the beginning. The movie stream is unicast, just like a cold observable.</li>
-</ul>
-
-<h4 id="going-to-the-movies">Going to the movies</h4>
-<p>Another way of watching a movie is by going to the movies. In contrast with Netflix, it’s not you who decides when the movie will begin. It will begin at a predetermined time. When the movie starts, everyone who is present will see the same movie. If someone arrives too late, he will have missed the first part of the movie, but can follow everything afterwards the same way as the other people. If you decide to stop watching the movie because you don’t like it, the other people can keep on watching it. If everybody decides to walk out because it’s that bad, the movie will keep on playing.</p>
-
-<p>Going to the movies is actually the perfect metaphor for a hot observable. Lets take a look at the common properties between the two:</p>
-
-<ul>
-  <li>As soon as the movie starts, everybody who is watching it, sees the same thing. If a person arrives 5 minutes late, the movie will not restart just for him. He will, from his moment of arrival, see the same things. So watching a movie at the movies is the same as a hot observable because it is multicast.</li>
-  <li>If the movie has already started, and you arrive 5 minutes later, you will have missed the first part. So just like a hot observable, the movie is not lazy.</li>
-</ul>
-
-<h3 id="what-about-publishrefcount">What about <code>publish().refCount()</code></h3>
-
-<p>Aside from hot and cold observables, you can also create an observable that starts emitting values as soon as there is one subscriber. You can accomplish this with the <code>publish().refCount()</code> operator or its alias <code>share()</code>. I’ve seen people calling this observable ‘warm’, ‘semi-hot’ or ‘semi-cold’.</p>
-
-<h4 id="watching-a-movie-with-friends">Watching a movie with friends</h4>
-<p>You could think of this ‘type’ of observable as watching a movie with some (douchy) friends. Let’s say you decide to watch a movie together at 6PM at your friends place. Due to car trouble, you’ll be runnning 15 minutes late so you text your friend and ask him to wait.
-Because he is so excited about the movie, he decides to start anyway. As expected, you arrive 15 minutes late and you keep on watching the movie, having missed the first part.</p>
-
-<p>Let’s see how this maps to the ‘warm’ observable we described above.</p>
-
-<ul>
-  <li>Since your (douchy) friend decides to start watching the movie, you missed the first part. So, as soon as he starts watching the movie, the movie stream starts and all your friends that were on time, see the same values. Since you arrive too late, you’ll miss the first part. This is exactly the same as our ‘warm’ observable.</li>
-</ul>
-
-<h3 id="conclusion">Conclusion</h3>
-<p>So, if you ever have to explain the concept yourself, or just as a way to better remember it, think of observables like this:</p>
-
-<ul>
-  <li>Hot observable 		-&gt; 		Movie at the movies</li>
-  <li>Cold observable 		-&gt; 		Movie with netflix</li>
-  <li>‘Warm’ observable 	-&gt; 		Movie with friends</li>
-</ul>
 
 	  ]]></description>
 	</item>

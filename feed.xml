@@ -23,6 +23,21 @@
     
       
       <item>
+        <title>RxJS polling strategies</title>
+        
+          <description>&lt;p&gt;Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 11 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        /rxjs-polling/</link>
+        <guid isPermaLink="true">/rxjs-polling/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Nx on your CI, how does it work?</title>
         
           <description>&lt;p&gt;Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of &lt;a href=&quot;https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2&quot; target=&quot;_blank&quot;&gt;schematics&lt;/a&gt; that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.&lt;/p&gt;
