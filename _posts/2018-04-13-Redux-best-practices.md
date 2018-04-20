@@ -1,3 +1,4 @@
+---
 layout: post
 title: Redux (@ngrx/store) best practices
 published: false
@@ -85,8 +86,7 @@ The benifit of keeping state in the url is:
 - We can bookmark the url
 - We can share that url with other people
 
-Example: We have a map of a city with houses. On every house that we click we have to zoom in to that house and the information of that house could be shown in a sidebar
-![map](/assets/images/posts/redux-best-practices/map.png)
+If we can put simple things into the url, we should at least consider it.
 
 ## Avoid HUGE lists
 
