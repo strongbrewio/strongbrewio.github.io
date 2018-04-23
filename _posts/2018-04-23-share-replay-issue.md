@@ -16,7 +16,7 @@ cover: 'assets/images/cover/cover8.jpg'
 ---
 This post describes an issue with the current `shareReplay` operator in RxJS. There has been an open issue for this on Github, but as it has been open for quite some time now. The issue might introduce some memory leaks, so I decided to write about it.
 
-You can find the Github issue <a href="https://github.com/ReactiveX/rxjs/issues/3336" target="_blank">here</a>. There is already a PR for this issue that has been discussed <a href="https://github.com/ReactiveX/rxjs/pull/3354" target="_blank">here</a>. However, it is still unclear what the desired behavior should be. This needs to be discussed by the core team members
+You can find the Github issue <a href="https://github.com/ReactiveX/rxjs/issues/3336" target="_blank">here</a>. There is already a PR for this issue that has been discussed <a href="https://github.com/ReactiveX/rxjs/pull/3354" target="_blank">here</a>. However, it is still unclear what the desired behavior should be. This needs to be discussed by the core team members.
 
 Hopefully this will get resolved and it will get fixed really quick :). For the time being, it made sense to warn people about it.
 
