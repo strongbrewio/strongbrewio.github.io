@@ -57,7 +57,7 @@ As you can see, the interval part of our stream keeps emitting whenever we unsub
 
 ### Defining the problem
 
-Whenever we are using the `shareReplay` operator, we must be very carefull. The `shareReplay` operator does not clean up streams when they have not yet completed. In our case, the `interval$` keeps emitting values after we stopped listening. This will introduce a memory leak into our application.
+Whenever we are using the `shareReplay` operator, we must be very careful. The `shareReplay` operator does not clean up streams when they have not yet completed. In our case, the `interval$` keeps emitting values after we stopped listening. This will introduce a memory leak into our application.
 
 ### Fixing the problem
 
