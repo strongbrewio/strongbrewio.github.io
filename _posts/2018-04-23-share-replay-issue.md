@@ -20,7 +20,7 @@ You can find the Github issue <a href="https://github.com/ReactiveX/rxjs/issues/
 
 Hopefully this will get resolved and it will get fixed really quick :). For the time being, it made sense to warn people about it.
 
-## Let's find out the issue
+## Let's identify the issue
 
 Let's take a look at the following code.
 
