@@ -12,6 +12,64 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Be careful when using shareReplay</title>
+	  <link>//share-replay-issue/</link>
+	  <author></author>
+	  <pubDate>2018-04-23T00:00:00+00:00</pubDate>
+	  <guid>//share-replay-issue/</guid>
+	  <description><![CDATA[
+	     <p>This post describes an issue with the current <code>shareReplay</code> operator in RxJS. There has been an open issue for this on Github, but as it has been open for quite some time now. The issue might introduce some memory leaks, so I decided to write about it.</p>
+
+<p>You can find the Github issue <a href="https://github.com/ReactiveX/rxjs/issues/3336" target="_blank">here</a>. There is already a PR for this issue that has been discussed <a href="https://github.com/ReactiveX/rxjs/pull/3354" target="_blank">here</a>. However, it is still unclear what the desired behavior should be. This needs to be discussed by the core team members.</p>
+
+<p>Hopefully this will get resolved and it will get fixed really quick :). For the time being, it made sense to warn people about it.</p>
+
+<h2 id="lets-identify-the-issue">Let’s identify the issue</h2>
+
+<p>Let’s take a look at the following code.</p>
+
+<pre><code class="language-typescript">const interval$ = interval(1000)
+  .pipe(
+     tap(console.log),
+     mapTo('nextValue'),
+     take(10),
+     shareReplay(1),
+  );
+</code></pre>
+
+<p>We are defining an interval stream. Let’s assume that we need this interval stream to create multiple other streams. In that case, we need to transform our stream from a cold stream to a hot one by multicasting it. If we do not do this we are basically subscribing multiple times to the interval stream, and we are triggering the interval multiple times.</p>
+
+<p>Using the <code>shareReplay</code> operator, we are multicasting our <code>interval$</code>. So far so good right?!</p>
+
+<p>Let’s subscribe to this stream and stop subscribing after ‘3000ms’.</p>
+
+<pre><code class="language-typescript">const subscription = interval$.subscribe(console.log);
+
+setTimeout(() =&gt; {
+  subscription.unsubscribe();
+}, 3000);
+</code></pre>
+<p><code>shareReplay</code> uses a <code>refCount</code> under the hood. This will make sure that the source stream is subscribed to when the subscribers count goes up to 1 or higher. Whenever we unsubscribe, the <code>refCount</code> of the subscription is dropping to 0. In that case, we expect that the source stream (being our interval) is cleaned up and it stops emitting values.</p>
+
+<p>Let’s see what happens. A live example of the code can be found here:</p>
+
+<p><a class="jsbin-embed" href="http://jsbin.com/kocagizoje/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.1.4"></script></p>
+
+<p>As you can see, the interval part of our stream keeps emitting whenever we unsubscribe. This might lead to some unexpected behavior in our code, or even memory leaks. Whenever the <code>interval$</code> has no more subscribers, it doesn’t make sense to keep the source subscription active.</p>
+
+<h3 id="defining-the-problem">Defining the problem</h3>
+
+<p>Whenever we are using the <code>shareReplay</code> operator, we must be very careful. The <code>shareReplay</code> operator does not clean up streams when they have not yet completed. In our case, the <code>interval$</code> keeps emitting values after we stopped listening. This will introduce a memory leak into our application.</p>
+
+<h3 id="fixing-the-problem">Fixing the problem</h3>
+
+<p>Whenever the stream we are multicasting will have multiple values, or even don’t complete on their own, it might be better to use the combination <code>publishReplay(1).refCount()</code> for the time being.</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>RxJS polling strategies</title>
 	  <link>//rxjs-polling/</link>
 	  <author></author>
@@ -1439,203 +1497,6 @@ public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
 <h2 id="conclusion">Conclusion</h2>
 
 <p>Using the ease of composing of observables and decorators in typescript, we were able to create something really fast which can be reused throughout our entire application. It shouldn’t stop with a retry decorator. We could apply this principle to a whole bunch of RxJS related issues like catching errors for example.</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Client side filtering using streams</title>
-	  <link>//client-side-filtering-with-streams/</link>
-	  <author></author>
-	  <pubDate>2017-02-15T00:00:00+00:00</pubDate>
-	  <guid>//client-side-filtering-with-streams/</guid>
-	  <description><![CDATA[
-	     <p>I have been coaching people in using RxJS for a while now. During this time, I’ve noticed that the hardest part for people to learn is not the API, concept or operators but the paradigm switch. Thinking reactively is not something that comes easily and you really have to get your hands dirty to get there.</p>
-
-<p>Below I will show a piece of code that is used to do some basic client side filtering. It’s a snippet of code from somebody that I was coaching which perfecly shows how someone just starting with RxJS often handles this situation. Later on, we will update this to show how you would implement this with the reactive paradigm.</p>
-
-<h3 id="example-case">Example case</h3>
-
-<p>The example application we will be using is really easy. We have service which fetches a number of Star Wars characters from the swapi.com API. We will show these in a list and provide a select element to filter the fetched characters based on the gender.
-The screen looks like this:</p>
-
-<p><img src="https://www.dropbox.com/s/2s9e877rpdaa5w0/Screenshot%202017-02-25%2011.16.57.png?raw=1" alt="example-app" /></p>
-
-<p>You can find the live example <a href="http://blog-kwintenp-examples.surge.sh/client-side-filter/withStream" target="_blank">here</a>.</p>
-
-<h3 id="client-side-filtering-without-streams">Client side filtering without streams</h3>
-
-<p>First we are going to look at an example where we implement the client side filtering without streams. Of course, we are going to use a stream to fetch the data from the backend, but afterwards, the implementation will be imperative.</p>
-
-<pre><code class="language-typescript">// keep a local list of all the characters
-characters: Array&lt;StarWarsCharacter&gt;;
-// keep a list of all the filtered characters
-filteredCharacters: Array&lt;StarWarsCharacter&gt;;
-
-constructor(private starWarsService: StarWarsService) {}
-
-// at startup time, we fetch the characters and save them
-// to our local copy. We keep a local copy of the entire
-// array since we will need it later on when the filter changes
-ngOnInit() {
-  this.starWarsService.getCharacters()
-    .subscribe((fetchedCharacters) =&gt; {
-        this.characters = fetchedCharacters;
-        this.filteredCharacters = fetchedCharacters;
-    })
-}
-
-// when the filter value changes, we filter the local list of
-// characters and save the result to the
-// filteredCharacters array. Here we reuse the entire array
-// to create a new one.
-filterChanged(value: string)
-  if (value === "All") {
-    this.filteredCharacters = this.characters;
-  } else {
-    this.filteredCharacters =
-       this.characters.pipe(
-          filter(
-            (character: StarWarsCharacter) =&gt; {
-               character.gender.toLowerCase() === value.toLowerCase()
-            }
-          ),
-       );
-  }
-}
-</code></pre>
-<p>At startup time, we fetch the characters and save them in two local arrays, <code>characters</code> and <code>filteredCharacters</code>. When the filter actually changes, we use the local copy of the characters to filter out all the correct ones and create a new array. We then assign this new array to the <code>filteredCharacters</code> reference.
-The component’s html looks like this:</p>
-
-<pre><code class="language-html">&lt;h1&gt;Client side filtering without streams example&lt;/h1&gt;
-&lt;div class="row"&gt;
-  &lt;div class="col-sm-3"&gt;
-    &lt;!-- Component that holds the select and throws an event --&gt;
-    &lt;!-- when it changes --&gt;
-    &lt;app-gender-filter (filterChange)="filterChanged($event)"&gt;
-    &lt;/app-gender-filter&gt;
-  &lt;/div&gt;
-  &lt;div class="col-sm-9"&gt;&lt;/div&gt;
-  &lt;div class="col-sm-6"&gt;
-    &lt;!-- component that holds the list and displays the --&gt;
-    &lt;!-- characters --&gt;
-    &lt;app-character-list [characters]="filteredCharacters"&gt;
-    &lt;/app-character-list&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-
-</code></pre>
-
-<p>While this all works perfectly, it’s not the best solution possible with the reactive paradigm in mind. We have to hold a local copy of the characters array, which kind of bugs me.
-It’s also not really flexible. Here, we are fetching the characters via a backend call. This will thus only hold one result. But what if it’s an observable we get from Firebase? In that case the characters array can change as well. To be able to update the view properly when the characters change, we would also have to keep a local copy of the filter to update the <code>filteredCharacters</code> array reference accordingly.
-And what if you would have a multitude of filters… This would result in a multitude of local variables to keep track of.</p>
-
-<p>Using streams we can make this much more flexible!</p>
-
-<h3 id="client-side-filtering-with-streams">Client side filtering with streams</h3>
-
-<p>Let’s first of all try to think what should happen by thinking in streams of data. We will then try to reason about how we can use these streams, combine them and create a result.</p>
-
-<p>If you think about it, we have two inputs that might change our view. On the one hand, we have our list of characters, which should be displayed. And on the other hand we have the dropdown which might filter this list.</p>
-
-<p>Let’s look at the marble diagrams of what these streams might look like:</p>
-
-<p><img src="https://www.dropbox.com/s/89blsfj9aoybdg0/Screenshot%202017-03-04%2016.10.54.png?raw=1" alt="marble-diagram" /></p>
-
-<p>The resulting stream we want is one that holds an array with the filtered characters. If you think about the two input streams we just created, this resulting stream is actually a combination of both of the input streams.
-If we have characters, we want to combine these with the filter and display them onto the screen. If the filter changes, we want to re-execute this logic. If we would have new characters (think about a stream from Firebase), we would also want to re-execute this logic.</p>
-
-<p>It turns out that RxJS provides us with a perfect operator to do something like this: <code>combineLatest</code>. This operator merges streams by executing a projector function on the latest values of these streams.
-The resulting stream looks like this:</p>
-
-<p><img src="https://www.dropbox.com/s/zhj0xvz6d5e84m4/Screenshot%202017-03-04%2016.12.24.png?raw=1" alt="marble-diagram" /></p>
-
-<p><strong>Note:</strong> You can notice here that the result stream only holds a value when both of the streams have emitted a single value. This is a precondition of the <code>combineLatest</code> operator. It will only emit an event onto the newly created stream if all source observables have emitted at least one element. If we think about our example, this means that the gender filter should already have a value to start with.</p>
-
-<p>Let’s take a look at the code!</p>
-
-<pre><code class="language-typescript">export class ClientSideFilterComponent implements OnInit {
-  filter$: BehaviorSubject&lt;string&gt;;
-  characters$: Observable&lt;StarWarsCharacter[]&gt;;
-  filteredCharacters$: Observable&lt;StarWarsCharacter[]&gt;;
-
-  constructor(private starWarsService: StarWarsService) {
-  }
-
-  ngOnInit() {
-    // We create a stream ourselves to map an event form the child
-    // component to a stream of 'filter values'.
-    // We use a BehaviorSubject because this will have an initial 
-    // value. This is important because the combineLatest operator
-    // we will use below only works if every stream has emitted 
-    // at least one value.
-    this.filter$ = new BehaviorSubject("All");
-
-    // we keep the stream containing our characters
-    this.characters$  = this.starWarsService.getCharacters();
-
-    // we create a new stream based on the two input
-    // streams we defined
-    this.filteredCharacters$ = this.createFilterCharacters(
-            this.filter$,
-            this.characters$
-    );
-  }
-
-  public createFilterCharacters(
-            filter$: Observable&lt;string&gt;,
-            characters$: Observable&lt;StarWarsCharacter[]&gt;) {
-    // We combine both of the input streams using the combineLatest
-    // operator. Every time one of the two streams we are combining
-    // here changes value, the project function is re-executed and
-    // the result stream will get a new value. In our case this is
-    // a new array with all the filtered characters.
-    return combineLatest(
-      characters$,
-      filter$, (characters: StarWarsCharacter[], filter: string) =&gt; {
-        // this is the project function where we imperatively
-        // implement the filtering logic
-        if (filter === "All") return characters;
-        return characters.filter(
-                (character: StarWarsCharacter) =&gt;
-                    character.gender.toLowerCase()
-                        === filter.toLowerCase()
-        );
-      });
-  }
-
-  filterChanged(value: string) {
-    // Everytime we have new value, we pass it to the filter$
-    this.filter$.next(value);
-  })
-}
-</code></pre>
-<p>We can use the new stream we created to bind in the view using the async pipe from Angular like this:</p>
-
-<pre><code class="language-html">&lt;h1&gt;Client side filtering with streams example&lt;/h1&gt;
-&lt;div class="row"&gt;
-  &lt;div class="col-sm-3"&gt;
-    &lt;app-gender-filter (filterChange)="filterChanged($event)"&gt;
-    &lt;/app-gender-filter&gt;
-  &lt;/div&gt;
-  &lt;div class="col-sm-9"&gt;&lt;/div&gt;
-  &lt;div class="col-sm-6"&gt;
-    &lt;!-- Using the async pipe we bind it in the app-character-list --&gt;
-    &lt;!-- component --&gt;
-    &lt;app-character-list [characters]="filteredCharacters$ | async"&gt;
-    &lt;/app-character-list&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-
-</code></pre>
-
-<p>If we look at the code we have now, it’s much more flexible. We do not have to write any extra code if the <code>characters$</code>  would have any new values. We do not need to hold any local copies (this is done implicitely by the <code>combineLatest</code> operator). If we would want to add new filters, it’s just a matter of adding another stream to the <code>combineLatest$</code> operator.
-We also don’t have to manually unsubscribe from the filteredCharacters$, the async pipe handles this for us.</p>
-
-<h3 id="conclusion">Conclusion</h3>
-<p>By thinking in input streams and output streams, we were able to map the inputs we had to a result. We bound the stream in the view layer. Using streams up until the html of our component, we eliminated the need for local copies of data and made our code more robust and open to changes. If we now want to add another filter on top of the list, it’s a piece of cake!</p>
-
-<p>You can find the code on <a href="https://github.com/KwintenP/blog-examples/tree/master/src/app/home/client-side-filter" target="_blank"> Github </a>.</p>
 
 	  ]]></description>
 	</item>
