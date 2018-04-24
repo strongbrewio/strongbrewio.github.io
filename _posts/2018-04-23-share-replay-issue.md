@@ -36,7 +36,7 @@ const interval$ = interval(1000)
 
 We are defining an interval stream. Let's assume that we need this interval stream to create multiple other streams. In that case, we need to transform our stream from a cold stream to a hot one by multicasting it. If we do not do this we are basically subscribing multiple times to the interval stream, and we are triggering the interval multiple times.
 
-Using the `shareReplay` operator, we are multicasting our `interval$`. So far so good right!
+Using the `shareReplay` operator, we are multicasting our `interval$`. So far so good right?!
 
 Let's subscribe to this stream and stop subscribing after '3000ms'. 
 
@@ -53,7 +53,7 @@ Let's see what happens. A live example of the code can be found here:
 
 <a class="jsbin-embed" href="http://jsbin.com/kocagizoje/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.1.4"></script>
 
-As you can see, the interval part of our stream keeps emitting whenever we unsubscribe. This might lead to some unexpected behavior in our code. Whenever the `interval$` has no more subscribers, it doesn't make sense to keep the source subscription active. 
+As you can see, the interval part of our stream keeps emitting whenever we unsubscribe. This might lead to some unexpected behavior in our code, or even memory leaks. Whenever the `interval$` has no more subscribers, it doesn't make sense to keep the source subscription active. 
 
 ### Defining the problem
 
