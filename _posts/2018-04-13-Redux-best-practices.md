@@ -28,7 +28,7 @@ It is a best practice to only use it when your application demands it.
 ## Basic best practices
 
 While the folllowing list might be common sense for an experienced Redux developer, let's sum those up as a refreshment for the sake of completeness.
-- Our application can only count one store, otherwise it would become to complex 
+- Our application can only count one store, otherwise it would become too complex 
 - Reducers have to be pure, this is a principle from functional programming which makes functions predictable and avoids side effects
 - Immutable datastructures are very important to optimise change detection cycles and avoid unexpected behavior, therefore reducers should handle data in an immutable manner
 - Reducers always have to return a value! So don't forget to implement the default case of the switch statement to return the original state
@@ -86,7 +86,10 @@ If the endpoint to get a list of users is returning a partial object instead of 
 ## What do we put in the store?
 
 We shouldn't put things in the store just because we can. We have to think about what state needs to be in there and why.
-State that is being shared between components can sometimes be kept in the parent component for instance, but when state needs to be shared between different root components (rendered inside a router-outlet) we might want to keep that state in the store.
+State that is being shared between components can sometimes be kept in the parent component for instance. We call that inner state:
+The component keeps its own state, the component itself is responsible for that. If that component state does not affect anything from the application state, it does not need to be on the application state or touch redux. 
+
+However, when state needs to be shared between different root components (rendered inside a router-outlet) we might want to keep that state in the store.
 
 When we need to remember a value when navigating through the application we could put that in the store as well. An example here could be: Remembering if a sidebar was collapsed or not, so when we navigate back to the page with the sidebar, it would still be collapsed.
 
@@ -180,7 +183,7 @@ type User = Readonly<{
 
 ### Actiontypes
 
-An action type should be a string that explains what the action should change in the store. Keep these strings consistent. Don't make the actiontypes to long, keep them short and clear.
+An action type should be a string that explains what the action should change in the store. Keep these strings consistent. Don't make the actiontypes too long, keep them short and clear.
 
 ```typescript
 // This is bad
@@ -390,7 +393,7 @@ function contractsReducer
         v.id === contract_id ? 
         {
           ...contract, 
-          assignees: [...assignees, action.payload.assignee]
+          assignees: [...assignees, assignee]
         } : 
         v
       )
@@ -446,9 +449,12 @@ Having the store injected everywhere in our application is not a good idea. We w
 Therefore we could consider the following as best practices:
 - Components don't need to know we are using Redux, don't inject the store in them.
 - Services generally don't need to know we are using Redux, don't inject the store in them.
-- We want to be able to refactor Redux out of our application without to much effort
+- We want to be able to refactor Redux away from our application without to much effort
 
 Therefore we want to have some kind of abstraction layer between the presentation layer and the state management layer.
+
+How to abstract away the statemanagement layer can be read in the following two articles: [A scalable angular architecture](https://blog.strongbrew.io/A-scalable-angular2-architecture/) and [A scalable angular architecture part 2](https://blog.strongbrew.io/A-scalable-angular-architecture-part2/).
+This is an architecture that we are using at our customers that really works for us.
 
 ## Redux as a messaging bus VS redux as a state management layer
 
@@ -462,3 +468,12 @@ That being said, I wouldn't call my approach a best practice, but it is a best p
 ## Conclusion
 
 We learned a lot! Once again, the best practices explained in this article are based on personal experiences and projects we have worked on. These are practices that work for us. They are not meant to be seen as the only way of doing things.
+
+## Special thanks
+
+A very warm and much appreciated special thanks to the following people:
+
+[Nicholas Jamieson](https://twitter.com/ncjamieson), [Raúl Jiménez](https://twitter.com/elecash) and [Fabian Gosebrink](https://twitter.com/FabianGosebrink): Thank you all so much for reviewing and pointing out some awesome ideas
+
+
+Your input makes blogging worth while!
