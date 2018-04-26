@@ -27,7 +27,7 @@ It is a best practice to only use it when your application demands it.
 
 ## Basic best practices
 
-While the folllowing list might be common sense for an experienced Redux developer, let's sum those up as a refreshment for the sake of completeness.
+While the following list might be common sense for an experienced Redux developer, let's sum those up as a refreshment for the sake of completeness.
 - Our application can only count one store, otherwise it would become too complex 
 - Reducers have to be pure, this is a principle from functional programming which makes functions predictable and avoids side effects
 - Immutable datastructures are very important to optimise change detection cycles and avoid unexpected behavior, therefore reducers should handle data in an immutable manner
@@ -63,7 +63,7 @@ This is exactly what our reducers will do with the data that flows into them. So
 
 Another approach for models is using Interfaces. Interfaces are great because are only interpreted in compile time, doesn't use memory in runtime and are very expressive. If your model doesn't need to be computed (like `get fullName()` in the previous example), then is advisable to use Interfaces instead.
 
-Using Interfaces alos allows us to get advantage of some TypeScript features like `Pick<T>`. With `Pick<T>` we can create Types from Interfaces, which is very handy in some situations, like creating a model and a record with fewer properties:
+Using Interfaces allows us to get advantage of some TypeScript features like `Pick<T>`. With `Pick<T>` we can create Types from Interfaces, which is very handy in some situations, like creating a model and a record with fewer properties:
 
 ```typescript
 export interface User {
