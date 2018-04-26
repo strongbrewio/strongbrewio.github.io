@@ -13,7 +13,7 @@ tags: Redux, @ngrx, Angular
 cover: 'assets/images/cover/cover2.jpg'
 ---
 
-[@ngrx/store](https://github.com/ngrx/platform/blob/master/docs/store/README.md) is a library that tries to solve the problems of statemanagement through the principles of [Redux](https://redux.js.org/). The difference between Redux and @ngrx/store is that @ngrx/store is written specifically for [Angular](https://angular.io) and it embraces the use of Observables from [RxJS](http://reactivex.io/rxjs/).
+[@ngrx/store](https://github.com/ngrx/platform/blob/master/docs/store/README.md) is a library that tries to solve the problems of state management through the principles of [Redux](https://redux.js.org/). The difference between Redux and @ngrx/store is that @ngrx/store is written specifically for [Angular](https://angular.io) and it embraces the use of Observables from [RxJS](http://reactivex.io/rxjs/).
 The combination of redux principles and RxJS can be very powerful when it comes to writing reactive applications.
 Since a lot of Angular projects use @ngrx/store, it might be a good idea to write down some best-practices.
 
@@ -61,6 +61,28 @@ console.log(updatedUser.fullName); // undefined
 Since we have updated the user in an immutable way, it has created a new reference and therefore all its functionality has been lost.
 This is exactly what our reducers will do with the data that flows into them. So always send plain objects when it comes to sending payloads in the actions.
 
+Another approach for models is using Interfaces. Interfaces are great because are only interpreted in compile time, doesn't use memory in runtime and are very expressive. If your model doesn't need to be computed (like `get fullName()` in the previous example), then is advisable to use Interfaces instead.
+
+Using Interfaces alos allows us to get advantage of some TypeScript features like `Pick<T>`. With `Pick<T>` we can create Types from Interfaces, which is very handy in some situations, like creating a model and a record with fewer properties:
+
+```typescript
+export interface User {
+    id: number;
+    name: string;
+    middleName: string;
+    lastName: string;
+    fullName: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+}
+
+export type UserRecord = Pick<User, 'id' | 'fullName'>;
+```
+
+If the endpoint to get a list of users is returning a partial object instead of the full object then we can create a new Type instead of two Classes or Interfaces. This is a cleaner approach and easier to maintain if your models are prepared for your UI.
+
 ## What do we put in the store?
 
 We shouldn't put things in the store just because we can. We have to think about what state needs to be in there and why.
@@ -68,21 +90,21 @@ State that is being shared between components can sometimes be kept in the paren
 
 When we need to remember a value when navigating through the application we could put that in the store as well. An example here could be: Remembering if a sidebar was collapsed or not, so when we navigate back to the page with the sidebar, it would still be collapsed.
 
-Complex state is something that we might want to put in the store as well, since Redux can handle complex statemanagement in an elegant fasion.
-The general rule of thumb here could be, **Only keep shared state, values that we want to remember and complex state in the store**
+Complex state is something that we might want to put in the store as well, since Redux can handle complex state management in an elegant way.
+The general rule of thumb here could be, **Only keep shared state, values that we want to remember and complex state in the store**. Really, is ok to not save in the store a state that only affects one component. The store is for shared states.
 Don't add state in the store if we don't need to, it would result in unneeded boilerplate and complexity.
 
 That being said, there are 2 more reasons where we might want to add extra state into the store:
-- When we want to make our application real-time. Check out [this article](https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/).
-- When we want to do optimistic updates. Check out [this article](https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/)
+- When we want to make our application real-time. Check out [How we made our app real time in 6 lines of code](https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/).
+- When we want to do optimistic updates. Check out [Cancellable optimistic updates in Angular2 and Redux](https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/)
 
 
 ## Don't forget about router params
 
 A common mistake is putting things inside the store that could easily be added in the url.
-The benifit of keeping state in the url is:
+The benefit of keeping state in the url is:
 
-- We can use the browser its navigation buttons
+- We can use the browser navigation buttons
 - We can bookmark the url
 - We can share that url with other people
 
@@ -124,8 +146,8 @@ export interface ApplicationState {
 }  
 ```
 
-I'm not saying you can not nest state, I am saying we have to be very carefull when we do. The general rule of thumb here is: "keep the state as flat as possible"
-If we want to compose state in @ngrx/store we can work with feature module reducers and lazy load them as we can see [here](https://github.com/ngrx/platform/blob/master/docs/store/api.md#feature-module-state-composition).
+I'm not saying you cannot nest state, I am saying we have to be very careful when we do. The general rule of thumb here is: **keep the state as flat as possible**
+If we want to compose state in @ngrx/store we can work with feature module reducers and lazy load them as we can see in [Feature Module State Composition](https://github.com/ngrx/platform/blob/master/docs/store/api.md#feature-module-state-composition).
 
 ## Make everything readonly
 
@@ -169,7 +191,8 @@ const DATA_USERS_SET_USER_ADDRESS = 'DATA_USERS_SET_USER_ADDRESS';
 const SET_USER_ADDRESS = 'SET_USER_ADDRESS';
 
 ```
-If the statemanagment would become very large we could prefix the action, but let's keep it simple and small as long as we can.
+
+If the state managment would become very large we could prefix the action, but let's keep it simple and small as long as we can.
 
 ### Action creator classes
 
@@ -228,9 +251,9 @@ class UpdateUserAction implements Action{
 }
 ```
 
-### Typesafety
+### Type Safety
 
-Typesafety is a huge win when using Redux with typescript, it requires a bit of boilerplate but it makes developing reducers feel like a walk in the park. It makes sure that our applications won't compile if they have type errors and it gives us great autocompletion inside our reducers.
+Type Safety is a huge win when using Redux with typescript, it requires a bit of boilerplate but it makes developing reducers feel like a walk in the park. It makes sure that our applications won't compile if they have type errors and it gives us great autocompletion inside our reducers.
 Therefore I would definitely consider it a must. Since [Kwinten Pisman](https://twitter.com/KwintenP) already wrote an [awesome article](https://blog.strongbrew.io/type-safe-actions-in-reducers/) about this we won't go in to much detail here.
 
 ## Reducer design
@@ -271,6 +294,7 @@ function usersReducer
     }
 }
 ```
+
 As we can see have have used destructuring to extract the properties of the payload into variables.
 Cleaner right? Let's imagine that our actions has 5 or even more properties on their payloads. In that case this would definitely help.
 Something to note here is that the case implementation is wrapped inside a block statement. This is important because our reducer can have the same payload properties for different actions.
@@ -282,7 +306,7 @@ This means that `user_id` and `address` won't be available in the other case sta
 Reducers should not contain business logic, they are used to handle the state in an immutable fashion. We won't write business logic inside reducers because:
 
 - It would become very complex
-- Business logic has nothing to do with statemanagement
+- Business logic has nothing to do with state management
 - We have services for that
 
 ### Child reducers
@@ -381,7 +405,7 @@ function contractsReducer
 
 As we can see, we have extracted the handling of contracts into its own reducer, which follows the exact same principles of a regular reducer.
 
-The example just became a lot easier to read and way more maintainable. When traversing complex datastructures, reducer nesting can be a really elegant way of managing state.
+The example just became a lot easier to read and way more maintainable. When traversing complex data structures, reducer nesting can be a really elegant way of managing state.
 
 ## Testing
 
@@ -419,6 +443,7 @@ describe('reducer: usersReducer', () => {
 ## Decoupling redux from the presentation layer
 
 Having the store injected everywhere in our application is not a good idea. We want to create an Angular, Vue or React application. Not a Redux application.
+
 Therefore we could consider the following as best practices:
 - Components don't need to know we are using Redux, don't inject the store in them.
 - Services generally don't need to know we are using Redux, don't inject the store in them.
@@ -426,12 +451,12 @@ Therefore we could consider the following as best practices:
 
 Therefore we want to have some kind of abstraction layer between the presentation layer and the state management layer.
 
-## Redux as a messaging bus VS redux as a statemanagement layer
+## Redux as a messaging bus VS redux as a state management layer
 
-This might be a personal preference, but I like to use Redux as a pure statemanagement layer. Yes, there are tools like @ngrx/effects where
-we can send actions to our application and those actions won't just perform statemanagement but will do XHR calls among other things.
+This might be a personal preference, but I like to use Redux as a pure state management layer. Yes, there are tools like @ngrx/effects where
+we can send actions to our application and those actions won't just perform state management but will do XHR calls among other things.
 
-The nice thing about this approach is that we use some kind of messaging bus. However, I mostly like to keep it simple and abstract Redux away as much as possible. Therefore I don't use @ngrx/effects and only use Redux to update pieces of state and consume theses pieces. Some part of me believes that Redux shouldn't be used to perform backend calls nor decide when to optimistically update. I usually tackle optimistic updates [this way].(https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/).
+The nice thing about this approach is that we use some kind of messaging bus. However, I mostly like to keep it simple and abstract Redux away as much as possible. Therefore I don't use @ngrx/effects and only use Redux to update pieces of state and consume theses pieces. Some part of me believes that Redux shouldn't be used to perform backend calls nor decide when to optimistically update. I usually tackle optimistic updates [this way](https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/).
 
 That being said, I wouldn't call my approach a best practice, but it is a best practice to really think about which way we want it.
 
