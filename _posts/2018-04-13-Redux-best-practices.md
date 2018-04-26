@@ -91,8 +91,7 @@ State that is being shared between components can sometimes be kept in the paren
 When we need to remember a value when navigating through the application we could put that in the store as well. An example here could be: Remembering if a sidebar was collapsed or not, so when we navigate back to the page with the sidebar, it would still be collapsed.
 
 Complex state is something that we might want to put in the store as well, since Redux can handle complex state management in an elegant way.
-The general rule of thumb here could be, **Only keep shared state, values that we want to remember and complex state in the store**. Really, is ok to not save in the store a state that only affects one component. The store is for shared states.
-Don't add state in the store if we don't need to, it would result in unneeded boilerplate and complexity.
+The general rule of thumb here could be, **Only keep shared state, values that we want to remember and complex state in the store**. Don't add state in the store if we don't need to, it would result in unneeded boilerplate and complexity.
 
 That being said, there are 2 more reasons where we might want to add extra state into the store:
 - When we want to make our application real-time. Check out [How we made our app real time in 6 lines of code](https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/).
