@@ -194,6 +194,17 @@ const SET_USER_ADDRESS = 'SET_USER_ADDRESS';
 
 ```
 
+Another cool idea might be to suffix the action with square brackets and put the whole thing into an action object:
+
+```typescript
+
+// Easy to read/debug
+const UserActions = {
+  SET_ADDRESS: '[USER] ADDRESS'
+}
+
+```
+
 If the state managment would become very large we could prefix the action, but let's keep it simple and small as long as we can.
 
 ### Action creator classes
