@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Redux (@ngrx/store) best practices
-published: false
+published: true
 description: This article is all about what to do and what not to do when using Redux (@ngrx/store)
 author: brechtbilliet
 comments: true
