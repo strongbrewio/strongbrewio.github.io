@@ -5,7 +5,7 @@ published: true
 description: This article is all about what to do and what not to do when using Redux (@ngrx/store)
 author: brechtbilliet
 comments: true
-date: 2016-12-21
+date: 2018-04-28
 subclass: 'post'
 categories: 'brechtbilliet'
 disqus: true
