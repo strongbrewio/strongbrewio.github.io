@@ -12,6 +12,482 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Redux (@ngrx/store) best practices</title>
+	  <link>//Redux-best-practices/</link>
+	  <author></author>
+	  <pubDate>2018-04-27T00:00:00+00:00</pubDate>
+	  <guid>//Redux-best-practices/</guid>
+	  <description><![CDATA[
+	     <p><a href="https://github.com/ngrx/platform/blob/master/docs/store/README.md">@ngrx/store</a> is a library that tries to solve the problems of state management through the principles of <a href="https://redux.js.org/">Redux</a>. The difference between Redux and @ngrx/store is that @ngrx/store is written specifically for <a href="https://angular.io">Angular</a> and it embraces the use of Observables from <a href="http://reactivex.io/rxjs/">RxJS</a>.
+The combination of redux principles and RxJS can be very powerful when it comes to writing reactive applications.
+Since a lot of Angular projects use @ngrx/store, it might be a good idea to write down some best-practices.</p>
+
+<p>Note: The best-practices and opinions described in this article are strictly personal. Best practices are almost always a matter of opinion. Nevertheless, we (StrongBrew) are using these best practices at all our customers on a daily basis and they certainly work for us.   From now on @ngrx/store will be reffered to as Redux in this article.</p>
+
+<h2 id="to-redux-or-not-to-redux">To Redux or not to Redux?</h2>
+
+<p>The first question that we might want to ask ourselves is do we really need Redux in our application.
+It is a best practice to only use it when your application demands it.
+<a href="https://blog.strongbrew.io/do-we-really-need-redux">This article</a> tackles this question separately.</p>
+
+<h2 id="basic-best-practices">Basic best practices</h2>
+
+<p>While the following list might be common sense for an experienced Redux developer, let’s sum those up as a refreshment for the sake of completeness.</p>
+<ul>
+  <li>Our application can only count one store, otherwise it would become too complex</li>
+  <li>Reducers have to be pure, this is a principle from functional programming which makes functions predictable and avoids side effects</li>
+  <li>Immutable datastructures are very important to optimise change detection cycles and avoid unexpected behavior, therefore reducers should handle data in an immutable manner</li>
+  <li>Reducers always have to return a value! So don’t forget to implement the default case of the switch statement to return the original state</li>
+</ul>
+
+<h2 id="dont-add-models-to-the-store">Don’t add models to the store</h2>
+
+<p>A model can be seen as a javascript object which has functionality, like the following example:</p>
+
+<pre><code class="language-typescript">class User{
+    constructor(private firstName: string, private lastName:string){
+    }
+
+    get fullName(): string {
+        return `${this.firstName} ${this.lastName}`; 
+    }
+}
+</code></pre>
+
+<p>While the Redux package written by Dan Abramov forbids sending these prototyped objects as a payload, @ngrx/store does not forbid it yet.
+However, it is a bad practice because it adds a lot of complexity to the store and chances are big that the models will get broken because of the immutable way of handling data. Check this example for instance:</p>
+
+<pre><code class="language-typescript">const user = new User('Brecht', 'Billiet');
+console.log(user.fullName); // Brecht Billiet
+const updatedUser = {...user, lastName: 'Doe'};
+console.log(updatedUser.fullName); // undefined
+</code></pre>
+
+<p>Since we have updated the user in an immutable way, it has created a new reference and therefore all its functionality has been lost.
+This is exactly what our reducers will do with the data that flows into them. So always send plain objects when it comes to sending payloads in the actions.</p>
+
+<p>Another approach for models is using Interfaces. Interfaces are great because are only interpreted in compile time, doesn’t use memory in runtime and are very expressive. If your model doesn’t need to be computed (like <code>get fullName()</code> in the previous example), then is advisable to use Interfaces instead.</p>
+
+<p>Using Interfaces allows us to get advantage of some TypeScript features like <code>Pick&lt;T&gt;</code>. With <code>Pick&lt;T&gt;</code> we can create Types from Interfaces, which is very handy in some situations, like creating a model and a record with fewer properties:</p>
+
+<pre><code class="language-typescript">export interface User {
+    id: number;
+    name: string;
+    middleName: string;
+    lastName: string;
+    fullName: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+}
+
+export type UserRecord = Pick&lt;User, 'id' | 'fullName'&gt;;
+</code></pre>
+
+<p>If the endpoint to get a list of users is returning a partial object instead of the full object then we can create a new Type instead of two Classes or Interfaces. This is a cleaner approach and easier to maintain if your models are prepared for your UI.</p>
+
+<h2 id="what-do-we-put-in-the-store">What do we put in the store?</h2>
+
+<p>We shouldn’t put things in the store just because we can. We have to think about what state needs to be in there and why.
+State that is being shared between components can sometimes be kept in the parent component for instance. We call that inner state:
+The component keeps its own state, the component itself is responsible for that. If that component state does not affect anything from the application state, it does not need to be on the application state or touch redux.</p>
+
+<p>However, when state needs to be shared between different root components (rendered inside a router-outlet) we might want to keep that state in the store.</p>
+
+<p>When we need to remember a value when navigating through the application we could put that in the store as well. An example here could be: Remembering if a sidebar was collapsed or not, so when we navigate back to the page with the sidebar, it would still be collapsed.</p>
+
+<p>Complex state is something that we might want to put in the store as well, since Redux can handle complex state management in an elegant way.
+The general rule of thumb here could be, <strong>Only keep shared state, values that we want to remember and complex state in the store</strong>. Don’t add state in the store if we don’t need to, it would result in unneeded boilerplate and complexity.</p>
+
+<p>That being said, there are 2 more reasons where we might want to add extra state into the store:</p>
+<ul>
+  <li>When we want to make our application real-time. Check out <a href="https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/">How we made our app real time in 6 lines of code</a>.</li>
+  <li>When we want to do optimistic updates. Check out <a href="https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/">Cancellable optimistic updates in Angular2 and Redux</a></li>
+</ul>
+
+<h2 id="dont-forget-about-router-params">Don’t forget about router params</h2>
+
+<p>A common mistake is putting things inside the store that could easily be added in the url.
+The benefit of keeping state in the url is:</p>
+
+<ul>
+  <li>We can use the browser navigation buttons</li>
+  <li>We can bookmark the url</li>
+  <li>We can share that url with other people</li>
+</ul>
+
+<p>If we can put simple things into the url, we should at least consider it.</p>
+
+<h2 id="avoid-huge-lists">Avoid HUGE lists</h2>
+
+<p>Redux can not be seen as a local in-memory database, so we can’t put all our data into the store for performance reasons.
+Redux can be seen as an abstraction of state and data that our application needs at a certain time.</p>
+
+<p>For instance if we have a list of 10000 users, we don’t want to put them all in the store. What we could do is keep track of a list of 500 users in the store, which the user can see at that specific time, and load more users on the background and update that buffered list.</p>
+
+<h2 id="designing-the-state">Designing the state</h2>
+
+<p>Designing the state of our application is an important step, and we recommend to draw that state on a whiteboard first. The most important rule here is: <strong>Keep the state as flat as possible</strong></p>
+
+<p>One of the most common bad practices is deep-nesting the state into something that becomes rather complex:</p>
+
+<pre><code class="language-typscript">
+// this is an example of how not to design state
+export interface ApplicationState {
+    moduleA: {
+        data: {
+            foo: {
+                bar: {
+                    users: User[],
+                    cars: Car[]
+                }
+            }
+        }
+    }
+}  
+
+// keeping it flat makes the application way easier
+export interface ApplicationState {
+    users: User[],
+    cars: Car[]
+}  
+</code></pre>
+
+<p>I’m not saying you cannot nest state, I am saying we have to be very careful when we do. The general rule of thumb here is: <strong>keep the state as flat as possible</strong>
+If we want to compose state in @ngrx/store we can work with feature module reducers and lazy load them as we can see in <a href="https://github.com/ngrx/platform/blob/master/docs/store/api.md#feature-module-state-composition">Feature Module State Composition</a>.</p>
+
+<h2 id="make-everything-readonly">Make everything readonly</h2>
+
+<p>We already covered the reason why we need to work immutable, but how can we enforce this?
+Typescript comes with a readonly keyword which we can use to make a property readonly</p>
+
+<pre><code class="language-typescript">type User = {
+    readonly firstName: string;
+    readonly lastName: string;
+}
+
+const user: User = {firstName: 'Brecht', lastName: 'Billiet'};
+user.lastName = 'Doe';//cannot assign to 'lastName' 
+// because it is a constant of read-only property
+</code></pre>
+
+<p>This would certainly make sure we aren’t updating properties in our reducers by accident. It does suck that we have to write readonly for every property.
+The cool thing is that typescript offers us something called “advanced types” where we can do something like this:</p>
+
+<pre><code class="language-typescript">// By using the Readonly&lt;&gt; advanced types all the properties inside the type
+// are readonly by default
+type User = Readonly&lt;{
+    firstName: string;
+    lastName: string;
+}&gt;;
+</code></pre>
+
+<h2 id="action-design">Action design</h2>
+
+<h3 id="actiontypes">Actiontypes</h3>
+
+<p>An action type should be a string that explains what the action should change in the store. Keep these strings consistent. Don’t make the actiontypes too long, keep them short and clear.</p>
+
+<pre><code class="language-typescript">// This is bad
+const DATA_USERS_SET_USER_ADDRESS = 'DATA_USERS_SET_USER_ADDRESS';
+
+// This is better
+const SET_USER_ADDRESS = 'SET_USER_ADDRESS';
+
+</code></pre>
+
+<p>Another cool idea might be to suffix the action with square brackets and put the whole thing into an action object:</p>
+
+<pre><code class="language-typescript">
+// Easy to read/debug
+const UserActions = {
+  SET_ADDRESS: '[USER] ADDRESS'
+}
+
+</code></pre>
+
+<p>If the state managment would become very large we could prefix the action, but let’s keep it simple and small as long as we can.</p>
+
+<h3 id="action-creator-classes">Action creator classes</h3>
+
+<p>When we use plain action types and payloads it becomes quite painful to remember all the action type names and all the payloads that belong to them. This example for instance:</p>
+
+<pre><code class="language-typescript">const user_id = '1234', address = {whatevz};
+this.store.dispatch(
+    {
+        type: 'SET_USER_ADDRESS', 
+        payload: {user_id, address}
+    });
+</code></pre>
+
+<p>That’s pretty nasty if we want remember all that stuff, so let’s create action creator classes for these. What if we could do this?</p>
+
+<pre><code class="language-typescript">const user_id = '1234', address = {whatevz};
+this.store.dispatch(new SetUserAddressAction(user_id, address));
+</code></pre>
+
+<p>That’s just became way easier to use and we don’t have to remember the payload of the action.</p>
+
+<p>If we wanted to implement the actioncreator class for this action it would look like this:</p>
+
+<pre><code class="language-typescript">class SetUserAddressAction implements Action {
+    type = SET_USER_ADDRESS;
+    payload: {user_id: string, address: Address};
+    constructor(user_id: string, address: Address){
+        this.payload = {user_id, address};
+    }
+}
+</code></pre>
+
+<h3 id="payload-design">Payload design</h3>
+
+<p>When the action would only have one property for the payload we might be encouraged to use the payload directly instead of creating a property in it. However that would lead to inconsistency, so it might be better to always use subproperties</p>
+
+<pre><code class="language-typescript">// This is bad (inconsistent with the rest of the actions)
+class UpdateUserAction implements Action {
+    type = UPDATE_USER;
+    payload: User;
+    constructor(user: User){
+        this.payload = user;
+    }
+}
+// This is better
+class UpdateUserAction implements Action{
+    type = UPDATE_USER;
+    payload: {user: User};
+    constructor(user: User){
+        this.payload = {user};
+    }
+}
+</code></pre>
+
+<h3 id="type-safety">Type Safety</h3>
+
+<p>Type Safety is a huge win when using Redux with typescript, it requires a bit of boilerplate but it makes developing reducers feel like a walk in the park. It makes sure that our applications won’t compile if they have type errors and it gives us great autocompletion inside our reducers.
+Therefore I would definitely consider it a must. Since <a href="https://twitter.com/KwintenP">Kwinten Pisman</a> already wrote an <a href="https://blog.strongbrew.io/type-safe-actions-in-reducers/">awesome article</a> about this we won’t go in to much detail here.</p>
+
+<h2 id="reducer-design">Reducer design</h2>
+
+<h3 id="destructuring-the-payload">Destructuring the payload</h3>
+
+<p>If we want to make the reducer code more readable and shorter we could use javascript destructuring for that.
+This might be personal preference, but it sure as hell makes our reducers easier to read. Take this example for instance:</p>
+
+<pre><code class="language-typescript">function usersReducer
+  (state: User[], action: UserActions): User []{
+    switch(action.type) {
+      case 'SET_USER_ADDRESS':
+        return state.map(v =&gt; 
+          v.id === action.payload.user_id ? 
+          {...user, address: action.payload.address} : 
+          v
+        )
+    }
+}
+</code></pre>
+<p>The <code>action.payload.</code>code comes back a few times, resulting in longer codelines.
+The following piece of code might be more readable:</p>
+
+<pre><code class="language-typescript">function usersReducer
+  (state: User[], action: UserActions): User []{
+    switch(action.type) {
+      case 'SET_USER_ADDRESS': {
+        const {user_id, address} = action.payload;
+        return state.map(v =&gt; 
+          v.id === user_id ? 
+          {...user, address} : 
+          v
+        )
+      }
+    }
+}
+</code></pre>
+
+<p>As we can see have have used destructuring to extract the properties of the payload into variables.
+Cleaner right? Let’s imagine that our actions has 5 or even more properties on their payloads. In that case this would definitely help.
+Something to note here is that the case implementation is wrapped inside a block statement. This is important because our reducer can have the same payload properties for different actions.</p>
+
+<p>This means that <code>user_id</code> and <code>address</code> won’t be available in the other case statements, which is exactly what we want.</p>
+
+<h3 id="dont-write-business-logic-inside-our-reducers">Don’t write business logic inside our reducers</h3>
+
+<p>Reducers should not contain business logic, they are used to handle the state in an immutable fashion. We won’t write business logic inside reducers because:</p>
+
+<ul>
+  <li>It would become very complex</li>
+  <li>Business logic has nothing to do with state management</li>
+  <li>We have services for that</li>
+</ul>
+
+<h3 id="child-reducers">Child reducers</h3>
+
+<p>When reducers need to update a piece of state a few levels down in the tree it can become complex in no-time. Take this example for instance:</p>
+
+<pre><code class="language-typescript">type User = {
+    id: string;
+    contracts: Contract[];
+}
+type Contract = {
+    id: string;
+    assignees: Assignee[];
+}
+type ApplicationState = {
+    users: User[];
+}   
+...
+</code></pre>
+
+<p>If we would put all the logic to add an assignee to a specific contract of a specific user, the code would be hard to read. Checkout the following piece of code:</p>
+
+<pre><code class="language-typescript">// This is bad
+function usersReducer
+  (state: User[], action: UserActions): User []{
+  switch(action.type) {
+    case 'ADD_USER_CONTRACT_ASSIGNEE': {
+      const {user_id, contract_id, assignee} = action.payload;
+      return state.map(v =&gt; 
+        v.id === user_id ? 
+        {
+          ...user, 
+          contracts: user.contracts.map(contract =&gt; 
+            contract.id === contract_id ?
+            {
+              ...contract, 
+              assignees: [...contract.assignees, assignee]
+            } : 
+            contract
+          )
+        } : 
+        v
+      )
+    }
+    default:
+      return state;
+  }
+}
+</code></pre>
+
+<p>When reducers become complex it might be a good idea to split the reducer up into child reducers. Check the refactored version of the previous example:</p>
+
+<pre><code class="language-typescript">// This is better
+function usersReducer
+  (state: User[], action: UserActions): User []{
+  switch(action.type) {
+    case 'ADD_USER_CONTRACT_ASSIGNEE': {
+      const {user_id, contract_id, assignee} = action.payload;
+      return state.map(v =&gt; 
+        v.id === user_id ? 
+        {
+          ...user, 
+          contracts: contractsReducer(contracts, action.payload)
+        } : 
+        v
+      )
+    }
+    default:
+      return state;
+  }
+}
+
+function contractsReducer
+  (state: Contract[], action: UserActions): Contract []{
+  switch(action.type) {
+    case 'ADD_USER_CONTRACT_ASSIGNEE': {
+      const { contract_id, assignee} = action.payload;
+      return state.map(v =&gt; 
+        v.id === contract_id ? 
+        {
+          ...contract, 
+          assignees: [...assignees, assignee]
+        } : 
+        v
+      )
+    }
+    default:
+      return state;
+  }
+}
+
+</code></pre>
+
+<p>As we can see, we have extracted the handling of contracts into its own reducer, which follows the exact same principles of a regular reducer.</p>
+
+<p>The example just became a lot easier to read and way more maintainable. When traversing complex data structures, reducer nesting can be a really elegant way of managing state.</p>
+
+<h2 id="testing">Testing</h2>
+
+<p>Since reducers are pure functions, unit testing them is very easy.
+We won’t need to mock out any dependencies and we only have to test the value that the reducer returns.</p>
+
+<p>We can also use <a href="https://www.npmjs.com/package/deep-freeze">deepfreeze</a> to freeze the state that when the reducer accidently mutates data, the tests will throw an error. Deepfreeze is nothing more than a recursive <code>Object.freeze</code></p>
+
+<pre><code class="language-typescript">describe('reducer: usersReducer', () =&gt; {
+  describe('case UPDATE_USER', () =&gt; {
+    it('should return a new instance with the correct state', 
+    () =&gt; {
+      const initialState = [new User('1'), new User('2')];
+      // deepfreeze makes sure the reducer 
+      // doesn't mutate anything by accident
+      deepfreeze(initialState); 
+      const user = new User('2');
+      const action = new UpdateUserAction(user);
+      const newState = usersReducer(initialState, action);
+      // check if the result of the array is a new ref
+      expect(changedState).not.toBe(initialState); 
+      // check if the result of the use is a new ref
+      expect(changedState[1]).not.toBe(changedState[1]);
+      // check if the user got updated automatically
+      expect(changedState[1]).toEqual(user);
+    });
+  });
+});
+  
+</code></pre>
+
+<p><strong>Note: Don’t forget to test the default action</strong></p>
+
+<h2 id="decoupling-redux-from-the-presentation-layer">Decoupling redux from the presentation layer</h2>
+
+<p>Having the store injected everywhere in our application is not a good idea. We want to create an Angular, Vue or React application. Not a Redux application.</p>
+
+<p>Therefore we could consider the following as best practices:</p>
+<ul>
+  <li>Components don’t need to know we are using Redux, don’t inject the store in them.</li>
+  <li>Services generally don’t need to know we are using Redux, don’t inject the store in them.</li>
+  <li>We want to be able to refactor Redux away from our application without to much effort</li>
+</ul>
+
+<p>Therefore we want to have some kind of abstraction layer between the presentation layer and the state management layer.</p>
+
+<p>How to abstract away the statemanagement layer can be read in the following two articles: <a href="https://blog.strongbrew.io/A-scalable-angular2-architecture/">A scalable angular architecture</a> and <a href="https://blog.strongbrew.io/A-scalable-angular-architecture-part2/">A scalable angular architecture part 2</a>.
+This is an architecture that we are using at our customers that really works for us.</p>
+
+<h2 id="redux-as-a-messaging-bus-vs-redux-as-a-state-management-layer">Redux as a messaging bus VS redux as a state management layer</h2>
+
+<p>This might be a personal preference, but I like to use Redux as a pure state management layer. Yes, there are tools like @ngrx/effects where
+we can send actions to our application and those actions won’t just perform state management but will do XHR calls among other things.</p>
+
+<p>The nice thing about this approach is that we use some kind of messaging bus. However, I mostly like to keep it simple and abstract Redux away as much as possible. Therefore I don’t use @ngrx/effects and only use Redux to update pieces of state and consume theses pieces. Some part of me believes that Redux shouldn’t be used to perform backend calls nor decide when to optimistically update. I usually tackle optimistic updates <a href="https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/">this way</a>.</p>
+
+<p>That being said, I wouldn’t call my approach a best practice, but it is a best practice to really think about which way we want it.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We learned a lot! Once again, the best practices explained in this article are based on personal experiences and projects we have worked on. These are practices that work for us. They are not meant to be seen as the only way of doing things.</p>
+
+<h2 id="special-thanks">Special thanks</h2>
+
+<p>A very warm and much appreciated special thanks to the following people:</p>
+
+<p><a href="https://twitter.com/ncjamieson">Nicholas Jamieson</a>, <a href="https://twitter.com/elecash">Raúl Jiménez</a> and <a href="https://twitter.com/FabianGosebrink">Fabian Gosebrink</a>: Thank you all so much for reviewing and pointing out some awesome ideas</p>
+
+<p>Your input makes blogging worth while!</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>RxJS polling strategies</title>
 	  <link>//rxjs-polling/</link>
 	  <author></author>
@@ -2826,137 +3302,6 @@ export class InfiniteScrollListComponent {
 Let’s say that we would like to free up DOM-elements and use only 100 items at a time, we could just create a new stream for that :)</p>
 
 <p>Thanks for reading, I hope you enjoyed it.</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>How share() can reduce network requests</title>
-	  <link>//how-share()-can-reduce-network-requests/</link>
-	  <author></author>
-	  <pubDate>2016-12-20T00:00:00+00:00</pubDate>
-	  <guid>//how-share()-can-reduce-network-requests/</guid>
-	  <description><![CDATA[
-	     <p>As you hopefully all know, observables you get back from the Angular 2 Http service are cold. A cold observable only starts when you subscribe to to it and is unicast (for every subscription to the Http observable, a network call is triggered).</p>
-
-<p><strong>Note:</strong> If you want to dive deeper into hot vs cold observables, Christoph Burgdorf from Thoughtram wrote <a href="http://blog.thoughtram.io/angular/2016/06/16/cold-vs-hot-observables.html" target="_blank">an awesome article </a> on the subject (Rx pun intended :)).</p>
-
-<h4 id="project-setup">Project setup</h4>
-
-<p>To demonstrate how the <code>share()</code> operator can reduce our number of network calls, I’ve created a demo application (code available on <a href="https://github.com/KwintenP/save-netwerk-requests-with-share" target="_blank">Github</a>). The setup looks like this:</p>
-
-<p><img src="https://www.dropbox.com/s/d87po1zbp2ri11u/Screenshot%202016-12-15%2020.08.33.png?raw=1" alt="setup" /></p>
-
-<p>As you can see, we have an app component, which is smart, and three dumb components. During startup, the app component will randomly fetch one of the Star Wars characters by calling the StarWarsService.</p>
-
-<pre><code class="language-typescript">// app.component.ts
-this.character$ =
-     this.starWarsService.getCharacter(this.generateNumber());
-</code></pre>
-
-<p>The StarWarsService uses Angular’s Http and returns a character from the series using the swapi.co API.</p>
-
-<pre><code class="language-typescript">// star-wars.service.ts
-public getCharacter(id: number): Observable&lt; StarWarsCharacter &gt; {
-    return this.http.get('https://swapi.co/api/people/' + id)
-      .pipe(
-      	   map((response: Response) =&gt; response.json())
-      );
-}
-</code></pre>
-
-<p>The app component creates three new observables by mapping the <code>character$</code> source observable.</p>
-
-<pre><code class="language-typescript">// app.component.ts
-this.name$ = this.character$.pipe(
-   map(character =&gt; character.name)
-);
-this.birthDate$ = this.character$.pipe(
-   map(character =&gt; character.birth_year)
-);
-this.gender$ = this.character$.pipe(
-   map(character =&gt; character.gender)
-);
-</code></pre>
-
-<p>The data is passed to the dumb components using the <code>async</code> pipe.</p>
-
-<pre><code class="language-html">&lt;app-character-name [name]="name$ | async"&gt;
-&lt;/app-character-name&gt;
-&lt;app-character-birthdate [birthDate]="birthDate$ | async"&gt;
-&lt;/app-character-birthdate&gt;
-
-&lt;button type="button" (click)="toggleEnabled()"&gt;
-     Enable gender component
-&lt;/button&gt;
-&lt;app-character-gender *ngIf="enabled" [gender]="gender$ | async"&gt;
-&lt;/app-character-gender&gt;
-</code></pre>
-
-<p>As you can see in the snippet above, the gender component is only rendered <strong>after</strong> the button has been clicked. This way we can simulate a ‘delayed subscription’. We’ll see why this is important in a second.</p>
-
-<h4 id="potential-pitfall">Potential pitfall</h4>
-<p>If we run this code, everything works perfectly. But if we look at the network tab, we can see some strange behaviour.</p>
-
-<p><img src="https://www.dropbox.com/s/j5etmgqz668v4wp/Dec-15-2016%2020-00-10.gif?raw=1" alt="setup" /></p>
-
-<p>When the page is refreshed, we already see two calls to the backend. If we click the button to enable the gender component, we see another request being send. Why do we see multiple backend requests if we’re only asking for one <code>character$</code>?</p>
-
-<p>The reason is simple. The <code>character$</code> is a <strong>cold observable</strong>. If you subscribe to a cold http observable twice, you’ll have two backend requests.
-We map this <code>character$</code> or source observable using the <code>map</code> operator to three different observables. Every subscription to one of these three observables (which is done by the async pipe), is basically the same as subscribing to the <code>character$</code> observable directly. And because the <code>character$</code> observable is a cold observable, you see multiple requests.
-The problem with this is that the underlying subscription to the source observable is <strong>not shared</strong>.</p>
-
-<h4 id="how-can-we-fix-this-kind-of">How can we fix this (kind of)</h4>
-
-<p>Let’s change the observable that the StarWarsService returns like this:</p>
-
-<pre><code class="language-typescript">return this.http.get('https://swapi.co/api/people/' + id)
-      .pipe(
-          map((response: Response) =&gt; response.json()),
-          share()
-      );
-</code></pre>
-
-<p>We added the <code>share()</code> operator. This is an alias for doing <code>publish().refCount()</code>. This will make the <code>character$</code> a hot observable that starts emitting events as soon as the first one subscribes. The <code>character$</code> observable will be a ‘shared’ one. Let’s first see what this means and explain afterwards:</p>
-
-<p><img src="https://www.dropbox.com/s/o3i03kudmutt1gk/Dec-15-2016%2019-57-47.gif?raw=1" alt="setup" /></p>
-
-<p>Now we can see that, on the initial page load, there is only one request. That’s because the <code>share()</code> operator will share the underlying subscription between its listeners. As soon as the first one subscribes, it will listen to the Http observable and thus trigger one backend request. Everybody else who starts listening afterwards, will get the same result. Hence we only see a single request to the swapi.co API.</p>
-
-<p>But, when I click on the button to enable the gender component, we can see that a second request is triggered. This means our <code>share()</code> operator doesn’t help us entirely. It turns out that with <code>share()</code>, if the source observable completes, the underlying subscription is gone as well. So when the gender component gets rendered, the original request is long finished and completed. For every new subscription after this completion, in our case via the <code>gender$</code> observable, the <code>share()</code> operator will start a new backend request.</p>
-
-<p>This can perfectly be expected behaviour, if you want it. In some cases though, you don’t.</p>
-
-<h4 id="publishreplay-to-the-rescue">publishReplay to the rescue</h4>
-
-<p>Let’s change the observable from the StarWarsService one more time:</p>
-
-<pre><code class="language-typescript">let obs$: ConnectableObservable&lt;StarWarsCharacter&gt; =
-     this.http.get('https://swapi.co/api/people/' + id)
-         .pipe(
-            map((response: Response) =&gt; response.json()),
-            publishReplay(),
-         );
-obs$.connect();
-return obs$;
-</code></pre>
-
-<p>I removed the <code>share()</code> operator and used <code>publishReplay()</code> instead. This will return an observable that will subscribe to the source observable as soon as you <code>connect()</code> it. In our case, this needs to happen immediately, so I call it before returning.
-Let’s see what this does:</p>
-
-<p><img src="https://www.dropbox.com/s/5j4381vj8439dbb/Dec-15-2016%2019-55-20.gif?raw=1" alt="setup" /></p>
-
-<p>Alright! Now we only have one request at startup time and we do not have a new one when we render the gender component. The <code>publishReplay()</code> operator doesn’t care if the Http observable completes or not. For every new subscription, it will just return the previous result.</p>
-
-<h4 id="conclusion">Conclusion</h4>
-
-<ul>
-  <li>If your source observable ‘splits’ into multiple observables, using the <code>share()</code> operator will reduce network requests.</li>
-  <li>If you have subscriptions which are delayed due to delayed rendering, you might want to use the <code>publishReplay()</code> operator to avoid extra requests.</li>
-</ul>
-
-<p><strong>NOTE:</strong> Thanks to <a href="https://twitter.com/juristr">@juristr</a> for the review!</p>
-
 
 	  ]]></description>
 	</item>

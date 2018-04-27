@@ -8,6 +8,23 @@
     
       
       <item>
+        <title>Redux (@ngrx/store) best practices</title>
+        
+          <description>&lt;p&gt;&lt;a href=&quot;https://github.com/ngrx/platform/blob/master/docs/store/README.md&quot;&gt;@ngrx/store&lt;/a&gt; is a library that tries to solve the problems of state management through the principles of &lt;a href=&quot;https://redux.js.org/&quot;&gt;Redux&lt;/a&gt;. The difference between Redux and @ngrx/store is that @ngrx/store is written specifically for &lt;a href=&quot;https://angular.io&quot;&gt;Angular&lt;/a&gt; and it embraces the use of Observables from &lt;a href=&quot;http://reactivex.io/rxjs/&quot;&gt;RxJS&lt;/a&gt;.
+The combination of redux principles and RxJS can be very powerful when it comes to writing reactive applications.
+Since a lot of Angular projects use @ngrx/store, it might be a good idea to write down some best-practices.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 27 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        /Redux-best-practices/</link>
+        <guid isPermaLink="true">/Redux-best-practices/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Be careful when using shareReplay</title>
         
           <description>&lt;p&gt;This post describes an issue with the current &lt;code&gt;shareReplay&lt;/code&gt; operator in RxJS. There has been an open issue for this on Github, but as it has been open for quite some time now. The issue might introduce some memory leaks, so I decided to write about it.&lt;/p&gt;
