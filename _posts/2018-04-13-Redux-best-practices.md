@@ -1,15 +1,17 @@
 ---
-layout: post
 title: Redux (@ngrx/store) best practices
 published: true
-description: This article is all about what to do and what not to do when using Redux (@ngrx/store)
 author: brechtbilliet
-comments: true
-date: 2018-04-28
+description: This article is all about what to do and what not to do when using Redux (@ngrx/store)
+layout: post
+navigation: True
+date:   2018-04-27
+tags: Redux @ngrx Angular
 subclass: 'post'
 categories: 'brechtbilliet'
+logo: 'assets/images/strongbrewlogo.png'
+published: true
 disqus: true
-tags: Redux, @ngrx, Angular
 cover: 'assets/images/cover/cover2.jpg'
 ---
 
