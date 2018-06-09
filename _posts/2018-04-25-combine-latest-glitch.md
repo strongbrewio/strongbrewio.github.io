@@ -85,15 +85,17 @@ To make it even more clear, lets put it in steps.
 - the `switchMap` operator gets these values and subscribes to the stream that triggers a backend call
 - offset is set to 0
 - the `combineLatest` operator sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0
-- the `switchMap` operator gets these values, unsubscribes (and thus cancels) the previous requests and starts a new one
+- the `switchMap` operator gets these values, unsubscribes (and thus cancels) the previous request and starts a new one
 
 Something you might have not expected in this flow is that, whenever the limit is set, this changes propagates to the `combineLatest` operator directly before changing the offset. 
 
-**Note:** This is possible because RxJS does not have the notion of transactions. In a 'true' FRP implementation, this would not be possible. Transactions would make sure there can be no simultaneous events. This is food for another post though :).
+**Note:** This is possible because RxJS does not have the notion of transactions. In a 'true' Functional Reactive Programming implementation, this would not be possible. Transactions would make sure there can be no simultaneous events. This is food for another post though :).
 
 ### How can we fix this
 
-If there was a way we could make sure that changes that happen in the same call stack (which is what is happening when clicking the reset button), are discarded in favor of the last change. This means, that when the `combineLatest` operator emits two values at the same time, the last one is send through when the call stack is cleared.
+If there was a way we could make sure that changes that happen in the same call stack (which is what is happening when clicking the reset button), are discarded in favor of the last change, we could fix our problem.
+
+This means, that when the `combineLatest` operator emits two values at the same time, the last one is send through when the call stack is cleared.
 
 To do this, we can leverage the `debounceTime` operator with a value of 0 directly after the `combineLatest`. This will make sure only the last value is passed through to the `switchMap` and this after the call stack has been cleared.
 
