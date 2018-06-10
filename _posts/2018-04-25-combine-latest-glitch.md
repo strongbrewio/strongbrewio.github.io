@@ -15,11 +15,11 @@ disqus: true
 cover: 'assets/images/cover/cover4.jpg'
 ---
 
-The `combineLatest` operator is probably one of my favorite operators, that I believe everyone should know. You should never try to learn all of them but `combineLatest`, to me, is definitely one of those ~15 you should probably understand.
+The `combineLatest` operator is probably one of my favorite ones, that I believe everyone should know. You should never try to learn all of them but `combineLatest`, to me, is definitely one of those ~15 you should probably understand.
 
 **Note:** If you are unfamiliar with this operator, I suggest you check it out immediately <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-combineLatest" target="_blank">here</a>.
 
-Even though it is one of the most well known operators, it can potentially introduce some weird behaviour. Let's try and find the weird behaviour.
+Even though it is one of the most well known operators, it can potentially introduce some weird behaviour. Let's try and find the weird behaviour and see how we can fix it.
 
 ## Identifying the problem
 
@@ -66,7 +66,7 @@ reset() {
 }
 ```
 
-To see the hiccup, open your devtools on the network tab and check what happens.
+To see the hiccup, open your devtools on the network tab and check what happens when you click the button.
 
 ![gif-reset-clicked](https://www.dropbox.com/s/uzl8lprokyw99ew/reset-button-clicked.gif?raw=1)
 
@@ -74,7 +74,11 @@ Whenever the button is clicked, we can see that a call is initiated but immediat
 
 ### Explaining the behavior
 
-Actually, this makes sense. In the description of the marble diagram above, there was a highlight: 'the `combineLatest` operator to create a stream that will have a new value every time one of the source stream changes'. By clicking the reset button, we updated both of our source streams by resetting both the limit and offset value at the same time. The effect of this action was that the stream created by the `combineLatest` operator fired twice, thus starting two backend requests, thus, cancelling one immediately. 
+Actually, this makes sense. In the description of the marble diagram above, there was a highlight: 
+
+> 'the `combineLatest` operator to create a stream that will have a new value every time one of the source stream changes'.
+
+By clicking the reset button, we updated both of our source streams by resetting both the limit and offset value at the same time. The effect of this action was that the stream created by the `combineLatest` operator fired twice, thus starting two backend requests, thus, cancelling one immediately because we used the `switchMap` operator. 
 
 To make it even more clear, lets put it in steps.
 
@@ -87,17 +91,32 @@ To make it even more clear, lets put it in steps.
 - the `combineLatest` operator sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0
 - the `switchMap` operator gets these values, unsubscribes (and thus cancels) the previous request and starts a new one
 
-Something you might have not expected in this flow is that, whenever the limit is set, this changes propagates to the `combineLatest` operator directly before changing the offset. 
+Something you might have not expected in this flow is that, whenever the limit is set, this change propagates to the `combineLatest` operator directly before changing the offset. 
 
 **Note:** This is possible because RxJS does not have the notion of transactions. In a 'true' Functional Reactive Programming implementation, this would not be possible. Transactions would make sure there can be no simultaneous events. This is food for another post though :).
 
-### How can we fix this
+### How can we fix this?
 
 If there was a way we could make sure that changes that happen in the same call stack (which is what is happening when clicking the reset button), are discarded in favor of the last change, we could fix our problem.
 
-This means, that when the `combineLatest` operator emits two values at the same time, the last one is send through when the call stack is cleared.
+This means, that when the `combineLatest` operator emits two values in the same call stack, the last one is send through when the call stack is cleared.
 
 To do this, we can leverage the `debounceTime` operator with a value of 0 directly after the `combineLatest`. This will make sure only the last value is passed through to the `switchMap` and this after the call stack has been cleared.
+
+Let's put this in steps again to make it clear.
+
+- `combineLatest` holds the last values from all source streams (in the gif, the begin scenario was, limit = 8, offset = 2)
+- the reset button is clicked
+- limit is set to 5
+- the `combineLatest` operator sees a new value coming in for limit and emits a new combination, limit = 5, offset = 2
+- the `debounceTime` operator sees a new value and (because of the 0) will wait until the call stack is cleared to pass it on
+- offset is set to 0
+- the `combineLatest` operator sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0
+- the `debouncetime` operator sees again a new value, will discard of the old one, and will wait for the stack to be cleared to pass it on
+- the call stack is cleared
+- the `debounceTime` operator sees no new value is given and will pass the combination, limit = 5, offset = 0, on
+- the `switchMap` operator gets these values and subscribes to the stream that triggers a backend call
+
 
 The updated code looks like this:
 
@@ -110,11 +129,10 @@ this.pokemon$ = combineLatest(limit$, offset$, (limit, offset) => ({limit, offse
       );
 ``` 
 
-You can find the updated example <a href="https://stackblitz.com/edit/angular-gnlpt6" target="_blank">here</a> and see that the issue no longer happens.
+You can play with the updated example here and see that the issue no longer happens.
+
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-gnlpt6?embed=1&file=src/main.ts"></iframe>
 
 ## Conclusion
 
-When combining streams with the `combineLatest` that might change within the same call stack, you might get unexpected behavior. You can fix this by adding a `debounceTime(0)` right after the `combineLatest`.
-
-
-https://stackblitz.com/edit/angular-deqtkx?file=src%2Fapp%2Fapp.module.ts
+When combining streams with the `combineLatest` operator, where the source streams might have new values within the same call stack, you might get unexpected behavior. You can fix this by adding a `debounceTime(0)` right after the `combineLatest`.
