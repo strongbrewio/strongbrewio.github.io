@@ -112,7 +112,7 @@ Let's put this in steps again to make it clear.
 - the `debounceTime` operator sees a new value and (because of the 0) will wait until the call stack is cleared to pass it on
 - offset is set to 0
 - the `combineLatest` operator sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0
-- the `debouncetime` operator sees again a new value, will discard of the old one, and will wait for the stack to be cleared to pass it on
+- the `debounceTime` operator sees again a new value, will discard of the old one, and will wait for the stack to be cleared to pass it on
 - the call stack is cleared
 - the `debounceTime` operator sees no new value is given and will pass the combination, limit = 5, offset = 0, on
 - the `switchMap` operator gets these values and subscribes to the stream that triggers a backend call
