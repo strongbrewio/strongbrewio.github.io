@@ -33,7 +33,7 @@ Let's take a look at how we can set up our stream to make this work. We will sta
 
 ![marble-diagram](https://vectr.com/tmp/f1jfpxhCHV/b8pN04Jr9.svg?width=1000&height=461.54&select=b8pN04Jr9page0)
 
-We have a stream of the limit values and one for the offset values. We combine these streams using **`combineLatest` to create a stream that will have a new value every time one of the source stream changes**. We then use `switchMap` to fetch the data from the backend based on these values to get a `pokemon$`. Because we use `switchMap`, if a call is not finished yet, it will be cancelled when a new call is initiated by changing the limit or offset.
+We have a stream of the limit values and one for the offset values. We combine these streams using **`combineLatest` to create a stream that will have a new value every time one of the source streams changes**. We then use `switchMap` to fetch the data from the backend based on these values to get a `pokemon$`. Because we use `switchMap`, if a call is not finished yet, it will be cancelled when a new call is initiated by changing the limit or offset.
 
 Code wise this looks like this:
 
@@ -66,9 +66,9 @@ reset() {
 }
 ```
 
-To see the hiccup, open Chrome's DevTools and open the 'Network' tab and check what happens when you click the button.
+To see the hiccup, open Chrome's DevTools, open the 'Network' tab and check what happens when you click the button.
 
-![gif-reset-clicked](https://www.dropbox.com/s/uzl8lprokyw99ew/reset-button-clicked.gif?raw=1)
+![gif-reset-clicked](https://www.dropbox.com/s/dxcct5dld4wf0c3/combine-latest-glitch.gif?raw=1)
 
 Whenever the button is clicked, we can see that a call is initiated but immediately cancelled and a new call is started. That's a little strange no? 
 
@@ -76,7 +76,7 @@ Whenever the button is clicked, we can see that a call is initiated but immediat
 
 Actually, this makes sense. In the description of the marble diagram above, there was a highlight:
 
-> '`combineLatest` creates a stream that will have a new value every time one of the source stream changes'.
+> '`combineLatest` creates a stream that will have a new value every time one of the source streams changes'.
 
 By clicking the reset button, we updated both of our source streams by resetting both the limit and offset value at the same time. The effect of this action was that the stream created by `combineLatest` fired twice, thus starting two backend requests, thus, cancelling one immediately because we used `switchMap`.
 
@@ -103,6 +103,8 @@ This means, that when `combineLatest` emits two values in the same call stack, t
 
 To do this, we can leverage `debounceTime` with a value of 0 directly after the `combineLatest`. This will make sure only the last value is passed through to the `switchMap` and this after the call stack has been cleared.
 
+**Note:** If you do not know what the call stack is, watch one of my favorite talks ever by Philip Roberts that covers it <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>.
+
 Let's put this in steps again to make it clear.
 
 - `combineLatest` holds the last values from all source streams (in the gif, the begin scenario was, limit = 8, offset = 2)
@@ -121,7 +123,10 @@ Let's put this in steps again to make it clear.
 The updated code looks like this:
 
 ```typescript
-this.pokemon$ = combineLatest(limit$, offset$, (limit, offset) => ({limit, offset}))
+this.pokemon$ = combineLatest(
+            limit$,
+            offset$,
+            (limit, offset) => ({limit, offset}))
       .pipe(
         debounceTime(0),
         switchMap(data => this.pokemonService.getPokemon(data.limit, data.offset)),
