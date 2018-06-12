@@ -12,6 +12,148 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>A glitch in combineLatest (and how to fix it!)</title>
+	  <link>//combine-latest-glitch/</link>
+	  <author></author>
+	  <pubDate>2018-06-12T00:00:00+00:00</pubDate>
+	  <guid>//combine-latest-glitch/</guid>
+	  <description><![CDATA[
+	     <p>The <code>combineLatest</code> operator is probably one of my favorite ones, that I believe everyone should know. You should never try to learn all of them but <code>combineLatest</code>, to me, is definitely one of those ~15 you should probably understand.</p>
+
+<p><strong>Note:</strong> If you are unfamiliar with this operator, I suggest you check it out immediately <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-combineLatest" target="_blank">here</a> or <a href="http://reactive.how/combinelatest" target="_blank">here</a>.</p>
+
+<p>Even though it is one of the most well known operators, it can potentially introduce some weird behaviour. Let’s try and find the weird behaviour and see how we can fix it.</p>
+
+<h2 id="identifying-the-problem">Identifying the problem</h2>
+
+<p>To do so, I created an application that visualizes a number of pokemon based on a limit and offset parameter.</p>
+
+<p><img src="https://www.dropbox.com/s/u1autxtkhlp3nfk/Screenshot%202018-06-09%2013.44.16.png?raw=1" alt="example-app-screenshot" /></p>
+
+<p>Every time the limit <strong>or</strong> the offset changes, a backend call is triggered that will update the list of pokemon to be shown.</p>
+
+<p>Let’s take a look at how we can set up our stream to make this work. We will start by looking at the marble diagram.</p>
+
+<p><img src="https://vectr.com/tmp/f1jfpxhCHV/b8pN04Jr9.svg?width=1000&amp;height=461.54&amp;select=b8pN04Jr9page0" alt="marble-diagram" /></p>
+
+<p>We have a stream of the limit values and one for the offset values. We combine these streams using <strong><code>combineLatest</code> to create a stream that will have a new value every time one of the source streams changes</strong>. We then use <code>switchMap</code> to fetch the data from the backend based on these values to get a <code>pokemon$</code>. Because we use <code>switchMap</code>, if a call is not finished yet, it will be cancelled when a new call is initiated by changing the limit or offset.</p>
+
+<p>Code wise this looks like this:</p>
+
+<pre><code class="language-typescript">this.pokemon$ = combineLatest(
+			limit$, 
+			offset$, 
+			(limit, offset) =&gt; ({limit, offset}))
+      .pipe(
+        switchMap(data =&gt; this.pokemonService.getPokemon(data.limit, data.offset)),
+        map((response: {results: Pokemon[]}) =&gt; response.results),
+      );
+</code></pre>
+
+<p>Here is the live example you can play with:</p>
+
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-deqtkx?embed=1&amp;file=src/app/app.component.ts"></iframe>
+
+<p><strong>Note:</strong> If you open Chrome’s DevTools, head over to the ‘Network’ tab and update the values pretty quick, you can see the calls being cancelled.</p>
+
+<h3 id="i-thought-their-was-some-weird-behavior">I thought their was some weird behavior?</h3>
+
+<p>Everything seems to work fine right? So where is the hiccup?
+Aside from the option to change the limit and offset values, there is also a ‘reset’ button. This button will set the values back to 5 and 0.</p>
+
+<pre><code class="language-typescript">reset() {
+    this.limitControl.setValue(5);
+    this.offsetControl.setValue(0);
+}
+</code></pre>
+
+<p>To see the hiccup, open Chrome’s DevTools, open the ‘Network’ tab and check what happens when you click the button.</p>
+
+<p><img src="https://www.dropbox.com/s/dxcct5dld4wf0c3/combine-latest-glitch.gif?raw=1" alt="gif-reset-clicked" /></p>
+
+<p>Whenever the button is clicked, we can see that a call is initiated but immediately cancelled and a new call is started. That’s a little strange no?</p>
+
+<h3 id="explaining-the-behavior">Explaining the behavior</h3>
+
+<p>Actually, this makes sense. In the description of the marble diagram above, there was a highlight:</p>
+
+<blockquote>
+  <p>‘<code>combineLatest</code> creates a stream that will have a new value every time one of the source streams changes’.</p>
+</blockquote>
+
+<p>By clicking the reset button, we updated both of our source streams by resetting both the limit and offset value at the same time. The effect of this action was that the stream created by <code>combineLatest</code> fired twice, thus starting two backend requests, thus, cancelling one immediately because we used <code>switchMap</code>.</p>
+
+<p>To make it even more clear, lets put it in steps.</p>
+
+<ul>
+  <li><code>combineLatest</code> holds the last values from all source streams (in the gif, the begin scenario was, limit = 8, offset = 2)</li>
+  <li>the reset button is clicked</li>
+  <li>limit is set to 5</li>
+  <li><code>combineLatest</code> sees a new value coming in for limit and emits a new combination, limit = 5, offset = 2</li>
+  <li><code>switchMap</code> gets these values and subscribes to the stream that triggers a backend call</li>
+  <li>offset is set to 0</li>
+  <li><code>combineLatest</code> sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0</li>
+  <li><code>switchMap</code> gets these values, unsubscribes (and thus cancels) the previous request and starts a new one</li>
+</ul>
+
+<p>Something you might have not expected in this flow is that, whenever the limit is set, this change propagates to <code>combineLatest</code> directly before changing the offset.</p>
+
+<p><strong>Note:</strong> This is possible because RxJS does not have the notion of transactions. In a ‘true’ Functional Reactive Programming implementation, this would not be possible. Transactions would make sure there can be no simultaneous events. This is food for another post though :).</p>
+
+<h3 id="how-can-we-fix-this">How can we fix this?</h3>
+
+<p>If there was a way we could make sure that changes that happen in the same call stack (which is what is happening when clicking the reset button), are discarded in favor of the last change, we could fix our problem.</p>
+
+<p>This means, that when <code>combineLatest</code> emits two values in the same call stack, the last one is send through when the call stack is cleared.</p>
+
+<p>To do this, we can leverage <code>debounceTime</code> with a value of 0 directly after the <code>combineLatest</code>. This will make sure only the last value is passed through to the <code>switchMap</code> and this after the call stack has been cleared.</p>
+
+<p><strong>Note:</strong> If you do not know what the call stack is, watch one of my favorite talks ever by Philip Roberts that covers it <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>.</p>
+
+<p>Let’s put this in steps again to make it clear.</p>
+
+<ul>
+  <li><code>combineLatest</code> holds the last values from all source streams (in the gif, the begin scenario was, limit = 8, offset = 2)</li>
+  <li>the reset button is clicked</li>
+  <li>limit is set to 5</li>
+  <li>the <code>combineLatest</code> operator sees a new value coming in for limit and emits a new combination, limit = 5, offset = 2</li>
+  <li>the <code>debounceTime</code> operator sees a new value and (because of the 0) will wait until the call stack is cleared to pass it on</li>
+  <li>offset is set to 0</li>
+  <li>the <code>combineLatest</code> operator sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0</li>
+  <li>the <code>debounceTime</code> operator sees again a new value, will discard of the old one, and will wait for the stack to be cleared to pass it on</li>
+  <li>the call stack is cleared</li>
+  <li>the <code>debounceTime</code> operator sees no new value is given and will pass the combination, limit = 5, offset = 0, on</li>
+  <li>the <code>switchMap</code> operator gets these values and subscribes to the stream that triggers a backend call</li>
+</ul>
+
+<p>The updated code looks like this:</p>
+
+<pre><code class="language-typescript">this.pokemon$ = combineLatest(
+            limit$,
+            offset$,
+            (limit, offset) =&gt; ({limit, offset}))
+      .pipe(
+        debounceTime(0),
+        switchMap(data =&gt; this.pokemonService.getPokemon(data.limit, data.offset)),
+        map((response: {results: Pokemon[]}) =&gt; response.results),
+      );
+</code></pre>
+
+<p>You can play with the updated example here and see that the issue no longer happens.</p>
+
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-gnlpt6?embed=1&amp;file=src/main.ts"></iframe>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>When combining streams with the <code>combineLatest</code> operator, where the source streams might have new values within the same call stack, you might get unexpected behavior. You can fix this by adding a <code>debounceTime(0)</code> right after the <code>combineLatest</code>.</p>
+
+<p><strong>Note:</strong> Special thanks to <a href="https://twitter.com/elmd_" target="_blank">Dominic Elm</a>, <a href="https://twitter.com/ncjamieson" target="_blank">Nicholas Jamieson</a>, <a href="https://twitter.com/chaos_monster" target="_blank">Martin Sonnenholzer</a>, <a href="https://twitter.com/maartentibau" target="_blank">Maarten Tibau</a> and <a href="https://twitter.com/frederikprijck" target="_blank">Frederik Prijck</a> for reviewing!</p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Be careful when using shareReplay</title>
 	  <link>//share-replay-issue/</link>
 	  <author></author>
@@ -2190,159 +2332,6 @@ Let’s take a look at the full example.</p>
 
 <h3 id="conclusion">Conclusion</h3>
 <p>Using marble diagram testing, we can write tests way faster and very easy. If we use marble diagrams up front to think about our streams, we can use this to test our code as well.</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Using decorators and observables to implement retry</title>
-	  <link>//decorators-and-observables-to-implement-retry-logic/</link>
-	  <author></author>
-	  <pubDate>2017-02-15T00:00:00+00:00</pubDate>
-	  <guid>//decorators-and-observables-to-implement-retry-logic/</guid>
-	  <description><![CDATA[
-	     <p>Last week, I was at a meetup in Ghent where I was talking with <a href="https://twitter.com/stefanlapers" target="_blank">Stefan Lapers</a> about programming languages in general. We started talking about writing your backend using either Java or node.js. We agreed that node.js has massive potential but in a lot of situations companies choose Java because of it’s maturity. If you’re using a microservices based architecture for example, you can rely heavily on spring cloud which does a whole bunch of stuff for you so you can focus on functionality.
-One element in spring cloud is hystrix. When you’re doing a network call which is protected by hystrix, you can, by just adding an annotation, tell how many times you want to retry this if it fails and even provide a fallback if it fails entirely.</p>
-
-<p>When I was driving home later that night, I was thinking to myself that using observables and typescript decorators, it should be possible to implement something similar myself. The next morning I tried it out and about 30 minutes later I had a working version. Here it is.</p>
-
-<h2 id="the-example">The example</h2>
-
-<p>In the example below, we have a service which fetches a number of Star Wars characters from the backend, at least it tries. It seems I kind of screwed up the implementation a little :).</p>
-
-<pre><code class="language-typescript">public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
-    return throw('Failing on purpose');
-}
-</code></pre>
-<p>Instead of actually doing a backend call, I’m just returning an observable which will throw as soon as it’s subscribed to. This is of course not to handy but for demonstration purposes, it’s quite ideal.
-Using the decorator I created myself, we can make this code a little more resillient (we’ll dive into how this decorator is constructed later on).</p>
-
-<pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
-public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
-    return throw('Failing on purpose');
-}
-</code></pre>
-
-<p>I’ve added the <code>retry</code> decorator. The first argument it takes tells the decorator the times it should retry the backend call. The second parameter is the fallback that will be used if the backend keeps on failing.</p>
-
-<p>The following is a gif of what happens when you try to run this code:</p>
-
-<p><img src="https://www.dropbox.com/s/7natkxyj02o3xmd/Mar-08-2017%2019-32-51.gif?raw=1" alt="example-gif" /></p>
-
-<p>You can see that there are 3 tries before the method returns the fallback we defined. Pretty cool right.</p>
-
-<p>A second example is if you click the button below the first example. This will actually try to do the real request.
-The code for this backend call looks like this:</p>
-
-<pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
-public getCharacters(): Observable&lt;StarWarsCharacter[]&gt; {
-    return this.http.get('https://swapi.co/api/people/')
-      .pipe(
-         map((response: Response) =&gt; response.json().results)
-      );
-}
-</code></pre>
-
-<p>For the retry example here to work, you have to go offline first, which will cause the request to fail. If you then try to run this code, you can see in the network tab it actually tries to do 3 requests, which fail because we are offline. After three attempts, the fallback is returned.</p>
-
-<p><img src="https://www.dropbox.com/s/494jhrwvtdelo09/Mar-08-2017%2019-35-31.gif?raw=1" alt="example-gif" /></p>
-
-<p>You can find the live working example <a href="http://blog-kwintenp-examples.surge.sh/home/retry" target="_blank">here</a>. Open up your console to see the number of tries and inspect the network tab with the second example.</p>
-
-<h2 id="the-implementation">The implementation</h2>
-
-<p>To implement this, there are two important things we need to do. First is implementing the logic to retry the call if it failed. We can levarage streams for this. Next we need to extract that logic into a typescript decorator.</p>
-
-<h3 id="observable-composition">Observable composition</h3>
-
-<p>Retrying a subscription after it has failed is fairly easy using RxJS. We can use the <code>retryWhen</code> operator for this. Let’s look at some code.</p>
-
-<pre><code class="language-typescript">private starWarsService: StarWarsService;
-
-characters$: Observable&lt;StarWarsCharacter&gt; = 
-	// we call the starWarsService to get the characters
-	this.starWarsService
-		.getCharacters()
-		// we use the retryWhen operator to retry a number of times
-		.pipe(
-		    retryWhen((errors: Observable&lt;any&gt;) =&gt; {
-		       // we use the scan operator to count the number of tries
-               return errors.scan((errorCount, err) =&gt; {
-                 console.log('Try ' + (errorCount + 1));
-                 if (errorCount &gt;= 3) {
-                    throw err;
-                 }
-                 return errorCount + 1;
-               }, 0).delay(1000);
-             }),
-            // we catch the error if it keeps on failing and return
-            // the fallback
-          catchError(() =&gt; of(fallback))
-      );
-</code></pre>
-<p>I’m not going to go into the details of the RxJS implementation, that whould require a totally separate post.
-What this code does however, is create an observable that, once subscribed to, will try to execute the backend call. If it fails, which it will in our case, it will re-execute it 2 more times with a single second delay in between. If it still fails, it will return the fallback we can define.</p>
-
-<p>That’s the exact logic we want our decorator to do. So let’s see how we can extract this logic in the decorator.</p>
-
-<h3 id="creating-a-decorator">Creating a decorator</h3>
-
-<p>There are different types of decorators. We can put a decorator on a class, method, property or accessor method. In our case, we are going to use the method decorator. A method decorator is in fact nothing more than a function that gets called at runtime. You can find more information on what decorators are and how to use them <a href="https://www.typescriptlang.org/docs/handbook/decorators.html#method-decorators" target="_blank">here</a></p>
-
-<p>Using a method decorator, you can replace, observe or modify the method definition. What we are going to do is really easy. Lets take a look at the image below.</p>
-
-<p><img src="https://www.dropbox.com/s/o3xef1gl9f4jlmd/Screenshot%202017-03-05%2014.14.48.png?raw=1" alt="method decorator" /></p>
-
-<p>At runtime, when the method we are decorating gets called, the decorator will be called first (1). We are going to call the actual function (2) which is going to return an observable in our case (3). Before returning the observable to the caller of our decorated function (5), we are going to augment the observable with our retry logic (4) and return this new observable.</p>
-
-<p>Lets take a look at the code:</p>
-
-<pre><code class="language-typescript">// defining the decorator is the same as the defining a
-// function with the same name
-export function retry(times = 3, fallback: any) {
-  return (target, key, descriptor) =&gt; {
-    // the descriptor holds a reference to the actual method
-    // we are decorating
-    const originalMethod = descriptor.value;
-    // we replace the old function with a new function
-    descriptor.value = function () {
-      // call the original method and
-      // augment the resulting observable
-      // with the retry and fallback mechanism
-      // we defined above
-      return originalMethod.apply(this)
-        .pipe(
-           retryWhen((errors) =&gt; {
-             return errors.scan((errorCount, err) =&gt; {
-               console.log('Try ' + (errorCount + 1));
-               if (errorCount &gt;= times - 1) {
-                 throw err;
-               }
-               return errorCount + 1;
-             }, 0).delay(1000);
-           }),
-           catchError(() =&gt; of(fallback));
-        )
-    };
-    // return edited descriptor as opposed to
-    // overwriting the descriptor
-    return descriptor;
-  };
-}
-</code></pre>
-<p>In the decorator we take the original function. We replace this function with a new one that executes the original one and augments the resulting observable with our retry logic.</p>
-
-<p>Once you’ve understood the syntax of the method decorator, this implementation is pretty straight forward. It now allows us to add the decorator on top of every function that returns an observable like this:</p>
-
-<pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
-public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
-    return throw('Failing on purpose');
-}
-</code></pre>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Using the ease of composing of observables and decorators in typescript, we were able to create something really fast which can be reused throughout our entire application. It shouldn’t stop with a retry decorator. We could apply this principle to a whole bunch of RxJS related issues like catching errors for example.</p>
 
 	  ]]></description>
 	</item>
