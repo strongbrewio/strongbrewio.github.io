@@ -138,3 +138,4 @@ You can play with the updated example here and see that the issue no longer happ
 When combining streams with the `combineLatest` operator, where the source streams might have new values within the same call stack, you might get unexpected behavior. You can fix this by adding a `debounceTime(0)` right after the `combineLatest`.
 
 **Note:** Special thanks to <a href="https://twitter.com/elmd_" target="_blank">Dominic Elm</a>, <a href="https://twitter.com/ncjamieson" target="_blank">Nicholas Jamieson</a>, <a href="https://twitter.com/chaos_monster" target="_blank">Martin Sonnenholzer</a>, <a href="https://twitter.com/maartentibau" target="_blank">Maarten Tibau</a> and <a href="https://twitter.com/frederikprijck" target="_blank">Frederik Prijck</a> for reviewing!
+
