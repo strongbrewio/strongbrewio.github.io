@@ -104,6 +104,7 @@ This means, that when `combineLatest` emits two values in the same call stack, t
 To do this, we can leverage `debounceTime` with a value of 0 directly after the `combineLatest`. This will make sure only the last value is passed through to the `switchMap` and this after the call stack has been cleared.
 
 **Note:** If you do not know what the call stack is, watch one of my favorite talks ever by Philip Roberts that covers it <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>.
+**Note2:** Whenever there is a mention of 'in the same call stack' this could be replaced with 'changes that occur during the same turn of the event loop'.
 
 Let's put this in steps again to make it clear.
 
