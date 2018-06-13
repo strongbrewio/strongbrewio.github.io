@@ -290,7 +290,8 @@ Aside from the option to change the limit and offset values, there is also a ‘
 
 <p>To do this, we can leverage <code>debounceTime</code> with a value of 0 directly after the <code>combineLatest</code>. This will make sure only the last value is passed through to the <code>switchMap</code> and this after the call stack has been cleared.</p>
 
-<p><strong>Note:</strong> If you do not know what the call stack is, watch one of my favorite talks ever by Philip Roberts that covers it <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>.</p>
+<p><strong>Note:</strong> If you do not know what the call stack is, watch one of my favorite talks ever by Philip Roberts that covers it <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>.
+<strong>Note2:</strong> Whenever there is a mention of ‘in the same call stack’ this could be replaced with ‘changes that occur during the same turn of the event loop’.</p>
 
 <p>Let’s put this in steps again to make it clear.</p>
 
