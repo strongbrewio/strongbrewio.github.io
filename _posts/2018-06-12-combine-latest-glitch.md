@@ -38,11 +38,9 @@ We have a stream of the limit values and one for the offset values. We combine t
 Code wise this looks like this:
 
 ```typescript
-this.pokemon$ = combineLatest(
-			limit$, 
-			offset$, 
-			(limit, offset) => ({limit, offset}))
-      .pipe(
+this.pokemon$ = combineLatest(limit$, offset$)
+       .pipe(
+        map(data => ({limit: data[0], offset: data[1]})),
         switchMap(data => this.pokemonService.getPokemon(data.limit, data.offset)),
         map((response: {results: Pokemon[]}) => response.results),
       );
@@ -124,11 +122,9 @@ Let's put this in steps again to make it clear.
 The updated code looks like this:
 
 ```typescript
-this.pokemon$ = combineLatest(
-            limit$,
-            offset$,
-            (limit, offset) => ({limit, offset}))
-      .pipe(
+this.pokemon$ = combineLatest(limit$, offset$)
+       .pipe(
+        map(data => ({limit: data[0], offset: data[1]})),
         debounceTime(0),
         switchMap(data => this.pokemonService.getPokemon(data.limit, data.offset)),
         map((response: {results: Pokemon[]}) => response.results),
@@ -137,7 +133,7 @@ this.pokemon$ = combineLatest(
 
 You can play with the updated example here and see that the issue no longer happens.
 
-<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-gnlpt6?embed=1&file=src/main.ts"></iframe>
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-gnlpt6?embed=1&file=src/app/app.component.ts"></iframe>
 
 ## Conclusion
 
