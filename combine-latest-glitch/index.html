@@ -222,11 +222,9 @@
 
 <p>Code wise this looks like this:</p>
 
-<pre><code class="language-typescript">this.pokemon$ = combineLatest(
-			limit$, 
-			offset$, 
-			(limit, offset) =&gt; ({limit, offset}))
-      .pipe(
+<pre><code class="language-typescript">this.pokemon$ = combineLatest(limit$, offset$)
+       .pipe(
+        map(data =&gt; ({limit: data[0], offset: data[1]})),
         switchMap(data =&gt; this.pokemonService.getPokemon(data.limit, data.offset)),
         map((response: {results: Pokemon[]}) =&gt; response.results),
       );
@@ -311,11 +309,9 @@ Aside from the option to change the limit and offset values, there is also a ‘
 
 <p>The updated code looks like this:</p>
 
-<pre><code class="language-typescript">this.pokemon$ = combineLatest(
-            limit$,
-            offset$,
-            (limit, offset) =&gt; ({limit, offset}))
-      .pipe(
+<pre><code class="language-typescript">this.pokemon$ = combineLatest(limit$, offset$)
+       .pipe(
+        map(data =&gt; ({limit: data[0], offset: data[1]})),
         debounceTime(0),
         switchMap(data =&gt; this.pokemonService.getPokemon(data.limit, data.offset)),
         map((response: {results: Pokemon[]}) =&gt; response.results),
@@ -324,7 +320,7 @@ Aside from the option to change the limit and offset values, there is also a ‘
 
 <p>You can play with the updated example here and see that the issue no longer happens.</p>
 
-<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-gnlpt6?embed=1&amp;file=src/main.ts"></iframe>
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-gnlpt6?embed=1&amp;file=src/app/app.component.ts"></iframe>
 
 <h2 id="conclusion">Conclusion</h2>
 
