@@ -1,6 +1,6 @@
 ---
 layout: post
-title: The SIP principle
+title: Thinking reactive with the SIP principle
 date:   2018-06-30
 subclass: 'post'
 published: true
@@ -20,6 +20,8 @@ While writing RxJS code for small pragmatic solutions can be super easy, it migh
 
 We as StrongBrew are huge fans of reactive programming and we use our reactive mindset in Angular on a daily basis.
 In this article we will learn a principle that helps us to tackle very complex RxJS situations in an opinionated structured way.
+
+The code of this article is written with [Angular](https://angular.io) but the concepts can be used with every framework.
 
 ## The situation
 
