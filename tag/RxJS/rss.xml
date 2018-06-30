@@ -992,8 +992,8 @@ class AppComponent {
 class FooService {
     // this is way cleaner: this service doesn't even know
     // about streams now
-    filterUsers(users: User): User[] {
-        return users.pipe(filter(user =&gt; user.age &gt;= 18);
+    filterUsers(users: User[]): User[] {
+        return users.filter(user =&gt; user.age &gt;= 18);
     }
 }
 </code></pre>
