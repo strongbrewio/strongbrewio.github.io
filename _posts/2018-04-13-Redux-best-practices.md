@@ -442,11 +442,11 @@ describe('reducer: usersReducer', () => {
       const action = new UpdateUserAction(user);
       const newState = usersReducer(initialState, action);
       // check if the result of the array is a new ref
-      expect(changedState).not.toBe(initialState); 
-      // check if the result of the use is a new ref
-      expect(changedState[1]).not.toBe(changedState[1]);
+      expect(newState).not.toBe(initialState); 
+      // check if the result of the user is a new ref
+      expect(newState[1]).not.toBe(initialState[1]);
       // check if the user got updated automatically
-      expect(changedState[1]).toEqual(user);
+      expect(newState[1]).toEqual(user);
     });
   });
 });
