@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Thinking reactive with the SIP principle</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="/the-sip-principle/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Thinking reactive with the SIP principle" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="//the-sip-principle/" />
+    <meta property="og:image" content="/assets/images/cover/cover8.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Thinking reactive with the SIP principle" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="//the-sip-principle/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover8.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "Thinking reactive with the SIP principle",
+    "url": "//the-sip-principle/",
+    "image": "/assets/images/cover/cover8.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover8.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>Want to work with us?</h5>
+<a href="https://strongbrew.io/about" class="button" rel="noopener">Learn more</a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Thinking reactive with the SIP principle</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                    
+                    
+                    
+                    
+                    <time class="post-date" datetime="2018-06-30">30 Jun 2018
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>A few months back we released <a href="https://blog.strongbrew.io/rxjs-best-practices-in-angular/">RxJS best practices in Angular</a> and a while before that <a href="https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs/">Thinking reactively in Angular and RxJS</a>. 
+Both of these articles are focussing on “trying to make the mind switch towards reactive programming”.</p>
+
+<p>However, sometimes we like to have structured opinionated ways of tackling problems, especially when things become complex. We like a roadmap of some kind, something to fall back on, something to guide us through these complex reactive scenarios.</p>
+
+<p>While writing RxJS code for small pragmatic solutions can be super easy, it might become complex when combining multiple streams or doing other advanced stuff.</p>
+
+<p>We as StrongBrew are huge fans of reactive programming and we use our reactive mindset in Angular on a daily basis.
+In this article we will learn a principle that helps us to tackle very complex RxJS situations in an opinionated structured way.</p>
+
+<p>The code of this article is written with <a href="https://angular.io">Angular</a> but the concepts can be used with every framework.</p>
+
+<h2 id="the-situation">The situation</h2>
+
+<p>We are going to build an application to search for starships in the <a href="https://swapi.co">swapi api</a>. The application counts a few features:</p>
+<ul>
+  <li>It has to load data on page load</li>
+  <li>The user can search for starships by entering text in the searchbox</li>
+  <li>The user can load starships by a chosen model</li>
+  <li>The user can load starships by a random model</li>
+  <li>There is a loading indicator that needs to be shown when the data is being loaded</li>
+  <li>Previous XHR calls should be canceled to avoid race conditions</li>
+  <li>We want to filter the results by the number of passengers allowed on the ship. <strong>Note: This is a clientside filter</strong></li>
+</ul>
+
+<p>As we can see, there is quite a lot of asynchronous logic going on here, and if we would implement this in an imperative way, it would be pretty hard to keep it simple. However, the application can easily be written with the use of RxJS. In this application we don’t want to think in actions anymore, we want to think in streams of data. <strong>Everything is a stream!</strong></p>
+
+<h2 id="the-sip-principle">The SIP principle</h2>
+<p>With StrongBrew, we came up with a simple principle of handling this reactive mindset. We call it the <strong>SIP principle</strong>.
+The SIP principle stands for the following:</p>
+<ul>
+  <li>S: Source streams</li>
+  <li>I: Intermediate streams</li>
+  <li>P: Presentation streams</li>
+</ul>
+
+<h3 id="source-streams">Source streams</h3>
+
+<p>These streams will contain all the user interaction. They are generally bound to the outputs of our dumb components. A source stream could also contain real-time data, but we won’t cover that part in this article.
+Let’s have a look at our application and look for the source streams there:
+(the left column pretty much contains all the user interaction)
+<img src="/assets/images/posts/sip-principle/source-streams.png" alt="Source streams" /></p>
+
+<p>After executing the first step of the SIP principle we have found 4 source streams.
+<code>searchTerm$</code>, <code>selectedModel$</code>, <code>randomModel$</code> and <code>numberOfPassengers$</code>.</p>
+
+<p>What’s important to note here is that we named these streams as <strong>streams of data</strong> rather than naming them as streams of actions. We want to stop thinking in actions and start thinking in streams of data, remember? That’s why we didn’t name the first stream <code>search$</code> (which would be an action), we rather named it <code>searchTerm$</code> so we know it contains a search term.</p>
+
+<p>Source streams are <strong>mostly subjects</strong> or streams that come from the framework, e.g. a routing params stream.</p>
+
+<p>In our application the source streams will look like this:</p>
+
+<pre><code class="language-typescript">searchTerm$ = new ReplaySubject&lt;string&gt;(1);
+selectedModel$ = new ReplaySubject&lt;string&gt;(1);
+randomModel$ = new ReplaySubject&lt;string&gt;(1);
+// needs an initial value
+numberOfPassengers$ = new BehaviorSubject(1000000); 
+</code></pre>
+
+<p>These subjects will be populated by the outputs as shown below:</p>
+
+<pre><code class="language-html">&lt;sidebar 
+    (search)="searchTerm$.next($event)"
+    (selectModel)="selectedModel$.next($event)"
+    (randomModel)="randomModel$.next($event)"
+    (changeNumberOfPassengers)="numberOfPassengers$.next($event)"
+&gt;
+&lt;/sidebar&gt;
+...
+</code></pre>
+
+<h3 id="presentation-streams">Presentation streams</h3>
+
+<p>After finding the source streams we need to find the presentation streams.
+These are the streams that our template needs to render properly. These are quite easy to find. We just have to look at the template and see which inputs our components expect. We can have a look at our template. (The outputs are stripped for readability purposes).</p>
+
+<pre><code class="language-html">  &lt;sidebar class="sidebar" 
+    [models]="fixedModels" 
+    [numberOfPassengers]=""
+  &gt;
+  &lt;/sidebar&gt;
+  &lt;div class="main"&gt;
+    &lt;starship-list 
+        [starships]=""
+        [loading]=""&gt;
+    &lt;/starship-list&gt;
+  &lt;/div&gt;
+</code></pre>
+
+<p>We can instantly see that we need 3 presentation streams:
+We need the number of passengers, the starships that need to be shown and whether the application is loading or not. Let’s fill in the blanks, shall we?!</p>
+
+<pre><code class="language-html">  &lt;sidebar class="sidebar" 
+    [models]="fixedModels" 
+    [numberOfPassengers]="numberOfPassengers$|async"
+  &gt;
+  &lt;/sidebar&gt;
+  &lt;div class="main"&gt;
+    &lt;starship-list 
+        [starships]="filteredResults$|async"
+        [loading]="loading$|async"&gt;
+    &lt;/starship-list&gt;
+  &lt;/div&gt;
+</code></pre>
+
+<p>So after step 2 we have found the following presentation streams: <code>numberOfPassengers$</code>, <code>filteredResults$</code> and <code>loading$</code>.</p>
+
+<h3 id="starting-with-the-sip-diagram">Starting with the SIP diagram</h3>
+
+<p>Let’s visualize these streams by creating a SIP diagram:</p>
+
+<p><img src="/assets/images/posts/sip-principle/sp.png" alt="Source streams, presentation streams" /></p>
+
+<p>The goal is to calculate the presentation streams, based on the source streams. There are 2 presentation streams that we need to calculate: <code>filteredResults$</code> and <code>loading$</code>. We don’t need to calculate <code>numberOfPassengers$</code> since it’s the same stream as the source stream.</p>
+
+<p>Let’s start with the <code>filteredResults$</code>. The <code>filteredResults$</code> is dependent on <code>searchTerm$</code>, <code>selectedModel$</code>, <code>randomModel$</code> and <code>numberOfPassengers$</code>. To make this calculation easier we can use intermediate streams.</p>
+
+<h3 id="intermediate-streams">Intermediate streams</h3>
+
+<p>Intermediate streams are streams that are used to make the bridge between the source streams and presentation streams easier.
+Let’s create a <code>query$</code> stream and a <code>results$</code> stream to make the calculation easier.</p>
+
+<p><img src="/assets/images/posts/sip-principle/sip1.png" alt="SIP 1" /></p>
+
+<p>We will use custom marble diagrams to visualize the different parts of the SIP diagram throughout this article.</p>
+
+<h4 id="calculating-the-query">Calculating the query$</h4>
+
+<p>The first intermediate stream that we have to create is the <code>query$</code> which is simply a merge from the <code>searchTerm$</code>, <code>selectedModel$</code> and <code>randomModel$</code>.</p>
+
+<p><img src="/assets/images/posts/sip-principle/query.png" alt="Query" /></p>
+
+<p>As we can see these 3 streams are being merged into one new <code>query$</code>. We don’t have to worry about when a user searches or selects a model, or even requests a random model. We only care about that simple stream of data, the <code>query$</code>.</p>
+
+<h4 id="calculating-the-results">Calculating the results$</h4>
+
+<p>Every time the <code>query$</code> gets a new value we want to fetch data from the API. For that we will use the <code>switchMap</code> operator.</p>
+
+<p><img src="/assets/images/posts/sip-principle/results.png" alt="Results" /></p>
+
+<h4 id="calculating-filteredresults">Calculating filteredResults$</h4>
+
+<p>We are ready to finish up the <code>filteredResults$</code> stream.
+If we look back at the previous SIP diagram we can see that we can create that stream by combining the <code>results$</code> and the <code>numberOfPassengers$</code>.</p>
+
+<p><img src="/assets/images/posts/sip-principle/filteredResults.png" alt="Filtered results" /></p>
+
+<h4 id="the-loading">The loading$</h4>
+
+<p>The next presentation stream that we want to create is called the <code>loading$</code>. Let’s update the SIP diagram accordingly. The <code>loading$</code> is based on the <code>query$</code> and the <code>results$</code>.</p>
+
+<p><img src="/assets/images/posts/sip-principle/sip2.png" alt="sip 2" /></p>
+
+<p>Every time the <code>query$</code> gets a new value the <code>loading$</code> should get the value <code>true</code>. Everytime the <code>result$</code> gets a new value the <code>loading$</code> should get the value <code>false</code>.
+So if we map every value of the <code>query$</code> to <code>true</code> and if we map every value of the <code>results$</code> to <code>false</code>, and merge those 2, we have created our <code>loading$</code> stream.</p>
+
+<p>Let’s create one last marble diagram for that.
+<img src="/assets/images/posts/sip-principle/loading.png" alt="Loading" /></p>
+
+<h3 id="what-do-we-need-to-share">What do we need to share?</h3>
+
+<p>We have came a long way, we have created the complete SIP diagram. We have visualized all the streams by creating marble diagrams, but if we look closely at the SIP diagram we might notice a problem.
+There are 2 arrows leaving the <code>query$</code> and 2 arrows leaving the <code>results$</code>. Every arrow stands for a subscription on the observable where the arrow starts.
+When working with cold observables, the producer function for that observable is executed every time we subscribe. Since <code>query$</code> is a hot stream, it doesn’t really matter, but <code>results$</code> will trigger an HTTP call every time it gets subscribed to. In short: the subscription on <code>loading$</code> and <code>filteredResults$</code> will trigger a subscription on <code>results$</code> twice. The SIP diagram show us which subscriptions need to be shared.</p>
+
+<p><img src="/assets/images/posts/sip-principle/sip3.png" alt="sip3" /></p>
+
+<h2 id="check-it-out">Check it out</h2>
+
+<p>The SIP diagram is complete now and we can start coding. Since this article is really about the SIP principle I won’t explain the code in detail. However, you can find the complete code in the StackBlitz below.</p>
+<iframe src="https://stackblitz.com/edit/sip-principle?embed=1&amp;file=app/app.component.ts" style="width: 100%; height: 500px"></iframe>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Before starting with implementing complex RxJS screens. Take a whiteboard and draw the flow first. The SIP principle that we created works for us but isn’t the only way to go of course.</p>
+
+<p>If you check the code inside the StackBlitz, you might be surprised about the amount of lines of code that we need to create this application. We have only a few lines of real logic, and we have covered most corner cases by thinking reactive.</p>
+
+<p>Because of the use of the <code>async</code> pipe we don’t need to unsubscribe from any stream manually since the <code>async</code> pipe does that for us.</p>
+
+<h2 id="special-thanks">Special thanks</h2>
+
+<p><a href="https://twitter.com/jvandemo">Jurgen van de Moere</a> for helping us with finding the right acronym.</p>
+
+<p>And the awesome reviewers:</p>
+<ul>
+  <li><a href="https://twitter.com/manfredsteyer">Manfred Steyer</a></li>
+  <li><a href="https://twitter.com/niklas_wortmann">Jan-Niklas Wortmann</a></li>
+  <li><a href="https://twitter.com/tim_deschryver">Tim Deschryver</a></li>
+  <li><a href="https://twitter.com/webdave_de">David Müllerchen</a></li>
+</ul>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                    
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Thinking reactive with the SIP principle&amp;url=the-sip-principle"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=the-sip-principle"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=the-sip-principle"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover4.jpg)"
+       href="/combine-latest-glitch">
+        <section class="post">
+            <h2>A glitch in combineLatest (and how to fix it!)</h2>
+            <p>The combineLatest operator is probably one of my favorite ones, that I believe everyone should...</p>
+        </section>
+    </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-112030289-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>

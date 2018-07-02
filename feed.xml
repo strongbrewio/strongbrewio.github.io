@@ -8,6 +8,22 @@
     
       
       <item>
+        <title>Thinking reactive with the SIP principle</title>
+        
+          <description>&lt;p&gt;A few months back we released &lt;a href=&quot;https://blog.strongbrew.io/rxjs-best-practices-in-angular/&quot;&gt;RxJS best practices in Angular&lt;/a&gt; and a while before that &lt;a href=&quot;https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs/&quot;&gt;Thinking reactively in Angular and RxJS&lt;/a&gt;. 
+Both of these articles are focussing on “trying to make the mind switch towards reactive programming”.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 30 Jun 2018 00:00:00 +0000</pubDate>
+        <link>
+        /the-sip-principle/</link>
+        <guid isPermaLink="true">/the-sip-principle/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>A glitch in combineLatest (and how to fix it!)</title>
         
           <description>&lt;p&gt;The &lt;code&gt;combineLatest&lt;/code&gt; operator is probably one of my favorite ones, that I believe everyone should know. You should never try to learn all of them but &lt;code&gt;combineLatest&lt;/code&gt;, to me, is definitely one of those ~15 you should probably understand.&lt;/p&gt;

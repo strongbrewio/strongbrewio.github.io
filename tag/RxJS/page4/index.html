@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Strongbrew blog</title>
+    <title>Strongbrew</title>
     <meta name="description" content="" />
 
     <!-- Mobile Meta -->
@@ -25,21 +25,21 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="/page2/" />
+        <link rel="canonical" href="/tag/RxJS/page4/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Strongbrew blog" />
+    <meta property="og:title" content="Strongbrew" />
     <meta property="og:description" content="" />
-    <meta property="og:url" content="//page2/" />
+    <meta property="og:url" content="//tag/RxJS/page4/" />
     <meta property="og:image" content="/assets/images/bg-gradient.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Strongbrew blog" />
+    <meta name="twitter:title" content="Strongbrew" />
     <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="//page2/" />
+    <meta name="twitter:url" content="//tag/RxJS/page4/" />
     <meta name="twitter:image:src" content="/assets/images/bg-gradient.jpg" />
 
     <script type="application/ld+json">
@@ -47,8 +47,8 @@
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Strongbrew blog",
-    "url": "//page2/",
+    "name": "Strongbrew",
+    "url": "//tag/RxJS/page4/",
     "image": "/assets/images/bg-gradient.jpg",
     "description": ""
 }
@@ -84,7 +84,7 @@
         <span class="hidden">Close</span>
     </a>
     <ul>
-        <li class="nav-home  nav-current" role="presentation"><a
+        <li class="nav-home " role="presentation"><a
                 href="/">Home</a></li>
         <li class="nav-about " role="presentation"><a
                 href="/about">About</a></li>
@@ -116,12 +116,14 @@
     <div class="site-wrapper">
 
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
-        <!-- < default -->
+        <!-- dynamically overriding backgrounds for tags as well as descriptions -->
+
+
+<!-- default -->
 <!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<!-- The big featured header  -->
-<header class="main-header "
-        style="background-image: url(/assets/images/bg-gradient.jpg) ">
+<!-- If we have a tag cover, display that - else blog cover - else nothing -->
+<header class="main-header tag-head " style="background-image: url(/assets/images/bg-gradient.jpg) ">
     <nav class="main-nav overlay clearfix">
         
             <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
@@ -129,11 +131,14 @@
     </nav>
     <div class="vertical">
         <div class="main-header-content inner">
-            <h1 class="page-title">Strongbrew</h1>
-            <h2 class="page-description"></h2>
+            <h1 class="page-title">Rxjs</h1>
+            <h2 class="page-description">
+            
+			    A 16-post collection
+            
+            </h2>
         </div>
     </div>
-    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">Scroll Down</span></a>
 </header>
 
 <!-- The main content area on the homepage -->
@@ -146,12 +151,10 @@
             <nav class="pagination" role="pagination">
     
         
-            <a class="newer-posts" href="/" title="Previous Page">&laquo; Newer Posts</a>
-        
+            <a class="newer-posts" href="/tag/RxJS/page3/" title="Previous Page">&laquo; Newer Posts</a>
+      
     
-    <span class="page-number"> Page 2 of 7 </span>
-     
-        <a class="older-posts" href="/page3/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 4 of 4 </span>
      
 </nav>
         
@@ -160,42 +163,10 @@
     
     <article class="post">
         <header class="post-header">
-            <h2 class="post-title"><a href="/do-we-really-need-redux">Do we really need Redux or @ngrx/store</a></h2>
+            <h2 class="post-title"><a href="/how-share()-can-reduce-network-requests">How share() can reduce network requests</a></h2>
         </header>
         <section class="post-excerpt">
-            <p>About this article If you are writing Angular, Vue or React applications, chances are big that you have used or encountered the Redux pattern. Redux helps... <a class="read-more" href="/do-we-really-need-redux">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/brechtbilliet'>Brecht Billiet</a>
-
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/Redux'>Redux</a>
-                    
-                
-            
-            <time class="post-date" datetime="2018-04-13">13 Apr 2018</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/how-nx-affected-apps-works">Nx on your CI, how does it work?</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of schematics... <a class="read-more" href="/how-nx-affected-apps-works">&raquo;</a></p>
+            <p>As you hopefully all know, observables you get back from the Angular 2 Http service are cold. A cold observable only starts when you subscribe to... <a class="read-more" href="/how-share()-can-reduce-network-requests">&raquo;</a></p>
         </section>
         <footer class="post-meta">
             
@@ -214,111 +185,15 @@
                 on
                 
                     
-                       <a href='/tag/Angular'>Angular</a>,
+                       <a href='/tag/RxJS'>Rxjs</a>,
                     
-                
-                    
-                       <a href='/tag/Nx'>Nx</a>
-                    
-                
-            
-            <time class="post-date" datetime="2018-03-13">13 Mar 2018</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/prerendering-angular-apps">Pre-rendering Angular Applications</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>Why should we pre-render Angular applications? At the moment of writing this article, there are several ways of optimizing Angular applications - We could compile them... <a class="read-more" href="/prerendering-angular-apps">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/brechtbilliet'>Brecht Billiet</a>
-
-                
-            
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
                 
                     
                        <a href='/tag/Angular'>Angular</a>
                     
                 
             
-            <time class="post-date" datetime="2018-03-04">04 Mar 2018</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/what-are-schedulers-in-rxjs">What are schedulers in RxJS</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used... <a class="read-more" href="/what-are-schedulers-in-rxjs">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
-
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/RxJS'>Rxjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2018-02-05">05 Feb 2018</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/display-a-component-based-on-role">Displaying components based on the role of a user</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need... <a class="read-more" href="/display-a-component-based-on-role">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
-
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/Angular'>Angular</a>
-                    
-                
-            
-            <time class="post-date" datetime="2018-01-15">15 Jan 2018</time>
+            <time class="post-date" datetime="2016-12-20">20 Dec 2016</time>
         </footer>
     </article>
     
@@ -328,12 +203,10 @@
         <nav class="pagination" role="pagination">
     
         
-            <a class="newer-posts" href="/" title="Previous Page">&laquo; Newer Posts</a>
-        
+            <a class="newer-posts" href="/tag/RxJS/page3/" title="Previous Page">&laquo; Newer Posts</a>
+      
     
-    <span class="page-number"> Page 2 of 7 </span>
-     
-        <a class="older-posts" href="/page3/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 4 of 4 </span>
      
 </nav>
     
