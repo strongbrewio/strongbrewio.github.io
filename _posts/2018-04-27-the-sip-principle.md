@@ -192,6 +192,14 @@ Before starting with implementing complex RxJS screens. Take a whiteboard and dr
 
 If you check the code inside the StackBlitz, you might be surprised about the amount of lines of code that we need to create this application. We have only a few lines of real logic, and we have covered most corner cases by thinking reactive.
 
+Because of the use of the `async` pipe we don't need to unsubscribe from any stream manually since the `async` pipe does that for us.
+
 ## Special thanks
 
 [Jurgen van de Moere](https://twitter.com/jvandemo) for helping us with finding the right acronym.
+
+And the awesome reviewers:
+- [Manfred Steyer](https://twitter.com/manfredsteyer)
+- [Jan-Niklas Wortmann](https://twitter.com/niklas_wortmann)
+- [Tim Deschryver](https://twitter.com/tim_deschryver)
+- [David Müllerchen](https://twitter.com/webdave_de)
