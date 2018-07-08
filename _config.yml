@@ -12,6 +12,7 @@ language: 'en-uk'
 name: 'Strongbrew'
 description: ""
 
+url: https://blog.strongbrew.io
 short_url: 'blog.strongbrew.io'
 google_analytics: UA-112030289-1
 disqus_brecht: brechtbilliet
