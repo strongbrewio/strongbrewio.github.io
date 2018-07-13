@@ -111,14 +111,14 @@ const autocomplete = (/* additional parameters */) =>
     (source$) => source$.pipe(/* do stuff */ )
 ```
 
-We can pass the time and callback function as parameters and use the operators we have written to create our own custom operator:
+We can pass the time and selector function as parameters and use the operators we have written to create our own custom operator:
 The operator looks like this:
 
 ```typescript
-const autocomplete = (time, cb) => (source$) =>
+const autocomplete = (time, selector) => (source$) =>
   source$.pipe(
     debounceTime(time),
-    switchMap(v => cb.apply(this, arguments)
+    switchMap(v => selector.apply(this, arguments)
         .pipe(
             takeUntil(
                 source$
@@ -148,3 +148,9 @@ You can find the sourcecode on stackblitz.
 ## Conclusion
 
 The combination of `debounceTime` and `switchMap` don't always cover everything. Showing irrelevant data to our users might not be what we want and creating our own operators is super easy! I hope you enjoyed the article.
+
+## Special thanks
+
+A special thanks for the awesome reviewers:
+
+- Nicholas Jamieson [@ncjamieson](https://twitter.com/ncjamieson)
