@@ -27,7 +27,7 @@ const results$ = term$
         debounceTime(1000),
         // higher order observable, abort previous
         // call if still busy
-        switchMap(term => fetchSomeData(term))
+        switchMap(term => getAutocompleteSuggestions(term))
     )
 ```
 
@@ -53,7 +53,7 @@ const results$ = term$
     .pipe(
         debounceTime(1000),
         switchMap(term => 
-            fetchSomeData(term)
+            getAutocompleteSuggestions(term)
                 .pipe(
                     takeUntil(term$) // this still won't work
                 )
@@ -78,7 +78,7 @@ const results$ = term$
     .pipe(
         debounceTime(1000),
         switchMap(term => 
-            fetchSomeData(term)
+            getAutocompleteSuggestions(term)
                 .pipe(
                     takeUntil(
                         //skip 1 value
@@ -138,7 +138,7 @@ Using our operator is super easy:
 const term$ = new BehaviorSubject('');
 const results$ = term$
     .pipe(
-        autocomplete(1000, term => fetchSomeData(term))
+        autocomplete(1000, term => getAutocompleteSuggestions(term))
     )
 ```
 
