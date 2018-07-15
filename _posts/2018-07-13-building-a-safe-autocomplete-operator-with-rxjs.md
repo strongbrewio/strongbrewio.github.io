@@ -153,3 +153,6 @@ The combination of `debounceTime` and `switchMap` don't always cover everything.
 A special thanks for the awesome reviewers:
 
 - Nicholas Jamieson [@ncjamieson](https://twitter.com/ncjamieson)
+- Philippe Martin [@feloy2](https://twitter.com/feloy2)
+- Jan-Niklas Wortmann [@niklas_wortmann](https://twitter.com/niklas_wortmann)
+- Maarten Tibau [@maartentibau](https://twitter.com/maartentibau)
