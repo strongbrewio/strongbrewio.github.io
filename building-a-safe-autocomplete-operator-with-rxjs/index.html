@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Building a safe autocomplete operator in RxJS</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="/building-a-safe-autocomplete-operator-with-rxjs/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Building a safe autocomplete operator in RxJS" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="//building-a-safe-autocomplete-operator-with-rxjs/" />
+    <meta property="og:image" content="/assets/images/cover/cover6.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Building a safe autocomplete operator in RxJS" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="//building-a-safe-autocomplete-operator-with-rxjs/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover6.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "Building a safe autocomplete operator in RxJS",
+    "url": "//building-a-safe-autocomplete-operator-with-rxjs/",
+    "image": "/assets/images/cover/cover6.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover6.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>Want to work with us?</h5>
+<a href="https://strongbrew.io/about" class="button" rel="noopener">Learn more</a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Building a safe autocomplete operator in RxJS</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                    
+                    
+                    
+                    
+                    <time class="post-date" datetime="2018-07-13">13 Jul 2018
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>A well-known use case of RxJS is creating a simple autocomplete search in only a few lines of code.
+This article is not just about creating our own autocomplete operator, we will create an autocomplete operator that is completely safe (we will cover the perception of safe later in this article).</p>
+
+<p>When creating a standard autocomplete with RxJS we most likely implement a <code>debounceTime</code> operator to throttle the text that the user is typing into the autocomplete and we use a <code>switchMap</code> operator instead of a <code>mergeMap</code> operator to abort previous calls.</p>
+
+<p>The implementation of this autocomplete might look like this:</p>
+
+<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
+const results$ = term$
+    .pipe(
+        // wait until the user stops typing for a second
+        debounceTime(1000),
+        // higher order observable, abort previous
+        // call if still busy
+        switchMap(term =&gt; getAutocompleteSuggestions(term))
+    )
+</code></pre>
+
+<h2 id="the-problem">The problem</h2>
+
+<p>When the user stops typing for 1 second, the browser will create a new XHR call. From that moment on, when the user types again and a previous XHR call is still busy, the browser will abort that XHR call to avoid racing conditions, and create a new XHR call. This is due to the <code>switchMap</code> operator since it will unsubscribe from the previous observable.</p>
+
+<p>Although that’s great, there is one problem though. What if the user starts typing again when an XHR call is still busy? 
+Since we have implemented a <code>debounceTime</code> operator, the call will not be aborted until one second has passed.
+In that period of time new results might be returned and showed to the user, which might not be what we want since <strong>they are not relevant anymore</strong>.</p>
+
+<p>What we want is that the XHR call gets aborted from the moment the user starts typing again, we don’t want to wait for a second.
+This sounds like an ideal scenario to write our custom operator.
+But, before creating our own operator, let’s just combine some operators to get the job done.</p>
+
+<p>A possible solution for this problem is using a <code>takeUntil</code> operator on the observable that will trigger the XHR call.
+The <code>takeUntil</code> operator will complete the observable as soon as it gets a value. We want to complete (and therefore abort) the observable when the user types again. With that knowledge we can write something like this:</p>
+
+<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
+const results$ = term$
+    .pipe(
+        debounceTime(1000),
+        switchMap(term =&gt; 
+            getAutocompleteSuggestions(term)
+                .pipe(
+                    takeUntil(term$) // this still won't work
+                )
+            )
+        )
+    )
+</code></pre>
+
+<p>Sadly, this does not work yet.</p>
+
+<p>Our <code>term$</code> observable is a <code>BehaviorSubject</code> for two reasons:</p>
+<ul>
+  <li>We want to pass an initial value to the subject</li>
+  <li>A <code>BehaviorSubject</code> is a <code>ReplaySubject(1)</code> behind the scenes that keeps track of the last value. This is important if we want to subscribe to that observable in a later stage (which is kinda what we do with the <code>takeUntil</code> operator).</li>
+</ul>
+
+<p>Because the <code>term$</code> observable is keeping track of the last value, the <code>takeUntil</code> operator will always have a value, resulting in the fact that every XHR call gets aborted immediately. This is not what we want.
+We want to skip one value of the <code>term$</code> observable every time.
+We can achieve that with the <code>skip</code> operator as shown in the following example:</p>
+
+<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
+const results$ = term$
+    .pipe(
+        debounceTime(1000),
+        switchMap(term =&gt; 
+            getAutocompleteSuggestions(term)
+                .pipe(
+                    takeUntil(
+                        //skip 1 value
+                        term$.pipe(skip(1))
+                    )
+                        
+                )
+            )
+        )
+    )
+</code></pre>
+
+<p>Now the following scenario works:</p>
+<ul>
+  <li>User types ‘l’</li>
+  <li>Application waits for a second</li>
+  <li>Application creates an XHR call</li>
+  <li>User types ‘lu’</li>
+  <li>Even though the XHR call wasn’t finished yet it gets aborted immediately (it doesn’t wait for a second anymore to abort that XHR call)</li>
+</ul>
+
+<p>Because of that the user never gets irrelevant data on its screen.</p>
+
+<h2 id="extracting-the-logic-into-a-custom-operator">Extracting the logic into a custom operator</h2>
+
+<p>We don’t want to write this logic every time, so let’s extract this logic into a custom written operator.</p>
+
+<p>Turns out that creating custom operators is super easy. An operator is just a function that returns a function that gets the source observable.</p>
+
+<pre><code class="language-typescript">const autocomplete = (/* additional parameters */) =&gt; 
+    (source$) =&gt; source$.pipe(/* do stuff */ )
+</code></pre>
+
+<p>We can pass the <code>time</code> and <code>selector</code> function as parameters and use the operators we have written to create our own custom operator.
+The operator looks like this:</p>
+
+<pre><code class="language-typescript">const autocomplete = (time, selector) =&gt; (source$) =&gt;
+  source$.pipe(
+    debounceTime(time),
+    switchMap(v =&gt; selector.apply(this, arguments)
+        .pipe(
+            takeUntil(
+                source$
+                    .pipe(
+                        skip(1)
+                    )
+            )
+        )
+    )
+  )
+</code></pre>
+<p>We need the apply function to execute the selector function with the correct context and arguments.</p>
+
+<p><em>Note</em>: Learn more about the apply function <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply">here</a></p>
+
+<p>Using our operator is super easy:</p>
+
+<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
+const results$ = term$
+    .pipe(
+        autocomplete(1000, term =&gt; getAutocompleteSuggestions(term))
+    )
+</code></pre>
+
+<p>You can find the sourcecode on stackblitz.</p>
+<iframe src="https://stackblitz.com/edit/safe-switchmap?embed=1&amp;file=src/app/app.component.ts" style="width: 100%; height: 500px"></iframe>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The combination of <code>debounceTime</code> and <code>switchMap</code> don’t always cover everything. Showing irrelevant data to our users might not be what we want and creating our own operators is super easy! I hope you enjoyed the article.</p>
+
+<h2 id="special-thanks">Special thanks</h2>
+
+<p>A special thanks for the awesome reviewers:</p>
+
+<ul>
+  <li>Nicholas Jamieson <a href="https://twitter.com/ncjamieson">@ncjamieson</a></li>
+  <li>Philippe Martin <a href="https://twitter.com/feloy2">@feloy2</a></li>
+  <li>Jan-Niklas Wortmann <a href="https://twitter.com/niklas_wortmann">@niklas_wortmann</a></li>
+  <li>Maarten Tibau <a href="https://twitter.com/maartentibau">@maartentibau</a></li>
+  <li>Kwinten Pisman (@kwintenp)(https://twitter.com/kwintenp)</li>
+</ul>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                    
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Building a safe autocomplete operator in RxJS&amp;url=building-a-safe-autocomplete-operator-with-rxjs"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=building-a-safe-autocomplete-operator-with-rxjs"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=building-a-safe-autocomplete-operator-with-rxjs"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover8.jpg)"
+       href="/the-sip-principle">
+        <section class="post">
+            <h2>Thinking reactive with the SIP principle</h2>
+            <p>A few months back we released RxJS best practices in Angular and a while before...</p>
+        </section>
+    </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2018</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-112030289-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>

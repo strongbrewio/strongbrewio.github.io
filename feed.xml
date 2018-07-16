@@ -8,6 +8,22 @@
     
       
       <item>
+        <title>Building a safe autocomplete operator in RxJS</title>
+        
+          <description>&lt;p&gt;A well-known use case of RxJS is creating a simple autocomplete search in only a few lines of code.
+This article is not just about creating our own autocomplete operator, we will create an autocomplete operator that is completely safe (we will cover the perception of safe later in this article).&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 13 Jul 2018 00:00:00 +0000</pubDate>
+        <link>
+        /building-a-safe-autocomplete-operator-with-rxjs/</link>
+        <guid isPermaLink="true">/building-a-safe-autocomplete-operator-with-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Thinking reactive with the SIP principle</title>
         
           <description>&lt;p&gt;A few months back we released &lt;a href=&quot;https://blog.strongbrew.io/rxjs-best-practices-in-angular/&quot;&gt;RxJS best practices in Angular&lt;/a&gt; and a while before that &lt;a href=&quot;https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs/&quot;&gt;Thinking reactively in Angular and RxJS&lt;/a&gt;. 
