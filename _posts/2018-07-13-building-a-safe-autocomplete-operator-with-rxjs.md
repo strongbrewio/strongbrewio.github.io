@@ -33,7 +33,7 @@ const results$ = term$
 
 ## The problem
 
-When the user stops typing for 1 second, the browser will create a new XHR call. From that moment on, when the user is searching again and a previous XHR call is still busy, the browser will abort that XHR call to avoid racing conditions, and create a new XHR call. This is due to the `switchMap` operator since it will unsubscribe from the previous observable.
+When the user stops typing for 1 second, the browser will create a new XHR call. From that moment on, when the user types again and a previous XHR call is still busy, the browser will abort that XHR call to avoid racing conditions, and create a new XHR call. This is due to the `switchMap` operator since it will unsubscribe from the previous observable.
 
 Although that's great, there is one problem though. What if the user starts typing again when an XHR call is still busy? 
 Since we have implemented a `debounceTime` operator, the call will not be aborted until one second has passed.
@@ -129,7 +129,9 @@ const autocomplete = (time, selector) => (source$) =>
     )
   )
 ```
+We need the apply function to execute the selector function with the correct context and arguments.
 
+*Note*: Learn more about the apply function [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply)
 
 Using our operator is super easy:
 
@@ -156,3 +158,4 @@ A special thanks for the awesome reviewers:
 - Philippe Martin [@feloy2](https://twitter.com/feloy2)
 - Jan-Niklas Wortmann [@niklas_wortmann](https://twitter.com/niklas_wortmann)
 - Maarten Tibau [@maartentibau](https://twitter.com/maartentibau)
+- Kwinten Pisman (@kwintenp)(https://twitter.com/kwintenp)
