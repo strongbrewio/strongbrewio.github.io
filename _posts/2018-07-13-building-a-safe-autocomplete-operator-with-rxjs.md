@@ -158,4 +158,4 @@ A special thanks for the awesome reviewers:
 - Philippe Martin [@feloy2](https://twitter.com/feloy2)
 - Jan-Niklas Wortmann [@niklas_wortmann](https://twitter.com/niklas_wortmann)
 - Maarten Tibau [@maartentibau](https://twitter.com/maartentibau)
-- Kwinten Pisman (@kwintenp)(https://twitter.com/kwintenp)
+- Kwinten Pisman [@kwintenp](https://twitter.com/kwintenp)
