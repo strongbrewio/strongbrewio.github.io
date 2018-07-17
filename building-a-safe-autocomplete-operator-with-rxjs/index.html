@@ -289,7 +289,7 @@ The operator looks like this:</p>
 <pre><code class="language-typescript">const autocomplete = (time, selector) =&gt; (source$) =&gt;
   source$.pipe(
     debounceTime(time),
-    switchMap(v =&gt; selector.apply(this, arguments)
+    switchMap((...args: any[]) =&gt; selector(...args)
         .pipe(
             takeUntil(
                 source$
@@ -301,9 +301,6 @@ The operator looks like this:</p>
     )
   )
 </code></pre>
-<p>We need the apply function to execute the selector function with the correct context and arguments.</p>
-
-<p><em>Note</em>: Learn more about the apply function <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply">here</a></p>
 
 <p>Using our operator is super easy:</p>
 
