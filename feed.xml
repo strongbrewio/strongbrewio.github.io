@@ -4,7 +4,7 @@
     <title>Strongbrew - Articles</title>
     <description></description>
     <link>
-    </link>
+    https://blog.strongbrew.io</link>
     
       
       <item>
@@ -17,8 +17,8 @@ This article is not just about creating our own autocomplete operator, we will c
         
         <pubDate>Fri, 13 Jul 2018 00:00:00 +0000</pubDate>
         <link>
-        /building-a-safe-autocomplete-operator-with-rxjs/</link>
-        <guid isPermaLink="true">/building-a-safe-autocomplete-operator-with-rxjs/</guid>
+        https://blog.strongbrew.io/building-a-safe-autocomplete-operator-with-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/building-a-safe-autocomplete-operator-with-rxjs/</guid>
       </item>
       
     
@@ -33,8 +33,8 @@ Both of these articles are focussing on “trying to make the mind switch toward
         
         <pubDate>Sat, 30 Jun 2018 00:00:00 +0000</pubDate>
         <link>
-        /the-sip-principle/</link>
-        <guid isPermaLink="true">/the-sip-principle/</guid>
+        https://blog.strongbrew.io/the-sip-principle/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/the-sip-principle/</guid>
       </item>
       
     
@@ -48,8 +48,8 @@ Both of these articles are focussing on “trying to make the mind switch toward
         
         <pubDate>Tue, 12 Jun 2018 00:00:00 +0000</pubDate>
         <link>
-        /combine-latest-glitch/</link>
-        <guid isPermaLink="true">/combine-latest-glitch/</guid>
+        https://blog.strongbrew.io/combine-latest-glitch/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/combine-latest-glitch/</guid>
       </item>
       
     
@@ -65,8 +65,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Fri, 27 Apr 2018 00:00:00 +0000</pubDate>
         <link>
-        /Redux-best-practices/</link>
-        <guid isPermaLink="true">/Redux-best-practices/</guid>
+        https://blog.strongbrew.io/Redux-best-practices/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/Redux-best-practices/</guid>
       </item>
       
     
@@ -80,8 +80,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
         <link>
-        /share-replay-issue/</link>
-        <guid isPermaLink="true">/share-replay-issue/</guid>
+        https://blog.strongbrew.io/share-replay-issue/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/share-replay-issue/</guid>
       </item>
       
     
@@ -95,8 +95,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Thu, 19 Apr 2018 00:00:00 +0000</pubDate>
         <link>
-        /rxjs-polling/</link>
-        <guid isPermaLink="true">/rxjs-polling/</guid>
+        https://blog.strongbrew.io/rxjs-polling/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/rxjs-polling/</guid>
       </item>
       
     
@@ -110,8 +110,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Fri, 13 Apr 2018 00:00:00 +0000</pubDate>
         <link>
-        /do-we-really-need-redux/</link>
-        <guid isPermaLink="true">/do-we-really-need-redux/</guid>
+        https://blog.strongbrew.io/do-we-really-need-redux/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/do-we-really-need-redux/</guid>
       </item>
       
     
@@ -125,8 +125,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Tue, 13 Mar 2018 00:00:00 +0000</pubDate>
         <link>
-        /how-nx-affected-apps-works/</link>
-        <guid isPermaLink="true">/how-nx-affected-apps-works/</guid>
+        https://blog.strongbrew.io/how-nx-affected-apps-works/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/how-nx-affected-apps-works/</guid>
       </item>
       
     
@@ -140,8 +140,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Sun, 04 Mar 2018 00:00:00 +0000</pubDate>
         <link>
-        /prerendering-angular-apps/</link>
-        <guid isPermaLink="true">/prerendering-angular-apps/</guid>
+        https://blog.strongbrew.io/prerendering-angular-apps/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/prerendering-angular-apps/</guid>
       </item>
       
     
@@ -155,8 +155,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Mon, 05 Feb 2018 00:00:00 +0000</pubDate>
         <link>
-        /what-are-schedulers-in-rxjs/</link>
-        <guid isPermaLink="true">/what-are-schedulers-in-rxjs/</guid>
+        https://blog.strongbrew.io/what-are-schedulers-in-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/what-are-schedulers-in-rxjs/</guid>
       </item>
       
     
@@ -170,8 +170,8 @@ Since a lot of Angular projects use @ngrx/store, it might be a good idea to writ
         
         <pubDate>Mon, 15 Jan 2018 00:00:00 +0000</pubDate>
         <link>
-        /display-a-component-based-on-role/</link>
-        <guid isPermaLink="true">/display-a-component-based-on-role/</guid>
+        https://blog.strongbrew.io/display-a-component-based-on-role/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/display-a-component-based-on-role/</guid>
       </item>
       
     
@@ -186,8 +186,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Thu, 04 Jan 2018 00:00:00 +0000</pubDate>
         <link>
-        /rxjs-best-practices-in-angular/</link>
-        <guid isPermaLink="true">/rxjs-best-practices-in-angular/</guid>
+        https://blog.strongbrew.io/rxjs-best-practices-in-angular/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/rxjs-best-practices-in-angular/</guid>
       </item>
       
     
@@ -201,8 +201,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Tue, 24 Oct 2017 00:00:00 +0000</pubDate>
         <link>
-        /safe-image-requests-in-angular/</link>
-        <guid isPermaLink="true">/safe-image-requests-in-angular/</guid>
+        https://blog.strongbrew.io/safe-image-requests-in-angular/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/safe-image-requests-in-angular/</guid>
       </item>
       
     
@@ -216,8 +216,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Fri, 08 Sep 2017 00:00:00 +0000</pubDate>
         <link>
-        /code-formatting-with-rxjs/</link>
-        <guid isPermaLink="true">/code-formatting-with-rxjs/</guid>
+        https://blog.strongbrew.io/code-formatting-with-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/code-formatting-with-rxjs/</guid>
       </item>
       
     
@@ -231,8 +231,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Sun, 20 Aug 2017 00:00:00 +0000</pubDate>
         <link>
-        /multicasting-operators-in-rxjs/</link>
-        <guid isPermaLink="true">/multicasting-operators-in-rxjs/</guid>
+        https://blog.strongbrew.io/multicasting-operators-in-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/multicasting-operators-in-rxjs/</guid>
       </item>
       
     
@@ -246,8 +246,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Sun, 13 Aug 2017 00:00:00 +0000</pubDate>
         <link>
-        /A-scalable-angular-architecture-part2/</link>
-        <guid isPermaLink="true">/A-scalable-angular-architecture-part2/</guid>
+        https://blog.strongbrew.io/A-scalable-angular-architecture-part2/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/A-scalable-angular-architecture-part2/</guid>
       </item>
       
     
@@ -261,8 +261,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
         <link>
-        /introducing-rx-devtools/</link>
-        <guid isPermaLink="true">/introducing-rx-devtools/</guid>
+        https://blog.strongbrew.io/introducing-rx-devtools/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/introducing-rx-devtools/</guid>
       </item>
       
     
@@ -276,8 +276,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Tue, 25 Jul 2017 00:00:00 +0000</pubDate>
         <link>
-        /thinking-reactively-in-angular-and-rxjs/</link>
-        <guid isPermaLink="true">/thinking-reactively-in-angular-and-rxjs/</guid>
+        https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs/</guid>
       </item>
       
     
@@ -291,8 +291,8 @@ The best practices described in this article are based on personal experiences a
         
         <pubDate>Wed, 15 Feb 2017 00:00:00 +0000</pubDate>
         <link>
-        /how-to-setup-marble-testing/</link>
-        <guid isPermaLink="true">/how-to-setup-marble-testing/</guid>
+        https://blog.strongbrew.io/how-to-setup-marble-testing/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/how-to-setup-marble-testing/</guid>
       </item>
       
     
@@ -307,8 +307,8 @@ One element in spring cloud is hystrix. When you’re doing a network call which
         
         <pubDate>Wed, 15 Feb 2017 00:00:00 +0000</pubDate>
         <link>
-        /decorators-and-observables-to-implement-retry-logic/</link>
-        <guid isPermaLink="true">/decorators-and-observables-to-implement-retry-logic/</guid>
+        https://blog.strongbrew.io/decorators-and-observables-to-implement-retry-logic/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/decorators-and-observables-to-implement-retry-logic/</guid>
       </item>
       
     
@@ -322,8 +322,8 @@ One element in spring cloud is hystrix. When you’re doing a network call which
         
         <pubDate>Wed, 15 Feb 2017 00:00:00 +0000</pubDate>
         <link>
-        /client-side-filtering-with-streams/</link>
-        <guid isPermaLink="true">/client-side-filtering-with-streams/</guid>
+        https://blog.strongbrew.io/client-side-filtering-with-streams/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/client-side-filtering-with-streams/</guid>
       </item>
       
     
@@ -339,8 +339,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Tue, 10 Jan 2017 00:00:00 +0000</pubDate>
         <link>
-        /my-favorite-metaphor-for-hot-vs-cold-observables/</link>
-        <guid isPermaLink="true">/my-favorite-metaphor-for-hot-vs-cold-observables/</guid>
+        https://blog.strongbrew.io/my-favorite-metaphor-for-hot-vs-cold-observables/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/my-favorite-metaphor-for-hot-vs-cold-observables/</guid>
       </item>
       
     
@@ -354,8 +354,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Wed, 21 Dec 2016 00:00:00 +0000</pubDate>
         <link>
-        /infinite-scroll-with-rxjs-and-angular2/</link>
-        <guid isPermaLink="true">/infinite-scroll-with-rxjs-and-angular2/</guid>
+        https://blog.strongbrew.io/infinite-scroll-with-rxjs-and-angular2/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/infinite-scroll-with-rxjs-and-angular2/</guid>
       </item>
       
     
@@ -369,8 +369,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Tue, 20 Dec 2016 00:00:00 +0000</pubDate>
         <link>
-        /how-share()-can-reduce-network-requests/</link>
-        <guid isPermaLink="true">/how-share()-can-reduce-network-requests/</guid>
+        https://blog.strongbrew.io/how-share()-can-reduce-network-requests/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/how-share()-can-reduce-network-requests/</guid>
       </item>
       
     
@@ -384,8 +384,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Mon, 21 Nov 2016 00:00:00 +0000</pubDate>
         <link>
-        /type-safe-actions-in-reducers/</link>
-        <guid isPermaLink="true">/type-safe-actions-in-reducers/</guid>
+        https://blog.strongbrew.io/type-safe-actions-in-reducers/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/type-safe-actions-in-reducers/</guid>
       </item>
       
     
@@ -399,8 +399,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Wed, 09 Nov 2016 00:00:00 +0000</pubDate>
         <link>
-        /A-scalable-angular2-architecture/</link>
-        <guid isPermaLink="true">/A-scalable-angular2-architecture/</guid>
+        https://blog.strongbrew.io/A-scalable-angular2-architecture/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/A-scalable-angular2-architecture/</guid>
       </item>
       
     
@@ -414,8 +414,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Fri, 23 Sep 2016 00:00:00 +0000</pubDate>
         <link>
-        /Cancellable-optimistic-updates-in-Angular2-and-Redux/</link>
-        <guid isPermaLink="true">/Cancellable-optimistic-updates-in-Angular2-and-Redux/</guid>
+        https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/</guid>
       </item>
       
     
@@ -429,8 +429,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Thu, 15 Sep 2016 00:00:00 +0000</pubDate>
         <link>
-        /combinereducers-enhanced/</link>
-        <guid isPermaLink="true">/combinereducers-enhanced/</guid>
+        https://blog.strongbrew.io/combinereducers-enhanced/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/combinereducers-enhanced/</guid>
       </item>
       
     
@@ -444,8 +444,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Sun, 11 Sep 2016 00:00:00 +0000</pubDate>
         <link>
-        /How-we-made-our-app-real-time-in-6-lines-of-code/</link>
-        <guid isPermaLink="true">/How-we-made-our-app-real-time-in-6-lines-of-code/</guid>
+        https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/</guid>
       </item>
       
     
@@ -459,8 +459,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Tue, 30 Aug 2016 00:00:00 +0000</pubDate>
         <link>
-        /components-demystified/</link>
-        <guid isPermaLink="true">/components-demystified/</guid>
+        https://blog.strongbrew.io/components-demystified/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/components-demystified/</guid>
       </item>
       
     
@@ -474,8 +474,8 @@ At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.
         
         <pubDate>Wed, 24 Aug 2016 00:00:00 +0000</pubDate>
         <link>
-        /Modals-in-angular2/</link>
-        <guid isPermaLink="true">/Modals-in-angular2/</guid>
+        https://blog.strongbrew.io/Modals-in-angular2/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/Modals-in-angular2/</guid>
       </item>
       
     
@@ -490,8 +490,8 @@ Here it is!&lt;/p&gt;
         
         <pubDate>Mon, 22 Aug 2016 00:00:00 +0000</pubDate>
         <link>
-        /how-to-write-clean-reducers-and-test-them/</link>
-        <guid isPermaLink="true">/how-to-write-clean-reducers-and-test-them/</guid>
+        https://blog.strongbrew.io/how-to-write-clean-reducers-and-test-them/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/how-to-write-clean-reducers-and-test-them/</guid>
       </item>
       
     
@@ -505,8 +505,8 @@ Here it is!&lt;/p&gt;
         
         <pubDate>Thu, 09 Jun 2016 00:00:00 +0000</pubDate>
         <link>
-        /how-the-hell-do-zones-really-work/</link>
-        <guid isPermaLink="true">/how-the-hell-do-zones-really-work/</guid>
+        https://blog.strongbrew.io/how-the-hell-do-zones-really-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/how-the-hell-do-zones-really-work/</guid>
       </item>
       
     
@@ -520,8 +520,8 @@ Here it is!&lt;/p&gt;
         
         <pubDate>Fri, 22 Apr 2016 00:00:00 +0000</pubDate>
         <link>
-        /the-smart-vs-dumb-components-quiz/</link>
-        <guid isPermaLink="true">/the-smart-vs-dumb-components-quiz/</guid>
+        https://blog.strongbrew.io/the-smart-vs-dumb-components-quiz/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/the-smart-vs-dumb-components-quiz/</guid>
       </item>
       
     
@@ -536,8 +536,8 @@ I’m not going to try and do the same, instead I want to look at a specific lif
         
         <pubDate>Wed, 06 Apr 2016 00:00:00 +0000</pubDate>
         <link>
-        /the-onchanges-lifecycle-hook/</link>
-        <guid isPermaLink="true">/the-onchanges-lifecycle-hook/</guid>
+        https://blog.strongbrew.io/the-onchanges-lifecycle-hook/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io/the-onchanges-lifecycle-hook/</guid>
       </item>
       
     
