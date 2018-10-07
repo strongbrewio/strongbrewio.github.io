@@ -18,7 +18,7 @@ disqus_brecht: brechtbilliet
 disqus_kwinten: kwintenpghostio
 # edit baseurl to simply '/' if using as your personal page (instead of a project page)
 baseurl: /
-url: https://blog.strongbrew.io
+url: https://blog.strongbrew.io/
 
 # Permalinks
 permalink: /:title/
