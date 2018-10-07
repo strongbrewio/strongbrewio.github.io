@@ -94,6 +94,7 @@ class: 'post-template'
 
                 <section class="share">
                     <h4>Share this post</h4>
+                   {{page.url}} {{site.url}}
                     <a class="icon-twitter"
                        href="http://twitter.com/share?text={{ page.title }}&amp;url={{ site.url }}{{ page.url | remove: '/' }}"
                        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
