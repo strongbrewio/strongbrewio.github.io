@@ -126,6 +126,8 @@ You could, for example, hold a boolean value whether something in the component 
 ###### 8: Is a component that contains child elements a `smart`?
 No. It is perfectly acceptable for a `dumb` component to contain other `dumb` components. Of course, a `dumb` component cannot contain a `smart` component.
 
+EDIT: As [@areksliwa](https://disqus.com/by/ArekSliwa/) pointed out in the comments, when you have a layout component where some content is being projected into via content projection, it can happen that a dumb component (the layout component) contains a smart component. This can happen for a tab(s) component for example.
+
 
 Can you think of some more questions? Please let me know :).
 
