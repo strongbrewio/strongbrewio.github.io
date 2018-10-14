@@ -295,6 +295,8 @@ You could, for example, hold a boolean value whether something in the component 
 <h6 id="8-is-a-component-that-contains-child-elements-a-smart">8: Is a component that contains child elements a <code>smart</code>?</h6>
 <p>No. It is perfectly acceptable for a <code>dumb</code> component to contain other <code>dumb</code> components. Of course, a <code>dumb</code> component cannot contain a <code>smart</code> component.</p>
 
+<p>EDIT: As <a href="https://disqus.com/by/ArekSliwa/">@areksliwa</a> pointed out in the comments, when you have a layout component where some content is being projected into via content projection, it can happen that a dumb component (the layout component) contains a smart component. This can happen for a tab(s) component for example.</p>
+
 <p>Can you think of some more questions? Please let me know :).</p>
 
 
