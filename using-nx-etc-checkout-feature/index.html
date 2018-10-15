@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Building a safe autocomplete operator in RxJS</title>
+    <title>Using nx-etc checkout feature</title>
     <meta name="description" content="" />
 
     <!-- Mobile Meta -->
@@ -25,21 +25,21 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="https://blog.strongbrew.io//building-a-safe-autocomplete-operator-with-rxjs/" />
+        <link rel="canonical" href="https://blog.strongbrew.io//using-nx-etc-checkout-feature/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Building a safe autocomplete operator in RxJS" />
+    <meta property="og:title" content="Using nx-etc checkout feature" />
     <meta property="og:description" content="" />
-    <meta property="og:url" content="https://blog.strongbrew.io///building-a-safe-autocomplete-operator-with-rxjs/" />
+    <meta property="og:url" content="https://blog.strongbrew.io///using-nx-etc-checkout-feature/" />
     <meta property="og:image" content="/assets/images/cover/cover6.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Building a safe autocomplete operator in RxJS" />
+    <meta name="twitter:title" content="Using nx-etc checkout feature" />
     <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="https://blog.strongbrew.io///building-a-safe-autocomplete-operator-with-rxjs/" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///using-nx-etc-checkout-feature/" />
     <meta name="twitter:image:src" content="/assets/images/cover/cover6.jpg" />
 
     <script type="application/ld+json">
@@ -47,8 +47,8 @@
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Building a safe autocomplete operator in RxJS",
-    "url": "https://blog.strongbrew.io///building-a-safe-autocomplete-operator-with-rxjs/",
+    "name": "Using nx-etc checkout feature",
+    "url": "https://blog.strongbrew.io///using-nx-etc-checkout-feature/",
     "image": "/assets/images/cover/cover6.jpg",
     "description": ""
 }
@@ -158,25 +158,25 @@
     <article class="post">
         <div class="post-inner">
             <header class="post-header">
-                <h1 class="post-title">Building a safe autocomplete operator in RxJS</h1>
+                <h1 class="post-title">Using nx-etc checkout feature</h1>
                 <section class="post-meta">
                     <!-- <a href='/'></a> -->
 
                     
                     
-                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
                     
                     
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
                     
                     
-                    <time class="post-date" datetime="2018-07-13">13 Jul 2018
+                    <time class="post-date" datetime="2018-10-14">14 Oct 2018
                     </time>
                     <!-- [[tags prefix=" on "]] -->
                     
                     on
                     
                     
-                    <a href='/tag/RxJS'>Rxjs</a>
+                    <a href='/tag/Angular'>Angular</a>
                     
                     
                     
@@ -185,150 +185,26 @@
 
             <section class="post-content">
 
-                <p>A well-known use case of RxJS is creating a simple autocomplete search in only a few lines of code.
-This article is not just about creating our own autocomplete operator, we will create an autocomplete operator that is completely safe (we will cover the perception of safe later in this article).</p>
+                <p>Using <a href="https://nrwl.io/nx">Nx</a> we can build applications using a monorepo style of development. If your monorepo contains a lot of applications and libraries, the development process might be impacted a little.</p>
 
-<p>When creating a standard autocomplete with RxJS we most likely implement a <code>debounceTime</code> operator to throttle the text that the user is typing into the autocomplete and we use a <code>switchMap</code> operator instead of a <code>mergeMap</code> operator to abort previous calls.</p>
-
-<p>The implementation of this autocomplete might look like this:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        // wait until the user stops typing for a second
-        debounceTime(1000),
-        // higher order observable, abort previous
-        // call if still busy
-        switchMap(term =&gt; getAutocompleteSuggestions(term))
-    )
-</code></pre>
-
-<h2 id="the-problem">The problem</h2>
-
-<p>When the user stops typing for 1 second, the browser will create a new XHR call. From that moment on, when the user types again and a previous XHR call is still busy, the browser will abort that XHR call to avoid racing conditions, and create a new XHR call. This is due to the <code>switchMap</code> operator since it will unsubscribe from the previous observable.</p>
-
-<p>Although that’s great, there is one problem though. What if the user starts typing again when an XHR call is still busy? 
-Since we have implemented a <code>debounceTime</code> operator, the call will not be aborted until one second has passed.
-In that period of time new results might be returned and showed to the user, which might not be what we want since <strong>they are not relevant anymore</strong>.</p>
-
-<p>What we want is that the XHR call gets aborted from the moment the user starts typing again, we don’t want to wait for a second.
-This sounds like an ideal scenario to write our custom operator.
-But, before creating our own operator, let’s just combine some operators to get the job done.</p>
-
-<p>A possible solution for this problem is using a <code>takeUntil</code> operator on the observable that will trigger the XHR call.
-The <code>takeUntil</code> operator will complete the observable as soon as it gets a value. We want to complete (and therefore abort) the observable when the user types again. With that knowledge we can write something like this:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        debounceTime(1000),
-        switchMap(term =&gt; 
-            getAutocompleteSuggestions(term)
-                .pipe(
-                    takeUntil(term$) // this still won't work
-                )
-            )
-        )
-    )
-</code></pre>
-
-<p>Sadly, this does not work yet.</p>
-
-<p>Our <code>term$</code> observable is a <code>BehaviorSubject</code> for two reasons:</p>
-<ul>
-  <li>We want to pass an initial value to the subject</li>
-  <li>A <code>BehaviorSubject</code> is a <code>ReplaySubject(1)</code> behind the scenes that keeps track of the last value. This is important if we want to subscribe to that observable in a later stage (which is kinda what we do with the <code>takeUntil</code> operator).</li>
-</ul>
-
-<p>Because the <code>term$</code> observable is keeping track of the last value, the <code>takeUntil</code> operator will always have a value, resulting in the fact that every XHR call gets aborted immediately. This is not what we want.
-We want to skip one value of the <code>term$</code> observable every time.
-We can achieve that with the <code>skip</code> operator as shown in the following example:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        debounceTime(1000),
-        switchMap(term =&gt; 
-            getAutocompleteSuggestions(term)
-                .pipe(
-                    takeUntil(
-                        //skip 1 value
-                        term$.pipe(skip(1))
-                    )
-                        
-                )
-            )
-        )
-    )
-</code></pre>
-
-<p>Now the following scenario works:</p>
-<ul>
-  <li>User types ‘l’</li>
-  <li>Application waits for a second</li>
-  <li>Application creates an XHR call</li>
-  <li>User types ‘lu’</li>
-  <li>Even though the XHR call wasn’t finished yet it gets aborted immediately (it doesn’t wait for a second anymore to abort that XHR call)</li>
-</ul>
-
-<p>Because of that the user never gets irrelevant data on its screen.</p>
-
-<h2 id="extracting-the-logic-into-a-custom-operator">Extracting the logic into a custom operator</h2>
-
-<p>We don’t want to write this logic every time, so let’s extract this logic into a custom written operator.</p>
-
-<p>Turns out that creating custom operators is super easy. An operator is just a function that returns a function that gets the source observable.</p>
-
-<pre><code class="language-typescript">const autocomplete = (/* additional parameters */) =&gt; 
-    (source$) =&gt; source$.pipe(/* do stuff */ )
-</code></pre>
-
-<p>We can pass the <code>time</code> and <code>selector</code> function as parameters and use the operators we have written to create our own custom operator.
-The operator looks like this:</p>
-
-<pre><code class="language-typescript">const autocomplete = (time, selector) =&gt; (source$) =&gt;
-  source$.pipe(
-    debounceTime(time),
-    switchMap((...args: any[]) =&gt; selector(...args)
-        .pipe(
-            takeUntil(
-                source$
-                    .pipe(
-                        skip(1)
-                    )
-            )
-        )
-    )
-  )
-</code></pre>
-
-<p>Using our operator is super easy:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        autocomplete(1000, term =&gt; getAutocompleteSuggestions(term))
-    )
-</code></pre>
-
-<p>You can find the sourcecode on stackblitz.</p>
-<iframe src="https://stackblitz.com/edit/safe-switchmap?embed=1&amp;file=src/app/app.component.ts" style="width: 100%; height: 500px"></iframe>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>The combination of <code>debounceTime</code> and <code>switchMap</code> don’t always cover everything. Showing irrelevant data to our users might not be what we want and creating our own operators is super easy! I hope you enjoyed the article.</p>
-
-<h2 id="special-thanks">Special thanks</h2>
-
-<p>A special thanks for the awesome reviewers:</p>
+<h3 id="problems">Problems</h3>
 
 <ul>
-  <li>Nicholas Jamieson <a href="https://twitter.com/ncjamieson">@ncjamieson</a></li>
-  <li>Philippe Martin <a href="https://twitter.com/feloy2">@feloy2</a></li>
-  <li>Jan-Niklas Wortmann <a href="https://twitter.com/niklas_wortmann">@niklas_wortmann</a></li>
-  <li>Maarten Tibau <a href="https://twitter.com/maartentibau">@maartentibau</a></li>
-  <li>Kwinten Pisman <a href="https://twitter.com/kwintenp">@kwintenp</a></li>
+  <li>Looking for files becomes somewhat annoying as you can find lots of them, even for apps or libs that you are not working one.</li>
+  <li>Opening up 20 apps and 50 libs in your IDE will impact its performance. While you might be only working on one or two apps.</li>
 </ul>
+
+<h3 id="solution">Solution</h3>
+
+<p>Nx-etc has a checkout feature that uses sparse checkouts and some scripts from Nx to only checkout apps and libs you are currently working on.
+You can find an overview of the lib in the video below.</p>
+
+<iframe src="https://player.vimeo.com/video/295018577" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+<p><a href="https://vimeo.com/295018577">Using nx-etc checkout feature</a> from <a href="https://vimeo.com/user79085465">Kwinten Pisman</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+
+<p>You can find the code on <a href="https://github.com/KwintenP/nx-etc">github</a>.</p>
+
+<p><strong>Note:</strong> Thanks to <a href="https://twitter.com/juristr">@juristr</a>, <a href="https://twitter.com/beeman_nl">@beeman</a> and <a href="https://twitter.com/chaos_monster">@chaos_monster</a> for testing and providing feedback!</p>
 
 
             </section>
@@ -341,24 +217,26 @@ const results$ = term$
                 
                 
                 
+                
+                
                 <figure class="author-image">
-                    <a class="img" href="/author/brechtbilliet"
-                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
                 </figure>
                 
 
                 <section class="author">
-                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
 
                     
-                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
                     
                     <div class="author-meta">
                         <span
                             class="author-location icon-location"> Belgium</span>
-                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        
                         <span class="author-link icon-twitter"><a
-                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
                     </div>
                 </section>
 
@@ -367,27 +245,26 @@ const results$ = term$
                 <section class="share">
                     <h4>Share this post</h4>
                     <a class="icon-twitter"
-                       href="http://twitter.com/share?text=Building a safe autocomplete operator in RxJS&amp;url=https://blog.strongbrew.io/building-a-safe-autocomplete-operator-with-rxjs"
+                       href="http://twitter.com/share?text=Using nx-etc checkout feature&amp;url=https://blog.strongbrew.io/using-nx-etc-checkout-feature"
                        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                         <span class="hidden">Twitter</span>
                     </a>
                     <a class="icon-facebook"
-                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/building-a-safe-autocomplete-operator-with-rxjs"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/using-nx-etc-checkout-feature"
                        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                         <span class="hidden">Facebook</span>
                     </a>
                     <a class="icon-google-plus"
-                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/building-a-safe-autocomplete-operator-with-rxjs"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/using-nx-etc-checkout-feature"
                        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
                         <span class="hidden">Google+</span>
                     </a>
                 </section>
                 
                 
-                
-                
 
                 <!-- Add Disqus Comments -->
+                
                 
                 
                 <div id="disqus_thread"></div>
@@ -414,7 +291,7 @@ const results$ = term$
         var d = document, s = d.createElement('script');
 
         // IMPORTANT: Replace EXAMPLE with your forum shortname!
-        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
 
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
@@ -426,7 +303,6 @@ const results$ = term$
         comments powered by Disqus.
     </a>
 </noscript>
-                
                 
                 
 
@@ -441,24 +317,15 @@ const results$ = term$
 
     <!-- [[! next_post ]] -->
     
-    <a class="read-next-story "
-       style="background-image: url(/assets/images/cover/cover6.jpg)"
-       href="/using-nx-etc-checkout-feature">
-        <section class="post">
-            <h2>Using nx-etc checkout feature</h2>
-            <p>Using [Nx](https://nrwl.io/nx) we can build applications using a monorepo style of development. If your monorepo...</p>
-        </section>
-    </a>
-    
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
     <a class="read-next-story prev "
-       style="background-image: url(/assets/images/cover/cover8.jpg)"
-       href="/the-sip-principle">
+       style="background-image: url(/assets/images/cover/cover6.jpg)"
+       href="/building-a-safe-autocomplete-operator-with-rxjs">
         <section class="post">
-            <h2>Thinking reactive with the SIP principle</h2>
-            <p>A few months back we released RxJS best practices in Angular and a while before...</p>
+            <h2>Building a safe autocomplete operator in RxJS</h2>
+            <p>A well-known use case of RxJS is creating a simple autocomplete search in only a...</p>
         </section>
     </a>
     

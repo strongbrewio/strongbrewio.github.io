@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Using nx-etc checkout feature</title>
+        
+          <description>&lt;p&gt;Using &lt;a href=&quot;https://nrwl.io/nx&quot;&gt;Nx&lt;/a&gt; we can build applications using a monorepo style of development. If your monorepo contains a lot of applications and libraries, the development process might be impacted a little.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sun, 14 Oct 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//using-nx-etc-checkout-feature/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//using-nx-etc-checkout-feature/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Building a safe autocomplete operator in RxJS</title>
         
           <description>&lt;p&gt;A well-known use case of RxJS is creating a simple autocomplete search in only a few lines of code.
