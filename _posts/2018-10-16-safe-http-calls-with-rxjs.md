@@ -16,7 +16,7 @@ cover: 'assets/images/cover/cover3.jpg'
 ---
 
 Hi there, since it's very busy lately this will probably be my one of my shortest articles ever.
-Maybe that's a good thing, because now you dont have an excuse not to read it. It's short, compact
+Maybe that's a good thing, because now you don't have an excuse not to read it. It's short, compact
 and maybe you will learn a thing or two.
 
 ## The problem
@@ -50,7 +50,7 @@ results$.subscribe((response: Result[]) => {
     console.log('do something fancy');
 })
 ```
-This all works fine, untill the user gets a `500` error, or even a simple `404` error ...
+This all works fine, until the user gets a `500` error, or even a simple `404` error ...
 If the user is having a bad connection which might result in a `404`, the observable will stop and the application will be broken. The user can search for results as much as he or she wants, the HTTP calls will never happen again.
 
 ## catchError
@@ -71,7 +71,7 @@ const results$ = searchTerm$.pipe(
 results$.subscribe(
     (response: Result[] | HttpErrorResponse) => {
         if(response instanceof HttpErrorResponse){
-            console.log('oh no:('));
+            console.log('oh no:(');
             return;
         }
         console.log('do something fancy');
@@ -80,7 +80,7 @@ results$.subscribe(
 ```
 
 Do note that the `catchError` operator is applied to the result observable that `fetchData()` returns, and not added as the second operator of the first pipe. 
-From the moment an observable receives an error, it will die... That's why it's important to catch the error at the highest level. 
+From the moment an observable receives an error, it will die... That's why it's important to catch the error on the inner observable. 
 
 ## retryWhen
 
@@ -106,7 +106,9 @@ const results$ = searchTerm$.pipe(
 )
 ```
 
-## Kicking it up a notch
+You can find more information about `retryWhen`[here](https://www.learnrxjs.io/operators/error_handling/retrywhen.html)
+
+## Using the online event
 
 We can do better than that. We can even use the [online](https://developer.mozilla.org/en-US/docs/Web/API/NavigatorOnLine/Online_and_offline_events) event from HTML5 to tell the browser to retry when the user regains internet connection. It's even shorter than before.
 
@@ -130,5 +132,12 @@ RxJS gives us great control over HTTP calls! If we know how error handling works
 
 There, I told you it would be short, I hope you learned something though.
 
+Also be sure to check this article: [Power of RxJS when using exponential backoff](https://blog.angularindepth.com/power-of-rxjs-when-using-exponential-backoff-a4b8bde276b0)
+
 ## Special thanks
-[AmarildoKurtaj](https://twitter.com/AmarildoKurtaj) The last example was based on his idea
+
+- [@AmarildoKurtaj](https://twitter.com/AmarildoKurtaj) The last example was based on his idea
+
+Reviewers:
+- [@tim_deschryver](https://twitter.com/tim_deschrijver)
+- [@rubenverm](https://twitter.com/rubenverm)
