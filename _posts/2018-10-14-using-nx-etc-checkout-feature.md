@@ -29,4 +29,4 @@ You can find an overview of the lib in the video below.
 
 You can find the code on [github](https://github.com/KwintenP/nx-etc).
 
-**Note:** Thanks to [@juristr](https://twitter.com/juristr), [@beeman](https://twitter.com/beeman_nl) and [@chaos_monster](https://twitter.com/chaos_monster) for testing and providing feedback!
+**Note:** Thanks to [@juristr](https://twitter.com/juristr), [@beeman](https://twitter.com/beeman_nl), [@chaos_monster](https://twitter.com/chaos_monster) and [@jvandemo](https://twitter.com/jvandemo) for testing and providing feedback!
