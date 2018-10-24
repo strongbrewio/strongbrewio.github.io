@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Using nx-etc checkout feature</title>
-    <meta name="description" content="" />
+    <title>Safe HTTP calls with RxJS</title>
+    <meta name="description" content="How to make sure our ajax calls are being executed on bad connections" />
 
     <!-- Mobile Meta -->
     <meta name="HandheldFriendly" content="True" />
@@ -25,32 +25,32 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="https://blog.strongbrew.io//using-nx-etc-checkout-feature/" />
+        <link rel="canonical" href="https://blog.strongbrew.io//safe-http-calls-with-rxjs/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Using nx-etc checkout feature" />
-    <meta property="og:description" content="" />
-    <meta property="og:url" content="https://blog.strongbrew.io///using-nx-etc-checkout-feature/" />
-    <meta property="og:image" content="/assets/images/cover/cover6.jpg" />
+    <meta property="og:title" content="Safe HTTP calls with RxJS" />
+    <meta property="og:description" content="How to make sure our ajax calls are being executed on bad connections" />
+    <meta property="og:url" content="https://blog.strongbrew.io///safe-http-calls-with-rxjs/" />
+    <meta property="og:image" content="/assets/images/cover/cover3.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Using nx-etc checkout feature" />
-    <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="https://blog.strongbrew.io///using-nx-etc-checkout-feature/" />
-    <meta name="twitter:image:src" content="/assets/images/cover/cover6.jpg" />
+    <meta name="twitter:title" content="Safe HTTP calls with RxJS" />
+    <meta name="twitter:description" content="How to make sure our ajax calls are being executed on bad connections" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///safe-http-calls-with-rxjs/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover3.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Using nx-etc checkout feature",
-    "url": "https://blog.strongbrew.io///using-nx-etc-checkout-feature/",
-    "image": "/assets/images/cover/cover6.jpg",
-    "description": ""
+    "name": "Safe HTTP calls with RxJS",
+    "url": "https://blog.strongbrew.io///safe-http-calls-with-rxjs/",
+    "image": "/assets/images/cover/cover3.jpg",
+    "description": "How to make sure our ajax calls are being executed on bad connections"
 }
     </script>
 
@@ -124,7 +124,7 @@
 <!-- #post -->
 
 <header id="header" class="main-header post-head "
-        style="background-image: url(/assets/images/cover/cover6.jpg) ">
+        style="background-image: url(/assets/images/cover/cover3.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         
         <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
@@ -158,25 +158,25 @@
     <article class="post">
         <div class="post-inner">
             <header class="post-header">
-                <h1 class="post-title">Using nx-etc checkout feature</h1>
+                <h1 class="post-title">Safe HTTP calls with RxJS</h1>
                 <section class="post-meta">
                     <!-- <a href='/'></a> -->
 
                     
                     
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
                     
                     
-                    <a href='/author/kwintenp'>Kwinten Pisman</a>
                     
                     
-                    <time class="post-date" datetime="2018-10-14">14 Oct 2018
+                    <time class="post-date" datetime="2018-10-24">24 Oct 2018
                     </time>
                     <!-- [[tags prefix=" on "]] -->
                     
                     on
                     
                     
-                    <a href='/tag/Angular'>Angular</a>
+                    <a href='/tag/RxJS'>Rxjs</a>
                     
                     
                     
@@ -185,26 +185,144 @@
 
             <section class="post-content">
 
-                <p>Using <a href="https://nrwl.io/nx">Nx</a> we can build applications using a monorepo style of development. If your monorepo contains a lot of applications and libraries, the development process might be impacted a little.</p>
+                <p>Hi there, since it’s very busy lately this will probably be my one of my shortest articles ever.
+Maybe that’s a good thing, because now you don’t have an excuse not to read it. It’s short, compact
+and maybe you will learn a thing or two.</p>
 
-<h3 id="problems">Problems</h3>
+<h2 id="the-problem">The problem</h2>
 
+<p>The article is all about making sure our HTTP calls don’t die on bad connections, since strangely enough, <strong>404 responses can kill your application when using RxJS</strong>.</p>
+
+<p>Remember that RxJS observables have 3 types of events right?</p>
 <ul>
-  <li>Looking for files becomes somewhat annoying as you can find lots of them, even for apps or libs that you are not working one.</li>
-  <li>Opening up 20 apps and 50 libs in your IDE will impact its performance. While you might be only working on one or two apps.</li>
+  <li><code>next</code>: passing in a new value into the observable</li>
+  <li><code>error</code>: when an error occurs</li>
+  <li><code>complete</code>: When the observable is completed</li>
 </ul>
 
-<h3 id="solution">Solution</h3>
+<p>We should not forget that <strong>an Error event will actually stop the observable</strong>. It will cease to exist.</p>
 
-<p>Nx-etc has a checkout feature that uses sparse checkouts and some scripts from Nx to only checkout apps and libs you are currently working on.
-You can find an overview of the lib in the video below.</p>
+<p>You might say: “That’s not that bad, we’ll just create a new one every time we want to fetch data”.</p>
 
-<iframe src="https://player.vimeo.com/video/295018577" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
-<p><a href="https://vimeo.com/295018577">Using nx-etc checkout feature</a> from <a href="https://vimeo.com/user79085465">Kwinten Pisman</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+<p>When you are approaching your application the <em>reactive way</em>, this scenario might be problematic:
+Imagine a typeahead search where we want to retrieve results for every input value. We have an observable of searchterms and we trigger the
+HTTP request for every value using a <code>switchMap</code>.</p>
 
-<p>You can find the code on <a href="https://github.com/KwintenP/nx-etc">github</a>.</p>
+<pre><code class="language-typescript">// this observable contains the values
+// of what the user is searching for
+// over time
+const searchTerm$: Observable&lt;string&gt;;
 
-<p><strong>Note:</strong> Thanks to <a href="https://twitter.com/juristr">@juristr</a>, <a href="https://twitter.com/beeman_nl">@beeman</a>, <a href="https://twitter.com/chaos_monster">@chaos_monster</a> and <a href="https://twitter.com/jvandemo">@jvandemo</a> for testing and providing feedback!</p>
+// when the term receives a new value...
+// go fetch some data
+const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; fetchData(term))
+)
+
+// subscribe to the observable to start listening
+results$.subscribe((response: Result[]) =&gt; {
+    console.log(response);
+})
+</code></pre>
+<p>This all works fine, until an error happens in the observable. This could come from a bad connection, server down-time or anything that went wrong during the HTTP request (500, 404, …) 
+If the user is having a bad connection which might result in a <code>404</code>, the observable will stop and the application will be broken. The user can search for results as much as he or she wants, the HTTP calls will never happen again.</p>
+
+<h2 id="catcherror">catchError</h2>
+
+<p>We could use the <code>catchError</code> operator that will basically catch the error for us, and return a brand new observable(containing the error).
+That observable will have the error as a value, instead of throwing it again as an error.
+That way we could actually show the user a decent message.
+This might look something like this:</p>
+
+<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; 
+        fetchData(term).pipe(
+            // return an observable with the error inside
+            catchError(e =&gt; of(e))
+        )
+    )
+)
+results$.subscribe(
+    (response: Result[] | HttpErrorResponse) =&gt; {
+        if(response instanceof HttpErrorResponse){
+            console.log('oh no:(');
+            return;
+        }
+        console.log('do something fancy');
+    });
+)
+</code></pre>
+
+<p>Ps: I’m not trying to say that this is the best idea to catch errors. I’m just showing you around some basics.</p>
+
+<p>Do note that the <code>catchError</code> operator is applied to the result observable that <code>fetchData()</code> returns, and not added as the second operator of the first pipe. 
+From the moment an observable receives an error, it will die… That’s why it’s important to catch the error on the inner observable.</p>
+
+<h2 id="retrywhen">retryWhen</h2>
+
+<p>Ok, great! The application won’t break anymore, but now imagine the following scenario: Our user is sitting in the train and drives through a tunnel. The connection is gone for a few seconds and the user won’t get results.</p>
+
+<p>We could fix that by telling RxJS to retry a few times</p>
+
+<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; 
+        fetchData(term).pipe(
+            retryWhen(e$ =&gt; e$.pipe(
+                // try again after 2 seconds
+                delay(2000),
+                // stop trying after 5 times
+                take(4)
+            )
+            // still keep the observable alive if
+            // the first 5 times fail
+            catchError(e =&gt; of(e))
+        )
+    )
+)
+</code></pre>
+
+<p>You can find more information about <code>retryWhen</code><a href="https://www.learnrxjs.io/operators/error_handling/retrywhen.html">here</a></p>
+
+<h2 id="using-the-online-event">Using the online event</h2>
+
+<p>Even though this is a good solution, there is room for improvement. A great choice is to use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/NavigatorOnLine/Online_and_offline_events">online</a> event from HTML5 to tell the browser to retry when the user regains internet connection. It’s even shorter than before and it’s super elegant</p>
+
+<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; 
+        fetchData(term).pipe(
+            retryWhen(() =&gt; fromEvent(window, 'online'))
+            // still keep the observable alive if
+            // the server would return a different
+            // HTTP error
+            catchError(e =&gt; of(e))
+        )
+    )
+)
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>RxJS gives us great control over HTTP calls! If we know how error handling works it becomes a breeze to take our HTTP calls to the next level.
+This doesn’t only apply to typeahead searches but to every observable where we combine an existing stream with an error-affected one like HTTP. For instance: this can also happen in NgRx effects or with the angular router.</p>
+
+<p>There, I told you it would be short, I hope you learned something though.</p>
+
+<p>Also be sure to check this article: <a href="https://blog.angularindepth.com/power-of-rxjs-when-using-exponential-backoff-a4b8bde276b0">Power of RxJS when using exponential backoff</a></p>
+
+<h2 id="special-thanks">Special thanks</h2>
+
+<ul>
+  <li><a href="https://twitter.com/AmarildoKurtaj">@AmarildoKurtaj</a> The last example was based on his idea</li>
+</ul>
+
+<p>Reviewers:</p>
+<ul>
+  <li><a href="https://twitter.com/fmalcher01">Ferdinand Malcher</a></li>
+  <li><a href="https://twitter.com/FabianGosebrink">Fabian Gosebrink</a></li>
+  <li><a href="https://twitter.com/tim_deschryver">Tim deschryver</a></li>
+  <li><a href="https://twitter.com/webdave_de">David Müllerchen</a></li>
+  <li><a href="https://twitter.com/rubenverm">Ruben Vermeulen</a></li>
+</ul>
 
 
             </section>
@@ -217,26 +335,24 @@ You can find an overview of the lib in the video below.</p>
                 
                 
                 
-                
-                
                 <figure class="author-image">
-                    <a class="img" href="/author/kwintenp"
-                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
                 </figure>
                 
 
                 <section class="author">
-                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
 
                     
-                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
                     
                     <div class="author-meta">
                         <span
                             class="author-location icon-location"> Belgium</span>
-                        
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
                         <span class="author-link icon-twitter"><a
-                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
                     </div>
                 </section>
 
@@ -245,26 +361,27 @@ You can find an overview of the lib in the video below.</p>
                 <section class="share">
                     <h4>Share this post</h4>
                     <a class="icon-twitter"
-                       href="http://twitter.com/share?text=Using nx-etc checkout feature&amp;url=https://blog.strongbrew.io/using-nx-etc-checkout-feature"
+                       href="http://twitter.com/share?text=Safe HTTP calls with RxJS&amp;url=https://blog.strongbrew.io/safe-http-calls-with-rxjs"
                        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                         <span class="hidden">Twitter</span>
                     </a>
                     <a class="icon-facebook"
-                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/using-nx-etc-checkout-feature"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/safe-http-calls-with-rxjs"
                        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                         <span class="hidden">Facebook</span>
                     </a>
                     <a class="icon-google-plus"
-                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/using-nx-etc-checkout-feature"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/safe-http-calls-with-rxjs"
                        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
                         <span class="hidden">Google+</span>
                     </a>
                 </section>
                 
                 
+                
+                
 
                 <!-- Add Disqus Comments -->
-                
                 
                 
                 <div id="disqus_thread"></div>
@@ -291,7 +408,7 @@ You can find an overview of the lib in the video below.</p>
         var d = document, s = d.createElement('script');
 
         // IMPORTANT: Replace EXAMPLE with your forum shortname!
-        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
 
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
@@ -303,6 +420,7 @@ You can find an overview of the lib in the video below.</p>
         comments powered by Disqus.
     </a>
 </noscript>
+                
                 
                 
 
@@ -317,24 +435,15 @@ You can find an overview of the lib in the video below.</p>
 
     <!-- [[! next_post ]] -->
     
-    <a class="read-next-story "
-       style="background-image: url(/assets/images/cover/cover3.jpg)"
-       href="/safe-http-calls-with-rxjs">
-        <section class="post">
-            <h2>Safe HTTP calls with RxJS</h2>
-            <p>Hi there, since it's very busy lately this will probably be my one of my...</p>
-        </section>
-    </a>
-    
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
     <a class="read-next-story prev "
        style="background-image: url(/assets/images/cover/cover6.jpg)"
-       href="/building-a-safe-autocomplete-operator-with-rxjs">
+       href="/using-nx-etc-checkout-feature">
         <section class="post">
-            <h2>Building a safe autocomplete operator in RxJS</h2>
-            <p>A well-known use case of RxJS is creating a simple autocomplete search in only a...</p>
+            <h2>Using nx-etc checkout feature</h2>
+            <p>Using Nx we can build applications using a monorepo style of development. If your monorepo...</p>
         </section>
     </a>
     

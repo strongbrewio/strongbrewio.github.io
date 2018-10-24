@@ -8,6 +8,23 @@
     
       
       <item>
+        <title>Safe HTTP calls with RxJS</title>
+        
+          <description>&lt;p&gt;Hi there, since it’s very busy lately this will probably be my one of my shortest articles ever.
+Maybe that’s a good thing, because now you don’t have an excuse not to read it. It’s short, compact
+and maybe you will learn a thing or two.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 24 Oct 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//safe-http-calls-with-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//safe-http-calls-with-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Using nx-etc checkout feature</title>
         
           <description>&lt;p&gt;Using &lt;a href=&quot;https://nrwl.io/nx&quot;&gt;Nx&lt;/a&gt; we can build applications using a monorepo style of development. If your monorepo contains a lot of applications and libraries, the development process might be impacted a little.&lt;/p&gt;
