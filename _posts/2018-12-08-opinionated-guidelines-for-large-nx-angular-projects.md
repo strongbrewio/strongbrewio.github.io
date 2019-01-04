@@ -81,7 +81,11 @@ When using Nx, we might already get pushed in an opinionated way of working, whi
 
 #### An app should be an empty shell
 
-Apps are deployable units that wire an application together. These apps are nearly empty shells that use libs to build an entire application. Therefore **an app almost holds no logic** and mostly uses lazy loading to load feature libs. Some feature libs can be seen as microfrontends.
+Apps are deployable units that wire an application together. These apps are nearly empty shells that use libs to build an entire application. Therefore **an app almost holds no logic** and mostly uses lazy loading to load feature libs. 
+That being said, our apps mostly not completely empty. In general they also contain:
+- The general layout (composed out of components from 'ui-kit')
+- Routing
+
 
 #### Keep the apps directory as flat as possible
 
@@ -265,7 +269,39 @@ To configure the tslint we have to use the `nx-enforce-module-boundaries` rule f
 ]
 ```
 
-This tslint config will ensuer that the rules defined above are mandatory.
+This tslint config will ensure that the rules defined above are mandatory.
+
+## Is this structure the only way?
+
+No, not at all, this would work perfectly for a monorepo with 5 applications. But if we are thinking about organisation wide monorepos, it might be a good idea to
+combine features app per app. In that case we would have something like:
+- `apps`
+- `libs`
+    - `app1`
+        - `api`
+            - `foo`
+            - ...
+        - `lazy`
+            - `bar`
+            - ...
+        - `shared`
+            - `baz`
+            - ...
+    - `app2`
+        - `api`
+            - `foo`
+            - ...
+        - `lazy`
+            - `bar`
+            - ...
+        - `shared`
+            - `baz`
+            - ...
+    - `ui-kit`
+    - `utils`
+        - `rxjs-operators`
+        - `forms`
+        - `http`
 
 ## How to share code organisation wide?
 
@@ -284,3 +320,10 @@ In that case, we could create an Nx worspace for every client, and have one over
 ## Conclusion
 
 I hope we learned something today. How we structure our workspaces is completely up to us, and we should use something that works for us, not just pick whatever you read in some blog article ;-). If this structure doesn't make sense to you, that's perfectly fine... And I would love to hear your thoughts about this approach
+
+## Special thanks to
+
+Thanks to the people that have review the article and gave great input!
+
+- [@beeman_nl](https://twitter.com/beeman_nl)
+- [@MrJamesHenry](https://twitter.com/mrjameshenry)
