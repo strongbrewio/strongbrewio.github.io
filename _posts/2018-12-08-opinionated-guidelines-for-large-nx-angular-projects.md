@@ -330,7 +330,8 @@ I hope we learned something today. How we structure our workspaces is completely
 
 ## Special thanks to
 
-Thanks to the people that have review the article and gave great input!
+Thanks to the people that have reviewed the article and gave great input!
+I couldn't have done it without you!
 
 - [@beeman_nl](https://twitter.com/beeman_nl)
 - [@MrJamesHenry](https://twitter.com/mrjameshenry)
