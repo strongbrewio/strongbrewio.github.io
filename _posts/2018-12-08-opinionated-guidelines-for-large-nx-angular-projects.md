@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Opinionated guidelines for large nx angular projects
-published: true
+published: false
 description: 
 author: brechtbilliet
 comments: true
