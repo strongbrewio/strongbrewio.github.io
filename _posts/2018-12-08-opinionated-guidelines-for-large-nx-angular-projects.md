@@ -23,9 +23,9 @@ Today we are going to learn how I manage Nx workspaces for large projects.
 ## A word about Nx
 
 Nx is a thin layer on top of the [Angular](https://angular.io) CLI that helps us with structuring large applications in the form of monorepos.
-A monorepo contains only one [Nx workspace](https://nrwl.io/nx/guide-nx-workspace) that can contain multiple apps and multiple libs (we will refer to apps and libs as Nx projects). An app is a deployable unit and a lib is meant to contain the actual logic that can be shared across the workspace. Nx is actively being developed and updated along with Angular by the amazing people of [nrwl](https://nrwl.io/).
+A monorepo contains only one [Nx workspace](https://nrwl.io/nx/guide-nx-workspace) that can contain multiple apps and multiple libs (we will refer to apps and libs as Nx projects). An app is a deployable unit and a lib is meant to contain the actual logic that can be shared across the workspace. Nx is actively being developed and updated along with Angular by the amazing people of [Nrwl](https://nrwl.io/).
 
-Nx focusses on managing **big Angular applications** that have a lot of shared functionality.
+Nx is especially valuable when managing **big Angular applications** that have a lot of shared functionality, but even in smaller projects it can help organize your approach.
 
 At StrongBrew we are using this technology for a bunch of our clients and even though Nx is already pretty opinionated, I decided to write down some best practices and guidelines that I try to take in consideration. 
 
@@ -36,7 +36,11 @@ The rules and guidelines written down in this article **might work for you**, an
 When it comes to managing monorepos, barrel files are quite important.
 A barrel file is a `index.ts` file that lives in the `src` directory of every Nx lib and is meant to expose logic to the rest of the workspace.
 
-The barrel file will only export javascript modules from inside of the Nx lib, and **only the ones that need to be exported**. It's the public interface of a lib towards the rest of the workspace.
+This file is really important when you understand one of the big potential risks of organizing code in monorepos - overexposure of implementation details.
+
+With code being located right next to each other, it can be easy to import code with deeply nested relative paths and include things that the original author of the code never intended to be used outside of their specific context.
+
+The Nx lib's `index.ts` file allows each lib to define its effective public API - only symbols which are explicitly exported from this file should be eligible for consumption in other parts of the workspace.
 
 Let's say that we have a `@strongbrew/users` lib which exposes a `UserService`...
 This is what the barrel file from  `@strongbrew/users` might look like.
@@ -50,10 +54,9 @@ Although this might seem pretty straight forward, let's go over a few best-pract
 
 ### Don't ever import a lib from a relative path
 
-When we want to import `UserService` inside another lib or app, we want to import it from `@strongbrew/users`. This is way cleaner then importing it from a relative path like `../../../users/lib/src/index.ts`.
+When we want to import `UserService` inside another lib or app, we want to import it from `@strongbrew/users`. This is way cleaner then importing it from a relative path like `../../../users/lib/src/index.ts` and helps protect us from the overexposure problem described above. Nx also provides a linting rule out of the box to make sure that you are respecting a lib's API and not doing deep imports.
 
-Nx uses typescript [path mapping](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping) to map these module names to the correct barrel files.
-That configuration can be found in the `tsconfig.json` file that lives in the root directory and could look like this.
+Nx uses TypeScript [path mapping](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping) to map these module names to the correct barrel files.
 
 ```json
 "paths": {
@@ -69,7 +72,7 @@ It's a known fact that barrel files might become big, but it gives us a central 
 
 ### Never let a lib import from its own Barrel file
 
-First of all, the javascript modules from a lib should not know what functionality that lib exposes, so it shouldn't know about that lib its barrel file.
+The TypeScript modules within a particular lib should not care what functionality that lib exposes, so it shouldn't use its own barrel file at any point.
 
 If a module imports something from its own barrel file, it almost always results in circular reference errors. Therefore, imports from inside of the module should use relative path imports.
 
@@ -81,15 +84,15 @@ When using Nx, we might already get pushed in an opinionated way of working, whi
 
 #### An app should be an empty shell
 
-Apps are deployable units that wire an application together. These apps are nearly empty shells that use libs to build an entire application. Therefore **an app almost holds no logic** and mostly uses lazy loading to load feature libs. Some feature libs can be seen as microfrontends.
+Apps are deployable units that wire the different pieces of an application together. These apps are nearly empty shells that use libs to build an entire application. Therefore **an app holds almost no logic** and mostly uses lazy loading to load feature libs. Some feature libs can be seen as microfrontends.
 
 #### Keep the apps directory as flat as possible
 
-Chances are small that our monorepo will contain 100+ apps and even if it does, chances are small that we can divide these apps into categories.
+It is unlikely that our monorepo will contain 100+ apps and even if it does, chances are small that we can divide these apps into categories.
 
 #### Apps should not import from other apps
 
-Although it might make sense, let's mention it anyway... Shared logic should always live inside of libs, an not inside of apps.
+Although it might seem obvious, let's mention it anyway... Shared logic should always live inside of libs, an not inside of apps. Apps are specific deployment targets.
 
 ### Structuring libs
 
@@ -112,9 +115,9 @@ The directory structure of our workspace might look like this:
     - `utils`
 
 - A feature contains logic specific to a certain domain, like managing users or performing authentication. 
-- On the other hand, the `utils` lib contains logic that doesn't have anything to do with any domain, E.g: http interceptors, shared RxJS operators, a service that handles notifications etc... Consider it a toolkit for your workspace.
+- On the other hand, the `utils` lib contains logic that doesn't have anything to do with any domain, E.g: HTTP interceptors, shared RxJS operators, a service that handles notifications etc... Consider it a toolkit for your workspace.
 
-In the next few secions we are going to cover the 3 types of feature libs, the `ui-kit` lib and the `utils` lib.
+In the next few sections we are going to cover the 3 types of feature libs, the `ui-kit` lib and the `utils` lib.
 
 #### feature/api
 
@@ -129,7 +132,7 @@ Another common use-case is that feature libs tend to use domain types from other
 
 #### feature/lazy
 
-This directory contains all feature libs that can be lazyloaded. To make sure these libs can be lazy loaded, they should expose an `NgModule` in the barrel file and are loaded as such:
+This directory contains all feature libs that can be lazyloaded. To make sure these libs can be lazy-loaded, they should expose an `NgModule` in the barrel file and are loaded as such:
 
 ```typescript
 RouterModule.forRoot([
@@ -201,9 +204,13 @@ Let's assume that we need a `feature/shared` lib called `messages` then we could
 
 ## Linting and tags
 
-When putting everything into the same workspace, and even if we should rely on typescript path mapping, we can still import whatever we want wherever we want... This could result in circular references and other problems (broken lazyloading, etc...)
+One thing that is absolutely critical when managing a monorepo is being able to determine, categorize, and constrain/run commands based on a dependency graph.
 
-Nx provides us with the ability to add tags to the different libs and apps and apply [tslint](https://palantir.github.io/tslint/) rules to make sure we can't import whatever we want wherever we want.
+Nx determines the dependency graph for us out of the box, it infers it by statically analyzing our TypeScript import and export statements (as well as a few other things specific to the Angular CLI).
+
+It has no way of automatically categorizing the dependency graph for it, because that is up to our subjective judgement, but it does provide helpers to make it easy.
+
+Nx provides us with the ability to add tags to the different libs and apps and apply [tslint](https://palantir.github.io/tslint/) rules to make sure we can't import whatever we want wherever we want.	Nx provides us with the ability to add tags to the different libs and apps and apply [tslint](https://palantir.github.io/tslint/) rules to make sure we can't import whatever we want wherever we want (potentially leading to circular references and other problems (broken lazyloading, etc...)).
 
 Tags can be added to projects in the `nx.json` file of the root directory.
 Tags can be determined in numerous ways. Some of us might like a tag per team, other might like it per domain. 
@@ -265,22 +272,22 @@ To configure the tslint we have to use the `nx-enforce-module-boundaries` rule f
 ]
 ```
 
-This tslint config will ensuer that the rules defined above are mandatory.
+This tslint config will ensure that the rules defined above are mandatory.
 
 ## How to share code organisation wide?
 
-Although an organisation wide monorepo has great benefits, they might be hard to sell to our manager. In some cases it wouldn't be the greatest idea either.
+Although an organisation wide monorepo has great benefits, they might be good reasons not to do it. These could be any combination of technical, cultural, legal or other reasons.
 
 ### Scenario A
 
-Our company has 10 angular projects that are actively developed and share a lot of code, but also had 5 legacy projects where there is no budget to bump them to the new Angular versions and so on. There might be a few [Vue.js](https://vuejs.org/) or [React](https://reactjs.org/) living there as well. It wouldn't make sense to put all of that into one big workspace. In that case we could have a workspace for the non-legacy angular projects, and that workspace would gladly welcome new projects in the future
+Our company has 10 angular projects that are actively developed and share a lot of code, but also had 5 legacy projects where there is no budget to bump them to the new Angular versions and so on. There might be a few [Vue.js](https://vuejs.org/) or [React](https://reactjs.org/) living there as well. It might be more trouble than it is worth for your organization to manage that complexity within one big workspace. In that case we could have a workspace for the non-legacy angular projects, and that workspace would gladly welcome new projects in the future.
 
 ### Scenario B
 
 Our company sells custom software to different clients. Every client wants its own custom look and feel, which a lot of custom logic, but we don't want to reinvent the wheel every time.
 
-In that case, we could create an Nx worspace for every client, and have one overlapsing toolkit that contains shared logic. That toolkit would live in its own monorepo and be published as an Angular package.
+In that case, we could create an Nx worspace for every client, and have one common toolkit that contains shared logic. That toolkit would live in its own monorepo and be published as an Angular package.
 
 ## Conclusion
 
-I hope we learned something today. How we structure our workspaces is completely up to us, and we should use something that works for us, not just pick whatever you read in some blog article ;-). If this structure doesn't make sense to you, that's perfectly fine... And I would love to hear your thoughts about this approach
+I hope we learned something today. How we structure our workspaces is completely up to us, and we should use something that works for us, not just pick whatever you read in some blog article ;-). If this structure doesn't make sense to you, that's perfectly fine... And I would love to hear your thoughts about this approach.
