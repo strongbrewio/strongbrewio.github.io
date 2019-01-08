@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Opinionated guidelines for large nx angular projects</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//opinionated-guidelines-for-large-nx-angular-projects/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Opinionated guidelines for large nx angular projects" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="https://blog.strongbrew.io///opinionated-guidelines-for-large-nx-angular-projects/" />
+    <meta property="og:image" content="/assets/images/cover/cover2.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Opinionated guidelines for large nx angular projects" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///opinionated-guidelines-for-large-nx-angular-projects/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover2.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "Opinionated guidelines for large nx angular projects",
+    "url": "https://blog.strongbrew.io///opinionated-guidelines-for-large-nx-angular-projects/",
+    "image": "/assets/images/cover/cover2.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover2.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>Want to work with us?</h5>
+<a href="https://strongbrew.io/about" class="button" rel="noopener">Learn more</a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Opinionated guidelines for large nx angular projects</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                    
+                    
+                    
+                    
+                    <time class="post-date" datetime="2018-12-08">08 Dec 2018
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>,
+                    
+                    
+                    
+                    <a href='/tag/nx'>Nx</a>,
+                    
+                    
+                    
+                    <a href='/tag/architecture'>Architecture</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <h2 id="about-this-article">About this article</h2>
+
+<p>This article contains a set of opinionated guidelines when it comes to building monorepos with <a href="https://nrwl.io/nx">Nx</a>.
+I wrote this article because when I used Nx in the beginning, I struggled a lot with how to structure my workspace, and I’ve hit quite a few walls. That being said, I’ve been using it for a while now, and I finally have the feeling that I’ve reached a structure where I feel comfortable with. It’s important to note that I don’t use this approach for organisation wide monorepos, but monorepos that contain 10 applications max.</p>
+
+<h2 id="a-word-about-nx">A word about Nx</h2>
+
+<p>Nx is a thin layer on top of the <a href="https://angular.io">Angular</a> CLI that helps us with structuring large applications in the form of monorepos.
+A monorepo contains only one <a href="https://nrwl.io/nx/guide-nx-workspace">Nx workspace</a> that can contain multiple apps and multiple libs (we will refer to apps and libs as Nx projects). An app is a deployable unit and a lib is meant to contain the actual logic that can be shared across the workspace. Nx is actively being developed and updated along with Angular by the amazing people of <a href="https://nrwl.io/">Nrwl</a>.</p>
+
+<p>Nx is especially valuable when managing <strong>big Angular applications</strong> that have a lot of shared functionality, but even in smaller projects it can help organize your approach.</p>
+
+<p>At StrongBrew we are using this technology for a bunch of our clients and even though Nx is already pretty opinionated, I decided to write down some best practices and guidelines that I try to take in consideration.</p>
+
+<p>The rules and guidelines written down in this article <strong>might work for you</strong>, and should in no circumstances be treated as the <em>ultimate truth</em>. Best practices and guidelines are mostly a matter of perception and personal preference. Nevertheless, I would love to share how I architect large Angular applications with Nx.</p>
+
+<h2 id="barrel-files">Barrel files</h2>
+
+<p>When it comes to managing monorepos, barrel files are quite important.
+A barrel file is a <code>index.ts</code> file that lives in the <code>src</code> directory of every Nx lib and is meant to expose logic to the rest of the workspace.</p>
+
+<p>This file is really important when you understand one of the big potential risks of organizing code in monorepos - overexposure of implementation details.</p>
+
+<p>With code being located right next to each other, it can be easy to import code with deeply nested relative paths and include things that the original author of the code never intended to be used outside of their specific context.</p>
+
+<p>The Nx lib’s <code>index.ts</code> file allows each lib to define its effective public API - only symbols which are explicitly exported from this file should be eligible for consumption in other parts of the workspace.</p>
+
+<p>Let’s say that we have a <code>@strongbrew/users</code> lib which exposes a <code>UserService</code>…
+This is what the barrel file from  <code>@strongbrew/users</code> might look like.</p>
+
+<pre><code class="language-typescript">// libs/users/src/index.ts
+export * from './lib/services/user.service';
+</code></pre>
+
+<p>Although this might seem pretty straight forward, let’s go over a few best-practices…</p>
+
+<h3 id="dont-ever-import-a-lib-from-a-relative-path">Don’t ever import a lib from a relative path</h3>
+
+<p>When we want to import <code>UserService</code> inside another lib or app, we want to import it from <code>@strongbrew/users</code>. This is way cleaner then importing it from a relative path like <code>../../../users/lib/src/index.ts</code> and helps protect us from the overexposure problem described above. Nx also provides a linting rule out of the box to make sure that you are respecting a lib’s API and not doing deep imports.</p>
+
+<p>Nx uses TypeScript <a href="https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping">path mapping</a> to map these module names to the correct barrel files.</p>
+
+<pre><code class="language-json">"paths": {
+    "@strongbrew/users": {
+        "libs/users/src/index.ts"
+    }
+}
+</code></pre>
+
+<h3 id="only-1-barrel-file-per-lib">Only 1 barrel file per lib</h3>
+
+<p>It’s a known fact that barrel files might become big, but it gives us a central place of handling all the exports + it drastically reduces the chance of getting circular reference errors. Therefore, a lib should only contain 1 single barrel file.</p>
+
+<h3 id="never-let-a-lib-import-from-its-own-barrel-file">Never let a lib import from its own Barrel file</h3>
+
+<p>The TypeScript modules within a particular lib should not care what functionality that lib exposes, so it shouldn’t use its own barrel file at any point.</p>
+
+<p>If a module imports something from its own barrel file, it almost always results in circular reference errors. Therefore, imports from inside of the module should use relative path imports.</p>
+
+<h2 id="structuring-the-workspace">Structuring the workspace</h2>
+
+<p>When using Nx, we might already get pushed in an opinionated way of working, which is great. But how are we going to structure the workspace itself? For instance, looking into a directory of 100 libs inside of a libs directory might not really be pragmatic to work with…</p>
+
+<h3 id="structuring-apps">Structuring apps</h3>
+
+<h4 id="an-app-should-be-an-empty-shell">An app should be an empty shell</h4>
+
+<p>Apps are deployable units that wire the different pieces of an application together. These apps are nearly empty shells that use libs to build an entire application. Therefore <strong>an app holds almost no logic</strong> and mostly uses lazy loading to load feature libs. Some feature libs can be seen as microfrontends.
+That being said, our apps mostly not completely empty. In general they also contain:</p>
+<ul>
+  <li>The general layout (composed out of components from ‘ui-kit’)</li>
+  <li>Routing</li>
+</ul>
+
+<h4 id="keep-the-apps-directory-as-flat-as-possible">Keep the apps directory as flat as possible</h4>
+
+<p>Chances are small that our monorepo will contain 100+ apps and even if it does, chances are small that we can divide these apps into categories.</p>
+
+<h4 id="apps-should-not-import-from-other-apps">Apps should not import from other apps</h4>
+
+<p>Although it might seem obvious, let’s mention it anyway… Shared logic should always live inside of libs, an not inside of apps. Apps are specific deployment targets.</p>
+
+<h3 id="structuring-libs">Structuring libs</h3>
+
+<p>Here comes the opinionated part, lets check how we can structure the libs inside of our workspace.</p>
+
+<p>The directory structure of our workspace might look like this:</p>
+<ul>
+  <li><code>apps</code></li>
+  <li><code>libs</code>
+    <ul>
+      <li><code>feature</code>
+        <ul>
+          <li><code>api</code>
+            <ul>
+              <li><code>foo</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>lazy</code>
+            <ul>
+              <li><code>bar</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>shared</code>
+            <ul>
+              <li><code>baz</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><code>ui-kit</code></li>
+      <li><code>utils</code></li>
+    </ul>
+  </li>
+  <li>A feature contains logic specific to a certain domain, like managing users or performing authentication.</li>
+  <li>On the other hand, the <code>utils</code> lib contains logic that doesn’t have anything to do with any domain, E.g: HTTP interceptors, shared RxJS operators, a service that handles notifications etc… Consider it a toolkit for your workspace.</li>
+</ul>
+
+<p>In the next few sections we are going to cover the 3 types of feature libs, the <code>ui-kit</code> lib and the <code>utils</code> lib.</p>
+
+<h4 id="featureapi">feature/api</h4>
+
+<p>This directory contains Nx libs with a very specific purpose:</p>
+<ul>
+  <li>These libs contain <strong>api logic</strong> or <strong>business logic</strong> that needs to be shared.</li>
+  <li>These libs contain the types of the REST responses. Let’s call them <strong>domain types</strong>.</li>
+  <li>If we want to work with models, or dto’s, these would also live here.</li>
+</ul>
+
+<p>Having a specific api lib is very handy when developing in a microservices platform. Every microservice would have its own <strong>api lib</strong> that can be used throughout the entire monorepo.</p>
+
+<p>Another common use-case is that feature libs tend to use domain types from other feature libs. By extracting these domain types in to api libs, we solve that problem. That way, these domain types can be shared across different places inside of the monorepo.</p>
+
+<h4 id="featurelazy">feature/lazy</h4>
+
+<p>This directory contains all feature libs that can be lazyloaded. To make sure these libs can be lazy-loaded, they should expose an <code>NgModule</code> in the barrel file and are loaded as such:</p>
+
+<pre><code class="language-typescript">RouterModule.forRoot([
+    {
+        path: 'users',
+        loadChildren: '@strongbrew/feature/lazy/users'
+    }
+])
+</code></pre>
+
+<p>One of the advantages is that these modules can be loaded on demand or even preloaded upfront. The biggest advantage though is that these modules are completely standalone, and don’t share anything with the rest of the workspace. This means they have nothing inside of their barrel file, other then the <code>NgModule</code> being exported. 
+<strong>Lazy loaded modules can never share logic with the workspace</strong>
+If we feel that a lazyloaded module needs to export something, we should extract that logic into a separate <code>feature/shared</code> or <code>feature/api</code> lib.</p>
+
+<p>When a <code>feature/lazy</code> module needs to perform XHR calls it should delegate it to a <code>feature/api</code> lib. Therefore a <code>feature/lazy</code> lib should never contain api logic.</p>
+
+<p>When using a statemanagement library like <a href="https://github.com/ngrx/platform">ngrx/store</a>, <code>feature/lazy</code> libs would contain their own reducers and use <code>store.forFeature()</code> to attach these to the <code>store</code> instance. This would result in lazy-loaded reducers.</p>
+
+<h4 id="featureshared">feature/shared</h4>
+
+<p>Not every feature can be lazyloaded. Think about feature logic that needs to be shared for instance. In that case we would create an Nx lib that lives inside of the <code>feature/shared</code> directory.</p>
+
+<p>When a <code>feature/shared</code> module needs to perform XHR calls it should delegate it to a <code>feature/api</code> lib. Therefore the <code>feature/lazy</code> lib should not contain api logic.</p>
+
+<h4 id="ui-kit">ui-kit</h4>
+
+<p>This lib contains all the shared presentational components that can be used in different applications. Think about dropdowns, datepickers and empty modals. A <code>user-detail</code> component for instance does NOT belong here. A monorepo can contain multiple <code>ui-kit</code> libraries. We should name them according to its purpose. E.g <code>ui-kit-mobile</code> is a common use case.</p>
+
+<p>The Ui-kit module contains an <code>ngModule</code> since we need it to declare and export our components/directives. The barrel file generally only exposes the <code>ngModule</code> since this is the vessel used to export the functionality.</p>
+
+<p>However, a <code>ui-kit</code> might also export certain types in its barrel file… Like <code>DatepickerConfiguration</code> or other <code>ui-kit</code> specific types.</p>
+
+<h4 id="utils">utils</h4>
+
+<p>This lib can contain all kinds of utilities. It could contain shared interceptors, guards, services and custom RxJS operators. Think about it als a framework toolbox that could benefit any application. We will NOT use an <code>ngModule</code> here for tree-shaking purposes.</p>
+
+<p>A <code>utils</code> lib will not contain any components. But if it contains pipes or directives we might need an <code>ngModule</code> for that.</p>
+
+<p>When your workspace is small, one single <code>utils</code> lib might suffice, but it could become a good idea to split these up when the <code>utils</code> lib gets to big.</p>
+
+<p>After splitting up, the directory structure of our workspace might look like this:</p>
+<ul>
+  <li><code>apps</code></li>
+  <li><code>libs</code>
+    <ul>
+      <li><code>feature</code>
+        <ul>
+          <li><code>api</code>
+            <ul>
+              <li><code>foo</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>lazy</code>
+            <ul>
+              <li><code>bar</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>shared</code>
+            <ul>
+              <li><code>baz</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><code>ui-kit</code></li>
+      <li><code>utils</code>
+        <ul>
+          <li><code>rxjs-operators</code></li>
+          <li><code>forms</code></li>
+          <li><code>http</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Do note, that the <code>forms</code> lib would not contain any forms or forms configuration, but it would contain general form logic that can be shared across the workspace.</p>
+
+<h3 id="prefixing-libs">Prefixing libs</h3>
+
+<p>Because of the fact that <code>selector</code> names for components and directives should be unique, prefixing them in a monorepo is quite important. 
+Since every project in the <code>angular.json</code> file has a <code>prefix</code> property, we could set that prefix for every project.</p>
+
+<p>Let’s assume that we need a <code>feature/shared</code> lib called <code>messages</code> then we could generate that lib by running <code>ng g lib messages --prefix sh-mes</code> for instance. 
+<code>sh-mes</code> would be the prefix and if we create a message component in this lib it would have the selector: <code>sh-mes-message</code>.</p>
+
+<h2 id="linting-and-tags">Linting and tags</h2>
+
+<p>One thing that is absolutely critical when managing a monorepo is being able to determine, categorize, and constrain/run commands based on a dependency graph.</p>
+
+<p>Nx determines the dependency graph for us out of the box, it infers it by statically analyzing our TypeScript import and export statements (as well as a few other things specific to the Angular CLI).</p>
+
+<p>It has no way of automatically categorizing the dependency graph for it, because that is up to our subjective judgement, but it does provide helpers to make it easy.</p>
+
+<p>Nx provides us with the ability to add tags to the different libs and apps and apply <a href="https://palantir.github.io/tslint/">tslint</a> rules to make sure we can’t import whatever we want wherever we want.	Nx provides us with the ability to add tags to the different libs and apps and apply <a href="https://palantir.github.io/tslint/">tslint</a> rules to make sure we can’t import whatever we want wherever we want (potentially leading to circular references and other problems (broken lazyloading, etc…)).</p>
+
+<p>Tags can be added to projects in the <code>nx.json</code> file of the root directory.
+Tags can be determined in numerous ways. Some of us might like a tag per team, other might like it per domain.</p>
+
+<p>I like to have tags for every lib type. It might be opinionated but it works fine for me (again, that’s a matter of personal preference)</p>
+
+<p>We define 5 types of tags:</p>
+
+<ul>
+  <li><code>app</code>: This tag is added to all the apps</li>
+  <li><code>shared</code>: This tag is added to <code>uikit</code> and <code>utils</code> libs</li>
+  <li><code>feature:lazy</code>: This tag is added to <code>feature/lazy</code> libs</li>
+  <li><code>feature:shared</code>: This tag is added to <code>feature/shared</code> libs</li>
+  <li><code>feature:api</code>: This tag is added to <code>feature/api</code> libs</li>
+</ul>
+
+<p>The rules could be the same for every workspace that we will create in the future:</p>
+
+<ul>
+  <li>Projects with the type <code>tag</code> can only depend on projects with the tags: <code>shared</code> or <code>feature:shared</code>.</li>
+  <li>Projects with the type <code>shared</code> can only depend on projects with the tags: <code>shared</code> (we don’t want to import domain specific logic in there do we?)</li>
+  <li>Projects with the type <code>feature:lazy</code> can only depend on projects with the tags: <code>shared</code>, <code>feature:shared</code> and <code>feature:api</code>.</li>
+  <li>Projects with the type: <code>feature:shared</code> can only depend on projects with the tags: <code>shared</code> and <code>feature:api</code>.</li>
+  <li>Projects with the type: <code>feature:api</code> can only depend on projects with the tags: <code>feature:api</code> and <code>shared</code>. (we never want to load <code>feature:shared</code> into an feature/api lib right?)</li>
+</ul>
+
+<h3 id="configuring-tslint">Configuring tslint</h3>
+
+<p>To configure the tslint we have to use the <code>nx-enforce-module-boundaries</code> rule from tslint. If you like the rules defined above, you can just copy-paste the module boundaries defined below right in your <code>tslint.json</code> file that lives in the root directory.</p>
+
+<pre><code class="language-json">"nx-enforce-module-boundaries": [
+  true,
+    {
+      "allow": [],
+      "depConstraints": [
+      {
+        "sourceTag": "app",
+        "onlyDependOnLibsWithTags": ["shared", "feature:shared"]
+      },
+      {
+        "sourceTag": "shared",
+        "onlyDependOnLibsWithTags": ["shared"]
+      },
+      {
+        "sourceTag": "feature:lazy",
+        "onlyDependOnLibsWithTags": [
+          "shared",
+          "feature:shared",
+          "feature:api"
+        ]
+      },
+      {
+        "sourceTag": "feature:api",
+        "onlyDependOnLibsWithTags": ["feature:api", "shared"]
+      },
+      {
+        "sourceTag": "feature:shared",
+        "onlyDependOnLibsWithTags": ["shared", "feature:api"]
+      }
+      ]
+    }
+]
+</code></pre>
+
+<p>This tslint config will ensure that the rules defined above are mandatory.</p>
+
+<h2 id="is-this-structure-the-only-way">Is this structure the only way?</h2>
+
+<p>No, not at all, this would work perfectly for a monorepo with 5 applications. But if we are thinking about organisation wide monorepos, it might be a good idea to
+combine features app per app. In that case we would have something like:</p>
+<ul>
+  <li><code>apps</code></li>
+  <li><code>libs</code>
+    <ul>
+      <li><code>app1</code>
+        <ul>
+          <li><code>api</code>
+            <ul>
+              <li><code>foo</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>lazy</code>
+            <ul>
+              <li><code>bar</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>shared</code>
+            <ul>
+              <li><code>baz</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><code>app2</code>
+        <ul>
+          <li><code>api</code>
+            <ul>
+              <li><code>foo</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>lazy</code>
+            <ul>
+              <li><code>bar</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+          <li><code>shared</code>
+            <ul>
+              <li><code>baz</code></li>
+              <li>…</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><code>ui-kit</code></li>
+      <li><code>utils</code>
+        <ul>
+          <li><code>rxjs-operators</code></li>
+          <li><code>forms</code></li>
+          <li><code>http</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="how-to-share-code-organisation-wide">How to share code organisation wide?</h2>
+
+<p>Although an organisation wide monorepo has great benefits, they might be good reasons not to do it. These could be any combination of technical, cultural, legal or other reasons.</p>
+
+<h3 id="scenario-a">Scenario A</h3>
+
+<p>Our company has 10 angular projects that are actively developed and share a lot of code, but also had 5 legacy projects where there is no budget to bump them to the new Angular versions and so on. There might be a few <a href="https://vuejs.org/">Vue.js</a> or <a href="https://reactjs.org/">React</a> living there as well. It might be more trouble than it is worth for your organization to manage that complexity within one big workspace. In that case we could have a workspace for the non-legacy angular projects, and that workspace would gladly welcome new projects in the future.</p>
+
+<h3 id="scenario-b">Scenario B</h3>
+
+<p>Our company sells custom software to different clients. Every client wants its own custom look and feel, which a lot of custom logic, but we don’t want to reinvent the wheel every time.</p>
+
+<p>In that case, we could create an Nx worspace for every client, and have one common toolkit that contains shared logic. That toolkit would live in its own monorepo and be published as an Angular package.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I hope we learned something today. How we structure our workspaces is completely up to us, and we should use something that works for us, not just pick whatever you read in some blog article ;-). If this structure doesn’t make sense to you, that’s perfectly fine… And I would love to hear your thoughts about this approach.</p>
+
+<h2 id="special-thanks-to">Special thanks to</h2>
+
+<p>Thanks to the people that have reviewed the article and gave great input!
+I couldn’t have done it without you!</p>
+
+<ul>
+  <li><a href="https://twitter.com/beeman_nl">@beeman_nl</a></li>
+  <li><a href="https://twitter.com/mrjameshenry">@MrJamesHenry</a></li>
+</ul>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.jpg)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                    
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Opinionated guidelines for large nx angular projects&amp;url=https://blog.strongbrew.io/opinionated-guidelines-for-large-nx-angular-projects"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/opinionated-guidelines-for-large-nx-angular-projects"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/opinionated-guidelines-for-large-nx-angular-projects"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover3.jpg)"
+       href="/safe-http-calls-with-rxjs">
+        <section class="post">
+            <h2>Safe HTTP calls with RxJS</h2>
+            <p>Hi there, since it’s very busy lately this will probably be my one of my...</p>
+        </section>
+    </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2019</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-112030289-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>
