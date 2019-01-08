@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Opinionated guidelines for large nx angular projects
-published: false
+published: true
 description: 
 author: brechtbilliet
 comments: true
@@ -16,9 +16,7 @@ cover: 'assets/images/cover/cover2.jpg'
 ## About this article
 
 This article contains a set of opinionated guidelines when it comes to building monorepos with [Nx](https://nrwl.io/nx).
-I wrote this article because when I used Nx in the beginning, I struggled a lot with how to structure my workspace, and I've hit quite a few walls. That being said, I've been using it for a while now, and I finally have the feeling that I've reached a structure where I feel comfortable with. 
-
-Today we are going to learn how I manage Nx workspaces for large projects.
+I wrote this article because when I used Nx in the beginning, I struggled a lot with how to structure my workspace, and I've hit quite a few walls. That being said, I've been using it for a while now, and I finally have the feeling that I've reached a structure where I feel comfortable with. It's important to note that I don't use this approach for organisation wide monorepos, but monorepos that contain 10 applications max.
 
 ## A word about Nx
 
