@@ -21,7 +21,7 @@
 	     <h2 id="about-this-article">About this article</h2>
 
 <p>This article contains a set of opinionated guidelines when it comes to building monorepos with <a href="https://nrwl.io/nx">Nx</a>.
-I wrote this article because when I used Nx in the beginning, I struggled a lot with how to structure my workspace, and I’ve hit quite a few walls. That being said, I’ve been using it for a while now, and I finally have the feeling that I’ve reached a structure where I feel comfortable with. It’s important to note that I don’t use this approach for organisation wide monorepos, but monorepos that contain 10 applications max.</p>
+I wrote this article because when I used Nx in the beginning, I struggled a lot with how to structure my workspace, and I’ve hit quite a few walls. That being said, I’ve been using it for a while now, and I finally have the feeling that I’ve reached a structure where I feel comfortable with.</p>
 
 <h2 id="a-word-about-nx">A word about Nx</h2>
 
