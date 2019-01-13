@@ -1118,9 +1118,11 @@ const whenToRefresh$ = of('').pipe(
 
 <p>Next thing we need to do is integrate this into our other code. Let’s see how we can accomplish this:</p>
 
-<pre><code class="language-typescript">this.polledBitcoin$ = this.load$.pipe(
-       concatMap(_ =&gt; bitcoin$.pipe(concat(whenToRefresh$))),
-       map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
+<pre><code class="language-typescript">const poll$ = concat(bitcoin$, whenToRefresh$);
+
+this.polledBitcoin$ = this.load$.pipe(
+  concatMap(_ =&gt; poll$),
+  map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
 );
 </code></pre>
 
@@ -1132,9 +1134,9 @@ const whenToRefresh$ = of('').pipe(
 
 <pre><code>bitcoin$:         -----(b|)
 load$:       f-------------f-------------f....
-                                \
-                  \              -----b-------N....
-                   -----b-------N
+(poll$)                    \
+(poll$)      \              -----b-------N....
+              -----b-------N
                    
                    
 polledBitcoin$:   ------b-------------b-------....
@@ -1144,7 +1146,7 @@ polledBitcoin$:   ------b-------------b-------....
 
 <p>A live example of the code can be found here:</p>
 
-<iframe src="https://stackblitz.com/edit/angular-5mplks?file=app/app.component.ts" style="width: 100%; height: 500px"></iframe>
+<iframe src="https://stackblitz.com/edit/angular-4nqhgq?embed=1&amp;file=src/app/app.component.ts" style="width: 100%; height: 500px"></iframe>
 
 <p><strong>Note:</strong> to really see that the next call is only scheduled 5000ms after the previous one finished, you can use the network tab and throttle the network to ‘slow 3g’.</p>
 
