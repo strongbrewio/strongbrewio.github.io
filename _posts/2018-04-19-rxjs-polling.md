@@ -215,9 +215,11 @@ We created a stream using the static `of`. This will fire an event immediately w
 Next thing we need to do is integrate this into our other code. Let's see how we can accomplish this:
 
 ```typescript
+const poll$ = concat(bitcoin$, whenToRefresh$);
+
 this.polledBitcoin$ = this.load$.pipe(
-       concatMap(_ => bitcoin$.pipe(concat(whenToRefresh$))),
-       map((response: {EUR: {last: number}}) => response.EUR.last),
+  concatMap(_ => poll$),
+  map((response: {EUR: {last: number}}) => response.EUR.last),
 );
 ```
 
@@ -230,9 +232,9 @@ Drawn out into an ASCII marble diagram, it looks like this.
 ```
 bitcoin$:         -----(b|)
 load$:       f-------------f-------------f....
-                                \
-                  \              -----b-------N....
-                   -----b-------N
+(poll$)                    \
+(poll$)      \              -----b-------N....
+              -----b-------N
                    
                    
 polledBitcoin$:   ------b-------------b-------....
@@ -242,7 +244,7 @@ We can see that, whenever the first backend call was started, we wait 5000ms (he
 
 A live example of the code can be found here:
 
-<iframe src="https://stackblitz.com/edit/angular-5mplks?file=app/app.component.ts" style="width: 100%; height: 500px"></iframe>
+<iframe src="https://stackblitz.com/edit/angular-4nqhgq?embed=1&file=src/app/app.component.ts" style="width: 100%; height: 500px"></iframe>
 
 **Note:** to really see that the next call is only scheduled 5000ms after the previous one finished, you can use the network tab and throttle the network to 'slow 3g'.
 
