@@ -12,6 +12,60 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Migrating to Nx</title>
+	  <link>//migrating-to-nx/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//migrating-to-nx/</guid>
+	  <description><![CDATA[
+	     <p>I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say, this has been a real eye opening experience. I’ve gotten to the point that everyone that is remotely interested into talking to me is going to get a pitch on why monorepos are the best and how Nx can help us in achieving this. I even gave a talk about this very topic at NG-BE which you can find <a href="https://www.youtube.com/watch?v=d04U7SjORTI" target="_blank">here</a>.</p>
+
+<p>The most common response that I’ve gotten is: “That all sounds great, but I’ll never be able to convince everyone in my company to start using a monorepo”. And this is the reason that I’m writing this blogpost. Because moving to a monorepo doesn’t have to be a big bang change at all. In fact, this is something you could do gradually, at your own pace over a long time period (although, I would try to do this in a reasonable time frame).</p>
+
+<h2 id="migrating">Migrating</h2>
+
+<h3 id="current-situation">Current situation</h3>
+
+<p>In most companies that I’ve visited over the past years, the situation is as follows. There are multiple teams working on different applications or libraries. Every team has its own repository where they store the code that is written by that team. If code needs to be shared with different teams, some code is published to an (internal) npm registry by one team and loaded by another team as a dependency.</p>
+
+<p>This situation could be referred to as a being a ‘polyrepo approach’ and kind of looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/lbf2k9rrd16mo42/polyrepo-migration-to-nx.png?raw=1" alt="polyrepo" /></p>
+
+<p>In this scenario, we have three teams with three repos. Team 1 is working on a ‘ui-kit’ that is being published to npm. The other teams load this ‘ui-kit’ by downloading it from the (internal) npm registry.</p>
+
+<p><strong>Note:</strong> Explaining why publishing to npm might not be the best idea in every situation and how a monorepo fixes this is not in the scope of this blogpost. For that, I would like to refer you to this <a href="https://www.youtube.com/watch?v=q4XmAy6_ucw" target="_blank">excellent talk</a> by Manfred Steyer.</p>
+
+<h3 id="hybrid-situation">Hybrid situation</h3>
+
+<p>Most people think that, when you want to move to a monorepo, all three teams in the example above need to do that in a single go. But this isn’t true at all. In fact, there is an obvious step between a polyrepo and a monorepo which I like to refer to as being a ‘hybrid approach’. And it looks a little like this:</p>
+
+<p><img src="https://www.dropbox.com/s/uxpdfxim81oz2x4/hybrid-migrating-to-nx.png?raw=1" alt="hybrid" /></p>
+
+<p>In this specific scenario, as a first step towards a monorepo, the team responsible for ‘app 1’ and the team responsible for the ‘ui-kit’ have moved there code into a single repository. This repo is setup using Nx (hence the distinction between apps and libs inside of that repo).</p>
+
+<p>The important thing to notice here is the fact that the ui-kit is both published to npm AND imported inside of ‘app 1’. This means that both inside the monorepo as outside of the monorepo this library is being used. This is exactly what is meant by the hybrid approach.</p>
+
+<p>This allows us to gradually start with a ‘monorepo’. You can start with two teams, and as soon as these get accustomed to it and everything is starting to run smoothly, a new team can be added. In the mean time, libraries that need to be shared with teams outside of the monorepo can still be published to npm. The end goal is that everything is moved to the monorepo.</p>
+
+<p>It is also an ideal way to convince the non-believers of this approach. If people see that two teams can work perfectly well together inside of a single repo, you have a viable and working example to sell the idea!</p>
+
+<h3 id="complete-monorepo-situation">Complete monorepo situation</h3>
+
+<p>When everyone has move to the monorepo, the situation could look like this:</p>
+
+<p><img src="https://www.dropbox.com/s/wyc5703yts5ddp2/monorepo-migrating-to-nx.png?raw=1" alt="monorepo	" /></p>
+
+<p>Here, we no longer use npm as a means to distribute code between different teams.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Migrating to a Nx or a monorepo is something you can do one small step at a time. After having demonstrated everything works for a small amount of teams/projects/code, you can convince everyone that this is in fact they way to go (not always of course) and keep on migrating towards a complete monorepo!</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Opinionated guidelines for large nx angular projects</title>
 	  <link>//opinionated-guidelines-for-large-nx-angular-projects/</link>
 	  <author></author>
@@ -2570,233 +2624,6 @@ He also has an amazing egghead course on that subject.</p>
 
 <h2 id="thanks-for-reading">Thanks for reading</h2>
 <p>I hope you all liked this article, if you have questions, shoot!</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>A scalable angular architecture (part 2)</title>
-	  <link>//A-scalable-angular-architecture-part2/</link>
-	  <author></author>
-	  <pubDate>2017-08-13T00:00:00+00:00</pubDate>
-	  <guid>//A-scalable-angular-architecture-part2/</guid>
-	  <description><![CDATA[
-	     <h1 id="the-sandbox-pattern">The sandbox pattern</h1>
-
-<h2 id="introduction">Introduction</h2>
-<p>A while ago I released a blogpost called “<a href="http://blog.brecht.io/A-scalable-angular2-architecture/">A scalable angular 2 architecture</a>” which was all about creating large scale enterprise webapplications. The title should actually have been <strong>“A scalable angular architecture”</strong> (It’s just angular) or even, <strong>“A scalable SPA architecture”</strong> since we can use the same architecture for <a href="https://facebook.github.io/react/">React</a> or <a href="https://vuejs.org">Vue.js</a>.</p>
-
-<p>It’s been over a year now, since I’ve been introducing that specific architecture in companies and projects. Nowadays, I know quite a few people that are using this particular architecture in their projects.
-Often, I ask developers about how they feel about this SPA-architecture and the feedback is mostly this:
-They believe its a <strong>clear and opiniated way</strong> to structure their code, and they have no trouble, finding their way into the codebase.</p>
-
-<p>A big part of the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">article</a> in question, was about explaining the so called “sandboxes”, a personal terminology for a very specific kind of facade.
-Since writing that <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">article</a> raised a bunch of questions about these “sandboxes”, it seemed like a good idea to write a followup article.</p>
-
-<p>In this article we will cover what sandboxes are really about and why I introduced them in the first place.</p>
-
-<p><strong>Note: This architecture is only one way of structuring your applications and the statements being made in this article are completely personal and might be opiniated.</strong></p>
-
-<h2 id="what-is-a-sandbox-in-a-nutshell">What is a sandbox in a nutshell</h2>
-
-<p>In real life it’s a place where we can put our children together with a limited set of toys. That way, they can only play with those toys and have fun, and we as parents wouldn’t have to worry about them running around in the garden.</p>
-
-<p>In this architecture a sandbox is a controlled environment, and the only place where components can consume pieces of the application.
-It’s the only interface for our smart components to communicate with the rest of the application. It’s a facade that abstracts away logic from our components. It does have very specific logic though.</p>
-
-<h2 id="here-is-why-i-introduced-sandboxes">Here is why I introduced sandboxes</h2>
-
-<p>One of the most challenging parts of creating big clientside javascript applications is encapsulation and dividing responsibilities. Having a decent encapsulated structure where every component, service, class has a clear reason of existence, makes it easy for us as developers to maintain the code and develop new features.</p>
-
-<p>When writing single-page-applications one could face the following challenges:</p>
-
-<h3 id="challenge-1-how-do-we-structure-components">Challenge 1: How do we structure components?</h3>
-
-<p>Since this topic is covered in the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">previous article</a>, we won’t do a deepdive in this subject.
-We use the smart/dumb component approach to structure our components. The dumb components mostly have presentational purposes and the smart components interact with the rest of the application.</p>
-
-<h3 id="challenge-2-how-do-we-handle-statemanagement">Challenge 2: How do we handle statemanagement?</h3>
-
-<p>Another topic covered by the <a href="http://blog.brecht.io/A-scalable-angular2-architecture/">previous article</a> is how handle our statemanagement. In short: we use @ngrx/store, or another redux implementation that embraces reactive programming.</p>
-
-<h3 id="challenge-3">Challenge 3</h3>
-
-<p>The first two challenges are met: we have a clear and structured presentational layer and because of the fact that we use @ngrx/store (or any statemanagement tool for that matter), we have a clear way of managing state. We can optimise performance with immutable data and still have clear unidirectional dataflow.</p>
-
-<p>However, there are still a few pieces of the puzzle missing, which might raise the following questions:</p>
-
-<h4 id="how-do-we-separate-the-presentation-layers-from-the-rest-of-the-application">How do we separate the presentation-layers from the rest of the application?</h4>
-
-<p>If we inject whatever we want in our smart components, their constructors might get huge in no-time. Do those smart components really need to know everything about the application? Do they need to know where everything lives and what service it should call from which module in the application? Wouldn’t it be easier if they had an interface they could talk to, that just handles things for them?
-It would certainly help to decouple angular modules from each other, and keep the responsibility of those smart components clear and compact. <strong>This is something a sandbox might be able to help us with.</strong></p>
-
-<h3 id="do-our-components-need-to-know-about-redux">Do our components need to know about redux?</h3>
-
-<p>Redux is an awesome library/principle that helps us ace statemanagement, but it’s a really heavy dependency if you don’t manage it carefully. What if your <strong>very specific</strong> redux actions would be everywhere in your components and services? In that case your codebase would be completely affected by it and it would be very hard to use another statemanagement tool in the future. It would be impossible to share that code in non-redux applications.
-It would be a huge depencency… What if you like to switch to firebase for instance, or MOBX, or even write your own statemanagement tool. You would need to refactor your whole application. The sole principle of redux is to manage state, and I prefer to use it that way. That is also why I don’t really use effects, thunk or saga. (That’s a personal preference)
-For me this means: <strong>Use redux only to manage state, not to trigger backend actions etc</strong>
-One could even argue that the action-dispatching and state-selecting should be combined in central places in your appliction.
- <strong>Let’s add that logic to the sandboxes as well.</strong></p>
-
-<h4 id="do-our-http-services-need-to-know-about-a-redux-implementation">Do our HTTP services need to know about a redux implementation?</h4>
-
-<p>Well, as the name already reveals. An HTTP service is all about doing HTTP communication and returning asynchronous objects to the components. An HTTP service should have no notion about redux at all nor any other statemanagement tool. Its sole purpose is fetching data and returning it. Let’s take a look at the following example for instance. We fetch an array of wines from the backend and we want to persist that in a redux store. This is an example of an HTTP service that is being abused to achieve that:</p>
-
-<pre><code class="language-typescript">class WineService {
-	// bad
-	fetchWines(): void {
-		this.api.get('url')
-			.subscribe(wines =&gt; 
-				this.store.dispatch({type: 'SET_WINES', payload: {wines}});
-	}
-}
-</code></pre>
-
-<p>This code doesn’t belong here, it’s not the responsibility of that service. The question is where does it belong?
-Does it belong in the component? They would get dirty and reduxy in no-time…
-<em>*Again, this would belong to the sandbox!</em>.</p>
-
-<p>An http service should look like this:</p>
-
-<pre><code class="language-typescript">class WineService {
-	// good
-	fetchWines(): Observable&lt;any&gt; {
-		return this.api.get('url')
-	}
-}
-</code></pre>
-
-<h4 id="on-what-place-do-we-dispatch-actions-to-the-store">On what place do we dispatch actions to the store?</h4>
-
-<p>Err…, the sandbox =)</p>
-
-<h4 id="where-do-we-handle-optimistic-updates">Where do we handle optimistic updates</h4>
-
-<p>Again, that would be the sandbox</p>
-
-<h4 id="how-to-not-make-your-whole-application-smell-like-redux">How to NOT make your whole application smell like REDUX</h4>
-
-<p>Components and services should not know about redux, so the store interaction should be in a very specific place as well.</p>
-
-<p>I bet you saw it coming, but YES! That’s what a sandbox is all about! It’s about separation of concerns and having a very specific interface to handle this very specific logic.</p>
-
-<h2 id="what-does-a-sandbox-do">What does a sandbox do?</h2>
-
-<p>A sandbox has a very specific responsibility:</p>
-
-<ul>
-  <li>It lets your module communicate with other modules without that module having to know about the rest of the application</li>
-  <li>It sends Redux actions</li>
-  <li>It exposes streams of data (coming from Redux, Firebase or other technologies)</li>
-  <li>It handles optimistic updates</li>
-  <li>It keeps the containers stupid enough</li>
-</ul>
-
-<h2 id="whats-very-specific-on-a-sandbox">What’s very specific on a sandbox?</h2>
-
-<ul>
-  <li>They handle what the container tells them to handle, without the container having to know how…</li>
-  <li>They interact between modules</li>
-  <li>They handle a lot of redux (or similar technology) logic</li>
-  <li>The functions mostly have a void return-type, unless we want to be able to cancel HTTP calls</li>
-  <li>They expose observables/streams</li>
-  <li>It mostly contains redundant code, but no redundant logic (it’s all about KISS instead of DRY)</li>
-  <li>Mostly every module has a sandbox, unless it contains a huge amount of logic (in that case we could implement a sandbox for every container)</li>
-  <li>It does not contain business logic, ever…</li>
-  <li>It mostly doesn’t contain if-statements, that would be business logic right?!</li>
-  <li>It gives us a clear overview of the responsabilities of a module.</li>
-</ul>
-
-<h2 id="what-doesnt-a-sandbox-do">What doesn’t a sandbox do?</h2>
-
-<ul>
-  <li>It doesn’t contain business logic. It contains sandbox logic (see above).</li>
-  <li>It doesn’t contain presentation logic, like routing etc.</li>
-  <li>It doesn’t do HTTP calls directly, it delegates to http services.</li>
-  <li>It doesn’t let your components do whatever they want =)</li>
-</ul>
-
-<h2 id="an-example">An example</h2>
-
-<pre><code class="language-typescript">@Injectable()
-export class StockSandbox {
-	// these are the store select statements
-	// It's pretty dirty to have them all over our components
-	// Our components just want to get streams of data, no matter where they come from
-	wines$ = this.store.select(state =&gt; state.wines);
-	isAuthenticated$ = this.store.select(state =&gt; state.authentication.isAuthenticated);
-
-	constructor(
-		private store: Store&lt;ApplicationState&gt;, 
-		private stockService: StockService,
-		private fooService: FooService) {
-	}
-
-	addWine(wine: Wine): void {
-		// use the stockservice to add a wine
-		// and when it's done handle our statemanagement
-		this.stockService.add(wine).subscribe((wine: Wine) =&gt; {
-			this.store.dispatch(new AddWine(wine));
-		}, () =&gt; this.handleError());
-	}
-
-	 removeWine(wine: Wine): void {
-		// removing a wine can be done optimistically!
-		// this would certainly improve the performance and snappyness of our app
-		// this would be sandbox logic
-		let action = new RemoveWine(wine._id);
-		this.store.dispatch(action);
-		this.stockService.remove(wine).subscribe(
-			() =&gt; {}, 
-			// if the call failed, we have to undo an action. This is sandbox logic as well!
-			() =&gt; this.store.dispatch({type: UNDO_ACTION, payload: action}););
-	}
-
-	fetchWine(id: string): Observable&lt;Wine&gt; {
-		// simple delegation of fetching something: Sandbox logic
-		return this.stockService.fetchWine(id).share();
-	}
-
-	notifyAnotherModule(): void {
-		// our components should NOT know where fooService is, or what it does
-		// it should just tell its sandbox to handle a specific action
-		this.fooService.doSomething();
-	}
-}
-</code></pre>
-
-<p>Look how clean this smart component has become:</p>
-<pre><code class="language-typescript">export class StockPageContainer {
-    wines$ = this.sb.wines$; // Does this stream comes from Redux? or Firebase (I don't need to know)
-    numberOfWines$ = this.wines$.map(wines =&gt; sumBy(wines, (wine: Wine) =&gt; wine.inStock));
-
-	// a clean constructor makes it easy to test.
-	// Util dependencies or presentational dependencies like a router
-	// do not belong in the sandbox.
-	// They belong right here in the component, in the presentational layer.
-    constructor(private sb: StockSandbox, private router: Router) {
-    }
-
-    onRemove(wine: Wine): void {
-		// Hey Sandbox! Remove the wine please, I don't care how you do it
-		// I don't even care that you do optimistic updates, it's not my business
-        this.sb.removeWine(wine);
-    }
-
-    notifyAnotherModule(): void {
-		// I don't know what will happen, but that's okay... It's not my responsability
-        this.sb.notifyAnotherModule(); 
-    }
-}
-
-</code></pre>
-
-<p>I hope this clarifies the purpose of the sandbox and why I have introduced them in my projects.
-If you still have questions about this approach, don’t hesitate to contact me =)</p>
-
-<h3 id="special-thanks">Special thanks</h3>
-<p>Special thanks to <a href="'https://twitter.com/ManfredSteyer'">Manfred Steyer (@manfredsteyer)</a> and <a href="https://twitter.com/juristr">Juri Strumpflohner (@juristr)</a> for reviewing this article!</p>
-
 
 	  ]]></description>
 	</item>

@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Strongbrew blog</title>
+    <title>Author</title>
     <meta name="description" content="" />
 
     <!-- Mobile Meta -->
@@ -25,31 +25,31 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="https://blog.strongbrew.io//page5/" />
+        <link rel="canonical" href="https://blog.strongbrew.io//author/nx/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Strongbrew blog" />
+    <meta property="og:title" content="Author" />
     <meta property="og:description" content="" />
-    <meta property="og:url" content="https://blog.strongbrew.io///page5/" />
-    <meta property="og:image" content="/assets/images/bg-gradient.jpg" />
+    <meta property="og:url" content="https://blog.strongbrew.io///author/nx/" />
+    <meta property="og:image" content="/assets/images/cover4.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Strongbrew blog" />
+    <meta name="twitter:title" content="Author" />
     <meta name="twitter:description" content="" />
-    <meta name="twitter:url" content="https://blog.strongbrew.io///page5/" />
-    <meta name="twitter:image:src" content="/assets/images/bg-gradient.jpg" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///author/nx/" />
+    <meta name="twitter:image:src" content="/assets/images/cover4.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Strongbrew blog",
-    "url": "https://blog.strongbrew.io///page5/",
-    "image": "/assets/images/bg-gradient.jpg",
+    "name": "Author",
+    "url": "https://blog.strongbrew.io///author/nx/",
+    "image": "/assets/images/cover4.jpg",
     "description": ""
 }
     </script>
@@ -59,7 +59,7 @@
 
 
 </head>
-<body class="paged archive-template nav-closed">
+<body class="author-template nav-closed">
     <div class="topbar">
         <div class="container">
             <a class="logo-wrapper" href="https://strongbrew.io">
@@ -84,7 +84,7 @@
         <span class="hidden">Close</span>
     </a>
     <ul>
-        <li class="nav-home  nav-current" role="presentation"><a
+        <li class="nav-home " role="presentation"><a
                 href="/">Home</a></li>
         <li class="nav-about " role="presentation"><a
                 href="/about">About</a></li>
@@ -120,42 +120,40 @@
     <div class="site-wrapper">
 
         <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
-        <!-- < default -->
+        <!-- < default}} -->
 <!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<!-- The big featured header  -->
-<header class="main-header "
-        style="background-image: url(/assets/images/bg-gradient.jpg) ">
-    <nav class="main-nav overlay clearfix">
+<!-- The big featured header -->
+
+<!-- Everything inside the #author tags pulls data from the author -->
+<!-- #author  -->
+    <header class="main-header author-head " style="background-image: url(/assets/images/cover4.jpg) ">
+        <nav class="main-nav overlay clearfix">
+            
+                <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+            
+        </nav>
+    </header>
+
+    <section class="author-profile inner">
         
-            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+            
         
-    </nav>
-    <div class="vertical">
-        <div class="main-header-content inner">
-            <h1 class="page-title">Strongbrew</h1>
-            <h2 class="page-description"></h2>
-        </div>
-    </div>
-    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">Scroll Down</span></a>
-</header>
+            
+        
+    </section>
+<!-- /author -->
 
 <!-- The main content area on the homepage -->
 <main id="content" class="content" role="main">
 
-    <!-- The tag below includes the post loop - partials/loop.hbs -->
+    <!-- The tag below includes the post loop - partials/loop.hbs  -->
         <!-- Previous/next page links - only displayed on page 2+ -->
     <div class="extra-pagination inner">
         
             <nav class="pagination" role="pagination">
     
-        
-            <a class="newer-posts" href="/page4/" title="Previous Page">&laquo; Newer Posts</a>
-      
-    
-    <span class="page-number"> Page 5 of 8 </span>
-     
-        <a class="older-posts" href="/page6/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 1 of 1 </span>
      
 </nav>
         
@@ -164,10 +162,10 @@
     
     <article class="post">
         <header class="post-header">
-            <h2 class="post-title"><a href="/introducing-rx-devtools">Introducing Rx devtools</a></h2>
+            <h2 class="post-title"><a href="/migrating-to-nx">Migrating to Nx</a></h2>
         </header>
         <section class="post-excerpt">
-            <p>Ever since I first started using RxJS up until this very day, it has become my absolute favorite way of coding. I cannot believe to work... <a class="read-more" href="/introducing-rx-devtools">&raquo;</a></p>
+            <p>I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say,... <a class="read-more" href="/migrating-to-nx">&raquo;</a></p>
         </section>
         <footer class="post-meta">
             
@@ -178,38 +176,6 @@
                 <!-- author -->
                 <a href='/author/kwintenp'>Kwinten Pisman</a>
 
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/RxJS'>Rxjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2017-08-04">04 Aug 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/thinking-reactively-in-angular-and-rxjs">Thinking reactively in Angular and RXJS</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>Foreword RxJS is an awesome library that can help us with creating reactive web applications. Reactive web applications can be overwhelming in the beginning, but eventually,... <a class="read-more" href="/thinking-reactively-in-angular-and-rxjs">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-                <img class="author-thumb" src="/assets/images/brecht.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/brechtbilliet'>Brecht Billiet</a>
-
-                
-            
                 
             
 
@@ -222,111 +188,15 @@
                     
                 
                     
-                       <a href='/tag/RxJS'>Rxjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2017-07-25">25 Jul 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/how-to-setup-marble-testing">How to setup marble testing</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>In an earlier blogpost, I showed you guys how to do client side filtering with streams (here). I tried to show you how you could use... <a class="read-more" href="/how-to-setup-marble-testing">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
-
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/RxJS'>Rxjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2017-02-15">15 Feb 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/decorators-and-observables-to-implement-retry-logic">Using decorators and observables to implement retry</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>Last week, I was at a meetup in Ghent where I was talking with Stefan Lapers about programming languages in general. We started talking about writing... <a class="read-more" href="/decorators-and-observables-to-implement-retry-logic">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
-
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/RxJS'>Rxjs</a>,
+                       <a href='/tag/nx'>Nx</a>,
                     
                 
                     
-                       <a href='/tag/Typescript'>Typescript</a>
+                       <a href='/tag/architecture'>Architecture</a>
                     
                 
             
-            <time class="post-date" datetime="2017-02-15">15 Feb 2017</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h2 class="post-title"><a href="/client-side-filtering-with-streams">Client side filtering using streams</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>I have been coaching people in using RxJS for a while now. During this time, I’ve noticed that the hardest part for people to learn is... <a class="read-more" href="/client-side-filtering-with-streams">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            
-                
-            
-                
-                <img class="author-thumb" src="/assets/images/kwintenp.jpg" alt="Author image" nopin="nopin" />
-                <!-- author -->
-                <a href='/author/kwintenp'>Kwinten Pisman</a>
-
-                
-            
-
-            <!-- [[tags prefix=" on "]] -->
-            
-                on
-                
-                    
-                       <a href='/tag/RxJS'>Rxjs</a>
-                    
-                
-            
-            <time class="post-date" datetime="2017-02-15">15 Feb 2017</time>
+            <time class="post-date" datetime="2019-01-05">05 Jan 2019</time>
         </footer>
     </article>
     
@@ -335,13 +205,7 @@
     
         <nav class="pagination" role="pagination">
     
-        
-            <a class="newer-posts" href="/page4/" title="Previous Page">&laquo; Newer Posts</a>
-      
-    
-    <span class="page-number"> Page 5 of 8 </span>
-     
-        <a class="older-posts" href="/page6/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 1 of 1 </span>
      
 </nav>
     

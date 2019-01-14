@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Migrating to Nx</title>
+        
+          <description>&lt;p&gt;I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say, this has been a real eye opening experience. I’ve gotten to the point that everyone that is remotely interested into talking to me is going to get a pitch on why monorepos are the best and how Nx can help us in achieving this. I even gave a talk about this very topic at NG-BE which you can find &lt;a href=&quot;https://www.youtube.com/watch?v=d04U7SjORTI&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//migrating-to-nx/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//migrating-to-nx/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Opinionated guidelines for large nx angular projects</title>
         
           <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;

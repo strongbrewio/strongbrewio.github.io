@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Migrating to Nx</title>
+    <meta name="description" content="Migrating multiple apps to an nx workspace" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//migrating-to-nx/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Migrating to Nx" />
+    <meta property="og:description" content="Migrating multiple apps to an nx workspace" />
+    <meta property="og:url" content="https://blog.strongbrew.io///migrating-to-nx/" />
+    <meta property="og:image" content="/assets/images/cover/cover2.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Migrating to Nx" />
+    <meta name="twitter:description" content="Migrating multiple apps to an nx workspace" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///migrating-to-nx/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover2.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew",
+    "name": "Migrating to Nx",
+    "url": "https://blog.strongbrew.io///migrating-to-nx/",
+    "image": "/assets/images/cover/cover2.jpg",
+    "description": "Migrating multiple apps to an nx workspace"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover2.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>Want to work with us?</h5>
+<a href="https://strongbrew.io/about" class="button" rel="noopener">Learn more</a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Migrating to Nx</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2019-01-05">05 Jan 2019
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>,
+                    
+                    
+                    
+                    <a href='/tag/nx'>Nx</a>,
+                    
+                    
+                    
+                    <a href='/tag/architecture'>Architecture</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say, this has been a real eye opening experience. I’ve gotten to the point that everyone that is remotely interested into talking to me is going to get a pitch on why monorepos are the best and how Nx can help us in achieving this. I even gave a talk about this very topic at NG-BE which you can find <a href="https://www.youtube.com/watch?v=d04U7SjORTI" target="_blank">here</a>.</p>
+
+<p>The most common response that I’ve gotten is: “That all sounds great, but I’ll never be able to convince everyone in my company to start using a monorepo”. And this is the reason that I’m writing this blogpost. Because moving to a monorepo doesn’t have to be a big bang change at all. In fact, this is something you could do gradually, at your own pace over a long time period (although, I would try to do this in a reasonable time frame).</p>
+
+<h2 id="migrating">Migrating</h2>
+
+<h3 id="current-situation">Current situation</h3>
+
+<p>In most companies that I’ve visited over the past years, the situation is as follows. There are multiple teams working on different applications or libraries. Every team has its own repository where they store the code that is written by that team. If code needs to be shared with different teams, some code is published to an (internal) npm registry by one team and loaded by another team as a dependency.</p>
+
+<p>This situation could be referred to as a being a ‘polyrepo approach’ and kind of looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/lbf2k9rrd16mo42/polyrepo-migration-to-nx.png?raw=1" alt="polyrepo" /></p>
+
+<p>In this scenario, we have three teams with three repos. Team 1 is working on a ‘ui-kit’ that is being published to npm. The other teams load this ‘ui-kit’ by downloading it from the (internal) npm registry.</p>
+
+<p><strong>Note:</strong> Explaining why publishing to npm might not be the best idea in every situation and how a monorepo fixes this is not in the scope of this blogpost. For that, I would like to refer you to this <a href="https://www.youtube.com/watch?v=q4XmAy6_ucw" target="_blank">excellent talk</a> by Manfred Steyer.</p>
+
+<h3 id="hybrid-situation">Hybrid situation</h3>
+
+<p>Most people think that, when you want to move to a monorepo, all three teams in the example above need to do that in a single go. But this isn’t true at all. In fact, there is an obvious step between a polyrepo and a monorepo which I like to refer to as being a ‘hybrid approach’. And it looks a little like this:</p>
+
+<p><img src="https://www.dropbox.com/s/uxpdfxim81oz2x4/hybrid-migrating-to-nx.png?raw=1" alt="hybrid" /></p>
+
+<p>In this specific scenario, as a first step towards a monorepo, the team responsible for ‘app 1’ and the team responsible for the ‘ui-kit’ have moved there code into a single repository. This repo is setup using Nx (hence the distinction between apps and libs inside of that repo).</p>
+
+<p>The important thing to notice here is the fact that the ui-kit is both published to npm AND imported inside of ‘app 1’. This means that both inside the monorepo as outside of the monorepo this library is being used. This is exactly what is meant by the hybrid approach.</p>
+
+<p>This allows us to gradually start with a ‘monorepo’. You can start with two teams, and as soon as these get accustomed to it and everything is starting to run smoothly, a new team can be added. In the mean time, libraries that need to be shared with teams outside of the monorepo can still be published to npm. The end goal is that everything is moved to the monorepo.</p>
+
+<p>It is also an ideal way to convince the non-believers of this approach. If people see that two teams can work perfectly well together inside of a single repo, you have a viable and working example to sell the idea!</p>
+
+<h3 id="complete-monorepo-situation">Complete monorepo situation</h3>
+
+<p>When everyone has move to the monorepo, the situation could look like this:</p>
+
+<p><img src="https://www.dropbox.com/s/wyc5703yts5ddp2/monorepo-migrating-to-nx.png?raw=1" alt="monorepo	" /></p>
+
+<p>Here, we no longer use npm as a means to distribute code between different teams.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Migrating to a Nx or a monorepo is something you can do one small step at a time. After having demonstrated everything works for a small amount of teams/projects/code, you can convince everyone that this is in fact they way to go (not always of course) and keep on migrating towards a complete monorepo!</p>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Migrating to Nx&amp;url=https://blog.strongbrew.io/migrating-to-nx"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/migrating-to-nx"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/migrating-to-nx"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+    <a class="read-next-story prev "
+       style="background-image: url(/assets/images/cover/cover2.jpg)"
+       href="/opinionated-guidelines-for-large-nx-angular-projects">
+        <section class="post">
+            <h2>Opinionated guidelines for large nx angular projects</h2>
+            <p>About this article This article contains a set of opinionated guidelines when it comes to...</p>
+        </section>
+    </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2019</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-112030289-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+</body>
+</html>
