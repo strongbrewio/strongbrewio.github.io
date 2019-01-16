@@ -108,7 +108,7 @@ this.data$ = this.load$.pipe(
 ```
 In this example `load$` will emit at start up and every time the data needs to be loaded. This is a very common scenario where this concept of restarting work can be used.
 
- ## Special thanks
+## Special thanks
  
  Special thanks to <a href="https://twitter.com/elmd_" target="blank">Dominic Elm</a> for reviewing!
 
