@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   
+      <title>blog.strongbrew.io</title>
+   
+   <link>https://blog.strongbrew.io/</link>
+   <description></description>
+   <language>en-uk</language>
+   <managingEditor> </managingEditor>
+   <atom:link href="rss" rel="self" type="application/rss+xml" />
+   
+	<item>
+	  <title>RxJS patterns - restarting work</title>
+	  <link>//rxjs-patterns-restarting-work/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-patterns-restarting-work/</guid>
+	  <description><![CDATA[
+	     <p>Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.</p>
+
+<p>I’ll do this by describing them as high level as possible, but still provide you with some examples on where they can be applied.</p>
+
+<h2 id="what-is-work">What is ‘work’?</h2>
+
+<p>When conducting interviews and discussing RxJS, I tend to ask people how they would describe an <code>Observable</code> in only a couple of sentences. I’m well aware that this is difficult and quite hard to describe. Here is my personal attempt:</p>
+
+<blockquote>
+  <p>An <code>Observable</code> is a wrapper around some work. That work can be triggered by subscribing in response to which one or multiple results can be pushed towards us. This might happen both synchronously and asynchronously.</p>
+</blockquote>
+
+<p>The reason I’m mentioning this is because it will help me in explaining what I mean with the term ‘work’ in the context of an <code>Observable</code>. Whatever is being triggered by subscribing to an <code>Observable</code> is something that I will refer to as ‘work’.</p>
+
+<h2 id="why-do-we-need-to-restart-work">Why do we need to restart work?</h2>
+
+<p>Let’s say that we have an <code>Observable</code> whose ‘work’ is actually triggering a backend call. We might want to execute this backend call multiple times, hence we want the ‘work’ that this specific <code>Observable</code> does to be executed multiple times.</p>
+
+<p>Thanks to the fact that <code>Observables</code> are cold by default, we can accomplish this by subscribing to this <code>Observable</code> multiple times. Every subscription will trigger a backend call.</p>
+
+<h2 id="how-can-we-do-this">How can we do this?</h2>
+
+<h3 id="non-reactive">Non reactive</h3>
+
+<p>A non-reactive solution to do so could be wrapping the subscription in a function and calling it over and over again every time we wish to subscribe.</p>
+
+<pre><code class="language-typescript">const executeBackendCall = () =&gt; {
+	this.someObs$.subscribe((result) =&gt; {
+	   // do something here
+	}
+}
+</code></pre>
+
+<p>But this obviously has some downsides to it. Aside from the fact that is not reactive, we have a subscription to manage for every function call, we can no longer chain this with other operators (as we manually subscribe), and so on.</p>
+
+<h3 id="reactive">Reactive</h3>
+
+<p>We want to implement this in a more reactive way. We can do this by no longer thinking in terms of function calls but in term of a series of triggers where we want to do something. We need a stream that is triggered every time we want a certain action to occur.</p>
+
+<p>Let’s assume we have such a stream. Whenever that stream fires, we want to do some ‘work’. Remember that ‘work’ is something that is encapsulated in an <code>Observable</code>.</p>
+
+<p>Translated to code this means that we want to map a next event to an <code>Observable</code>.</p>
+
+<pre><code class="language-typescript">const work$: Observable&lt;T&gt; = ...
+const trigger$ = ...
+
+const workExecutedOnTrigger$: Observable&lt;Observable&lt;T&gt;&gt; = trigger$.pipe(
+	map(triggerValue =&gt; work$)
+);
+</code></pre>
+
+<p>In this piece of code we have an <code>Observable</code> called <code>work$</code>, containing the ‘work’ we want to do when the <code>trigger$</code> fires. 
+We can create a new stream called <code>workExecutedOnTrigger$</code> that maps the trigger event to the <code>work$</code>.</p>
+
+<p>The problem with this code is that the result of this action is an <code>Observable&lt;Observable&lt;T&gt;&gt;</code> (also called a higher order observable) whilst we would actually like to have an <code>Observable&lt;T&gt;</code>.</p>
+
+<p>To accomplish this, we can use a flattening operator. We could use <code>switchMap</code> for example.</p>
+
+<pre><code class="language-typescript">const work$ = ...
+const trigger$ = ...
+
+const workExecutedOnTrigger$: Observable&lt;T&gt; = trigger$.pipe(
+	switchMap(triggerValue =&gt; work$)
+);
+</code></pre>
+
+<p>And this is it! Now we have an observable <code>workExecutedOnTrigger$</code> that will execute our <code>work$</code> and will restart that every time our <code>trigger$</code> fires. It is restarted as the <code>switchMap</code> operator will do the following:</p>
+
+<ol>
+  <li>the <code>trigger$</code> fires a next event</li>
+  <li>the <code>switchMap</code> operator takes that event and maps it to <code>work$</code></li>
+  <li>the <code>switchMap</code> operator subscribes to that stream</li>
+  <li>Every event emitted by the <code>work$</code> is being passed down</li>
+  <li>if the <code>trigger$</code> fires a new event, the previous execution of <code>work$</code> is unsubscribed from</li>
+  <li>Step 2 through 5 is repeated</li>
+</ol>
+
+<p>Thanks to the <code>switchMap</code> operator, we can restart the ‘inner’ <code>work$</code>. This means that we can <strong>restart our work</strong>.</p>
+
+<p><strong>Note:</strong> To create the <code>trigger$</code> we can use a <code>Subject</code>. I’ll cover this in the next pattern ‘mapping function calls to streams’.</p>
+
+<h2 id="when-to-use-it">When to use it</h2>
+
+<p>As promised, here are some concrete example when you would use this:</p>
+
+<ul>
+  <li>In an autocomplete, we want to execute a backend call every time the user types something new. We want to restart the call to the backend.</li>
+  <li>We fetch some data when the page loads for the first time. When we want to do this a second time (after data has been updated for example), we want to re-execute that call.</li>
+</ul>
+
+<pre><code class="language-typescript">this.data$ = this.load$.pipe(
+   switchMap(_ =&gt; this.service.loadData())
+);
+</code></pre>
+<p>In this example <code>load$</code> will emit at start up and every time the data needs to be loaded. This is a very common scenario where this concept of restarting work can be used.</p>
+
+
+	  ]]></description>
+	</item>
+
+
+</channel>
+</rss>

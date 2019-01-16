@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Migrating to Nx</title>
-    <meta name="description" content="Migrating multiple apps to an nx workspace" />
+    <title>RxJS patterns - restarting work</title>
+    <meta name="description" content="RxJS patterns how to restart an observable" />
 
     <!-- Mobile Meta -->
     <meta name="HandheldFriendly" content="True" />
@@ -25,21 +25,21 @@
     <link href="/assets/css/prism.css" rel="stylesheet">
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="https://blog.strongbrew.io//migrating-to-nx/" />
+        <link rel="canonical" href="https://blog.strongbrew.io//rxjs-patterns-restarting-work/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Migrating to Nx" />
-    <meta property="og:description" content="Migrating multiple apps to an nx workspace" />
-    <meta property="og:url" content="https://blog.strongbrew.io///migrating-to-nx/" />
+    <meta property="og:title" content="RxJS patterns - restarting work" />
+    <meta property="og:description" content="RxJS patterns how to restart an observable" />
+    <meta property="og:url" content="https://blog.strongbrew.io///rxjs-patterns-restarting-work/" />
     <meta property="og:image" content="/assets/images/cover/cover2.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Migrating to Nx" />
-    <meta name="twitter:description" content="Migrating multiple apps to an nx workspace" />
-    <meta name="twitter:url" content="https://blog.strongbrew.io///migrating-to-nx/" />
+    <meta name="twitter:title" content="RxJS patterns - restarting work" />
+    <meta name="twitter:description" content="RxJS patterns how to restart an observable" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///rxjs-patterns-restarting-work/" />
     <meta name="twitter:image:src" content="/assets/images/cover/cover2.jpg" />
 
     <script type="application/ld+json">
@@ -47,10 +47,10 @@
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew",
-    "name": "Migrating to Nx",
-    "url": "https://blog.strongbrew.io///migrating-to-nx/",
+    "name": "RxJS patterns - restarting work",
+    "url": "https://blog.strongbrew.io///rxjs-patterns-restarting-work/",
     "image": "/assets/images/cover/cover2.jpg",
-    "description": "Migrating multiple apps to an nx workspace"
+    "description": "RxJS patterns how to restart an observable"
 }
     </script>
 
@@ -160,7 +160,7 @@
     <article class="post">
         <div class="post-inner">
             <header class="post-header">
-                <h1 class="post-title">Migrating to Nx</h1>
+                <h1 class="post-title">RxJS patterns - restarting work</h1>
                 <section class="post-meta">
                     <!-- <a href='/'></a> -->
 
@@ -178,15 +178,7 @@
                     on
                     
                     
-                    <a href='/tag/Angular'>Angular</a>,
-                    
-                    
-                    
-                    <a href='/tag/nx'>Nx</a>,
-                    
-                    
-                    
-                    <a href='/tag/architecture'>Architecture</a>
+                    <a href='/tag/RxJS'>Rxjs</a>
                     
                     
                     
@@ -195,49 +187,102 @@
 
             <section class="post-content">
 
-                <p>I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say, this has been a real eye opening experience. I’ve gotten to the point that everyone that is remotely interested into talking to me is going to get a pitch on why monorepos are the best and how Nx can help us in achieving this. I even gave a talk about this very topic at NG-BE which you can find <a href="https://www.youtube.com/watch?v=d04U7SjORTI" target="_blank">here</a>.</p>
+                <p>Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.</p>
 
-<p>The most common response that I’ve gotten is: “That all sounds great, but I’ll never be able to convince everyone in my company to start using a monorepo”. And this is the reason that I’m writing this blogpost. Because moving to a monorepo doesn’t have to be a big bang change at all. In fact, this is something you could do gradually, at your own pace over a long time period (although, I would try to do this in a reasonable time frame).</p>
+<p>I’ll do this by describing them as high level as possible, but still provide you with some examples on where they can be applied.</p>
 
-<h2 id="migrating">Migrating</h2>
+<h2 id="what-is-work">What is ‘work’?</h2>
 
-<h3 id="current-situation">Current situation</h3>
+<p>When conducting interviews and discussing RxJS, I tend to ask people how they would describe an <code>Observable</code> in only a couple of sentences. I’m well aware that this is difficult and quite hard to describe. Here is my personal attempt:</p>
 
-<p>In most companies that I’ve visited over the past years, the situation is as follows. There are multiple teams working on different applications or libraries. Every team has its own repository where they store the code that is written by that team. If code needs to be shared with different teams, some code is published to an (internal) npm registry by one team and loaded by another team as a dependency.</p>
+<blockquote>
+  <p>An <code>Observable</code> is a wrapper around some work. That work can be triggered by subscribing in response to which one or multiple results can be pushed towards us. This might happen both synchronously and asynchronously.</p>
+</blockquote>
 
-<p>This situation could be referred to as a being a ‘polyrepo approach’ and kind of looks like this:</p>
+<p>The reason I’m mentioning this is because it will help me in explaining what I mean with the term ‘work’ in the context of an <code>Observable</code>. Whatever is being triggered by subscribing to an <code>Observable</code> is something that I will refer to as ‘work’.</p>
 
-<p><img src="https://www.dropbox.com/s/lbf2k9rrd16mo42/polyrepo-migration-to-nx.png?raw=1" alt="polyrepo" /></p>
+<h2 id="why-do-we-need-to-restart-work">Why do we need to restart work?</h2>
 
-<p>In this scenario, we have three teams with three repos. Team 1 is working on a ‘ui-kit’ that is being published to npm. The other teams load this ‘ui-kit’ by downloading it from the (internal) npm registry.</p>
+<p>Let’s say that we have an <code>Observable</code> whose ‘work’ is actually triggering a backend call. We might want to execute this backend call multiple times, hence we want the ‘work’ that this specific <code>Observable</code> does to be executed multiple times.</p>
 
-<p><strong>Note:</strong> Explaining why publishing to npm might not be the best idea in every situation and how a monorepo fixes this is not in the scope of this blogpost. For that, I would like to refer you to this <a href="https://www.youtube.com/watch?v=q4XmAy6_ucw" target="_blank">excellent talk</a> by Manfred Steyer.</p>
+<p>Thanks to the fact that <code>Observables</code> are cold by default, we can accomplish this by subscribing to this <code>Observable</code> multiple times. Every subscription will trigger a backend call.</p>
 
-<h3 id="hybrid-situation">Hybrid situation</h3>
+<h2 id="how-can-we-do-this">How can we do this?</h2>
 
-<p>Most people think that, when you want to move to a monorepo, all three teams in the example above need to do that in a single go. But this isn’t true at all. In fact, there is an obvious step between a polyrepo and a monorepo which I like to refer to as being a ‘hybrid approach’. And it looks a little like this:</p>
+<h3 id="non-reactive">Non reactive</h3>
 
-<p><img src="https://www.dropbox.com/s/uxpdfxim81oz2x4/hybrid-migrating-to-nx.png?raw=1" alt="hybrid" /></p>
+<p>A non-reactive solution to do so could be wrapping the subscription in a function and calling it over and over again every time we wish to subscribe.</p>
 
-<p>In this specific scenario, as a first step towards a monorepo, the team responsible for ‘app 1’ and the team responsible for the ‘ui-kit’ have moved there code into a single repository. This repo is setup using Nx (hence the distinction between apps and libs inside of that repo).</p>
+<pre><code class="language-typescript">const executeBackendCall = () =&gt; {
+	this.someObs$.subscribe((result) =&gt; {
+	   // do something here
+	}
+}
+</code></pre>
 
-<p>The important thing to notice here is the fact that the ui-kit is both published to npm AND imported inside of ‘app 1’. This means that both inside the monorepo as outside of the monorepo this library is being used. This is exactly what is meant by the hybrid approach.</p>
+<p>But this obviously has some downsides to it. Aside from the fact that is not reactive, we have a subscription to manage for every function call, we can no longer chain this with other operators (as we manually subscribe), and so on.</p>
 
-<p>This allows us to gradually start with a ‘monorepo’. You can start with two teams, and as soon as these get accustomed to it and everything is starting to run smoothly, a new team can be added. In the mean time, libraries that need to be shared with teams outside of the monorepo can still be published to npm. The end goal is that everything is moved to the monorepo.</p>
+<h3 id="reactive">Reactive</h3>
 
-<p>It is also an ideal way to convince the non-believers of this approach. If people see that two teams can work perfectly well together inside of a single repo, you have a viable and working example to sell the idea!</p>
+<p>We want to implement this in a more reactive way. We can do this by no longer thinking in terms of function calls but in term of a series of triggers where we want to do something. We need a stream that is triggered every time we want a certain action to occur.</p>
 
-<h3 id="complete-monorepo-situation">Complete monorepo situation</h3>
+<p>Let’s assume we have such a stream. Whenever that stream fires, we want to do some ‘work’. Remember that ‘work’ is something that is encapsulated in an <code>Observable</code>.</p>
 
-<p>When everyone has move to the monorepo, the situation could look like this:</p>
+<p>Translated to code this means that we want to map a next event to an <code>Observable</code>.</p>
 
-<p><img src="https://www.dropbox.com/s/wyc5703yts5ddp2/monorepo-migrating-to-nx.png?raw=1" alt="monorepo	" /></p>
+<pre><code class="language-typescript">const work$: Observable&lt;T&gt; = ...
+const trigger$ = ...
 
-<p>Here, we no longer use npm as a means to distribute code between different teams.</p>
+const workExecutedOnTrigger$: Observable&lt;Observable&lt;T&gt;&gt; = trigger$.pipe(
+	map(triggerValue =&gt; work$)
+);
+</code></pre>
 
-<h2 id="conclusion">Conclusion</h2>
+<p>In this piece of code we have an <code>Observable</code> called <code>work$</code>, containing the ‘work’ we want to do when the <code>trigger$</code> fires. 
+We can create a new stream called <code>workExecutedOnTrigger$</code> that maps the trigger event to the <code>work$</code>.</p>
 
-<p>Migrating to a Nx or a monorepo is something you can do one small step at a time. After having demonstrated everything works for a small amount of teams/projects/code, you can convince everyone that this is in fact they way to go (not always of course) and keep on migrating towards a complete monorepo!</p>
+<p>The problem with this code is that the result of this action is an <code>Observable&lt;Observable&lt;T&gt;&gt;</code> (also called a higher order observable) whilst we would actually like to have an <code>Observable&lt;T&gt;</code>.</p>
+
+<p>To accomplish this, we can use a flattening operator. We could use <code>switchMap</code> for example.</p>
+
+<pre><code class="language-typescript">const work$ = ...
+const trigger$ = ...
+
+const workExecutedOnTrigger$: Observable&lt;T&gt; = trigger$.pipe(
+	switchMap(triggerValue =&gt; work$)
+);
+</code></pre>
+
+<p>And this is it! Now we have an observable <code>workExecutedOnTrigger$</code> that will execute our <code>work$</code> and will restart that every time our <code>trigger$</code> fires. It is restarted as the <code>switchMap</code> operator will do the following:</p>
+
+<ol>
+  <li>the <code>trigger$</code> fires a next event</li>
+  <li>the <code>switchMap</code> operator takes that event and maps it to <code>work$</code></li>
+  <li>the <code>switchMap</code> operator subscribes to that stream</li>
+  <li>Every event emitted by the <code>work$</code> is being passed down</li>
+  <li>if the <code>trigger$</code> fires a new event, the previous execution of <code>work$</code> is unsubscribed from</li>
+  <li>Step 2 through 5 is repeated</li>
+</ol>
+
+<p>Thanks to the <code>switchMap</code> operator, we can restart the ‘inner’ <code>work$</code>. This means that we can <strong>restart our work</strong>.</p>
+
+<p><strong>Note:</strong> To create the <code>trigger$</code> we can use a <code>Subject</code>. I’ll cover this in the next pattern ‘mapping function calls to streams’.</p>
+
+<h2 id="when-to-use-it">When to use it</h2>
+
+<p>As promised, here are some concrete example when you would use this:</p>
+
+<ul>
+  <li>In an autocomplete, we want to execute a backend call every time the user types something new. We want to restart the call to the backend.</li>
+  <li>We fetch some data when the page loads for the first time. When we want to do this a second time (after data has been updated for example), we want to re-execute that call.</li>
+</ul>
+
+<pre><code class="language-typescript">this.data$ = this.load$.pipe(
+   switchMap(_ =&gt; this.service.loadData())
+);
+</code></pre>
+<p>In this example <code>load$</code> will emit at start up and every time the data needs to be loaded. This is a very common scenario where this concept of restarting work can be used.</p>
+
 
 
             </section>
@@ -278,17 +323,17 @@
                 <section class="share">
                     <h4>Share this post</h4>
                     <a class="icon-twitter"
-                       href="http://twitter.com/share?text=Migrating to Nx&amp;url=https://blog.strongbrew.io/migrating-to-nx"
+                       href="http://twitter.com/share?text=RxJS patterns - restarting work&amp;url=https://blog.strongbrew.io/rxjs-patterns-restarting-work"
                        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                         <span class="hidden">Twitter</span>
                     </a>
                     <a class="icon-facebook"
-                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/migrating-to-nx"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/rxjs-patterns-restarting-work"
                        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                         <span class="hidden">Facebook</span>
                     </a>
                     <a class="icon-google-plus"
-                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/migrating-to-nx"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/rxjs-patterns-restarting-work"
                        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
                         <span class="hidden">Google+</span>
                     </a>
@@ -350,24 +395,15 @@
 
     <!-- [[! next_post ]] -->
     
-    <a class="read-next-story "
-       style="background-image: url(/assets/images/cover/cover2.jpg)"
-       href="/rxjs-patterns-restarting-work">
-        <section class="post">
-            <h2>RxJS patterns - restarting work</h2>
-            <p>Having used RxJS for a while now, I've started to see patterns that I'm using...</p>
-        </section>
-    </a>
-    
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
     <a class="read-next-story prev "
        style="background-image: url(/assets/images/cover/cover2.jpg)"
-       href="/opinionated-guidelines-for-large-nx-angular-projects">
+       href="/migrating-to-nx">
         <section class="post">
-            <h2>Opinionated guidelines for large nx angular projects</h2>
-            <p>About this article This article contains a set of opinionated guidelines when it comes to...</p>
+            <h2>Migrating to Nx</h2>
+            <p>I have been using a monorepo with Nx for a while now (~1 year, an...</p>
         </section>
     </a>
     
