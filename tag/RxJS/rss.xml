@@ -12,6 +12,101 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>RxJS patterns - Mapping function calls to streams</title>
+	  <link>//rxjs-patterns-mapping-function-calls-to-streams/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-patterns-mapping-function-calls-to-streams/</guid>
+	  <description><![CDATA[
+	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+</ul>
+
+<p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
+
+<p>For example, we have a date picker to which we can pass a function <code>dateChange</code> that gets called when the date is updated. Whenever our date changes, we want to perform a backend call to fetch some data and show it onto the screen.</p>
+
+<p>In RxJS code, I would write something like this:</p>
+
+<pre><code class="language-typescript">const dateChange$ = ...
+
+const data$ = dateChange$.pipe(
+	switchMap(date =&gt; this.service.getData(date),
+);
+</code></pre>
+
+<p>In this scenario, I’m defining <code>data$</code> in terms of what it depends on, being the <code>dateChange$</code>. Because we define it like this and RxJS is a push based paradigm, every time the <code>dateChange$</code> changes, the <code>data$</code> will be updated and get a new value.</p>
+
+<p>But the problem here is, how do we get a <code>dateChange$</code>. We are integrating with a third party library that is going to call a function every time the date changes, it does not give us a stream. And we need a stream to write the reactive code we had in the snippet above.</p>
+
+<h2 id="transforming-a-function-into-an-observable">Transforming a function into an Observable</h2>
+
+<p>An <code>Observable</code> is something that encapsulates ‘work’ (to understand what I mean with ‘work’ please read the first pattern I covered <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/#what-is-work" target="_blank">here</a>). The encapsulation here means that we cannot define what that ‘work’ is. Once we get an <code>Observable</code> we can no longer change that ‘work’.</p>
+
+<p>However, there is a building block in RxJS were we can decide whatever an <code>Observable</code> produces and this is called a <code>Subject</code>!</p>
+
+<p>A complicated definition of a <code>Subject</code> is that it is both an <code>Observable</code> and an <code>Observer</code>. I like to think of it as being an <code>Observable</code> that has no work encapsulated and where you can produce the values. So you can send the next, error and/or complete event(s).</p>
+
+<p>Let’s see a code example on how we can leverage a <code>Subject</code> to transform a function call into an <code>Observable</code>.</p>
+
+<pre><code class="language-typescript">const dateChange$ = new Subject();
+
+someLibrary.onDateChange(
+	(date) =&gt; dateChange$.next(date)
+);
+</code></pre>
+
+<p>And that’s it! We pass a function to the third party library that only emits the value it gets onto the created <code>dateChange$</code> <code>Subject</code>. And because a <code>Subject</code> is also an <code>Observable</code>, we can just plug this into the snippet we had above.</p>
+
+<pre><code class="language-typescript">const dateChange$ = new Subject();
+
+someLibrary.onDateChange(
+	(date) =&gt; dateChange$.next(date)
+);
+
+const data$ = dateChange$.pipe(
+	switchMap(date =&gt; this.service.getData(date),
+);
+</code></pre>
+<p>Tada!</p>
+
+<h3 id="other-ways">Other ways</h3>
+
+<p>There are two other operators you can use to accomplish the same thing. The first one is called <code>fromEvent</code>. This one is perfect to integrate with API’s that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>):</p>
+
+<pre><code class="language-typescript">const somethingElement = document.getElementById('something');
+
+// a stream of all clicks on the somethingElement
+const click$ = fromEvent(somethingElement, 'click');
+</code></pre>
+
+<p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
+
+<pre><code class="language-typescript">fromEventPattern((handler) =&gt; someLibrary.onDateChange(handler))
+ .subscribe(console.log);
+</code></pre>
+
+<p>You can pass it a function that receives a <code>handler</code>. You can pass that <code>handler</code> to any callback based API which will be transformed into a stream.</p>
+
+<p><strong>Note</strong>: If you can use <code>fromEvent</code> or <code>fromEventPattern</code> you definitely should. The way to do it with a <code>Subject</code> is demonstrated since that is the most straight forward way and works in any scenario. But, if possible, use the operators.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Some concrete examples where to use this are:</p>
+
+<ul>
+  <li>When a function gets called by a third party library and we need a stream</li>
+  <li>To transform <code>@Output</code>s in Angular into streams</li>
+  <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
+</ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>RxJS patterns - restarting work</title>
 	  <link>//rxjs-patterns-restarting-work/</link>
 	  <author></author>
@@ -1751,178 +1846,6 @@ Therefore it’s recommended to use the functionality that Angular provides.</p>
 <h2 id="conclusion">Conclusion</h2>
 
 <p>Still here? Awesome! We learned a lot! If this article interests you, you might want to check out the “Advanced RxJS in Angular workshop” from <a href="https://strongbrew.io">Strongbrew</a>, where me and <a href="blog.kwintenp.com">Kwinten Pisman</a> teach how to use advanced RxJS in real Angular applications.</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Code formatting and RxJS</title>
-	  <link>//code-formatting-with-rxjs/</link>
-	  <author></author>
-	  <pubDate>2017-09-08T00:00:00+00:00</pubDate>
-	  <guid>//code-formatting-with-rxjs/</guid>
-	  <description><![CDATA[
-	     <p>One of the main benefits of RxJS to me is that it provides code that is ‘readable’. It provides us with a declarative programming approach where implementation details are hidden away. We are just describing what needs to be done, not how it should be done. This makes code you look at easy to understand.</p>
-
-<p>One problem that I face regularly when looking at other peoples code is that the code formatting or the way the (RxJS) code is written, takes away part of the benefit of writing your code this way. This post is a small summary on how I like to format my code to keep the readability benefits to a maximum.</p>
-
-<h3 id="one-operator-per-line">One operator per line</h3>
-
-<p>One thing I see all the time is something like this:</p>
-
-<pre><code class="language-typescript">Rx.Observable.pipe(interval(1000),map(x =&gt; x*2),filter(x =&gt; x%2 === 0),
-	mergeMap(x =&gt; someBackendCall(x)),map(res =&gt; res.json()).subscribe();
-</code></pre>
-
-<p>Here we can see a simple stream. Looking at what is does is a little more difficult however because of the outlining of the operators. If you format the code like this, it makes it so much easier:</p>
-
-<pre><code class="language-typescript">Rx.Observable.interval(1000)
-   .pipe(
-	   map(x =&gt; x*2),
-	   filter(x =&gt; x%2 === 0),
-	   mergeMap(x =&gt; someBackendCall(x)),
-	   map(res =&gt; res.json())
-	)
-	.subscribe();
-</code></pre>
-
-<p>By putting every operator on a new line, it is so much easier to see what’s happening.</p>
-
-<h3 id="using-nested-functions-for-functions-longer-than-one-line">Using nested functions for functions longer than one line</h3>
-
-<p>A lot of the RxJS operators will accept functions as parameters. These functions can influence the code formatting and impair the readability. Let’s take a look at an example:</p>
-
-<pre><code class="language-typescript">// A data$ stream
-private data$: Observable&lt;Array&lt;Data&gt;&gt;;
-
-// A function that uses this data$ 
-doSomething() {
-    this.data$
-    	.pipe(
-    	   take(1),
-           map((data) =&gt; {
-               if (data &amp;&amp; data.length &gt; 0) {
-                   	return data.forEach(datum =&gt; {
-                       datum.active = false;
-                    });
-               } else {
-            		return [];
-               }
-           }),
-           mergeMap((data) =&gt; {
-               data.forEach(datum =&gt; {
-                   this.whateverService.update(data);
-               });
-           })
-        )
-        .subscribe();
-}
-</code></pre>
-
-<p>We have a function <code>doSomething()</code> that, when called, will use the <code>data$</code> stream as a source and will perform a mapping of the data array events inside of this stream and then will perform a backend call for every element inside this array. 
-If you were able to detect this immediately, my hat off to you. To me however, this looks pretty bad. Let’s take a look at how we could make this better:</p>
-
-<pre><code class="language-typescript">// A data$ stream
-private data$: Observable&lt;Array&lt;Data&gt;&gt;;
-
-// A function that uses this data$ 
-doSomething() {
-    const mapAllTheElementsActiveFlagToFalse = (data) =&gt; {
-        if (data &amp;&amp; data.length &gt; 0) {
-            return data.forEach(datum =&gt; {
-                datum.active = false;
-            });
-        } else {
-            return [];
-        }
-    };
-
-    const callTheWhateverServiceForEveryElement = (data) =&gt; {
-        data.forEach(datum =&gt; {
-            this.whateverService.update(data);
-        });
-    }; 
-
-    this.data$
-    	.pipe(
-    	  take(1),
-          map(mapAllTheElementsActiveFlagToFalse),
-          mergeMap(callTheWhateverServiceForEveryElement)
-       ).subscribe();
-}
-</code></pre>
-
-<p>I updated the code so that all the functions passed to the operators are first created as nested functions. This might feel a little weird at first, creating nested functions, but if we look at the last few lines of code, these have become so much cleaner. If you know what the operators of RxJS do, you can actually read what is happening (I must admit, naming these functions might not be my strongest feat :)). You only have to look at the last lines of this function. The implementation details of the nested functions is irrelevant (remember, declarative is easier to read).
-I find this approach really helpful and tend to use it a lot, especially for functions that are longer than a single line.</p>
-
-<h3 id="avoid-using-nested-observables">Avoid using nested observables</h3>
-
-<p>RxJS provides us with a lot of operators which you can do a whole range of stuff with. One of them is combining different streams. One thing I sometimes see is this:</p>
-
-<pre><code class="language-typescript">private data$: Observable&lt;Array&lt;Data&gt;&gt;;
-private data2$: Observable&lt;Data2&gt;;
-
-result$: Observable&lt;any&gt;;
-
-doSomething() {
-	 // we combine the data$ and data2$ with combineLatest
-    this.result$ = combineLatest(
-        this.data$
-            .pipe(
-               map(data =&gt; data.length),
-            ),
-        this.data2$
-            .pipe(
-               mergeMap(val =&gt; this.whateverService.call(val)),
-            ),
-        (val1, val2) =&gt; {
-            // handle the values here   
-        }
-    );
-}
-</code></pre>
-
-<p>We create an observable by using the <code>combineLatest</code> operator. But before we do so, the <code>data$</code> and <code>data2$</code> streams are transformed. You could say we are working with nested streams. And even though, the operators are aligned perfectly and there are no functions that are longer than one line, it still feels weird. Let’s see how we might be able to make it better:</p>
-
-<pre><code class="language-typescript">private data$: Observable&lt;Array&lt;Data&gt;&gt;;
-private data2$: Observable&lt;Data2&gt;;
-
-result$: Observable&lt;any&gt;;
-
-doSomething() {
-    const dataLength$ = this.data$
-        .pipe(
-           map(data =&gt; data.length),
-        ); 
-    const whateverData$ = this.data2$
-        .pipe(
-           map(val =&gt; this.whateverService.call(val))
-        );
-
-	 // we combine the data$ and data2$ with combineLatest
-    this.result$ = combineLatest(
-        dataLength$,
-        whateverData$,
-        (val1, val2) =&gt; {
-            // handle the values here   
-        }
-    );
-}
-</code></pre>
-
-<p>This time, I extracted the nested observables and matched them to local variables first. I then use these newly created local variables to create a new stream using the <code>combineLatest</code> operator. 
-By extracting nested observables to a separate variable and naming this new observable properly, the code is easier to understand.</p>
-
-<p><strong>Conclusion</strong></p>
-
-<p>Try to keep the following in mind when writing RxJS code:</p>
-
-<ol>
-  <li>Put every operator on a new line.</li>
-  <li>Extract functions longer than a line to a nested function.</li>
-  <li>Try to avoid working with nested observables.</li>
-</ol>
-
 
 	  ]]></description>
 	</item>
