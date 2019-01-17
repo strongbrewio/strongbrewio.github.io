@@ -70,7 +70,7 @@ Tada!
 
 ### Other ways
 
-There are two other operators you can use to accomplish the same thing. The first one is called `fromEvent`. This one is perfect to integrate with API's that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>:
+There are two other operators you can use to accomplish the same thing. The first one is called `fromEvent`. This one is perfect to integrate with API's that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>):
 
 ```typescript
 const somethingElement = document.getElementById('something');
