@@ -28,7 +28,7 @@ Let's imagine that we have list of items in a webshop. In that list, we can chec
 
 In this use case, we have two `if-else`s. 
 - If there is an order which has an item that pushes the delivery date we need to show a popup. Otherwise we don't.
-- If the popup is shown, and the user accepts, we do a backend call to actually register the order. Otherwise we don't and the popup closes.
+- If the popup is shown, and the user accepts, we do a backend call to actually register the order. Otherwise we don't and the popup should close so the user can maybe remove that specific item.
 
 Let's first take a look at what the code could look like.
 
@@ -43,7 +43,7 @@ selectedItems$.pipe(
 
 **Note:** `ifElse` is not a real operator :)
 
-So we start with our `selectedItems$`. We then want to add our conditional logic. If we pass our conditional logic, we can perform the backend call, we use `switchMap` to do this. At last we subscribe and we route to a different page if the call was successfull.
+So we start with our `selectedItems$`. We then want to add our conditional logic. If we pass our conditional logic (either no delay or we showed the popup and the user accepted), we can perform the backend call. We can do this with the `switchMap` operator and using the `selectedItems`. At last we subscribe and we route to a different page if the call was successfull.
 
 Now, how can we plug 	in in that conditional logic? First of all, let's think about how we can show a popup. We can have a function, that adds a popup to the DOM and returns an Observable with the result. The type signature for that function could look like this:
 
@@ -51,9 +51,9 @@ Now, how can we plug 	in in that conditional logic? First of all, let's think ab
 showDialog(): Observable<boolean>;
 ```
 
-So, inside of the `Observable` chain we had above, we want to conditionally map this to the dialog we want to show. 
+So, inside of the `Observable` chain we had above, we want to conditionally execute the `Observable` that we get from the `showDialog` function so the dialog is shown. But, we only want to show this in case we have an item that delays the delivery date. 
 
-But, we only want to show this in case we have an item that delays the delivery date. Let's add that piece of logic first.
+Let's first implement what we need to do when there is no delivery delay (happy path 😄).
 
 ```typescript
 selectedItems$.pipe(
@@ -67,11 +67,11 @@ selectedItems$.pipe(
 );
 ```
 
-We add an if statement inside of a `map` operator. If the condition is not met, we just return the `selectedItems`. 
+We add an if statement inside of a `map` operator. If the condition is not met, so there is no delayed delivery, we just return the `selectedItems` so these can be used in the `switchMap` operator to do the backend call. 
 
 So far so good. BUT, how will we implement the else?
 
-We can use the same map operator, but in the else case, we want to map to the `Observable` we get from the `showDialog` function.
+Inside of the `map` operator, we can implement the else case. In that else case, we want to show the dialog. This means, we are going to map to the result of the `showDialog` function.
 
 ```typescript
 selectedItems$.pipe(
@@ -87,14 +87,14 @@ selectedItems$.pipe(
 );
 ```
 
-Inside the else statement, we return the `dialog$`. This means that, for the else statement, we get an `Observable<Observable<boolean>>` (remember that our `showDialog` function returns an `Observable<boolean>`. 
+Of course, this introduced a problem inside of our code. The if statemnet will still work, but the else statement is posing a problem here. If the else is executed, the stream that is returned by the `map` operator (so before the `switchMap`) is of type `Observable<Observable<<boolean>>`. That's not what we need. The `switchMap` operator needs to be applied to an `Observable` with our selected items.
 
-That's not what we want. We want to:
+To fix this, we don't need to return the `dialog$` but:
 
 - Subscribe to this stream (remember, `Observable`s are lazy and subscribing will trigger the dialog to be shown)
-- We want the result of the `Observable` and not the `Observable` itself.
+- Listen for the result of that `dialog$`, remember, the user can either accept or decline, and handle this properly
 
-To fix this, we can change the operator that we are using. If we change the `map` operator to a flattening operator such as `switchMap` or `concatMap`, we can return the `Observable` from the `showDialog` function and the operator will subscribe to the `Observable` for us and return the result!
+First step in fixing this, we can change the operator that we are using. If we change the `map` operator to a flattening operator such as `switchMap` or `concatMap`, we can return the `Observable` from the `showDialog` function and the operator will flatten it from an `Observable<Observable<boolean>>` to an `Observable<boolean>`.
 
 Let's take a look at the code:
 
@@ -112,9 +112,9 @@ selectedItems$.pipe(
 );
 ```
 
-Because we changed the operator, we have to make sure that every branch in the function we pass to `switchMap` must return an `Observable`. That's why we changed the `selectedItems` to `of(selectedItems)`. 
+As you can see we changed from a `map` to a `switchMap`. Because we changed the operator, we have to make sure that every branch in the function we pass to `switchMap` returns an `Observable`. That's why we changed the `selectedItems` to `of(selectedItems)`. 
 
-With this code, we are going to show the popup only if the condition is met. So we have a part of the conditional logic that we need. But, the overall code is not yet complete. The type of this `Observable` is `Observable<boolean|Array<Item>`. And that's not what we want. We don't want that boolean in there.
+With this code, we are going to show the popup only if the condition is met. So we have a part of the conditional logic that we need. But, the overall code is not yet complete. The type of the `Observable` created by the first `switchMap` is `Observable<boolean|Array<Item>`. And that's not what we want. We don't want that boolean in there.
 
 The last thing we need to do is check the value that we get back from the `dialog$`. This will return `true` if the user accepted the delay or `false` if the user denied. In that last case, we don't want to call the backend and this stream should stop.
 
@@ -142,16 +142,46 @@ selectedItems$.pipe(
 );
 ```
 
-Before returning the stream we get from the `showDialog` function, we are going to map its result to what we want. If the result was `true` we are going to return our `selectedItems`. But, since this is wrapped inside of a `switchMap` operator, we need to wrap this into an `Observable` using the static `of` operator. If the result was `false`, we can return the `never()` `Observable`. This is an `Observable` that will immediately complete and has no next event. By doing this, the `Observable` chain is interrupted and the next `switchMap` statement will not get executed (the one doing the backend call :)).
+Before returning the stream we get from the `showDialog` function, we are going to map its result to what we want. 
 
-And that's it. This code does what we want.
+If the result was `true` we are going to return our `selectedItems`. But, since this is wrapped inside of a `switchMap` operator, we need to wrap this into an `Observable` using the static `of` operator. 
+
+If the result was `false`, we can return the `never()` `Observable`. This is an `Observable` that will have no events whatsover. By doing this, the `Observable` chain is interrupted and the next `switchMap` statement will not get executed (the one doing the backend call :)).
+
+As as a last step, we want to make sure that we only take a single value. We start from the `selectedItems$` which can have potentially multiple values. For example when the user gets the popup, decides to cancel, the subscription would still be active. If the user selects a new item, the logic in our stream would fire immediately. We can fix this quite easily with the `take` operator.
 
 
-https://stackblitz.com/edit/rxjs-hsqluy?embed=1&file=index.ts
+```typescript
+selectedItems$.pipe(
+	take(1),
+	switchMap(selectedItems => {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item => item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog().pipe(
+				map(res => {
+					if(res) {
+						return of(selectedItems);
+					} else {
+						return never();
+					}
+				}),
+			);
+		}
+	}),
+	switchMap(selectedItems => this.service.buy(selectedItems))
+);
+```
+And that's it. This code does what we want! party emoji here
+
+You can find an working (slightly contrived example) below. Click the buttons to trigger a delivery with or without delay.
+
+	https://stackblitz.com/edit/rxjs-hsqluy?embed=1&file=index.ts
 
 ## Using the `tap` operator
 
-You can also hook into the `Observable` chain using the `tap` operator and maybe do some conditional work there. For example:
+You can also hook into the `Observable` chain using the `tap` operator and maybe do some conditional work there. For example, to disable or enable a certain button:
 
 ```typescript
 const selectedItems$ = ...
@@ -179,7 +209,7 @@ const disabled$ = selectedItems$.pipe(
 
 This gives you exactly the same result and we do not need 'if-else' logic here.
 
-// stream van items bevat 1 die de levering vertraagt (popup tonen om het te vragen)
+
 
 
 
