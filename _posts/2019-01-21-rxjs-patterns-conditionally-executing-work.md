@@ -209,9 +209,26 @@ const disabled$ = selectedItems$.pipe(
 
 This gives you exactly the same result and we do not need 'if-else' logic here.
 
+// stream van items bevat 1 die de levering vertraagt (popup tonen om het te vragen)
+
+Bar pattern;
+
+selectedItems$.pipe(
+	take(1),
+	switchMap(selectedItems => {
+		// if none of the items has a late delivery
+		insert conditional work here 
+		if(...) {
+			// return an Observable (you can wrap a normal object into an of)
+		}	
+	}),
+	switchMap(selectedItems => this.service.buy(selectedItems))
+);
 
 
-
+pausing an observable
+merging multiple executions into one
+prematurely ending work on an observable
 
 
 
