@@ -29,7 +29,7 @@ In RxJS code, I would write something like this:
 const dateChange$ = ...
 
 const data$ = dateChange$.pipe(
-	switchMap(date => this.service.getData(date),
+	switchMap(date => this.service.getData(date)),
 );
 ```
 
@@ -51,7 +51,7 @@ Let's see a code example on how we can leverage a `Subject` to transform a funct
 const dateChange$ = new Subject();
 
 someLibrary.onDateChange(
-	(date) => dateChange$.next(date)
+	date => dateChange$.next(date)
 );
 ```
 
@@ -61,11 +61,11 @@ And that's it! We pass a function to the third party library that only emits the
 const dateChange$ = new Subject();
 
 someLibrary.onDateChange(
-	(date) => dateChange$.next(date)
+	date => dateChange$.next(date)
 );
 
 const data$ = dateChange$.pipe(
-	switchMap(date => this.service.getData(date),
+	switchMap(date => this.service.getData(date)),
 );
 ```
 Tada!
@@ -84,7 +84,7 @@ const click$ = fromEvent(somethingElement, 'click');
 The other operator is called `fromEventPattern`. This can be used to integrate with the exact example described above. The code with `fromEventPattern` looks like this:
 
 ```typescript
-fromEventPattern((handler) => someLibrary.onDateChange(handler))
+fromEventPattern(handler => someLibrary.onDateChange(handler))
  .subscribe(console.log);
 ```
 
