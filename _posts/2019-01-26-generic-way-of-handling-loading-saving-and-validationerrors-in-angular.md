@@ -5,7 +5,7 @@ published: true
 description: In this article we are going to implement a generic solution on how to fix 3 common usecases that involve redundancy in CRUD applications.
 author: brechtbilliet
 comments: true
-date: 2019-01-26
+date: 2019-01-25
 subclass: 'post'
 categories: 'angular'
 disqus: true
