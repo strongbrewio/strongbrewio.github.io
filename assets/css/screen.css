@@ -2635,51 +2635,46 @@ body.page-template .post-title {
 
 
 /* spotlight */
-.rxjs-spotlight {
-    background: #375ba2;
-    padding: 10px;
-    color: #fff;
-    display: flex;
-    margin-right: 200px;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-.rxjs-spotlight-bottom {
-    display: flex;
-    flex-direction: row;
+.spotlight {
     background: #fff;
-    align-items:center;
-    align-content: center;
+    padding: 20px;
+    display: block;
+    overflow: hidden;
+    color: #1a100a;
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    margin-left: 20px;
 }
-.rxjs-spotlight h2 {
-    font-size: 1.5em;
-    color: #fff;
-}
-.rxjs-spotlight a {
-    text-decoration: none;
-}
-.rxjs-spotlight .techlogos {
+
+.spotlight .techlogos {
     background: #fff;
     display: flex;
     justify-content: space-between;
+    position: absolute;
     margin-top: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
     margin-left: 10px;
-    align-content: center;
 }
-.rxjs-spotlight .techlogos  li {
+.spotlight .techlogos li {
     list-style-type: none;
-    display: flex;
 }
-.rxjs-spotlight .techlogos li img {
-    max-width: 100px;
-    max-height: 100px;
+.spotlight .techlogos img {
+    max-width: 70px;
 }
-.rxjs-spotlight .img-wrapper {
+
+.spotlight .img-wrapper {
     display: flex;
     flex-direction: column;
     cursor: pointer;
+}
+.spotlight .img-wrapper .button {
+    margin-top: -57px;
+    border-radius: 0;
+}
+.spotlight .img-wrapper img {
+    width: 100%;
+    height: auto;
 }
 @media all and (max-width: 1000px) {
     .rxjs-spotlight {
