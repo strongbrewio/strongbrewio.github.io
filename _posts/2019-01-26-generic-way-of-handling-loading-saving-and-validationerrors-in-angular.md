@@ -24,15 +24,12 @@ When writing Angular applications there are always pieces of functionality that 
 
 In this article we are going to implement a generic solution on how to fix these usecases.
 
-## A non generic way of loading, saving and handling validation errors in Angular.
+## A non generic way of loading, saving and handling validation errors in Angular
 
 Before we jump to the solution, let's have a look at the impact of a non generic way of handling the previous called functionalities.
 A solution that is often used might look like the following: (keep in mind that this functionality has to be implemented over and over again for every component) 
 
 ```typescript
-loading: boolean;
-acting: boolean;
-
 ngOnInit(): void {
     this.loading = true;
     const usersCompleted = false;
@@ -54,35 +51,35 @@ Now this code is only for fetching two lists of data, this becomes ugly pretty q
 It becomes even worse if we want to update, add and remove data. Imagine that we have to handle validation errors as well:
 
 ```typescript
-remove(user): void {
+remove(user: User): void {
     // TODO: set acting to true
     this.userService.remove(user).subscribe(res => {
         // TODO: set acting to false
-    })
+    });
 }
-update(user): void {
+update(user: User): void {
     // TODO: set acting to true
     this.userService.update(user).subscribe(res => {
         // TODO: set acting to false
         // TODO: handle validation errors
-    })
+    });
 }
-add(user): void {
+add(user: User): void {
     // TODO: set acting to true
     this.userService.add(user).subscribe(res => {
         // TODO: set acting to false
         // TODO: handle validation errors
-    })
+    });
 }
 ```
 
-To handle validation errors we have to check if the httpstatusCode is 400, manually map the data etc.
+To handle validation errors we have to check if the HTTP status code is 400, manually map the data etc.
 
 These codesamples are in this article to prove a point. **It's dirty redundant logic that we have to implement over and over again**
 
 ## Let's clean this up
 
-To achieve this we will use an angular *service* in combination with an angular *interceptor* and typescript *decorators*.
+To achieve this we will use an Angular *service* in combination with an angular *interceptor* and Typescript *decorators*.
 
 The first thing we need is a `HttpStatusService` that exposes 3 observables:
 
@@ -111,7 +108,7 @@ export class HttpStatusService {
   // we don't want to expose the subject for
   // encapsulation purposes. That's why we convert them
   // into observables
-  validationErrors$ = 
+  getvalidationErrors$ = 
     this.validationErrorsSub$.asObservable();
   loading$ = 
     this.loadingSub$.pipe(distinctUntilChanged());
@@ -124,17 +121,17 @@ export class HttpStatusService {
     this.validationErrorsSub$.next(errors);
   }
 
-  set loading(v: boolean) {
-    this.loadingSub$.next(v);
+  set loading(val: boolean) {
+    this.loadingSub$.next(val);
   }
 
-  set acting(v: boolean) {
-    this.actingSub$.next(v);
+  set acting(val: boolean) {
+    this.actingSub$.next(val);
   }
 }
 ```
 
-So we have a service that basically holds the state of our 3 statusses.
+So we have a service that basically holds the state of our three statusses.
 Now we still have to make sure that the setters of these observables are being called at the right place and the right time.
 We don't want to manually implement that for every call, so let's create an interceptor for that.
 
@@ -152,13 +149,13 @@ export class HttpStatusInterceptor implements HttpInterceptor {
     private httpStatusService: HttpStatusService
   ) {}
 
-  private changeStatus(v: boolean, method: string): void {
+  private changeStatus(val: boolean, method: string): void {
     if (['POST', 'PUT', 'DELETE', 'PATCH']
       .indexOf(method) > -1) {
-      v ? this.actingCalls++ : this.actingCalls--;
+      val ? this.actingCalls++ : this.actingCalls--;
       this.httpStatusService.acting = this.actingCalls > 0;
     } else if (method === 'GET') {
-      v ? this.loadingCalls++ : this.loadingCalls--;
+      val ? this.loadingCalls++ : this.loadingCalls--;
       this.httpStatusService.loading = this.loadingCalls > 0;
     }
   }
@@ -309,10 +306,10 @@ export class UserComponent {
 We now have 3 observables that can easily be consumed in the template of the component with the use of the [async](https://angular.io/api/common/AsyncPipe) pipe. Here is an example:
 
 ```html
-<my-spinner *ngIf="loading$|async"></my-spinner>
+<my-spinner *ngIf="loading$ | async"></my-spinner>
 <my-user-form 
-    [validationErrors]="validationErrors$|async"
-    [disabled]="acting$|async"></my-user-form>
+    [validationErrors]="validationErrors$ | async"
+    [disabled]="acting$ | async"></my-user-form>
 
 ```
 
@@ -408,3 +405,13 @@ export function ValidationErrors() {
 We have learned that we can remove the redundancy that comes with loading, acting and errorhandling statusses almost completely by the use of an interceptor, a simple service and a few decorators.
 
 I hope you liked it!
+
+## Special thanks
+
+A very special thanks to the reviewers:
+
+- [Vitallii Bobrov (@bobrov1989)](https://twitter.com/bobrov1989)
+- [David Müllerchen (@webdave_de)](https://twitter.com/webdave_de)
+- [Maarten Tibau (@maartentibau)](https://twitter.com/maartentibau)
+- [Dominic Elm (@elmd_)](https://twitter.com/elmd_)
+- [Fabian Gosebrink (@FabianGosebrink)](https://twitter.com/fabiangosebrink)
