@@ -13,8 +13,6 @@ tags: Angular Architecture errorhandling interceptors decorators
 cover: 'assets/images/cover/cover5.jpg'
 ---
 
-# A generic way of handling loading-status, saving-status and validation errors in Angular
-
 When writing Angular applications there are always pieces of functionality that are being rewritten over and over again. 3 common usecases are:
 
 - Showing a *loading* status
