@@ -10,7 +10,7 @@
       <item>
         <title>A generic way of handling loading-status, saving-status and validation errors in Angular</title>
         
-          <description>&lt;h1 id=&quot;a-generic-way-of-handling-loading-status-saving-status-and-validation-errors-in-angular&quot;&gt;A generic way of handling loading-status, saving-status and validation errors in Angular&lt;/h1&gt;
+          <description>&lt;p&gt;When writing Angular applications there are always pieces of functionality that are being rewritten over and over again. 3 common usecases are:&lt;/p&gt;
 
 </description>
         
