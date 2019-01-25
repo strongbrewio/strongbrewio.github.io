@@ -10,8 +10,8 @@ date: 2019-01-26
 subclass: 'post'
 categories: 'brechtbilliet'
 disqus: true
-tags: Angular
-cover: 'assets/images/cover/cover2.jpg'
+tags: Angular Architecture errorhandling interceptors decorators
+cover: 'assets/images/cover/cover5.jpg'
 ---
 
 # A generic way of handling loading-status, saving-status and validation errors in Angular
@@ -75,7 +75,7 @@ add(user: User): void {
 
 To handle validation errors we have to check if the HTTP status code is 400, manually map the data etc.
 
-These codesamples are in this article to prove a point. **It's dirty redundant logic that we have to implement over and over again**
+These code samples are in this article to prove a point. **It's dirty redundant logic that we have to implement over and over again**
 
 ## Let's clean this up
 
@@ -131,7 +131,7 @@ export class HttpStatusService {
 }
 ```
 
-So we have a service that basically holds the state of our three statusses.
+So we have a service that basically holds the state of our three statuses.
 Now we still have to make sure that the setters of these observables are being called at the right place and the right time.
 We don't want to manually implement that for every call, so let's create an interceptor for that.
 
@@ -167,7 +167,7 @@ export class HttpStatusInterceptor implements HttpInterceptor {
 As we can see, we have created a private `changeStatus()` function that will use the `loading` and `acting` 
 setters of our `HttpStatusInterceptor` class.
 
-If the HTTP-method is `POST`, `PUT`, `DELETE` or `PATCH` we have to update the count of the `actingCalls` and if that count is bigger then 0, it means the user is acting and we have to update the `acting` property of the `HttpStatusService`.
+If the HTTP-method is `POST`, `PUT`, `DELETE` or `PATCH` we have to update the counter of the `actingCalls` and if that count is bigger then 0, it means the user is acting and we have to update the `acting` property of the `HttpStatusService`.
 
 If the HTTP-method is `GET` it should do the same for the `loadingCalls` property and `loading` setter of the `HttpStatusService`.
 
@@ -188,7 +188,7 @@ intercept(
   this.changeStatus(true, req.method);
   return next.handle(req.clone()).pipe(
     // when the request completes, errors or times out,
-    // we hafe to change the status as well
+    // we have to change the status as well
     finalize(() => {
       this.changeStatus(false, req.method);
     })
@@ -315,7 +315,7 @@ We now have 3 observables that can easily be consumed in the template of the com
 
 ## Optimizing with decorators
 
-We have cleaned up a lot, we found an easy way to get the httpstatusses to the component, but we can make it even simpler with the use of decorators. let's refactor the `UserComponent` class accordingly:
+We have cleaned up a lot, we found an easy way to get the httpstatuses to the component, but we can make it even simpler with the use of decorators. let's refactor the `UserComponent` class accordingly:
 
 ```typescript
 export class UserComponent {
@@ -402,7 +402,7 @@ export function ValidationErrors() {
 
 ## Conclusion
 
-We have learned that we can remove the redundancy that comes with loading, acting and errorhandling statusses almost completely by the use of an interceptor, a simple service and a few decorators.
+We have learned that we can remove the redundancy that comes with loading, acting and error handling statuses almost completely by the use of an interceptor, a simple service and a few decorators.
 
 I hope you liked it!
 
