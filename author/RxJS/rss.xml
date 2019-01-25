@@ -15,7 +15,7 @@
 	  <title>RxJS patterns - Mapping function calls to streams</title>
 	  <link>//rxjs-patterns-mapping-function-calls-to-streams/</link>
 	  <author></author>
-	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <pubDate>2019-01-15T00:00:00+00:00</pubDate>
 	  <guid>//rxjs-patterns-mapping-function-calls-to-streams/</guid>
 	  <description><![CDATA[
 	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
