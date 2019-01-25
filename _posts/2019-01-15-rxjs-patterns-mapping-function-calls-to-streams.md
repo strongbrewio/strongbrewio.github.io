@@ -5,7 +5,7 @@ published: true
 description: RxJS patterns mapping function calls to streams
 author: kwintenp
 comments: true
-date: 2019-01-05
+date: 2019-01-15
 subclass: 'post'
 categories: 'RxJS'
 disqus: true
