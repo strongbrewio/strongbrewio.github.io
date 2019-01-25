@@ -12,6 +12,408 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>A generic way of handling loading-status, saving-status and validation errors in Angular</title>
+	  <link>//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</link>
+	  <author></author>
+	  <pubDate>2019-01-25T00:00:00+00:00</pubDate>
+	  <guid>//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</guid>
+	  <description><![CDATA[
+	     <h1 id="a-generic-way-of-handling-loading-status-saving-status-and-validation-errors-in-angular">A generic way of handling loading-status, saving-status and validation errors in Angular</h1>
+
+<p>When writing Angular applications there are always pieces of functionality that are being rewritten over and over again. 3 common usecases are:</p>
+
+<ul>
+  <li>Showing a <em>loading</em> status</li>
+  <li>Showing an <em>acting</em> status (whether the user is adding, updating or removing data)</li>
+  <li>Showing validation errors</li>
+</ul>
+
+<p>In this article we are going to implement a generic solution on how to fix these usecases.</p>
+
+<h2 id="a-non-generic-way-of-loading-saving-and-handling-validation-errors-in-angular">A non generic way of loading, saving and handling validation errors in Angular</h2>
+
+<p>Before we jump to the solution, let’s have a look at the impact of a non generic way of handling the previous called functionalities.
+A solution that is often used might look like the following: (keep in mind that this functionality has to be implemented over and over again for every component)</p>
+
+<pre><code class="language-typescript">ngOnInit(): void {
+    this.loading = true;
+    const usersCompleted = false;
+    const citiesCompleted = false;
+    this.userService.fetch().subscribe(users =&gt; {
+        usersCompleted = true;
+        this.loading = usersCompleted &amp;&amp; citiesCompleted;
+    });
+    this.citiesService.fetch().subscribe(cities =&gt; {
+        citiesCompleted = true;
+        this.loading = usersCompleted &amp;&amp; citiesCompleted;
+    });
+}
+</code></pre>
+<p>We have to keep track of which call completes first because we can’t set loading to false, if there is call still busy. What happens when there is an error? We would have to implement that as well.</p>
+
+<p>Now this code is only for fetching two lists of data, this becomes ugly pretty quickly and the worst thing about this is that we have to reimplement that for every component that does data fetching.</p>
+
+<p>It becomes even worse if we want to update, add and remove data. Imagine that we have to handle validation errors as well:</p>
+
+<pre><code class="language-typescript">remove(user: User): void {
+    // TODO: set acting to true
+    this.userService.remove(user).subscribe(res =&gt; {
+        // TODO: set acting to false
+    });
+}
+update(user: User): void {
+    // TODO: set acting to true
+    this.userService.update(user).subscribe(res =&gt; {
+        // TODO: set acting to false
+        // TODO: handle validation errors
+    });
+}
+add(user: User): void {
+    // TODO: set acting to true
+    this.userService.add(user).subscribe(res =&gt; {
+        // TODO: set acting to false
+        // TODO: handle validation errors
+    });
+}
+</code></pre>
+
+<p>To handle validation errors we have to check if the HTTP status code is 400, manually map the data etc.</p>
+
+<p>These code samples are in this article to prove a point. <strong>It’s dirty redundant logic that we have to implement over and over again</strong></p>
+
+<h2 id="lets-clean-this-up">Let’s clean this up</h2>
+
+<p>To achieve this we will use an Angular <em>service</em> in combination with an angular <em>interceptor</em> and Typescript <em>decorators</em>.</p>
+
+<p>The first thing we need is a <code>HttpStatusService</code> that exposes 3 observables:</p>
+
+<ul>
+  <li><code>loading$</code>: whether the user is fetching data</li>
+  <li><code>acting$</code>: whether the user is removing, updating or adding data</li>
+  <li><code>validationErrors$</code>: whether there are validation errors or not</li>
+</ul>
+
+<pre><code class="language-typescript">// http-status.service.ts
+@Injectable({
+  // important to provide this service to the 
+  // injector of the root module 
+  providedIn: 'root'
+})
+export class HttpStatusService {
+  // regular subject because we don't want to replay
+  // the validationerrors
+  private validationErrorsSub$ 
+    = new Subject&lt;ValidationError[]&gt;();
+
+  // 2 subjects that replays the last value 
+  // (ideal for state)
+  private loadingSub$ = new ReplaySubject&lt;boolean&gt;(1);
+  private actingSub$ = new ReplaySubject&lt;boolean&gt;(1);
+
+  // we don't want to expose the subject for
+  // encapsulation purposes. That's why we convert them
+  // into observables
+  getvalidationErrors$ = 
+    this.validationErrorsSub$.asObservable();
+  loading$ = 
+    this.loadingSub$.pipe(distinctUntilChanged());
+  acting$ = 
+    this.actingSub$.pipe(distinctUntilChanged());
+
+  // these are just some regular setters to next 
+  // the values in our subjects
+  set validationErrors(errors: ValidationError[]) {
+    this.validationErrorsSub$.next(errors);
+  }
+
+  set loading(val: boolean) {
+    this.loadingSub$.next(val);
+  }
+
+  set acting(val: boolean) {
+    this.actingSub$.next(val);
+  }
+}
+</code></pre>
+
+<p>So we have a service that basically holds the state of our three statuses.
+Now we still have to make sure that the setters of these observables are being called at the right place and the right time.
+We don’t want to manually implement that for every call, so let’s create an interceptor for that.</p>
+
+<pre><code class="language-typescript">@Injectable({
+    providedIn: 'root'
+})
+export class HttpStatusInterceptor implements HttpInterceptor {
+  // keep track of the loading calls
+  private loadingCalls = 0; 
+  // keep track of the acting calls
+  private actingCalls = 0; 
+
+  constructor(
+    private httpStatusService: HttpStatusService
+  ) {}
+
+  private changeStatus(val: boolean, method: string): void {
+    if (['POST', 'PUT', 'DELETE', 'PATCH']
+      .indexOf(method) &gt; -1) {
+      val ? this.actingCalls++ : this.actingCalls--;
+      this.httpStatusService.acting = this.actingCalls &gt; 0;
+    } else if (method === 'GET') {
+      val ? this.loadingCalls++ : this.loadingCalls--;
+      this.httpStatusService.loading = this.loadingCalls &gt; 0;
+    }
+  }
+  ...
+}
+
+</code></pre>
+
+<p>As we can see, we have created a private <code>changeStatus()</code> function that will use the <code>loading</code> and <code>acting</code> 
+setters of our <code>HttpStatusInterceptor</code> class.</p>
+
+<p>If the HTTP-method is <code>POST</code>, <code>PUT</code>, <code>DELETE</code> or <code>PATCH</code> we have to update the counter of the <code>actingCalls</code> and if that count is bigger then 0, it means the user is acting and we have to update the <code>acting</code> property of the <code>HttpStatusService</code>.</p>
+
+<p>If the HTTP-method is <code>GET</code> it should do the same for the <code>loadingCalls</code> property and <code>loading</code> setter of the <code>HttpStatusService</code>.</p>
+
+<p>Of course we still have to implement the <code>intercept</code> function. Every time we intercept a call we have to change a status to <code>true</code>.
+Because this means that the user is loading or acting.
+The goal of an interceptor is to intercept a request, clone that request, do something with it and return it.
+The <code>handle</code> function of the <code>HttpHandler</code> returns an observable. This is the perfect place to apply a <code>finalize</code> operator,
+which we can use to set a status to <code>false</code>.</p>
+
+<pre><code class="language-typescript">...
+intercept(
+  req: HttpRequest&lt;any&gt;,
+  next: HttpHandler
+): Observable&lt;HttpEvent&lt;any&gt;&gt; {
+  // there is a new request, so we are definitely
+  // loading or acting, we have to change the status
+  this.changeStatus(true, req.method);
+  return next.handle(req.clone()).pipe(
+    // when the request completes, errors or times out,
+    // we have to change the status as well
+    finalize(() =&gt; {
+      this.changeStatus(false, req.method);
+    })
+  );
+}
+
+</code></pre>
+
+<p>This should automatically update the <code>loading$</code> and <code>acting$</code> observables in the <code>HttpStatusService</code>.
+However, we have not fixed our validation errors issue yet. For that we can use the <code>catchError</code> operator that we place before the finalize operator:</p>
+
+<pre><code class="language-typescript">intercept(
+  req: HttpRequest&lt;any&gt;,
+  next: HttpHandler
+): Observable&lt;HttpEvent&lt;any&gt;&gt; {
+  ..
+  return next.handle(req.clone()).pipe(
+    // catch the error
+    catchError(e =&gt; {
+      // if bad request &gt; validation erors
+      if (e.status === 400) { 
+        // use the validationErrors setter to update
+        this.httpStatusService.validationErrors = 
+          e.error.validationErrors;
+        // make sure that this result never 
+        // reaches the component
+        return NEVER;
+      }
+      // throw the error back
+      // or put that in the `HttpStatusService` as well ;-)      
+      return throwError(e); 
+    }),
+    finalize(...)
+  );
+}
+</code></pre>
+
+<p>The entire interceptor class looks like this:</p>
+
+<pre><code class="language-typescript">@Injectable({
+    providedIn: 'root'
+})
+export class HttpStatusInterceptor implements HttpInterceptor {
+  private loadingCalls = 0; 
+  private actingCalls = 0; 
+
+  constructor(
+    private httpStatusService: HttpStatusService
+  ) {}
+
+  private changeStatus(v: boolean, method: string): void {
+    if (['POST', 'PUT', 'DELETE', 'PATCH']
+      .indexOf(method) &gt; -1) {
+      v ? this.actingCalls++ : this.actingCalls--;
+      this.httpStatusService.acting = this.actingCalls &gt; 0;
+    } else if (method === 'GET') {
+      v ? this.loadingCalls++ : this.loadingCalls--;
+      this.httpStatusService.loading = this.loadingCalls &gt; 0;
+    }
+  }
+
+  intercept(
+    req: HttpRequest&lt;any&gt;,
+    next: HttpHandler
+  ): Observable&lt;HttpEvent&lt;any&gt;&gt; {
+    return next.handle(req.clone()).pipe(
+      catchError(e =&gt; {
+        if (e.status === 400) { 
+          this.httpStatusService.validationErrors = 
+            e.error.validationErrors;
+          return NEVER;
+        }
+        return throwError(e); 
+      }),
+      finalize(() =&gt; {
+        this.changeStatus(false, req.method);
+      })
+    );
+  }
+}
+</code></pre>
+
+<p>When registering the interceptor to the root module, the observables in the <code>HttpStatusService</code> will be updated automatically.</p>
+
+<p>So in the rootModule we have to add the following code to the <code>providers</code> property of the <code>@NgModule</code> decorator:</p>
+
+<pre><code class="language-typescript">providers: [
+  ...
+  {
+    provide: HTTP_INTERCEPTORS,
+    multi: true,
+    deps: [HttpStatusService],
+    useClass: HttpStatusInterceptor
+  }
+]
+</code></pre>
+
+<p>We can now use the <code>HttpStatusService</code> in our code as easy as this:</p>
+
+<pre><code class="language-typescript">export class UserComponent {
+  loading$ = this.httpStatus.loading;
+  validationErrors$ = this.httpStatus.validationErrors;
+  acting$ = this.httpStatus.loading;
+
+  constructor(
+    private httpStatusService: HttpStatusService) {
+  }
+}
+</code></pre>
+
+<p>We now have 3 observables that can easily be consumed in the template of the component with the use of the <a href="https://angular.io/api/common/AsyncPipe">async</a> pipe. Here is an example:</p>
+
+<pre><code class="language-html">&lt;my-spinner *ngIf="loading$ | async"&gt;&lt;/my-spinner&gt;
+&lt;my-user-form 
+    [validationErrors]="validationErrors$ | async"
+    [disabled]="acting$ | async"&gt;&lt;/my-user-form&gt;
+
+</code></pre>
+
+<h2 id="optimizing-with-decorators">Optimizing with decorators</h2>
+
+<p>We have cleaned up a lot, we found an easy way to get the httpstatuses to the component, but we can make it even simpler with the use of decorators. let’s refactor the <code>UserComponent</code> class accordingly:</p>
+
+<pre><code class="language-typescript">export class UserComponent {
+  @Loading()loading$;
+  @ValidationErrors() validationErrors$;
+  @Acting() acting$;
+}
+</code></pre>
+
+<p>This is very declarative way of working. The component is way cleaner and we don’t have to inject the <code>HttpStatusService</code> anymore.</p>
+
+<p>But how do we create these decorators? I’m glad you asked, it’s pretty easy. A property decorator is simply a function that returns a function that gets the target and key as arguments.</p>
+
+<pre><code class="language-typescript">export function Loading() {
+  return function (target: any, key: string): void {
+    // in this case the target is the component
+    // instance and key the property name
+    // target: userComponent, key: loading$
+    // now we have to set the property to the actual 
+    // loading$ observable that lives in the HttpStatusService
+    target[key] = // todo
+  }
+};
+</code></pre>
+
+<p>To set the property of the target we need to inject the <code>HttpStatusService</code> instance that is registered on the root injector of our application. After all that’s the instance that contains the actual state. Currently there is no easy way to do that.
+Until Angular provides us with functionality like <a href="https://github.com/angular/angular/issues/23301">that</a> we can use the following solution:</p>
+
+<p>Next to the <code>http-status.service</code> file, create a file called <code>root-injector.ts</code> and add the following code:</p>
+
+<pre><code class="language-typescript">import { Injector } from '@angular/core';
+
+export let rootInjector: Injector;
+export function setRootInjector(injector: Injector): void {
+  rootInjector = injector;
+}
+</code></pre>
+
+<p>The <code>setRootInjector()</code> function will be used by the rootModule to set the <code>rootInjector</code> variable that we expose here.
+To make it work the rootModule will have to call the <code>setRootInjector()</code> function like this:</p>
+
+<pre><code class="language-typescript">@NgModule({
+    ...
+})
+export class AppModule {
+  constructor(private injector: Injector) {
+    setRootInjector(injector);
+  }
+}
+
+</code></pre>
+
+<p>The last step is to actually use the <code>rootInjector</code> variable inside the decorators. The result looks like this:</p>
+
+<pre><code class="language-typescript">// loading.decorator.ts
+export function Loading() {
+  return function (target: any, key: string): void {
+    const service = rootInjector.get(HttpStatusService);
+    target[key] = service.loading$;
+  }
+};
+
+// acting.decorator.ts
+export function Acting() {
+  return function (target: any, key: string): void {
+    const service = rootInjector.get(HttpStatusService);
+    target[key] = service.acting$;
+  }
+};
+
+// validation-errors.decorator.ts
+export function ValidationErrors() {
+  return function (target: any, key: string): void {
+    const service = rootInjector.get(HttpStatusService);
+    target[key] = service.validationErrors$;
+  }
+};
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We have learned that we can remove the redundancy that comes with loading, acting and error handling statuses almost completely by the use of an interceptor, a simple service and a few decorators.</p>
+
+<p>I hope you liked it!</p>
+
+<h2 id="special-thanks">Special thanks</h2>
+
+<p>A very special thanks to the reviewers:</p>
+
+<ul>
+  <li><a href="https://twitter.com/bobrov1989">Vitallii Bobrov (@bobrov1989)</a></li>
+  <li><a href="https://twitter.com/webdave_de">David Müllerchen (@webdave_de)</a></li>
+  <li><a href="https://twitter.com/maartentibau">Maarten Tibau (@maartentibau)</a></li>
+  <li><a href="https://twitter.com/elmd_">Dominic Elm (@elmd_)</a></li>
+  <li><a href="https://twitter.com/fabiangosebrink">Fabian Gosebrink (@FabianGosebrink)</a></li>
+</ul>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Migrating to Nx</title>
 	  <link>//migrating-to-nx/</link>
 	  <author></author>
@@ -2389,241 +2791,6 @@ Therefore it’s recommended to use the functionality that Angular provides.</p>
 <h2 id="conclusion">Conclusion</h2>
 
 <p>Still here? Awesome! We learned a lot! If this article interests you, you might want to check out the “Advanced RxJS in Angular workshop” from <a href="https://strongbrew.io">Strongbrew</a>, where me and <a href="blog.kwintenp.com">Kwinten Pisman</a> teach how to use advanced RxJS in real Angular applications.</p>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Safe image requests in angular</title>
-	  <link>//safe-image-requests-in-angular/</link>
-	  <author></author>
-	  <pubDate>2017-10-24T00:00:00+00:00</pubDate>
-	  <guid>//safe-image-requests-in-angular/</guid>
-	  <description><![CDATA[
-	     <p>We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.</p>
-
-<p>Take this hypothetical application for instance: We have an app that is used to manage pictures and this particular app can have multiple users. It makes sense that every user owns their own images, right? For privacy reasons user A could never consume the images of user B. Since images are loaded through the DOM with the img DOM-element, it might be hard to add authorization there. Take this angular snippet for instance:</p>
-
-<pre><code class="language-typescript">@Component({
-    template: `
-        &lt;img [src]="img.src"/&gt;
-    `
-})
-export class FooComponent {
-    img = {
-        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
-    }
-}
-</code></pre>
-
-<p>Since the browser just loads this image through a normal HTTP call, how is the server supposed to know if user A or user B is trying to consume this image? The server needs some kind of authorization to be passed to it.</p>
-
-<h2 id="passing-the-authorization-with-session-cookies">Passing the authorization with Session cookies</h2>
-
-<p>We could use session cookies, which kinda works like this: The user authenticates with the backend of our app, receives a session cookie which will be passed with every future request. That way the backend knows who is trying to consume the resource in question.</p>
-
-<p>Some could argue that session cookies are not to way the go, and stateless backends are better and more scalable.
-If we use JWT or any other modern authentication system we would rather send <strong>authorization-headers</strong> instead of using the session cookie approach. The value that our server should receive in the authorization-header is called a <strong>Bearer token</strong>.</p>
-
-<h2 id="passing-the-authorization-without-cookies">Passing the authorization without cookies</h2>
-
-<p>Let’s explore 2 different methods to pass Bearer tokens to the backend:</p>
-
-<h3 id="passing-the-token-in-the-url">Passing the token in the url</h3>
-
-<p>In this case we would just pass the token as a <strong>query parameter</strong> in the url. The previous snippet would now look like this:</p>
-
-<pre><code class="language-typescript">@Component({
-    template: `
-        &lt;img [src]="img.src + '?bearer=' + bearToken"/&gt;
-    `
-})
-export class FooComponent {
-    img = {
-        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
-    }
-    bearerToken  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-}
-</code></pre>
-
-<p>The url of the server request would now look like this: <em>https://angular.io/assets/images/logos/angular/logo-nav@2x.png?bearer=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…</em></p>
-
-<p>Based on the token, the server knows which user tries to load the image and can block unauthorized users of fetching that image.</p>
-
-<p>There are a few tradeoffs:</p>
-
-<ul>
-  <li>The Token is there for everyone to see in the URL (less secure, but then again, they could still check it in the offline-storage)</li>
-  <li>Every time the token changes, the cache would be cleared, since the url of the resource changes</li>
-  <li>The backend would need a way to handle all the image calls that contain a bearer token in their url</li>
-  <li>We need to load and parse the token everywhere we load images in our components</li>
-  <li>Doesn’t work for css, unless it’s dynamically created</li>
-</ul>
-
-<h3 id="handling-the-images-with-ajax-calls">Handling the images with AJAX calls</h3>
-
-<p>In this approach we will create a generic way of handling image-security by using:</p>
-
-<ul>
-  <li>A generic component</li>
-  <li>AJAX calls with a blob responseType</li>
-  <li>HTTP interceptors (introduced by the new HttpClient in angular 4.3)</li>
-  <li>Data urls</li>
-</ul>
-
-<p>We would like to consume images like this:</p>
-
-<pre><code class="language-typescript">@Component({
-    template: `
-          &lt;secured-image [src]="img.src"&gt;&lt;/secured-image&gt;
-    `
-})
-export class FooComponent {
-    img = {
-        src: 'https://angular.io/assets/images/logos/angular/logo-nav@2x.png'
-    }
-}
-</code></pre>
-
-<p>Let’s create a <strong>secured-image</strong> component as shown above.
-This component needs to handle the following:</p>
-
-<ul>
-  <li>Load an image through an AJAX call</li>
-  <li>Create a data url based on a blob</li>
-  <li>When the source changes:
-    <ul>
-      <li>Cancel the previous AJAX call (if it’s still busy)</li>
-      <li>Start loading the new resource through AJAX</li>
-    </ul>
-  </li>
-  <li>When the component gets destroyed, cancel the current AJAX call (if it’s still busy)</li>
-</ul>
-
-<p>In the beginning, this might look like this:</p>
-
-<pre><code class="language-typescript">@Component({
-  selector: 'secured-image',
-  template: `
-    &lt;img [src]="dataUrl$|async"/&gt;
-  `
-})
-export class SecuredImageComponent implements OnChanges  {
-  // This code block just creates an rxjs stream from the src
-  // this makes sure that we can handle source changes
-  // or even when the component gets destroyed
-  // So basically turn src into src$
-  @Input() private src: string;
-  private src$ = new BehaviorSubject(this.src);
-  ngOnChanges(): void {
-    this.src$.next(this.src);
-  }
-
-  // this stream will contain the actual url that our img tag will load
-  // everytime the src changes, the previous call would be canceled and the
-  // new resource would be loaded
-  dataUrl$ = this.src$.switchMap(url =&gt; this.loadImage(url))
-  
-  // we need HttpClient to load the image
-  constructor(private httpClient: HttpClient) {
-  }
-
-  private loadImage(url: string): Observable&lt;any&gt; {
-    return this.httpClient
-      // load the image as a blob
-      .get(url, {responseType: 'blob'})
-      // create an object url of that blob that we can use in the src attribute
-      .map(e =&gt; URL.createObjectURL(e))
-  }
-}
-
-</code></pre>
-
-<p>This pretty much covers everything, but if we check it in the browser we get the following error.
-<strong>WARNING: sanitizing unsafe URL value blob:https://localhost:4200/da89c71e-5df2-4842-af06-993cd5263471 (see http://g.co/ng/security#xss)</strong></p>
-
-<p>Loading the image through AJAX does not work yet because we haven’t sanitized the url yet. For that we need the <strong>DomSanitizer</strong> that angular provides us. This is a security mechanism to protect the app from XSS-attacks. We basically have to tell angular which urls to trust.</p>
-
-<pre><code class="language-typescript">export class SecuredImageComponent implements OnChanges  {
-  ...
-  // inject the domSanitizer here as well
-  constructor(private httpClient: HttpClient, private domSanitizer: DomSanitizer) {
-  }
-
-  private loadImage(url: string): Observable&lt;any&gt; {
-    return this.httpClient
-      .get(...)
-      // pass the url through the domSanitizer so angular knows he can parse it
-      .map(e =&gt; this.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(e)))
-  }
-}
-
-</code></pre>
-
-<p>We now have a fully working way of loading images through AJAX calls. However, we still haven’t passed our Bearer token.
-We could add the the authorization header in the get call directly, but let’s find a cleaner solution.
-Since we use httpClient, this opens up a few doors for us.
-The new HttpClient, which was introduced in angular 4.3 offers a few new features. One of these features are <strong>interceptors</strong>.
-Interceptors are a way to hook into http calls that are being made by the new HttpClient.</p>
-
-<p>This would be a perfect solution to pass the bearer token wouldn’t you agree?</p>
-
-<p>Let’s create the interceptor and register it to angular.</p>
-
-<pre><code class="language-typescript">// my-http.interceptor.ts
-@Injectable()
-export class MyHttpInterceptor implements HttpInterceptor {
-  // intercept any http call done by the httpClient
-  intercept(request: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt; {
-    // fetch the bearer token from wherever you have stored it
-    // NOTE: fetching it directly from window is not a good idea (demo purpose)
-    const jwtToken = window.localStorage.getItem('jwtToken');
-
-    // if there is a token, clone the request and set the correct
-    // authorization header, if not =&gt; just use the old request
-    const requestToHandle = jwtToken
-      ? request.clone({
-        headers: request.headers.set('authorization', `Bearer ${jwtToken}`)
-      })
-      : request;
-    return next.handle(requestToHandle);
-  }
-}
-
-// app.module.ts
-@NgModule({
-  ...
-  // don't forget to import the HttpClientModule
-  imports: [ BrowserModule, FormsModule, HttpClientModule ],
-  providers: [{
-    // register the interceptor to our angular module
-    provide: HTTP_INTERCEPTORS, useClass: MyHttpInterceptor, multi: true
-  }]
-})
-export class AppModule { }
-</code></pre>
-
-<p>If you would like to learn more about interceptors, check this <a href="https://juristr.com/blog/2017/08/intercept-http-requests-in-angular/">awesome article</a> by <a href="https://twitter.com/juristr">Juri Strumpflohner</a>.
-He also has an amazing egghead course on that subject.</p>
-
-<p>Right now, every call that the secured-image component has initiated will load the image through AJAX with the right authorization header. That way the server can check who has been asking for that specific resource.</p>
-
-<p>However, this approach also introduces a few tradeoffs:</p>
-
-<ul>
-  <li>CORS headers for CDN resources. Since we are using a GET AJAX call there will be extra OPTIONS calls.</li>
-</ul>
-
-<p>Extra advantages:</p>
-<ul>
-  <li>It’s easier to handle the loading of the image, show a spinner or animation</li>
-  <li>Doesn’t work for css, unless it’s dynamically created</li>
-</ul>
-
-<p>You can find the complete source of a working version in this <a href="https://stackblitz.com/edit/secure-image-loads">stackblitz example</a>.</p>
-
-<h2 id="thanks-for-reading">Thanks for reading</h2>
-<p>I hope you all liked this article, if you have questions, shoot!</p>
 
 	  ]]></description>
 	</item>

@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>A generic way of handling loading-status, saving-status and validation errors in Angular</title>
+        
+          <description>&lt;h1 id=&quot;a-generic-way-of-handling-loading-status-saving-status-and-validation-errors-in-angular&quot;&gt;A generic way of handling loading-status, saving-status and validation errors in Angular&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Fri, 25 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>RxJS patterns - Mapping function calls to streams</title>
         
           <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:&lt;/p&gt;
