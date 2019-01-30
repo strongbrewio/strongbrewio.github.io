@@ -41,7 +41,7 @@ selectedItems$.pipe(
 ).subscribe(_ => // route to a different page here);
 ```
 
-**Note:** `ifElse` is not a real operator :)
+**Note:** `ifElse` is not a real operator 🙃
 
 So we start with our `selectedItems$`. We then want to add our conditional logic. If we pass our conditional logic (either no delay or we showed the popup and the user accepted), we can perform the backend call. We can do this with the `switchMap` operator and using the `selectedItems`. At last we subscribe and we route to a different page if the call was successfull.
 
@@ -87,7 +87,7 @@ selectedItems$.pipe(
 );
 ```
 
-Of course, this introduced a problem inside of our code. The if statemnet will still work, but the else statement is posing a problem here. If the else is executed, the stream that is returned by the `map` operator (so before the `switchMap`) is of type `Observable<Observable<<boolean>>`. That's not what we need. The `switchMap` operator needs to be applied to an `Observable` with our selected items.
+Of course, this introduces a problem inside of our code. The if statement will still work, but the else statement is posing a problem here. If the else is executed, the stream that is returned by the `map` operator (so before the `switchMap`) is of type `Observable<Observable<<boolean>>`. That's not what we need. The `switchMap` operator needs to be applied to an `Observable` with our selected items.
 
 To fix this, we don't need to return the `dialog$` but:
 
@@ -146,9 +146,15 @@ Before returning the stream we get from the `showDialog` function, we are going 
 
 If the result was `true` we are going to return our `selectedItems`. But, since this is wrapped inside of a `switchMap` operator, we need to wrap this into an `Observable` using the static `of` operator. 
 
-If the result was `false`, we can return the `never()` `Observable`. This is an `Observable` that will have no events whatsover. By doing this, the `Observable` chain is interrupted and the next `switchMap` statement will not get executed (the one doing the backend call :)).
+If the result was `false`, we can return the `never()` `Observable`. This is an `Observable` that will have no events whatsover. By doing this, the `Observable` chain is interrupted and `switchMap` that executes the backend call will never get an event and thus will not get executed (the one doing the backend call 🙃).
 
-As as a last step, we want to make sure that we only take a single value. We start from the `selectedItems$` which can have potentially multiple values. For example when the user gets the popup, decides to cancel, the subscription would still be active. If the user selects a new item, the logic in our stream would fire immediately. We can fix this quite easily with the `take` operator.
+As as a last step, we want to make sure that we only take a single value. We start from the `selectedItems$` which can have potentially multiple values. For example when:
+
+-  the user gets the popup, 
+-  decides to cancel
+-  selects or deselects a new item
+
+the subscription would still be active. If the user selects a new item, the logic in our stream would fire immediately. We can fix this quite easily with the `take` operator.
 
 
 ```typescript
@@ -173,11 +179,11 @@ selectedItems$.pipe(
 	switchMap(selectedItems => this.service.buy(selectedItems))
 );
 ```
-And that's it. This code does what we want! party emoji here
+And that's it. This code does what we want! 🎉🎉
 
-You can find an working (slightly contrived example) below. Click the buttons to trigger a delivery with or without delay.
+You can find a working (slightly contrived example) below. Click the buttons to trigger a delivery with or without delay. You can open the console to see a log statement being logged everytime the backend call would be executed.
 
-	https://stackblitz.com/edit/rxjs-hsqluy?embed=1&file=index.ts
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/rxjs-hsqluy?embed=1&file=index.ts"></iframe>
 
 ## Using the `tap` operator
 
@@ -209,26 +215,16 @@ const disabled$ = selectedItems$.pipe(
 
 This gives you exactly the same result and we do not need 'if-else' logic here.
 
-// stream van items bevat 1 die de levering vertraagt (popup tonen om het te vragen)
+## When to use this
 
-Bar pattern;
+Some concrete examples where to use this patterns are:
 
-selectedItems$.pipe(
-	take(1),
-	switchMap(selectedItems => {
-		// if none of the items has a late delivery
-		insert conditional work here 
-		if(...) {
-			// return an Observable (you can wrap a normal object into an of)
-		}	
-	}),
-	switchMap(selectedItems => this.service.buy(selectedItems))
-);
+- 
 
 
-pausing an observable
-merging multiple executions into one
-prematurely ending work on an observable
+
+
+
 
 
 
