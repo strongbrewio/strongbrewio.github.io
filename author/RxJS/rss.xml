@@ -22,6 +22,8 @@
 
 <ul>
   <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
 </ul>
 
 <p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
@@ -107,6 +109,283 @@ const click$ = fromEvent(somethingElement, 'click');
 	</item>
 
 	<item>
+	  <title>RxJS patterns - Prematurely ending work</title>
+	  <link>//rxjs-patterns-prematurely-ending-work/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-patterns-prematurely-ending-work/</guid>
+	  <description><![CDATA[
+	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+</ul>
+
+<p>The next pattern I want to discuss when we you want to prematurely end work. There are many scenarios when you would want to do this. We can start some work (aka an <code>Observable</code>) and want to kill that subscription if our  user navigates to a different page, the user changes something which should trigger a different call, …</p>
+
+<h2 id="how-can-we-do-it">How can we do it</h2>
+
+<p>One thing I really like about RxJS is how declarative it is. You can quite often translate what you want into a sentence and translate that sentence into code.</p>
+
+<p>Let’s say that we want to listen to a certain stream, until a certain event happens. An extremely common scenario is when you are working with a UI framework that works with components. Often you want to: ‘Listen to this specific <code>Observable</code> until the component gets destroyed’.</p>
+
+<p>Translated into code, we could have something like this:</p>
+
+<pre><code class="language-typescript">workWeWantToDo$.pipe(
+	listenTillThisEventHappens(componentDestroyed)
+).subscribe();
+</code></pre>
+<p><strong>Note:</strong> <code>listenTillThisEventHappens</code> is not an operator :).</p>
+
+<p>The <code>listenTillThisEventHappens</code> can be replaced by the <code>takeUntil</code> operator which does exactly this. And we can create a stream from a lifecycle hook that gets called via our UI framework. Checkout the other pattern ‘mapping function calls to streams’ to see how you can accomplish this.</p>
+
+<p>The resulting code is:</p>
+
+<pre><code class="language-typescript">workWeWantToDo$.pipe(
+	takeUntil(componentDestroy$)
+).subscribe();
+</code></pre>
+
+<p>When creating this <code>Observable</code> we use the <code>takeUntil</code> operator. This operator will subscribe to the stream above (if it was subscribed to itself of course) and will proxy these values until the <code>componentDestroy$</code> emits. Then the <code>takeUntil</code> will kill the subscription.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Everytime you are thinking: ‘I want to stop this when that happens’.</p>
+
+<ul>
+  <li>To kill subscriptions when a component is destroyed</li>
+  <li>When trying to know when a user stopped dragging. You can have a stream that listens for ‘dragDown’ and take values until a ‘dragUp’ events happens.</li>
+</ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>RxJS patterns - Conditionally executing work</title>
+	  <link>//rxjs-patterns-conditionally-executing-work/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-patterns-conditionally-executing-work/</guid>
+	  <description><![CDATA[
+	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/xjs-patterns-mapping-function-calls-to-streams/" target="_blank">mapping a function to a stream</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
+</ul>
+
+<p>The next pattern I want to discuss is executing conditional work. Sometimes, you have a stream and if some condition is met, you want to do some extra step.</p>
+
+<p>But, we do not have an <code>if-else</code> operator. And that makes sense. If we had such an operator, the entire <code>Observable</code> chain would be broken. Luckily there are a few ways to introduce conditional work inside of our <code>Observable</code> chains.</p>
+
+<h2 id="executing-conditional-work">Executing conditional work</h2>
+
+<p>Let’s imagine that we have list of items in a webshop. In that list, we can check one or more items that we want to buy. When the user clicks on the ‘buy’ button, we first want to check if one of the items delays the delivery date by a huge amount. If so, we want to show a popup to notify the user. He can either decline and change his order or accept this.</p>
+
+<p>In this use case, we have two <code>if-else</code>s.</p>
+<ul>
+  <li>If there is an order which has an item that pushes the delivery date we need to show a popup. Otherwise we don’t.</li>
+  <li>If the popup is shown, and the user accepts, we do a backend call to actually register the order. Otherwise we don’t and the popup should close so the user can maybe remove that specific item.</li>
+</ul>
+
+<p>Let’s first take a look at what the code could look like.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	'ifElse'(() =&gt; {
+		// 
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+).subscribe(_ =&gt; // route to a different page here);
+</code></pre>
+
+<p><strong>Note:</strong> <code>ifElse</code> is not a real operator 🙃</p>
+
+<p>So we start with our <code>selectedItems$</code>. We then want to add our conditional logic. If we pass our conditional logic (either no delay or we showed the popup and the user accepted), we can perform the backend call. We can do this with the <code>switchMap</code> operator and using the <code>selectedItems</code>. At last we subscribe and we route to a different page if the call was successfull.</p>
+
+<p>Now, how can we plug 	in in that conditional logic? First of all, let’s think about how we can show a popup. We can have a function, that adds a popup to the DOM and returns an Observable with the result. The type signature for that function could look like this:</p>
+
+<pre><code class="language-typescript">showDialog(): Observable&lt;boolean&gt;;
+</code></pre>
+
+<p>So, inside of the <code>Observable</code> chain we had above, we want to conditionally execute the <code>Observable</code> that we get from the <code>showDialog</code> function so the dialog is shown. But, we only want to show this in case we have an item that delays the delivery date.</p>
+
+<p>Let’s first implement what we need to do when there is no delivery delay (happy path 😄).</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	map(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return selectedItems;
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>We add an if statement inside of a <code>map</code> operator. If the condition is not met, so there is no delayed delivery, we just return the <code>selectedItems</code> so these can be used in the <code>switchMap</code> operator to do the backend call.</p>
+
+<p>So far so good. BUT, how will we implement the else?</p>
+
+<p>Inside of the <code>map</code> operator, we can implement the else case. In that else case, we want to show the dialog. This means, we are going to map to the result of the <code>showDialog</code> function.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	map(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return selectedItems;
+		} else {
+			return showDialog();
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>Of course, this introduces a problem inside of our code. The if statement will still work, but the else statement is posing a problem here. If the else is executed, the stream that is returned by the <code>map</code> operator (so before the <code>switchMap</code>) is of type <code>Observable&lt;Observable&lt;&lt;boolean&gt;&gt;</code>. That’s not what we need. The <code>switchMap</code> operator needs to be applied to an <code>Observable</code> with our selected items.</p>
+
+<p>To fix this, we don’t need to return the <code>dialog$</code> but:</p>
+
+<ul>
+  <li>Subscribe to this stream (remember, <code>Observable</code>s are lazy and subscribing will trigger the dialog to be shown)</li>
+  <li>Listen for the result of that <code>dialog$</code>, remember, the user can either accept or decline, and handle this properly</li>
+</ul>
+
+<p>First step in fixing this, we can change the operator that we are using. If we change the <code>map</code> operator to a flattening operator such as <code>switchMap</code> or <code>concatMap</code>, we can return the <code>Observable</code> from the <code>showDialog</code> function and the operator will flatten it from an <code>Observable&lt;Observable&lt;boolean&gt;&gt;</code> to an <code>Observable&lt;boolean&gt;</code>.</p>
+
+<p>Let’s take a look at the code:</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog();
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>As you can see we changed from a <code>map</code> to a <code>switchMap</code>. Because we changed the operator, we have to make sure that every branch in the function we pass to <code>switchMap</code> returns an <code>Observable</code>. That’s why we changed the <code>selectedItems</code> to <code>of(selectedItems)</code>.</p>
+
+<p>With this code, we are going to show the popup only if the condition is met. So we have a part of the conditional logic that we need. But, the overall code is not yet complete. The type of the <code>Observable</code> created by the first <code>switchMap</code> is <code>Observable&lt;boolean|Array&lt;Item&gt;</code>. And that’s not what we want. We don’t want that boolean in there.</p>
+
+<p>The last thing we need to do is check the value that we get back from the <code>dialog$</code>. This will return <code>true</code> if the user accepted the delay or <code>false</code> if the user denied. In that last case, we don’t want to call the backend and this stream should stop.</p>
+
+<p>Let’s add this:</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog().pipe(
+				map(res =&gt; {
+					if(res) {
+						return of(selectedItems);
+					} else {
+						return never();
+					}
+				}),
+			);
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>Before returning the stream we get from the <code>showDialog</code> function, we are going to map its result to what we want.</p>
+
+<p>If the result was <code>true</code> we are going to return our <code>selectedItems</code>. But, since this is wrapped inside of a <code>switchMap</code> operator, we need to wrap this into an <code>Observable</code> using the static <code>of</code> operator.</p>
+
+<p>If the result was <code>false</code>, we can return the <code>never()</code> <code>Observable</code>. This is an <code>Observable</code> that will have no events whatsover. By doing this, the <code>Observable</code> chain is interrupted and <code>switchMap</code> that executes the backend call will never get an event and thus will not get executed (the one doing the backend call 🙃).</p>
+
+<p>As as a last step, we want to make sure that we only take a single value. We start from the <code>selectedItems$</code> which can have potentially multiple values. For example when:</p>
+
+<ul>
+  <li>the user gets the popup,</li>
+  <li>decides to cancel</li>
+  <li>selects or deselects a new item</li>
+</ul>
+
+<p>the subscription would still be active. If the user selects a new item, the logic in our stream would fire immediately. We can fix this quite easily with the <code>take</code> operator.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	take(1),
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog().pipe(
+				map(res =&gt; {
+					if(res) {
+						return of(selectedItems);
+					} else {
+						return never();
+					}
+				}),
+			);
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+<p>And that’s it. This code does what we want! 🎉🎉</p>
+
+<p>You can find a working (slightly contrived example) below. Click the buttons to trigger a delivery with or without delay. You can open the console to see a log statement being logged everytime the backend call would be executed.</p>
+
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/rxjs-hsqluy?embed=1&amp;file=index.ts"></iframe>
+
+<h2 id="using-the-tap-operator">Using the <code>tap</code> operator</h2>
+
+<p>You can also hook into the <code>Observable</code> chain using the <code>tap</code> operator and maybe do some conditional work there. For example, to disable or enable a certain button:</p>
+
+<pre><code class="language-typescript">const selectedItems$ = ...
+
+selectedItems$.pipe(
+	tap(selectedItems =&gt; {
+		if(selectedItems.length === 5) {
+			this.newOrderBtnDisabled = true;
+		} else {
+			this.newOrderBtnDisabled = false;
+		}
+	})
+);
+</code></pre>
+
+<p>I would argue however that it is better to create a new stream that contains the ‘disable’ state of that button. This can be achieved like this:</p>
+
+<pre><code class="language-typescript">const selectedItems$ = ...
+
+const disabled$ = selectedItems$.pipe(
+	map(selectedItems =&gt; selectedItems &gt; 5)
+);
+</code></pre>
+
+<p>This gives you exactly the same result and we do not need ‘if-else’ logic here.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Some examples where to use this pattern is:</p>
+
+<ul>
+  <li>when a popup can decide if the action should be executed</li>
+  <li>when creating a generic component that can show a spinner or not based on some configuration</li>
+  <li>when creating a wizard and you only want to continue to the next step if the user current step is validated through a backend call</li>
+</ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>RxJS patterns - restarting work</title>
 	  <link>//rxjs-patterns-restarting-work/</link>
 	  <author></author>
@@ -114,6 +393,13 @@ const click$ = fromEvent(somethingElement, 'click');
 	  <guid>//rxjs-patterns-restarting-work/</guid>
 	  <description><![CDATA[
 	     <p>Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.</p>
+
+<p>Here are the other patterns:</p>
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
+</ul>
 
 <p>I’ll do this by describing them as high level as possible, but still provide you with some examples on where they can be applied.</p>
 

@@ -22,6 +22,8 @@
 
 <ul>
   <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
 </ul>
 
 <p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
@@ -107,6 +109,283 @@ const click$ = fromEvent(somethingElement, 'click');
 	</item>
 
 	<item>
+	  <title>RxJS patterns - Prematurely ending work</title>
+	  <link>//rxjs-patterns-prematurely-ending-work/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-patterns-prematurely-ending-work/</guid>
+	  <description><![CDATA[
+	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+</ul>
+
+<p>The next pattern I want to discuss when we you want to prematurely end work. There are many scenarios when you would want to do this. We can start some work (aka an <code>Observable</code>) and want to kill that subscription if our  user navigates to a different page, the user changes something which should trigger a different call, …</p>
+
+<h2 id="how-can-we-do-it">How can we do it</h2>
+
+<p>One thing I really like about RxJS is how declarative it is. You can quite often translate what you want into a sentence and translate that sentence into code.</p>
+
+<p>Let’s say that we want to listen to a certain stream, until a certain event happens. An extremely common scenario is when you are working with a UI framework that works with components. Often you want to: ‘Listen to this specific <code>Observable</code> until the component gets destroyed’.</p>
+
+<p>Translated into code, we could have something like this:</p>
+
+<pre><code class="language-typescript">workWeWantToDo$.pipe(
+	listenTillThisEventHappens(componentDestroyed)
+).subscribe();
+</code></pre>
+<p><strong>Note:</strong> <code>listenTillThisEventHappens</code> is not an operator :).</p>
+
+<p>The <code>listenTillThisEventHappens</code> can be replaced by the <code>takeUntil</code> operator which does exactly this. And we can create a stream from a lifecycle hook that gets called via our UI framework. Checkout the other pattern ‘mapping function calls to streams’ to see how you can accomplish this.</p>
+
+<p>The resulting code is:</p>
+
+<pre><code class="language-typescript">workWeWantToDo$.pipe(
+	takeUntil(componentDestroy$)
+).subscribe();
+</code></pre>
+
+<p>When creating this <code>Observable</code> we use the <code>takeUntil</code> operator. This operator will subscribe to the stream above (if it was subscribed to itself of course) and will proxy these values until the <code>componentDestroy$</code> emits. Then the <code>takeUntil</code> will kill the subscription.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Everytime you are thinking: ‘I want to stop this when that happens’.</p>
+
+<ul>
+  <li>To kill subscriptions when a component is destroyed</li>
+  <li>When trying to know when a user stopped dragging. You can have a stream that listens for ‘dragDown’ and take values until a ‘dragUp’ events happens.</li>
+</ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>RxJS patterns - Conditionally executing work</title>
+	  <link>//rxjs-patterns-conditionally-executing-work/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-patterns-conditionally-executing-work/</guid>
+	  <description><![CDATA[
+	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/xjs-patterns-mapping-function-calls-to-streams/" target="_blank">mapping a function to a stream</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
+</ul>
+
+<p>The next pattern I want to discuss is executing conditional work. Sometimes, you have a stream and if some condition is met, you want to do some extra step.</p>
+
+<p>But, we do not have an <code>if-else</code> operator. And that makes sense. If we had such an operator, the entire <code>Observable</code> chain would be broken. Luckily there are a few ways to introduce conditional work inside of our <code>Observable</code> chains.</p>
+
+<h2 id="executing-conditional-work">Executing conditional work</h2>
+
+<p>Let’s imagine that we have list of items in a webshop. In that list, we can check one or more items that we want to buy. When the user clicks on the ‘buy’ button, we first want to check if one of the items delays the delivery date by a huge amount. If so, we want to show a popup to notify the user. He can either decline and change his order or accept this.</p>
+
+<p>In this use case, we have two <code>if-else</code>s.</p>
+<ul>
+  <li>If there is an order which has an item that pushes the delivery date we need to show a popup. Otherwise we don’t.</li>
+  <li>If the popup is shown, and the user accepts, we do a backend call to actually register the order. Otherwise we don’t and the popup should close so the user can maybe remove that specific item.</li>
+</ul>
+
+<p>Let’s first take a look at what the code could look like.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	'ifElse'(() =&gt; {
+		// 
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+).subscribe(_ =&gt; // route to a different page here);
+</code></pre>
+
+<p><strong>Note:</strong> <code>ifElse</code> is not a real operator 🙃</p>
+
+<p>So we start with our <code>selectedItems$</code>. We then want to add our conditional logic. If we pass our conditional logic (either no delay or we showed the popup and the user accepted), we can perform the backend call. We can do this with the <code>switchMap</code> operator and using the <code>selectedItems</code>. At last we subscribe and we route to a different page if the call was successfull.</p>
+
+<p>Now, how can we plug 	in in that conditional logic? First of all, let’s think about how we can show a popup. We can have a function, that adds a popup to the DOM and returns an Observable with the result. The type signature for that function could look like this:</p>
+
+<pre><code class="language-typescript">showDialog(): Observable&lt;boolean&gt;;
+</code></pre>
+
+<p>So, inside of the <code>Observable</code> chain we had above, we want to conditionally execute the <code>Observable</code> that we get from the <code>showDialog</code> function so the dialog is shown. But, we only want to show this in case we have an item that delays the delivery date.</p>
+
+<p>Let’s first implement what we need to do when there is no delivery delay (happy path 😄).</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	map(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return selectedItems;
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>We add an if statement inside of a <code>map</code> operator. If the condition is not met, so there is no delayed delivery, we just return the <code>selectedItems</code> so these can be used in the <code>switchMap</code> operator to do the backend call.</p>
+
+<p>So far so good. BUT, how will we implement the else?</p>
+
+<p>Inside of the <code>map</code> operator, we can implement the else case. In that else case, we want to show the dialog. This means, we are going to map to the result of the <code>showDialog</code> function.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	map(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return selectedItems;
+		} else {
+			return showDialog();
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>Of course, this introduces a problem inside of our code. The if statement will still work, but the else statement is posing a problem here. If the else is executed, the stream that is returned by the <code>map</code> operator (so before the <code>switchMap</code>) is of type <code>Observable&lt;Observable&lt;&lt;boolean&gt;&gt;</code>. That’s not what we need. The <code>switchMap</code> operator needs to be applied to an <code>Observable</code> with our selected items.</p>
+
+<p>To fix this, we don’t need to return the <code>dialog$</code> but:</p>
+
+<ul>
+  <li>Subscribe to this stream (remember, <code>Observable</code>s are lazy and subscribing will trigger the dialog to be shown)</li>
+  <li>Listen for the result of that <code>dialog$</code>, remember, the user can either accept or decline, and handle this properly</li>
+</ul>
+
+<p>First step in fixing this, we can change the operator that we are using. If we change the <code>map</code> operator to a flattening operator such as <code>switchMap</code> or <code>concatMap</code>, we can return the <code>Observable</code> from the <code>showDialog</code> function and the operator will flatten it from an <code>Observable&lt;Observable&lt;boolean&gt;&gt;</code> to an <code>Observable&lt;boolean&gt;</code>.</p>
+
+<p>Let’s take a look at the code:</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog();
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>As you can see we changed from a <code>map</code> to a <code>switchMap</code>. Because we changed the operator, we have to make sure that every branch in the function we pass to <code>switchMap</code> returns an <code>Observable</code>. That’s why we changed the <code>selectedItems</code> to <code>of(selectedItems)</code>.</p>
+
+<p>With this code, we are going to show the popup only if the condition is met. So we have a part of the conditional logic that we need. But, the overall code is not yet complete. The type of the <code>Observable</code> created by the first <code>switchMap</code> is <code>Observable&lt;boolean|Array&lt;Item&gt;</code>. And that’s not what we want. We don’t want that boolean in there.</p>
+
+<p>The last thing we need to do is check the value that we get back from the <code>dialog$</code>. This will return <code>true</code> if the user accepted the delay or <code>false</code> if the user denied. In that last case, we don’t want to call the backend and this stream should stop.</p>
+
+<p>Let’s add this:</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog().pipe(
+				map(res =&gt; {
+					if(res) {
+						return of(selectedItems);
+					} else {
+						return never();
+					}
+				}),
+			);
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>Before returning the stream we get from the <code>showDialog</code> function, we are going to map its result to what we want.</p>
+
+<p>If the result was <code>true</code> we are going to return our <code>selectedItems</code>. But, since this is wrapped inside of a <code>switchMap</code> operator, we need to wrap this into an <code>Observable</code> using the static <code>of</code> operator.</p>
+
+<p>If the result was <code>false</code>, we can return the <code>never()</code> <code>Observable</code>. This is an <code>Observable</code> that will have no events whatsover. By doing this, the <code>Observable</code> chain is interrupted and <code>switchMap</code> that executes the backend call will never get an event and thus will not get executed (the one doing the backend call 🙃).</p>
+
+<p>As as a last step, we want to make sure that we only take a single value. We start from the <code>selectedItems$</code> which can have potentially multiple values. For example when:</p>
+
+<ul>
+  <li>the user gets the popup,</li>
+  <li>decides to cancel</li>
+  <li>selects or deselects a new item</li>
+</ul>
+
+<p>the subscription would still be active. If the user selects a new item, the logic in our stream would fire immediately. We can fix this quite easily with the <code>take</code> operator.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	take(1),
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog().pipe(
+				map(res =&gt; {
+					if(res) {
+						return of(selectedItems);
+					} else {
+						return never();
+					}
+				}),
+			);
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+<p>And that’s it. This code does what we want! 🎉🎉</p>
+
+<p>You can find a working (slightly contrived example) below. Click the buttons to trigger a delivery with or without delay. You can open the console to see a log statement being logged everytime the backend call would be executed.</p>
+
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/rxjs-hsqluy?embed=1&amp;file=index.ts"></iframe>
+
+<h2 id="using-the-tap-operator">Using the <code>tap</code> operator</h2>
+
+<p>You can also hook into the <code>Observable</code> chain using the <code>tap</code> operator and maybe do some conditional work there. For example, to disable or enable a certain button:</p>
+
+<pre><code class="language-typescript">const selectedItems$ = ...
+
+selectedItems$.pipe(
+	tap(selectedItems =&gt; {
+		if(selectedItems.length === 5) {
+			this.newOrderBtnDisabled = true;
+		} else {
+			this.newOrderBtnDisabled = false;
+		}
+	})
+);
+</code></pre>
+
+<p>I would argue however that it is better to create a new stream that contains the ‘disable’ state of that button. This can be achieved like this:</p>
+
+<pre><code class="language-typescript">const selectedItems$ = ...
+
+const disabled$ = selectedItems$.pipe(
+	map(selectedItems =&gt; selectedItems &gt; 5)
+);
+</code></pre>
+
+<p>This gives you exactly the same result and we do not need ‘if-else’ logic here.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Some examples where to use this pattern is:</p>
+
+<ul>
+  <li>when a popup can decide if the action should be executed</li>
+  <li>when creating a generic component that can show a spinner or not based on some configuration</li>
+  <li>when creating a wizard and you only want to continue to the next step if the user current step is validated through a backend call</li>
+</ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>RxJS patterns - restarting work</title>
 	  <link>//rxjs-patterns-restarting-work/</link>
 	  <author></author>
@@ -114,6 +393,13 @@ const click$ = fromEvent(somethingElement, 'click');
 	  <guid>//rxjs-patterns-restarting-work/</guid>
 	  <description><![CDATA[
 	     <p>Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.</p>
+
+<p>Here are the other patterns:</p>
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
+</ul>
 
 <p>I’ll do this by describing them as high level as possible, but still provide you with some examples on where they can be applied.</p>
 
@@ -1152,700 +1438,6 @@ polledBitcoin$:   ------b-------------b-------....
 
 <p>RxJS and polling is a match made in heaven. There a number of different ways to implement polling which all have there trade offs. Understanding the differences between the ones described above will get you a long way.</p>
 
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>What are schedulers in RxJS</title>
-	  <link>//what-are-schedulers-in-rxjs/</link>
-	  <author></author>
-	  <pubDate>2018-02-05T00:00:00+00:00</pubDate>
-	  <guid>//what-are-schedulers-in-rxjs/</guid>
-	  <description><![CDATA[
-	     <p>One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used to execute tasks. The main reason for this is that the authors of RxJS did a great job in abstracting this logic. They used the principle of least concurrency as the default scheduling strategy which makes sure that in most cases, we don’t have to think about changing the default.</p>
-
-<p>This post will examine the different schedulers and explain the differences between them.</p>
-
-<h2 id="async-in-javascript">Async in javascript</h2>
-<p>To understand the difference between the different schedulers, we must first examine how async works in javascript. No worries, we won’t go in too deep :).</p>
-
-<p>Javascript is a single threaded language that uses an event loop to handle asynchronous operations. One of my favorite talks ever covers this topic really well. It’s by Philip Roberts and you can find a recording <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>. Be sure to check it out if you are unsure what the event loop is and how it works.</p>
-
-<h3 id="understanding-by-example">Understanding by example</h3>
-
-<p>Let’s look at an example.</p>
-
-<pre><code class="language-typescript">console.log('script start');
-
-setTimeout(function() {
-  console.log('setTimeout');
-}, 0);
-
-Promise.resolve().then(function() {
-  console.log('promise1');
-}).then(function() {
-  console.log('promise2');
-});
-
-console.log('script end');
-</code></pre>
-
-<p>If you run this piece of code, the result will look like this:</p>
-
-<pre><code class="language-typescript">script start
-script end
-promise1
-promise2
-setTimeout
-</code></pre>
-<p>If you know how the event loop works, you understand that ‘script start’ and ‘script end’ were logged first. The ‘setTimeout’ and ‘promises’ that get triggered were put on a queue to be executed when the call stack cleared.</p>
-
-<p>But what’s a lesser known fact is that there are different queues. There is a microtask and a macrotask queue. A promise gets added to the microtask queue and a setTimeout to the macrotask queue.
-Whenever the call stack is cleared, the microtasks queue gets cleared first. Hence the ‘promise1’ is the next log statement we see.</p>
-
-<p>When a microtask is finished, the rest of the microtasks queue gets executed until the microtask queue is empty. That’s the reason ‘promise2’ is logged next. So even if the second promise gets scheduled during the execution of the first, it still gets executed before the setTimeout.</p>
-
-<p>Lastly, when the microtask queue is cleared, the next task is picked from the macrotask queue, and the ‘setTimeout’ is logged.</p>
-
-<p>There you have it, this is how async works in javascript! Might be a little to quick but since it’s not part of this post to explain everything in detail, I’ll leave it at that. And also because Jake Archibald basically explained it in perfect detail right <a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/" target="_blank">here</a>.</p>
-
-<h2 id="schedulers">Schedulers</h2>
-
-<p>In RxJS there are different schedulers that all schedule work using a different (a)sync technique behind the scenes. Let’s take a look at an example to learn a few of them. There are three statement logged on different schedulers.</p>
-
-<pre><code class="language-typescript">const asyncScheduler = Rx.Observable.of('')
-  .startWith('async', Rx.Scheduler.async);
-
-const asapScheduler = Rx.Observable.of('')
-  .startWith('asap', Rx.Scheduler.asap);
-
-const queueScheduler = Rx.Observable.of('')
-  .startWith('queue', Rx.Scheduler.queue);
-
-
-Rx.Observable.merge(
-    asyncScheduler,
-    asapScheduler,
-    queueScheduler)
-  .filter(x =&gt; !!x)
-  .subscribe(console.log);
-
-console.log('after subscription')
-</code></pre>
-
-<p>The results of running this code is:</p>
-
-<pre><code class="language-typescript">queue
-after subscription
-asap
-async
-</code></pre>
-
-<p>As you can see, the ‘queue’ is the only statement logged synchronously. We can conclude this because it is the only statement logged before the ‘after subscription’ statement is logged. 
-Next we can see that the ‘asap’ is logged before the ‘async’. That is because the <code>asap</code> scheduler uses the micro task queue and the <code>async</code> uses the macrotask queue.</p>
-
-<p>Now, to list all of them, we can look at the table below. In the example I didn’t cover the ‘animationFrame’ and the ‘virtualTime’ scheduler. The ‘animationFrame’ scheduler allows you to schedule work to be executed when there is a repaint. The ‘virtualTime’ scheduler is something you can use to test your code in a synchronous fashion using marble diagrams.</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>Scheduler</th>
-      <th>Approach</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>Queue</code></td>
-      <td>Executes task synchronously but waits for current task to be finished</td>
-    </tr>
-    <tr>
-      <td><code>Asap</code></td>
-      <td>Schedules on the micro task queue</td>
-    </tr>
-    <tr>
-      <td><code>Async</code></td>
-      <td>Schedules on the macro task queue</td>
-    </tr>
-    <tr>
-      <td><code>AnimationFrame</code></td>
-      <td>Relies on ‘requestAnimationFrame’</td>
-    </tr>
-    <tr>
-      <td><code>VirtualTime</code></td>
-      <td>Will execute everything synchronous ordered by delay and mainly used in testing</td>
-    </tr>
-  </tbody>
-</table>
-
-<h3 id="using-schedulers-in-rxjs">Using schedulers in RxJS</h3>
-<p>Some operators, like ‘startWith’ in the example above, allow you to pass in an optional scheduler to influence when a certain task gets executed. Every operator that has this option, will also have a default value.</p>
-
-<p>For example, the <code>debounceTime</code> operator uses the ‘async’ scheduler as a default as you can see below.</p>
-
-<pre><code class="language-typescript">export function debounceTime&lt;T&gt;(dueTime: number, scheduler: IScheduler = async)
-</code></pre>
-
-<h2 id="conclusion">Conclusion</h2>
-<p>Schedulers influence the timing on which tasks get executed. You can change the default schedulers of some operators by passing in an extra scheduler argument.</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>RxJS best practices in Angular</title>
-	  <link>//rxjs-best-practices-in-angular/</link>
-	  <author></author>
-	  <pubDate>2018-01-04T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-best-practices-in-angular/</guid>
-	  <description><![CDATA[
-	     <p>This article is all about the do’s and don’ts when it comes to writing reactive applications with <a href="http://reactivex.io/">RxJS</a> in <a href="https://angular.io/">Angular</a> applications. 
-The best practices described in this article are based on personal experiences and can be assumed as personal opinions.</p>
-
-<p>The topics we will tackle in this article are:</p>
-<ul>
-  <li><a href="#learning-how-to-think-reactive">Learning how to think reactive</a></li>
-  <li><a href="#pipeable-operators">Pipeable operators</a></li>
-  <li><a href="#ascii-marble-diagrams">ASCII marble diagrams</a></li>
-  <li><a href="#using-pure-functions">Using pure functions</a></li>
-  <li><a href="#avoiding-memory-leaks">Avoiding memory leaks</a></li>
-  <li><a href="#avoiding-nested-subscribes">Avoiding nested subscribes</a></li>
-  <li><a href="#avoiding-manual-subscribes-in-Angular">Avoiding manual subscribes in Angular</a></li>
-  <li><a href="#dont-pass-streams-to-components-directly">Don’t pass streams to components directly</a></li>
-  <li><a href="#dont-pass-streams-to-services">Don’t pass streams to services</a></li>
-  <li><a href="#sharing-subscriptions">Sharing subscriptions</a></li>
-  <li><a href="#when-to-use-Subjects">When to use Subjects</a></li>
-  <li><a href="#cleancode-practices">Clean-code practices</a></li>
-  <li><a href="#Angular-embraces-RxJS">Angular embraces RxJS</a></li>
-</ul>
-
-<p><strong>Note:</strong>
-We will refer to observables as streams in this article.
-Since the streams in this article use the <code>$</code>-suffix, a short explanation.
-First of all, there is a lot of debate about the <code>$</code>-suffix but I believe this should be a personal preference. 
-The reason why I prefer to use it, is because I find it very easy to separate streams from regular objects.
-That being said, I would not consider it a best practice, just a personal choice.</p>
-
-<h2 id="learning-how-to-think-reactive">Learning how to think reactive</h2>
-
-<p>Reactive programming is completely different than imperative programming. It requires us to make a certain mind switch.
-This mind switch is rather important if we want to benefit from RxJS completely.
-We want to <strong>stop thinking in specific actions</strong> and we want to <strong>start thinking in streams</strong>. 
-It requires us to forget a part of practices that we already know (at least for a moment).
-In <a href="http://blog.brecht.io/Creating-reactive-calendar-in-angular4/">this article</a> we can find some tips and practical examples on how to start thinking reactive in RxJS.</p>
-
-<h2 id="pipeable-operators">Pipeable operators</h2>
-
-<p>The first best practice is the use of pipeable operators. The operators being used in this article are pipeable.
-Since version 5.5 RxJS has introduced these so called pipeable operators which are easier to import than patch operators, and
-also have <a href="https://webpack.js.org/guides/tree-shaking/">treeshaking</a> advantages. More information about pipeable operators can be found <a href="https://blog.angularindepth.com/rxjs-understanding-lettable-operators-fe74dda186d3">here</a> and <a href="https://blog.hackages.io/rxjs-5-5-piping-all-the-things-9d469d1b3f44">here</a>.</p>
-
-<p>This example illustrates the difference between doing it the old way and the new way.</p>
-
-<pre><code class="language-typescript">// BAD: This is the old way and should be avoided (patch operators)
-// as we can see the operators (filter, map) are part of the
-// Observable prototype
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
-const new$ = Observable.interval$
-    .filter(v =&gt; v % 2 === 0)
-    .map(v =&gt; v * 2);
-
-// GOOD: This is the new and improved way (lettable operators)
-// we just use the pipe operator where we pass operators that
-// we can import from 'rxjs/operators'
-import {filter, map} from 'rxjs/operators';
-const new$ = interval$
-    .pipe(
-        filter(v =&gt; v % 2 === 0),
-        map(v =&gt; v *2)
-    )
-</code></pre>
-
-<h2 id="ascii-marble-diagrams">ASCII marble diagrams</h2>
-
-<p>Some developers tend to say: “Great code should be self-explanatory, writing documentation is something that we might want to avoid.”
-In some cases I would agree with that statement, but for complex RxJS code we might want to reconsider.
-Streams can become complex in the following scenarios:</p>
-<ul>
-  <li>When we take the lifecycle of streams into account, (how long do they live? when do they start living? what destroys them?)</li>
-  <li>When we start combining streams (every stream has a different lifecycle remember?)</li>
-  <li>When we subscribe multiple times or even subscribe after a while, or even never subscribe to them</li>
-</ul>
-
-<p><a href="http://rxmarbles.com/">marble diagrams</a> are a cool way of visualising streams but it’s hard to put those marble-diagrams in our code right?!
-There is an ASCII variant of these marble-diagrams that we can use to describe and document our complex streams and how they interact with each other.</p>
-
-<p>ASCII diagrams have more advantages then just documenting:</p>
-<ul>
-  <li>It gives us a graphic thinking model</li>
-  <li>It becomes easy to review someones code and validate to see if it really does what it’s supposed to be doing</li>
-  <li>Great to draw on a whiteboard before we start coding</li>
-  <li>You can type them in your IDE or editor before you actually start coding. (An easy way to trick your mind into thinking reactively)</li>
-  <li>We can use them to write unit tests as well: <a href="http://blog.kwintenp.com/how-to-setup-marble-testing/">Checkout this awesome article</a></li>
-</ul>
-
-<p>The concepts behind ASCII marble documentation are quite simple. Take this easy example for instance:</p>
-
-<pre><code class="language-typescript">// ---a--b--c--d---e---...
-// ---a--b--c--d---e|
-// ---a--b--c--d---e#
-// ---a--b-^-c--d---e
-</code></pre>
-<ul>
-  <li><code>-</code> (stands for a time frame)</li>
-  <li><code>a-z</code> (are the values that are next’ed in the stream)</li>
-  <li><code>|</code> (indicates that the stream has completed)</li>
-  <li><code>...</code> (indicates that the stream will keep on living)</li>
-  <li><code>#</code> (indicates that an error occurred)</li>
-  <li><code>^</code> (indicates where we start subscribing (only for hot streams)</li>
-</ul>
-
-<p>Perhaps it’s time to check a real example and how we might document it:</p>
-
-<pre><code class="language-typescript">const interval$ = interval(1000)            // 0--1--2--3--4--5--6...
-const new$ = interval$
-    .pipe(
-        skip(1),                            // ---1--2--3--4--5--6...
-        take(5),                            // ---1--2--3--4--5|
-        filter(v =&gt; v % 2 === 0),           // ------2-----4---|
-        map(v =&gt; v + 1)                     // ------3-----5---|
-    )
-</code></pre>
-
-<p>Take a minute to let this sink into your brain, because this might be <strong>THE WAY</strong> of making a complex code snippets readable for anyone.
-When we take a look at this diagram, it’s fairly easy to comprehend what happens, and how every operator affects the <code>new$</code> stream we can see above. There is no “one way of doing things” when it comes to writing ASCII marble-diagrams. You can put them where and how you want.
-As we want to do for all other documentation: <strong>keep it up to date!</strong></p>
-
-<h2 id="using-pure-functions">Using pure functions</h2>
-
-<p>RxJS follows the concepts of functional reactive programming which basically means that we will use <a href="https://medium.com/javascript-scene/master-the-javascript-interview-what-is-a-pure-function-d1c076bec976">pure functions</a> to create our reactive flow.
-A function is pure when:</p>
-<ul>
-  <li>It doesn’t mutate anything</li>
-  <li>It will always return the same value based on the same parameters</li>
-  <li>It doesn’t have any side effects. It can’t mutate state outside of the function</li>
-</ul>
-
-<p>In the beginning it might seem pragmatic to use side effects, but that mostly means we aren’t fully thinking reactively. 
-Therefore avoid side effects at much as possible.</p>
-
-<h2 id="avoiding-memory-leaks">Avoiding memory leaks</h2>
-
-<p>To consume a stream we need to <strong>subscribe</strong> to that stream. When we subscribe to that stream a <strong>subscription</strong> will be created.
-That subscription will keep on living until the stream is <strong>completed</strong> or until we <strong>unsubscribe manually</strong> from that stream.
-Managing subscriptions is very important and in a number of cases we will have to manually unsubscribe an existing subscription to avoid memory leaks. Take this example for instance:</p>
-
-<pre><code class="language-typescript">class AppComponent implements OnInit {
-   ngOnInit() {
-        // The following stream will produce values every second
-        // 0--1--2--3--4--5--6--...
-        const interval$ = interval(1000);
-        // Even when this component gets destroyed,
-        // the stream will keep producing values...
-        // This means the console will keep on logging
-        // This is a classic example of a memory-leak
-        const subscription = interval$.subscribe(r =&gt; console.log(r));
-    }
-}
-</code></pre>
-
-<p>To remove the memory-leak in this component we can keep track of the subscriptions by taking advantage of the <code>ngOnDestroy()</code> lifecycle hook of Angular:</p>
-
-<pre><code class="language-typescript">class AppComponent implements OnInit, OnDestroy {
-    subscriptions = [];
-    ngOnInit() {
-        const interval$ = interval(1000);
-        const subscription = interval$.subscribe(r =&gt; console.log(r));
-        // manually keep track of the subscriptions in a subscription array
-        this.subscriptions.push(subscription);
-    }
-
-    ngOnDestroy() {
-        // when the component get's destroyed, unsubscribe all the subscriptions
-        this.subscriptions.forEach(sub =&gt; sub.unsubscribe());
-    }
-}
-</code></pre>
-
-<p>However, when we are using a bunch of subscriptions, it can become quite dirty. Before, we talked about the fact that a subscription will live until we manually unsubscribe (like we just did in the snippet above), but also until the stream gets <strong>completed</strong>. A cool way to handle this issue is to use a Subject that we next in the <code>ngOnDestroy()</code> lifecycle hook of Angular:</p>
-
-<pre><code class="language-typescript">class AppComponent implements OnInit, OnDestroy {
-    destroy$ = new Subject();
-    ngOnInit() {
-        // interval$: 0--1--2--3--4--5--6--...
-        // destroy$:  -------------true|
-        // result:    0--1--2--3--4|
-        const interval$ = interval(1000);
-        interval$
-            // let the interval$ stream live 
-            // until the destroy$ Subject gets a value
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(r =&gt; console.log(r));
-    }
-
-    ngOnDestroy() {
-        // when the component get's destroyed, pass something to the
-        // destroy$ Subject
-        this.destroy$.next(true);
-    }
-}
-</code></pre>
-
-<h2 id="avoiding-nested-subscribes">Avoiding nested subscribes</h2>
-
-<p>Nesting subscribes is something that needs to be avoided as much as possible. It makes the code unreadable, complex, and introduces side effects.
-It basically forces you to <strong>NOT</strong> think reactively. Take this Angular example for instance:</p>
-
-<pre><code class="language-typescript">class AppComponent {
-    user: User;
-    constructor(
-        private route: ActivatedRoute, 
-        private userService: UserService)
-    {
-        // when the params of the route changes,
-        // we want to fetch the user and set the user property
-        //
-        // VERY BAD: nesting subscribes is ugly and takes away
-        // the control over a stream
-        this.route.params
-            .pipe(map(v =&gt; v.id))
-            .subscribe(id =&gt; 
-                this.userService.fetchById(id)
-                    .subscribe(user =&gt; this.user = user))
-    }
-}
-</code></pre>
-
-<p>The previous implementation is considered a bad-practice. It’s recommended to use <strong>higher-order streams</strong> like <code>mergeMap</code> or <code>switchMap</code>. Let’s have a look at this example:</p>
-
-<pre><code class="language-typescript">class AppComponent {
-    user: User;
-    constructor(
-        private route: ActivatedRoute, 
-        private userService: UserService) 
-    {
-        // when the params of the route changes,
-        // we want to fetch the user and set the user property
-        //
-        // GOOD: we have created a single subscribe which makes
-        // the flow way easier and gives us the control we need
-        this.route.params
-            .pipe(
-                map(v =&gt; v.id),
-                switchMap(id =&gt; this.userService.fetchById(id))
-            )
-            .subscribe(user =&gt; this.user = user)
-    }
-}
-</code></pre>
-
-<h2 id="avoiding-manual-subscribes-in-angular">Avoiding manual subscribes in Angular</h2>
-
-<p>To consume a stream we need to subscribe that stream, that’s simply how observables work. But what if a component needs values from 5 different streams… Would that mean, that we want to subscribe to all of these streams and manually map all the values to unique properties, just to make it work? That would suck, right?!</p>
-
-<p>Angular has this super cool feature called the <code>async pipe</code>. It’s used to consume streams directly in the template
-The async pipe does 3 things for us:</p>
-<ul>
-  <li>It subscribes to the stream and passes the value to a component</li>
-  <li>It <strong>unsubscribes automatically</strong> when the component gets destroyed (removes a lot of unsubscribe logic)</li>
-  <li>Triggers change detection automatically</li>
-</ul>
-
-<p>This means we don’t have to manually subscribe nor unsubscribe anymore. Which cleans up the code a lot.
-Let’s have a look at the cleaned up previous example:</p>
-
-<pre><code class="language-typescript">@Component({
-    ...
-    template: `
-        &lt;user-detail [user]="user$|async"&gt;&lt;/user-detail&gt;
-    `
-})
-class AppComponent {
-    // expose a user$ stream that will be 
-    // subscribed in the template with the async pipe
-    user$ = this.route.params.pipe(
-        map(v =&gt; v.id),
-        switchMap(id =&gt; this.userService.fetchById(id))
-    );
-
-    constructor(
-        private route: ActivatedRoute, 
-        private userService: UserService) {
-    }
-}
-</code></pre>
-
-<p>If you are into <a href="https://reactjs.org/">React</a>, I’ve created this lib called <a href="https://www.npmjs.com/package/react-rx-connect">react-rx-connect</a> that would solve this problem. It binds the streams to the state, and unsubscribes from them when the component gets destroyed.</p>
-
-<h2 id="dont-pass-streams-to-components-directly">Don’t pass streams to components directly</h2>
-
-<p>One of the most important aspects of software architecture might be the concept of <strong>decoupling</strong> pieces of code.
-Therefore we could consider passing streams to child components as a <strong>bad practice</strong> because it creates a very tight link between the parent component and the child component. They are no longer decoupled since subscriptions in the child component might trigger actions in the parent component. We never want the child component to be responsible of initiating data calls right?! That’s the task of the smart component. See the difference between
-<a href="http://blog.brecht.io/components-demystified/#smart-vs-dumb-components">smart and dumb components here</a>.
-A component should always receive an object or value and should not even care if that object or value comes from a stream or not.</p>
-
-<pre><code class="language-typescript">// BAD
-// app.component.ts
-@Component({
-    selector: 'app',
-    template: `
-        &lt;!-- 
-            BAD: The users$ steram is passed
-            to user-detail directly as a stream 
-        --&gt;
-        &lt;user-detail [user$]="user$"&gt;&lt;/user-detail&gt;
-    `
-})
-class AppComponent {
-    // this http call will get called when the 
-    // user-detail component subscribes to users$
-    // We don't want that
-    users$ = this.http.get(...);
-    ...
-}
-
-// user-detail.component.ts
-@Component({
-    selector: 'user-detail',
-    template: `
-        
-    `
-})
-class UserDetailComponent implements OnInit {
-    @Input() user$: Observable&lt;User&gt;;
-    user: User;
-    ngOnInit(){
-        // WHOOPS! This child component subscribes to the stream
-        // of the parent component which will do an automatic XHR call
-        // because Angular HTTP returns a cold stream
-        this.user$.subscribe(u =&gt; this.user = u);
-    }
-}
-</code></pre>
-
-<p>It would be better to handle the subscription in the parent component itself:</p>
-
-<pre><code class="language-typescript">// GOOD
-// app.component.ts
-@Component({
-    selector: 'app',
-    template: `
-        &lt;user-detail [user]="user$|async"&gt;&lt;/user-detail&gt;
-    `
-})
-class AppComponent implements OnInit {
-    users$: Observable&lt;User[]&gt; = this.http.get(...);
-    user: User;
-    ngOnInit(){
-        // the app component (smart) subscribes to the user$ which will
-        // do an XHR call here
-        this.users$ = this.http.get(...);
-    }
-    ...
-}
-
-// user-detail.component.ts
-@Component({
-    selector: 'user-detail',
-    template: `
-        
-    `
-})
-class UserDetailComponent {
-    // This component doesn't even know that we are using RxJS which
-    // results in better decoupling
-    @Input() user: User;
-}
-</code></pre>
-
-<p>The responsibility of the component is clear. The user-detail is meant to be dumb and is completely decoupled from its parent.</p>
-
-<p>There are however situations where we would like to create a stream from an input. In that case we could take a look at this library: <a href="https://www.npmjs.com/package/ngx-reactivetoolkit">ngx-reactivetoolkit</a></p>
-
-<h2 id="dont-pass-streams-to-services">Don’t pass streams to services</h2>
-
-<p>Although, it might seem like a pragmatic solution to pass streams directly to services, it could be seen as a <strong>bad practice</strong> if we consider the decoupling again. By passing a stream to a service we don’t know what’s going to happen to it. The stream could be subscribed to, or even combined with another stream that has a longer lifecycle, that could eventually determine the state of our application.
-Subscriptions might trigger unwanted behavior. And after all, services don’t care that your components are using streams. Take this example for instance:</p>
-
-<pre><code class="language-typescript">// BAD
-// app.component.ts
-class AppComponent {
-     users$ = this.http.get(...)
-     filteredusers$ = this.fooService
-        .filterUsers(this.users$); // Passing stream directly: BAD
-    ...
-}
-
-// foo.service.ts
-class FooService {
-    // return a stream based on a stream
-    // BAD! because we don't know what will happen here
-    filterUsers(users$: Observable&lt;User[]&gt;): Observable&lt;User[]&gt; {
-        return users$.pipe(
-            map(users =&gt; users.filter(user =&gt; user.age &gt;= 18))
-    }
-}
-</code></pre>
-
-<p>It would be better to use higher order streams for these situations.
-Use <code>switchMap</code> over <code>mergeMap</code> if possible, since it will unsubscribe the previous stream.
-The following example is better since all the RxJS logic is centralized in one place where the subscribing and unsubscribing happens: The smart component.</p>
-
-<pre><code class="language-typescript">// GOOD
-// app.component.ts
-class AppComponent {
-    users$ = this.http.get(...)
-    filteredusers$ = this.users$
-        .pipe(switchMap(users =&gt; this.fooService.filterUsers(users)));
-    ...
-}
-
-// foo.service.ts
-class FooService {
-    // this is way cleaner: this service doesn't even know
-    // about streams now
-    filterUsers(users: User[]): User[] {
-        return users.filter(user =&gt; user.age &gt;= 18);
-    }
-}
-</code></pre>
-
-<h2 id="sharing-subscriptions">Sharing subscriptions</h2>
-
-<p>Since most streams are cold by default, every subscription will trigger the <strong>producer</strong> of these streams.
-The execution of the producer logic on every subscription, might not be what we want if we have multiple subscriptions.
-Eg. Subscribing to Angular its <code>http.get()</code> multiple times will actually perform multiple xhr calls.
-The following example will trigger the xhr call twice because <code>numberOfUsers$</code> depends on <code>users$</code>.</p>
-
-<pre><code class="language-typescript">@Component({
-    selector: 'app',
-    template: `
-        Number of users: {{numberOfUsers$|async}}
-        &lt;users-grid [users]="users$|async"&gt;&lt;/users-grid&gt;
-    `
-})
-// BAD
-class AppComponent {
-    users$ = this.http.get(...)
-    // the subscription on this stream will execute the xhr call again
-    numberOfUsers$ = this.users$.pipe(map(v =&gt; v.length); 
-}
-</code></pre>
-
-<p>In those cases we might want to share the subscriptions. The following example uses the <code>share()</code> operator:</p>
-
-<pre><code class="language-typescript">@Component({
-    selector: 'app',
-    template: `
-        Number of users: {{numberOfUsers$|async}}
-        &lt;users-grid [users]="users$|async"&gt;&lt;/users-grid&gt;
-    `
-})
-// GOOD
-class AppComponent {
-    users$ = this.http.get(...).pipe(share());
-    // the subscription on this stream will execute the xhr call again
-    numberOfUsers$ = this.users$.pipe(map(v =&gt; v.length); 
-}
-</code></pre>
-
-<p>Sharing a stream makes it hot. This means that if we subscribe after the value is produced, we will miss that value.
-In that case we might want to use <code>shareReplay(1)</code> instead of <code>share()</code>. This will keep the last value in memory for us.</p>
-
-<p>It’s a common mistake to share everything. We don’t always want to work with hot streams and sharing subscriptions comes with a small performance cost.Also, lazy streams have their advantages.</p>
-
-<p>Angular also provides a <em>great alternative</em> that can reduce the sharing of streams to a minimum by using the <code>async as else</code> syntax.. 
-Personally I would consider the use of this feature as a best practice.
-The following example reduces the number of streams, the number of subscriptions and gives us <strong>an easy way to show a loading indicator</strong>.</p>
-
-<pre><code class="language-typescript">@Component({
-    selector: 'app',
-    template: `
-        &lt;div *ngIf="users$|async as users; else loading"&gt;
-            Number of users: 
-            &lt;users-grid [users]="users"&gt;&lt;/users-grid&gt;
-        &lt;/div&gt;
-        &lt;ng-template #loading&gt;Loading...&lt;/ng-template&gt;
-    `
-})
-class AppComponent {
-    // This stream will only subscribed to once
-    users$ = this.http.get(...);
-}
-</code></pre>
-
-<h2 id="when-to-use-subjects">When to use Subjects</h2>
-
-<p>A Subject is both a hot observable and an observer at the same time. This gives us the opportunity to next values into the stream ourselves.
-Subjects tend to be overused by people that didn’t make the mind switch towards reactive programming yet.</p>
-
-<p>Only use them when really needed, for instance it’s ok to use Subjects in the following scenarios:</p>
-<h4 id="when-mocking-streams-in-tests">When mocking streams in tests</h4>
-
-<pre><code class="language-typescript">const fetchAll$ = new Subject(); // use a Subject as a mock
-usersServiceMock.fetchAll.mockReturnValue(fetchAll$);
-fetchAll$.next(fakeUser);
-</code></pre>
-
-<h4 id="when-we-want-to-create-streams-from-outputs-in-angular">When we want to create streams from outputs in Angular</h4>
-
-<pre><code class="language-typescript">@Component({
-    ...
-    template: `
-    &lt;some-component (search)="search$.next($event)"&gt;&lt;/some-component&gt;
-    `
-})
-class AppComponent {
-search$ = new Subject(); // ----t-----te-----ter----term...
-}
-</code></pre>
-
-<h4 id="when-handling-circular-references">When handling circular references</h4>
-
-<p>I’m not going to dive in this to deep, but <a href="">Dominic Elm</a> does an awesome job explaining this in <a href="https://blog.thoughtram.io/rxjs/2017/08/24/taming-snakes-with-reactive-streams.html#behaviorsubject-to-the-rescue">this great article</a></p>
-
-<p>For most other cases an operator or Observable.create might be enough.</p>
-
-<p><strong>Note:</strong>
-A BehaviorSubject is commonly used because it has a <code>getValue()</code> function. That would also be considered a bad practice.
-When we are trying to fetch a specific value it usually means we are not thinking reactive.</p>
-
-<h2 id="clean-code-practices">Clean code practices</h2>
-<p>Consistent code indentation and formatting can improve the readability of complex streams:</p>
-<ul>
-  <li>Align operators below each other</li>
-</ul>
-
-<pre><code class="language-typescript">    foo$.pipe(
-        map(...)
-        filter(...)
-        tap(...)
-    )
-</code></pre>
-
-<ul>
-  <li>Extract into different streams when it becomes unreadable</li>
-  <li>Put complexer functionality in private methods (make the reactive flow clear)</li>
-  <li>Avoid the use of brackets for readability, that’s personal preference.</li>
-</ul>
-
-<h2 id="angular-embraces-rxjs">Angular embraces RxJS</h2>
-
-<p>We already saw a glimpse of why Angular is a framework that really embraces the use of RxJS.
-Therefore it’s recommended to use the functionality that Angular provides.</p>
-<ul>
-  <li>The <code>ActivatedRoute</code> has exposes a params stream.</li>
-  <li>The Http and HttpClient both return streams</li>
-  <li>The <code>Form</code> and <code>FormControl</code> both have a <code>valueChanges</code> property that returns a stream</li>
-  <li>The async pipe is an awesome feature that really helps us to use the streams in our templates</li>
-  <li>Using the <code>ngOnInit()</code> lifecycle function to initialize streams can help us for mocking purposes</li>
-</ul>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Still here? Awesome! We learned a lot! If this article interests you, you might want to check out the “Advanced RxJS in Angular workshop” from <a href="https://strongbrew.io">Strongbrew</a>, where me and <a href="blog.kwintenp.com">Kwinten Pisman</a> teach how to use advanced RxJS in real Angular applications.</p>
 
 	  ]]></description>
 	</item>

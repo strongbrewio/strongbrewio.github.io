@@ -38,6 +38,36 @@
     
       
       <item>
+        <title>RxJS patterns - Prematurely ending work</title>
+        
+          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS patterns - Conditionally executing work</title>
+        
+          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>RxJS patterns - restarting work</title>
         
           <description>&lt;p&gt;Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.&lt;/p&gt;
