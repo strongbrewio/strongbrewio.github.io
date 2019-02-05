@@ -16,6 +16,8 @@ cover: 'assets/images/cover/cover8.jpg'
 This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:
 
 - <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a>
+- <a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a>
+- <a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a>
 
 Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let's say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action. 
 

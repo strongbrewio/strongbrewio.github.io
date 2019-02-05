@@ -16,7 +16,7 @@ cover: 'assets/images/cover/cover8.jpg'
 This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:
 
 - <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a>
-- <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">mapping a function to a stream</a>
+- <a href="https://blog.strongbrew.io/xjs-patterns-mapping-function-calls-to-streams/" target="_blank">mapping a function to a stream</a>
 - <a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a>
 
 The next pattern I want to discuss is executing conditional work. Sometimes, you have a stream and if some condition is met, you want to do some extra step. 

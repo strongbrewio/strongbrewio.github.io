@@ -15,6 +15,12 @@ cover: 'assets/images/cover/cover2.jpg'
 
 Having used RxJS for a while now, I've started to see patterns that I'm using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I'm frequently using so that you can apply them in your own code.
 
+Here are the other patterns:
+- <a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a>
+- <a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a>
+- <a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a>
+
+
 I'll do this by describing them as high level as possible, but still provide you with some examples on where they can be applied.
 
 ## What is 'work'?
