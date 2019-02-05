@@ -13,10 +13,11 @@ tags: RxJS
 cover: 'assets/images/cover/cover8.jpg'
 ---
 
-This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:
+This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:
 
 - <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a>
 - <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">mapping a function to a stream</a>
+- <a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a>
 
 The next pattern I want to discuss is executing conditional work. Sometimes, you have a stream and if some condition is met, you want to do some extra step. 
 
@@ -217,9 +218,11 @@ This gives you exactly the same result and we do not need 'if-else' logic here.
 
 ## When to use this
 
-Some concrete examples where to use this patterns are:
+Some examples where to use this pattern is:
 
-- 
+- when a popup can decide if the action should be executed
+- when creating a generic component that can show a spinner or not based on some configuration
+- when creating a wizard and you only want to continue to the next step if the user current step is validated through a backend call
 
 
 
