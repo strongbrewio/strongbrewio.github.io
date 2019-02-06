@@ -8,6 +8,36 @@
     
       
       <item>
+        <title>RxJS patterns - Prematurely ending work</title>
+        
+          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 30 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS patterns - Conditionally executing work</title>
+        
+          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 29 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>A generic way of handling loading-status, saving-status and validation errors in Angular</title>
         
           <description>&lt;p&gt;When writing Angular applications there are always pieces of functionality that are being rewritten over and over again. 3 common usecases are:&lt;/p&gt;
@@ -33,36 +63,6 @@
         <link>
         https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams/</link>
         <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams/</guid>
-      </item>
-      
-    
-      
-      <item>
-        <title>RxJS patterns - Prematurely ending work</title>
-        
-          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:&lt;/p&gt;
-
-</description>
-        
-        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
-        <link>
-        https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</link>
-        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</guid>
-      </item>
-      
-    
-      
-      <item>
-        <title>RxJS patterns - Conditionally executing work</title>
-        
-          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:&lt;/p&gt;
-
-</description>
-        
-        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
-        <link>
-        https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</link>
-        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</guid>
       </item>
       
     

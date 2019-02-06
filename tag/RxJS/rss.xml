@@ -12,107 +12,10 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
-	  <title>RxJS patterns - Mapping function calls to streams</title>
-	  <link>//rxjs-patterns-mapping-function-calls-to-streams/</link>
-	  <author></author>
-	  <pubDate>2019-01-15T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-patterns-mapping-function-calls-to-streams/</guid>
-	  <description><![CDATA[
-	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
-
-<ul>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
-</ul>
-
-<p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
-
-<p>For example, we have a date picker to which we can pass a function <code>dateChange</code> that gets called when the date is updated. Whenever our date changes, we want to perform a backend call to fetch some data and show it onto the screen.</p>
-
-<p>In RxJS code, I would write something like this:</p>
-
-<pre><code class="language-typescript">const dateChange$ = ...
-
-const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date),
-);
-</code></pre>
-
-<p>In this scenario, I’m defining <code>data$</code> in terms of what it depends on, being the <code>dateChange$</code>. Because we define it like this and RxJS is a push based paradigm, every time the <code>dateChange$</code> changes, the <code>data$</code> will be updated and get a new value.</p>
-
-<p>But the problem here is, how do we get a <code>dateChange$</code>. We are integrating with a third party library that is going to call a function every time the date changes, it does not give us a stream. And we need a stream to write the reactive code we had in the snippet above.</p>
-
-<h2 id="transforming-a-function-into-an-observable">Transforming a function into an Observable</h2>
-
-<p>An <code>Observable</code> is something that encapsulates ‘work’ (to understand what I mean with ‘work’ please read the first pattern I covered <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/#what-is-work" target="_blank">here</a>). The encapsulation here means that we cannot define what that ‘work’ is. Once we get an <code>Observable</code> we can no longer change that ‘work’.</p>
-
-<p>However, there is a building block in RxJS were we can decide whatever an <code>Observable</code> produces and this is called a <code>Subject</code>!</p>
-
-<p>A complicated definition of a <code>Subject</code> is that it is both an <code>Observable</code> and an <code>Observer</code>. I like to think of it as being an <code>Observable</code> that has no work encapsulated and where you can produce the values. So you can send the next, error and/or complete event(s).</p>
-
-<p>Let’s see a code example on how we can leverage a <code>Subject</code> to transform a function call into an <code>Observable</code>.</p>
-
-<pre><code class="language-typescript">const dateChange$ = new Subject();
-
-someLibrary.onDateChange(
-	(date) =&gt; dateChange$.next(date)
-);
-</code></pre>
-
-<p>And that’s it! We pass a function to the third party library that only emits the value it gets onto the created <code>dateChange$</code> <code>Subject</code>. And because a <code>Subject</code> is also an <code>Observable</code>, we can just plug this into the snippet we had above.</p>
-
-<pre><code class="language-typescript">const dateChange$ = new Subject();
-
-someLibrary.onDateChange(
-	(date) =&gt; dateChange$.next(date)
-);
-
-const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date),
-);
-</code></pre>
-<p>Tada!</p>
-
-<h3 id="other-ways">Other ways</h3>
-
-<p>There are two other operators you can use to accomplish the same thing. The first one is called <code>fromEvent</code>. This one is perfect to integrate with API’s that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>):</p>
-
-<pre><code class="language-typescript">const somethingElement = document.getElementById('something');
-
-// a stream of all clicks on the somethingElement
-const click$ = fromEvent(somethingElement, 'click');
-</code></pre>
-
-<p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
-
-<pre><code class="language-typescript">fromEventPattern((handler) =&gt; someLibrary.onDateChange(handler))
- .subscribe(console.log);
-</code></pre>
-
-<p>You can pass it a function that receives a <code>handler</code>. You can pass that <code>handler</code> to any callback based API which will be transformed into a stream.</p>
-
-<p><strong>Note</strong>: If you can use <code>fromEvent</code> or <code>fromEventPattern</code> you definitely should. The way to do it with a <code>Subject</code> is demonstrated since that is the most straight forward way and works in any scenario. But, if possible, use the operators.</p>
-
-<h2 id="when-to-use-this">When to use this</h2>
-
-<p>Some concrete examples where to use this are:</p>
-
-<ul>
-  <li>When a function gets called by a third party library and we need a stream</li>
-  <li>To transform <code>@Output</code>s in Angular into streams</li>
-  <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
-</ul>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
 	  <title>RxJS patterns - Prematurely ending work</title>
 	  <link>//rxjs-patterns-prematurely-ending-work/</link>
 	  <author></author>
-	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <pubDate>2019-01-30T00:00:00+00:00</pubDate>
 	  <guid>//rxjs-patterns-prematurely-ending-work/</guid>
 	  <description><![CDATA[
 	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
@@ -167,7 +70,7 @@ const click$ = fromEvent(somethingElement, 'click');
 	  <title>RxJS patterns - Conditionally executing work</title>
 	  <link>//rxjs-patterns-conditionally-executing-work/</link>
 	  <author></author>
-	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <pubDate>2019-01-29T00:00:00+00:00</pubDate>
 	  <guid>//rxjs-patterns-conditionally-executing-work/</guid>
 	  <description><![CDATA[
 	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:</p>
@@ -379,6 +282,103 @@ const disabled$ = selectedItems$.pipe(
   <li>when a popup can decide if the action should be executed</li>
   <li>when creating a generic component that can show a spinner or not based on some configuration</li>
   <li>when creating a wizard and you only want to continue to the next step if the user current step is validated through a backend call</li>
+</ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>RxJS patterns - Mapping function calls to streams</title>
+	  <link>//rxjs-patterns-mapping-function-calls-to-streams/</link>
+	  <author></author>
+	  <pubDate>2019-01-15T00:00:00+00:00</pubDate>
+	  <guid>//rxjs-patterns-mapping-function-calls-to-streams/</guid>
+	  <description><![CDATA[
+	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
+</ul>
+
+<p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
+
+<p>For example, we have a date picker to which we can pass a function <code>dateChange</code> that gets called when the date is updated. Whenever our date changes, we want to perform a backend call to fetch some data and show it onto the screen.</p>
+
+<p>In RxJS code, I would write something like this:</p>
+
+<pre><code class="language-typescript">const dateChange$ = ...
+
+const data$ = dateChange$.pipe(
+	switchMap(date =&gt; this.service.getData(date),
+);
+</code></pre>
+
+<p>In this scenario, I’m defining <code>data$</code> in terms of what it depends on, being the <code>dateChange$</code>. Because we define it like this and RxJS is a push based paradigm, every time the <code>dateChange$</code> changes, the <code>data$</code> will be updated and get a new value.</p>
+
+<p>But the problem here is, how do we get a <code>dateChange$</code>. We are integrating with a third party library that is going to call a function every time the date changes, it does not give us a stream. And we need a stream to write the reactive code we had in the snippet above.</p>
+
+<h2 id="transforming-a-function-into-an-observable">Transforming a function into an Observable</h2>
+
+<p>An <code>Observable</code> is something that encapsulates ‘work’ (to understand what I mean with ‘work’ please read the first pattern I covered <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/#what-is-work" target="_blank">here</a>). The encapsulation here means that we cannot define what that ‘work’ is. Once we get an <code>Observable</code> we can no longer change that ‘work’.</p>
+
+<p>However, there is a building block in RxJS were we can decide whatever an <code>Observable</code> produces and this is called a <code>Subject</code>!</p>
+
+<p>A complicated definition of a <code>Subject</code> is that it is both an <code>Observable</code> and an <code>Observer</code>. I like to think of it as being an <code>Observable</code> that has no work encapsulated and where you can produce the values. So you can send the next, error and/or complete event(s).</p>
+
+<p>Let’s see a code example on how we can leverage a <code>Subject</code> to transform a function call into an <code>Observable</code>.</p>
+
+<pre><code class="language-typescript">const dateChange$ = new Subject();
+
+someLibrary.onDateChange(
+	(date) =&gt; dateChange$.next(date)
+);
+</code></pre>
+
+<p>And that’s it! We pass a function to the third party library that only emits the value it gets onto the created <code>dateChange$</code> <code>Subject</code>. And because a <code>Subject</code> is also an <code>Observable</code>, we can just plug this into the snippet we had above.</p>
+
+<pre><code class="language-typescript">const dateChange$ = new Subject();
+
+someLibrary.onDateChange(
+	(date) =&gt; dateChange$.next(date)
+);
+
+const data$ = dateChange$.pipe(
+	switchMap(date =&gt; this.service.getData(date),
+);
+</code></pre>
+<p>Tada!</p>
+
+<h3 id="other-ways">Other ways</h3>
+
+<p>There are two other operators you can use to accomplish the same thing. The first one is called <code>fromEvent</code>. This one is perfect to integrate with API’s that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>):</p>
+
+<pre><code class="language-typescript">const somethingElement = document.getElementById('something');
+
+// a stream of all clicks on the somethingElement
+const click$ = fromEvent(somethingElement, 'click');
+</code></pre>
+
+<p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
+
+<pre><code class="language-typescript">fromEventPattern((handler) =&gt; someLibrary.onDateChange(handler))
+ .subscribe(console.log);
+</code></pre>
+
+<p>You can pass it a function that receives a <code>handler</code>. You can pass that <code>handler</code> to any callback based API which will be transformed into a stream.</p>
+
+<p><strong>Note</strong>: If you can use <code>fromEvent</code> or <code>fromEventPattern</code> you definitely should. The way to do it with a <code>Subject</code> is demonstrated since that is the most straight forward way and works in any scenario. But, if possible, use the operators.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Some concrete examples where to use this are:</p>
+
+<ul>
+  <li>When a function gets called by a third party library and we need a stream</li>
+  <li>To transform <code>@Output</code>s in Angular into streams</li>
+  <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
 </ul>
 
 
