@@ -5,7 +5,7 @@ published: true
 description: RxJS patterns conditionally executing work
 author: kwintenp
 comments: true
-date: 2019-01-05
+date: 2019-01-29
 subclass: 'post'
 categories: 'RxJS'
 disqus: true
