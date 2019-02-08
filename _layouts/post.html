@@ -17,16 +17,18 @@ class: 'post-template'
         <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         {% endif %}
     </nav>
-    <div class="spotlight">
-        <h2>Become an Angular architect!</h2>
-        <ul class="techlogos">
-            <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
-        </ul>
-        <div class="img-wrapper">
-            <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
-            <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
-                <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
-            </a>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
         </div>
     </div>
 </header>
@@ -142,31 +144,5 @@ class: 'post-template'
 
 </main>
 
-<aside class="read-next">
 
-    <!-- [[! next_post ]] -->{{ post.url | remove: '/' }}
-    {% if page.next %}
-    <a class="read-next-story {% if page.next.cover %}"
-       style="background-image: url({{ site.baseurl }}{{ page.next.cover }}){% else %}no-cover{% endif %}"
-       href="{{ site.baseurl }}{{ page.next.url | remove: '/' }}">
-        <section class="post">
-            <h2>{{ page.next.title }}</h2>
-            <p>{{ page.next.content | strip_html | truncatewords:15 }}</p>
-        </section>
-    </a>
-    {% endif %}
-    <!-- [[! /next_post ]] -->
-    <!-- [[! prev_post ]] -->
-    {% if page.previous %}
-    <a class="read-next-story prev {% if page.previous.cover %}"
-       style="background-image: url({{ site.baseurl }}{{ page.previous.cover }}){% else %}no-cover{% endif %}"
-       href="{{ site.baseurl }}{{ page.previous.url | remove: '/' }}">
-        <section class="post">
-            <h2>{{ page.previous.title }}</h2>
-            <p>{{ page.previous.content | strip_html | truncatewords:15 }}</p>
-        </section>
-    </a>
-    {% endif %}
-    <!-- [[! /prev_post ]] -->
-</aside>
 <!-- /post -->
