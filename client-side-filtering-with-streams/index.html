@@ -18,11 +18,12 @@
 
     <!-- Styles'n'Scripts -->
     <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
-    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
 
     <!-- highlight.js -->
     <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
 
     <!-- Ghost outputs important style and meta data with this tag -->
         <link rel="canonical" href="https://blog.strongbrew.io//client-side-filtering-with-streams/" />
@@ -71,6 +72,7 @@
                     <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
                     <li><a href="/" class="active">Blog</a></li>
                     <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/code-review" rel="noopener" routerLinkActive="active">Code review</a></li>
                     <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
                 </ul>
             </div>
@@ -142,23 +144,32 @@
         <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
         
     </nav>
-    <div class="spotlight">
-        <h2>Become an Angular architect!</h2>
-        <ul class="techlogos">
-            <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
-        </ul>
-        <div class="img-wrapper">
-            <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
-            <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
-                <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
-            </a>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
         </div>
     </div>
 </header>
 
 <div class="followme followme-abs" id="followme">
-<h5>Want to work with us?</h5>
-<a href="https://strongbrew.io/about" class="button" rel="noopener">Learn more</a>
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
 </div>
 
 
@@ -503,40 +514,61 @@ We also don’t have to manually unsubscribe from the filteredCharacters$, the a
 
 </main>
 
-<aside class="read-next">
 
-    <!-- [[! next_post ]] -->
-    
-    <a class="read-next-story "
-       style="background-image: url(/assets/images/cover/cover1.jpg)"
-       href="/decorators-and-observables-to-implement-retry-logic">
-        <section class="post">
-            <h2>Using decorators and observables to implement retry</h2>
-            <p>Last week, I was at a meetup in Ghent where I was talking with Stefan...</p>
-        </section>
-    </a>
-    
-    <!-- [[! /next_post ]] -->
-    <!-- [[! prev_post ]] -->
-    
-    <a class="read-next-story prev "
-       style="background-image: url(/assets/images/cover/cover4.jpg)"
-       href="/my-favorite-metaphor-for-hot-vs-cold-observables">
-        <section class="post">
-            <h2>My favorite metaphor for hot vs cold observables</h2>
-            <p>A few weeks ago, I was at NG-BE (best conference of the year btw), where...</p>
-        </section>
-    </a>
-    
-    <!-- [[! /prev_post ]] -->
-</aside>
 <!-- /post -->
 
 
         <!-- The tiny footer at the very bottom -->
-        <footer class="site-footer clearfix">
-          <section class="copyright"><a href="/">Strongbrew</a> &copy; 2019</section>
-          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/myjekyll/jasper">Jasper</a></section>
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
         </footer>
     </div>
     <!-- highlight.js -->
@@ -547,22 +579,33 @@ We also don’t have to manually unsubscribe from the filteredCharacters$, the a
     <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <!-- Ghost outputs important scripts and data with this tag -->
     <!--  -->
-    <!-- Add Google Analytics  -->
-        <!-- Google Analytics Tracking code -->
-     <script>
-	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	    ga('create', 'UA-112030289-1', 'auto');
-	    ga('send', 'pageview');
-
-     </script>
     <!-- Fitvids makes video embeds responsive and awesome -->
     <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
     <!-- The main JavaScript file for Casper -->
     <script type="text/javascript" src="/assets/js/index.js"></script>
     <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
 </body>
 </html>

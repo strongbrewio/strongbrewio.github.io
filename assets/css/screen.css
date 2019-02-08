@@ -47,10 +47,19 @@ Custom css
     z-index: 999;
 }
 
-.followme > button {
-    width: 100px;
-    align-self: flex-end;
+.followme > .button {
+    display: flex;
+    margin-top:10px;
+    padding: 10px;
+    text-decoration: none;
+    font-family: "Open Sans", sans-serif;
+    text-rendering: geometricPrecision;
 }
+.followme > .button img {
+    width: 30px;
+    height: 30px;
+}
+
 
 /* ==========================================================================
    0. normalize.css v3.0.3 | MIT License | git.io/normalize | (minified)
@@ -407,7 +416,6 @@ h6 {
 
 h1 {
     font-size: 5rem;
-    letter-spacing: -2px;
     text-indent: -3px;
 }
 
@@ -2541,7 +2549,7 @@ body.page-template .post-title {
     align-items: center;
     min-height: 113px;
     background: #1a100a;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'open sans', sans-serif;
 }
 
 .topbar .container {
@@ -2574,7 +2582,9 @@ body.page-template .post-title {
 
 .topbar .menu li a {
     text-decoration: none;
-    font-size: 15px;
+    font-size: 0.75em;
+    font-family: "Open Sans", sans-serif;
+    line-height: 1.7em;
     padding: 5px 10px;
     color: #fff;
 }
@@ -2645,7 +2655,14 @@ body.page-template .post-title {
     margin-top: 20px;
     margin-bottom: 20px;
     max-width: 400px;
-    margin-left: 20px;
+}
+.spotlight a {
+    text-decoration: none;
+    font-family: "Open Sans", sans-serif;
+}
+.spotlight ul {
+    padding: 0px;
+    margin: 0px;
 }
 
 .spotlight .techlogos {
@@ -2658,9 +2675,6 @@ body.page-template .post-title {
 }
 .spotlight .techlogos li {
     list-style-type: none;
-}
-.spotlight .techlogos img {
-    max-width: 70px;
 }
 
 .spotlight .img-wrapper {
@@ -2680,4 +2694,53 @@ body.page-template .post-title {
     .rxjs-spotlight {
         margin-right: 0px;
     }
+}
+
+
+/* footer */
+.ftr {
+    background: #1a100a;
+    display: flex;
+    width: 100%;
+}
+.container {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+.ftr .footer-top {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: row;
+    font-family: "Open Sans", sans-serif;
+    color: #fff;
+    width: 100%;
+    justify-content: space-between;
+}
+.ftr .footer-top li {
+    list-style-type: none;
+    margin: 0;
+}
+.ftr .footer-top ul {
+    padding: 0;
+    margin: 0;
+}
+.ftr .footer-top h3 {
+    font-size: 1.17em;
+    color: #d6c9c4;
+}
+.ftr .footer-top a {
+    color: #fff;
+    font-family: "Open Sans", sans-serif;
+    text-decoration: none;
+}
+.ftr .footer-top {
+    padding-left: 20px;
+}
+.ftr .footer-bottom {
+    color: #d6c9c4;
+    text-align: center;
+    font-family: "Open Sans", sans-serif;
+    padding: 15px;
 }
