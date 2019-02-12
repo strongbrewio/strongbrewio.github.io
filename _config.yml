@@ -9,7 +9,7 @@ paginate: 5
 language: 'en-uk'
 
 # Website info
-name: 'Strongbrew'
+name: 'Strongbrew: Angular and RxJS blog'
 description: ""
 
 url: https://blog.strongbrew.io
