@@ -57,7 +57,7 @@ On the first run, the initial value will be used (second parameter passed to the
 // acc: 0, cur: 1 -> 1
 ```
 
-Next time the function gets called, the `acc` is going to be the previously returned value and the `cur` is the next value from the `Observable`. This process repeats for every value emitted by the `Observable`. Below you can see all of the other inputs and outputs of the accum targetulator function.
+Next time the function gets called, the `acc` is going to be the previously returned value and the `cur` is the next value from the `Observable`. This process repeats for every value emitted by the `Observable`. Below you can see all of the other inputs and outputs of the accumulator function.
 
 ```typescript
 // acc: 1, 		cur: 2 -> 3
@@ -87,7 +87,7 @@ Let's think about Arrays for a second. Arrays are datastructures. These datastru
 
 ## Conclusion
 
-As Arrays are **sync* datastructures, having an operator/method that emits temporary results when accumulating doesn't makes sense.
+As Arrays are **sync** datastructures, having an operator/method that emits temporary results when accumulating the values from an Array, doesn't makes sense.
 For `Observables` it does makes sense as the values (are|can be) delivered over time.
 
 
