@@ -25,7 +25,7 @@ Let's take a look at the definition of the scan operator (from the <a href="http
 
 If you don't know what the `scan` operator does, this definition might not make that much sense. Let's first look at an example on how we can use the operator and then revisit this.
 
-Let's say that we have an `Observable<number>` and we want to visualise the sum of all of the numbers on the screen. This is something we can use the `scan` operator for.  
+Let's say that we have an `Observable<number>` and we want to visualize the sum of all of the numbers on the screen. This is something we can use the `scan` operator for.  
 
 ```typescript
 const numbers$ = Observable.create(observer => {
@@ -81,7 +81,7 @@ Now that we know what the `scan` operator for RxJS does, let's revisit the defin
 
 We already know what the accumulator function is. We also get what the seed value is (our initial value, in our example 0). But I want to focus on the other part of the definition, 'returns each intermediate result'. 
 
-Let's try and reason why it would make sense to return each intermediate result. We know that `Observables` can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered 'over time' it is very usefull in a lot of scenarios to have temporary values.
+Let's try and reason why it would make sense to return each intermediate result. We know that `Observables` can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered 'over time' it is very useful in a lot of scenarios to have temporary values.
 
 Let's think about Arrays for a second. Arrays are datastructures. These datastructures are **always sync**. When you get an Array, it already 'holds' all of the values. If we think that the `scan` operator will emit temporary results as values might be delivered over time, it doesn't make sense that there is a `scan` operator for Arrays. Arrays are never async, so temporary calculated values wouldn't have any benefit!
 
