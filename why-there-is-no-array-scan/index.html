@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>RxJS patterns - Mapping function calls to streams</title>
-    <meta name="description" content="RxJS patterns mapping function calls to streams" />
+    <title>Why we have a scan for Observables but not for Arrays</title>
+    <meta name="description" content="Why we have a scan operator for Observables but not for Arrays" />
 
     <!-- Mobile Meta -->
     <meta name="HandheldFriendly" content="True" />
@@ -26,32 +26,32 @@
 
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams/" />
+        <link rel="canonical" href="https://blog.strongbrew.io//why-there-is-no-array-scan/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="RxJS patterns - Mapping function calls to streams" />
-    <meta property="og:description" content="RxJS patterns mapping function calls to streams" />
-    <meta property="og:url" content="https://blog.strongbrew.io///rxjs-patterns-mapping-function-calls-to-streams/" />
-    <meta property="og:image" content="/assets/images/cover/cover8.jpg" />
+    <meta property="og:title" content="Why we have a scan for Observables but not for Arrays" />
+    <meta property="og:description" content="Why we have a scan operator for Observables but not for Arrays" />
+    <meta property="og:url" content="https://blog.strongbrew.io///why-there-is-no-array-scan/" />
+    <meta property="og:image" content="/assets/images/cover/cover3.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="RxJS patterns - Mapping function calls to streams" />
-    <meta name="twitter:description" content="RxJS patterns mapping function calls to streams" />
-    <meta name="twitter:url" content="https://blog.strongbrew.io///rxjs-patterns-mapping-function-calls-to-streams/" />
-    <meta name="twitter:image:src" content="/assets/images/cover/cover8.jpg" />
+    <meta name="twitter:title" content="Why we have a scan for Observables but not for Arrays" />
+    <meta name="twitter:description" content="Why we have a scan operator for Observables but not for Arrays" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///why-there-is-no-array-scan/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover3.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew: Angular and RxJS blog",
-    "name": "RxJS patterns - Mapping function calls to streams",
-    "url": "https://blog.strongbrew.io///rxjs-patterns-mapping-function-calls-to-streams/",
-    "image": "/assets/images/cover/cover8.jpg",
-    "description": "RxJS patterns mapping function calls to streams"
+    "name": "Why we have a scan for Observables but not for Arrays",
+    "url": "https://blog.strongbrew.io///why-there-is-no-array-scan/",
+    "image": "/assets/images/cover/cover3.jpg",
+    "description": "Why we have a scan operator for Observables but not for Arrays"
 }
     </script>
 
@@ -138,7 +138,7 @@
 <!-- #post -->
 
 <header id="header" class="main-header post-head "
-        style="background-image: url(/assets/images/cover/cover8.jpg) ">
+        style="background-image: url(/assets/images/cover/cover3.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         
     </nav>
@@ -195,7 +195,7 @@
     <article class="post">
         <div class="post-inner">
             <header class="post-header">
-                <h1 class="post-title">RxJS patterns - Mapping function calls to streams</h1>
+                <h1 class="post-title">Why we have a scan for Observables but not for Arrays</h1>
                 <section class="post-meta">
                     <!-- <a href='/'></a> -->
 
@@ -206,7 +206,7 @@
                     <a href='/author/kwintenp'>Kwinten Pisman</a>
                     
                     
-                    <time class="post-date" datetime="2019-01-15">15 Jan 2019
+                    <time class="post-date" datetime="2019-01-05">05 Jan 2019
                     </time>
                     <!-- [[tags prefix=" on "]] -->
                     
@@ -222,91 +222,83 @@
 
             <section class="post-content">
 
-                <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
+                <p>A while ago, during a training, I was explaining the <code>scan</code> operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a <code>scan</code> operator for <code>Arrays</code>? They both have a <code>reduce</code> method, so why no <code>scan</code> right?</p>
 
-<ul>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
-</ul>
+<p>And actually it’s a really interesting question which showed he didn’t understand important differences between <code>Arrays</code> and <code>Observable</code>s.</p>
 
-<p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
+<h2 id="what-does-scan-do-in-rxjs">What does <code>scan</code> do in RxJS</h2>
 
-<p>For example, we have a date picker to which we can pass a function <code>dateChange</code> that gets called when the date is updated. Whenever our date changes, we want to perform a backend call to fetch some data and show it onto the screen.</p>
+<p>Let’s take a look at the definition of the scan operator (from the <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-scan" target="_blank">ReactiveX.io</a> site):</p>
 
-<p>In RxJS code, I would write something like this:</p>
+<blockquote>
+  <p>Applies an accumulator function over the source `Observable, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
 
-<pre><code class="language-typescript">const dateChange$ = ...
+<p>If you don’t know what the <code>scan</code> operator does, this definition might not make that much sense. Let’s first look at an example on how we can use the operator and then revisit this.</p>
 
-const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date)),
-);
+<p>Let’s say that we have an <code>Observable&lt;number&gt;</code> and we want to visualize the sum of all of the numbers on the screen. This is something we can use the <code>scan</code> operator for.</p>
+
+<pre><code class="language-typescript">const numbers$ = Observable.create(observer =&gt; {
+  observer.next(1);
+  setTimeout(() =&gt; observer.next(2), 100);
+  setTimeout(() =&gt; observer.next(3), 200);
+  setTimeout(() =&gt; observer.next(4), 400);
+  setTimeout(() =&gt; observer.next(5), 300);
+  setTimeout(() =&gt; observer.next(6), 500);
+})
+
+numbers$.pipe(
+  scan(
+  	(acc, cur) =&gt; {
+    	return acc + cur;
+  	}, 
+  	0 // &lt;-- initial value
+  )
+).subscribe(console.log);
 </code></pre>
 
-<p>In this scenario, I’m defining <code>data$</code> in terms of what it depends on, being the <code>dateChange$</code>. Because we define it like this and RxJS is a push based paradigm, every time the <code>dateChange$</code> changes, the <code>data$</code> will be updated and get a new value.</p>
+<p>The <code>scan</code> operator allows us to calculate the value by passing in an accumulator function. This function will get called with the ‘previous’ or initial value and the ‘current’ value and allows us to calculate the sum.</p>
 
-<p>But the problem here is, how do we get a <code>dateChange$</code>. We are integrating with a third party library that is going to call a function every time the date changes, it does not give us a stream. And we need a stream to write the reactive code we had in the snippet above.</p>
+<p>Let’s type out the values that will go into the accumulator function.</p>
 
-<h2 id="transforming-a-function-into-an-observable">Transforming a function into an Observable</h2>
+<p>On the first run, the initial value will be used (second parameter passed to the <code>scan</code> operator) and the first value from the <code>Observable</code>. The calculated value will be 1 (as per our function implementation).</p>
 
-<p>An <code>Observable</code> is something that encapsulates ‘work’ (to understand what I mean with ‘work’ please read the first pattern I covered <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/#what-is-work" target="_blank">here</a>). The encapsulation here means that we cannot define what that ‘work’ is. Once we get an <code>Observable</code> we can no longer change that ‘work’.</p>
-
-<p>However, there is a building block in RxJS were we can decide whatever an <code>Observable</code> produces and this is called a <code>Subject</code>!</p>
-
-<p>A complicated definition of a <code>Subject</code> is that it is both an <code>Observable</code> and an <code>Observer</code>. I like to think of it as being an <code>Observable</code> that has no work encapsulated and where you can produce the values. So you can send the next, error and/or complete event(s).</p>
-
-<p>Let’s see a code example on how we can leverage a <code>Subject</code> to transform a function call into an <code>Observable</code>.</p>
-
-<pre><code class="language-typescript">const dateChange$ = new Subject();
-
-someLibrary.onDateChange(
-	date =&gt; dateChange$.next(date)
-);
+<pre><code class="language-typescript">// acc: 0, cur: 1 -&gt; 1
 </code></pre>
 
-<p>And that’s it! We pass a function to the third party library that only emits the value it gets onto the created <code>dateChange$</code> <code>Subject</code>. And because a <code>Subject</code> is also an <code>Observable</code>, we can just plug this into the snippet we had above.</p>
+<p>Next time the function gets called, the <code>acc</code> is going to be the previously returned value and the <code>cur</code> is the next value from the <code>Observable</code>. This process repeats for every value emitted by the <code>Observable</code>. Below you can see all of the other inputs and outputs of the accumulator function.</p>
 
-<pre><code class="language-typescript">const dateChange$ = new Subject();
-
-someLibrary.onDateChange(
-	date =&gt; dateChange$.next(date)
-);
-
-const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date)),
-);
-</code></pre>
-<p>Tada!</p>
-
-<h3 id="other-ways">Other ways</h3>
-
-<p>There are two other operators you can use to accomplish the same thing. The first one is called <code>fromEvent</code>. This one is perfect to integrate with API’s that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>):</p>
-
-<pre><code class="language-typescript">const somethingElement = document.getElementById('something');
-
-// a stream of all clicks on the somethingElement
-const click$ = fromEvent(somethingElement, 'click');
+<pre><code class="language-typescript">// acc: 1, 		cur: 2 -&gt; 3
+// acc: 3, 		cur: 3 -&gt; 6
+// acc: 6, 		cur: 4 -&gt; 10
+// acc: 10, 	cur: 5 -&gt; 15
+// acc: 15, 	cur: 6 -&gt; 21
 </code></pre>
 
-<p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
+<p>You can find the StackBlitz example below (open the console to see the result):</p>
 
-<pre><code class="language-typescript">fromEventPattern(handler =&gt; someLibrary.onDateChange(handler))
- .subscribe(console.log);
-</code></pre>
+<iframe style="width: 100%; height: 400px" src="https://stackblitz.com/edit/rxjs-ylayki?embed=1&amp;file=index.ts"></iframe>
 
-<p>You can pass it a function that receives a <code>handler</code>. You can pass that <code>handler</code> to any callback based API which will be transformed into a stream.</p>
+<p><strong>Note:</strong> You might notice that calculating values over time is something that can be really useful to calculate state. My friend <a href="https://twitter.com/juristr" target="_blank">Juri Strumpflohner</a> has written an interesting <a href="https://juristr.com/blog/2018/10/simple-state-management-with-scan/" target="_blank">article</a> about this very topic.</p>
 
-<p><strong>Note</strong>: If you can use <code>fromEvent</code> or <code>fromEventPattern</code> you definitely should. The way to do it with a <code>Subject</code> is demonstrated since that is the most straight forward way and works in any scenario. But, if possible, use the operators.</p>
+<h2 id="will-you-please-tell-us-why-there-is-no-arrayscan">Will you please tell us why there is no Array.scan</h2>
 
-<h2 id="when-to-use-this">When to use this</h2>
+<p>Now that we know what the <code>scan</code> operator for RxJS does, let’s revisit the definition:</p>
 
-<p>Some concrete examples where to use this are:</p>
+<blockquote>
+  <p>Applies an accumulator function over the source <code>Observable</code>, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
 
-<ul>
-  <li>When a function gets called by a third party library and we need a stream</li>
-  <li>To transform <code>@Output</code>s in Angular into streams</li>
-  <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
-</ul>
+<p>We already know what the accumulator function is. We also get what the seed value is (our initial value, in our example 0). But I want to focus on the other part of the definition, ‘returns each intermediate result’.</p>
+
+<p>Let’s try and reason why it would make sense to return each intermediate result. We know that <code>Observable</code>s can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered ‘over time’ it is very useful in a lot of scenarios to have temporary values.</p>
+
+<p>Let’s think about Arrays for a second. Arrays are datastructures. These datastructures are <strong>always sync</strong>. When you get an Array, it already ‘holds’ all of the values. If we think that the <code>scan</code> operator will emit temporary results as values might be delivered over time, it doesn’t make sense that there is a <code>scan</code> operator for Arrays. Arrays are never async, so temporary calculated values wouldn’t have any benefit!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>As Arrays are <strong>sync</strong> datastructures, having an operator/method that emits temporary results when accumulating the values from an Array, doesn’t makes sense.
+For <code>Observable</code>s it does makes sense as the values (are|can be) delivered over time.</p>
 
 
 
@@ -348,17 +340,17 @@ const click$ = fromEvent(somethingElement, 'click');
                 <section class="share">
                     <h4>Share this post</h4>
                     <a class="icon-twitter"
-                       href="http://twitter.com/share?text=RxJS patterns - Mapping function calls to streams&amp;url=https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams"
+                       href="http://twitter.com/share?text=Why we have a scan for Observables but not for Arrays&amp;url=https://blog.strongbrew.io/why-there-is-no-array-scan"
                        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                         <span class="hidden">Twitter</span>
                     </a>
                     <a class="icon-facebook"
-                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/why-there-is-no-array-scan"
                        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                         <span class="hidden">Facebook</span>
                     </a>
                     <a class="icon-google-plus"
-                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/why-there-is-no-array-scan"
                        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
                         <span class="hidden">Google+</span>
                     </a>

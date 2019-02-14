@@ -312,7 +312,7 @@ const disabled$ = selectedItems$.pipe(
 <pre><code class="language-typescript">const dateChange$ = ...
 
 const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date),
+	switchMap(date =&gt; this.service.getData(date)),
 );
 </code></pre>
 
@@ -333,7 +333,7 @@ const data$ = dateChange$.pipe(
 <pre><code class="language-typescript">const dateChange$ = new Subject();
 
 someLibrary.onDateChange(
-	(date) =&gt; dateChange$.next(date)
+	date =&gt; dateChange$.next(date)
 );
 </code></pre>
 
@@ -342,11 +342,11 @@ someLibrary.onDateChange(
 <pre><code class="language-typescript">const dateChange$ = new Subject();
 
 someLibrary.onDateChange(
-	(date) =&gt; dateChange$.next(date)
+	date =&gt; dateChange$.next(date)
 );
 
 const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date),
+	switchMap(date =&gt; this.service.getData(date)),
 );
 </code></pre>
 <p>Tada!</p>
@@ -363,7 +363,7 @@ const click$ = fromEvent(somethingElement, 'click');
 
 <p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
 
-<pre><code class="language-typescript">fromEventPattern((handler) =&gt; someLibrary.onDateChange(handler))
+<pre><code class="language-typescript">fromEventPattern(handler =&gt; someLibrary.onDateChange(handler))
  .subscribe(console.log);
 </code></pre>
 
@@ -380,6 +380,95 @@ const click$ = fromEvent(somethingElement, 'click');
   <li>To transform <code>@Output</code>s in Angular into streams</li>
   <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
 </ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Why we have a scan for Observables but not for Arrays</title>
+	  <link>//why-there-is-no-array-scan/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//why-there-is-no-array-scan/</guid>
+	  <description><![CDATA[
+	     <p>A while ago, during a training, I was explaining the <code>scan</code> operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a <code>scan</code> operator for <code>Arrays</code>? They both have a <code>reduce</code> method, so why no <code>scan</code> right?</p>
+
+<p>And actually it’s a really interesting question which showed he didn’t understand important differences between <code>Arrays</code> and <code>Observable</code>s.</p>
+
+<h2 id="what-does-scan-do-in-rxjs">What does <code>scan</code> do in RxJS</h2>
+
+<p>Let’s take a look at the definition of the scan operator (from the <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-scan" target="_blank">ReactiveX.io</a> site):</p>
+
+<blockquote>
+  <p>Applies an accumulator function over the source `Observable, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
+
+<p>If you don’t know what the <code>scan</code> operator does, this definition might not make that much sense. Let’s first look at an example on how we can use the operator and then revisit this.</p>
+
+<p>Let’s say that we have an <code>Observable&lt;number&gt;</code> and we want to visualize the sum of all of the numbers on the screen. This is something we can use the <code>scan</code> operator for.</p>
+
+<pre><code class="language-typescript">const numbers$ = Observable.create(observer =&gt; {
+  observer.next(1);
+  setTimeout(() =&gt; observer.next(2), 100);
+  setTimeout(() =&gt; observer.next(3), 200);
+  setTimeout(() =&gt; observer.next(4), 400);
+  setTimeout(() =&gt; observer.next(5), 300);
+  setTimeout(() =&gt; observer.next(6), 500);
+})
+
+numbers$.pipe(
+  scan(
+  	(acc, cur) =&gt; {
+    	return acc + cur;
+  	}, 
+  	0 // &lt;-- initial value
+  )
+).subscribe(console.log);
+</code></pre>
+
+<p>The <code>scan</code> operator allows us to calculate the value by passing in an accumulator function. This function will get called with the ‘previous’ or initial value and the ‘current’ value and allows us to calculate the sum.</p>
+
+<p>Let’s type out the values that will go into the accumulator function.</p>
+
+<p>On the first run, the initial value will be used (second parameter passed to the <code>scan</code> operator) and the first value from the <code>Observable</code>. The calculated value will be 1 (as per our function implementation).</p>
+
+<pre><code class="language-typescript">// acc: 0, cur: 1 -&gt; 1
+</code></pre>
+
+<p>Next time the function gets called, the <code>acc</code> is going to be the previously returned value and the <code>cur</code> is the next value from the <code>Observable</code>. This process repeats for every value emitted by the <code>Observable</code>. Below you can see all of the other inputs and outputs of the accumulator function.</p>
+
+<pre><code class="language-typescript">// acc: 1, 		cur: 2 -&gt; 3
+// acc: 3, 		cur: 3 -&gt; 6
+// acc: 6, 		cur: 4 -&gt; 10
+// acc: 10, 	cur: 5 -&gt; 15
+// acc: 15, 	cur: 6 -&gt; 21
+</code></pre>
+
+<p>You can find the StackBlitz example below (open the console to see the result):</p>
+
+<iframe style="width: 100%; height: 400px" src="https://stackblitz.com/edit/rxjs-ylayki?embed=1&amp;file=index.ts"></iframe>
+
+<p><strong>Note:</strong> You might notice that calculating values over time is something that can be really useful to calculate state. My friend <a href="https://twitter.com/juristr" target="_blank">Juri Strumpflohner</a> has written an interesting <a href="https://juristr.com/blog/2018/10/simple-state-management-with-scan/" target="_blank">article</a> about this very topic.</p>
+
+<h2 id="will-you-please-tell-us-why-there-is-no-arrayscan">Will you please tell us why there is no Array.scan</h2>
+
+<p>Now that we know what the <code>scan</code> operator for RxJS does, let’s revisit the definition:</p>
+
+<blockquote>
+  <p>Applies an accumulator function over the source <code>Observable</code>, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
+
+<p>We already know what the accumulator function is. We also get what the seed value is (our initial value, in our example 0). But I want to focus on the other part of the definition, ‘returns each intermediate result’.</p>
+
+<p>Let’s try and reason why it would make sense to return each intermediate result. We know that <code>Observable</code>s can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered ‘over time’ it is very useful in a lot of scenarios to have temporary values.</p>
+
+<p>Let’s think about Arrays for a second. Arrays are datastructures. These datastructures are <strong>always sync</strong>. When you get an Array, it already ‘holds’ all of the values. If we think that the <code>scan</code> operator will emit temporary results as values might be delivered over time, it doesn’t make sense that there is a <code>scan</code> operator for Arrays. Arrays are never async, so temporary calculated values wouldn’t have any benefit!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>As Arrays are <strong>sync</strong> datastructures, having an operator/method that emits temporary results when accumulating the values from an Array, doesn’t makes sense.
+For <code>Observable</code>s it does makes sense as the values (are|can be) delivered over time.</p>
 
 
 	  ]]></description>

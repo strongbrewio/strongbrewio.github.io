@@ -68,6 +68,21 @@
     
       
       <item>
+        <title>Why we have a scan for Observables but not for Arrays</title>
+        
+          <description>&lt;p&gt;A while ago, during a training, I was explaining the &lt;code&gt;scan&lt;/code&gt; operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a &lt;code&gt;scan&lt;/code&gt; operator for &lt;code&gt;Arrays&lt;/code&gt;? They both have a &lt;code&gt;reduce&lt;/code&gt; method, so why no &lt;code&gt;scan&lt;/code&gt; right?&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//why-there-is-no-array-scan/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//why-there-is-no-array-scan/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>RxJS patterns - restarting work</title>
         
           <description>&lt;p&gt;Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.&lt;/p&gt;

@@ -312,7 +312,7 @@ const disabled$ = selectedItems$.pipe(
 <pre><code class="language-typescript">const dateChange$ = ...
 
 const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date),
+	switchMap(date =&gt; this.service.getData(date)),
 );
 </code></pre>
 
@@ -333,7 +333,7 @@ const data$ = dateChange$.pipe(
 <pre><code class="language-typescript">const dateChange$ = new Subject();
 
 someLibrary.onDateChange(
-	(date) =&gt; dateChange$.next(date)
+	date =&gt; dateChange$.next(date)
 );
 </code></pre>
 
@@ -342,11 +342,11 @@ someLibrary.onDateChange(
 <pre><code class="language-typescript">const dateChange$ = new Subject();
 
 someLibrary.onDateChange(
-	(date) =&gt; dateChange$.next(date)
+	date =&gt; dateChange$.next(date)
 );
 
 const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date),
+	switchMap(date =&gt; this.service.getData(date)),
 );
 </code></pre>
 <p>Tada!</p>
@@ -363,7 +363,7 @@ const click$ = fromEvent(somethingElement, 'click');
 
 <p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
 
-<pre><code class="language-typescript">fromEventPattern((handler) =&gt; someLibrary.onDateChange(handler))
+<pre><code class="language-typescript">fromEventPattern(handler =&gt; someLibrary.onDateChange(handler))
  .subscribe(console.log);
 </code></pre>
 
@@ -380,6 +380,95 @@ const click$ = fromEvent(somethingElement, 'click');
   <li>To transform <code>@Output</code>s in Angular into streams</li>
   <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
 </ul>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
+	  <title>Why we have a scan for Observables but not for Arrays</title>
+	  <link>//why-there-is-no-array-scan/</link>
+	  <author></author>
+	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <guid>//why-there-is-no-array-scan/</guid>
+	  <description><![CDATA[
+	     <p>A while ago, during a training, I was explaining the <code>scan</code> operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a <code>scan</code> operator for <code>Arrays</code>? They both have a <code>reduce</code> method, so why no <code>scan</code> right?</p>
+
+<p>And actually it’s a really interesting question which showed he didn’t understand important differences between <code>Arrays</code> and <code>Observable</code>s.</p>
+
+<h2 id="what-does-scan-do-in-rxjs">What does <code>scan</code> do in RxJS</h2>
+
+<p>Let’s take a look at the definition of the scan operator (from the <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-scan" target="_blank">ReactiveX.io</a> site):</p>
+
+<blockquote>
+  <p>Applies an accumulator function over the source `Observable, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
+
+<p>If you don’t know what the <code>scan</code> operator does, this definition might not make that much sense. Let’s first look at an example on how we can use the operator and then revisit this.</p>
+
+<p>Let’s say that we have an <code>Observable&lt;number&gt;</code> and we want to visualize the sum of all of the numbers on the screen. This is something we can use the <code>scan</code> operator for.</p>
+
+<pre><code class="language-typescript">const numbers$ = Observable.create(observer =&gt; {
+  observer.next(1);
+  setTimeout(() =&gt; observer.next(2), 100);
+  setTimeout(() =&gt; observer.next(3), 200);
+  setTimeout(() =&gt; observer.next(4), 400);
+  setTimeout(() =&gt; observer.next(5), 300);
+  setTimeout(() =&gt; observer.next(6), 500);
+})
+
+numbers$.pipe(
+  scan(
+  	(acc, cur) =&gt; {
+    	return acc + cur;
+  	}, 
+  	0 // &lt;-- initial value
+  )
+).subscribe(console.log);
+</code></pre>
+
+<p>The <code>scan</code> operator allows us to calculate the value by passing in an accumulator function. This function will get called with the ‘previous’ or initial value and the ‘current’ value and allows us to calculate the sum.</p>
+
+<p>Let’s type out the values that will go into the accumulator function.</p>
+
+<p>On the first run, the initial value will be used (second parameter passed to the <code>scan</code> operator) and the first value from the <code>Observable</code>. The calculated value will be 1 (as per our function implementation).</p>
+
+<pre><code class="language-typescript">// acc: 0, cur: 1 -&gt; 1
+</code></pre>
+
+<p>Next time the function gets called, the <code>acc</code> is going to be the previously returned value and the <code>cur</code> is the next value from the <code>Observable</code>. This process repeats for every value emitted by the <code>Observable</code>. Below you can see all of the other inputs and outputs of the accumulator function.</p>
+
+<pre><code class="language-typescript">// acc: 1, 		cur: 2 -&gt; 3
+// acc: 3, 		cur: 3 -&gt; 6
+// acc: 6, 		cur: 4 -&gt; 10
+// acc: 10, 	cur: 5 -&gt; 15
+// acc: 15, 	cur: 6 -&gt; 21
+</code></pre>
+
+<p>You can find the StackBlitz example below (open the console to see the result):</p>
+
+<iframe style="width: 100%; height: 400px" src="https://stackblitz.com/edit/rxjs-ylayki?embed=1&amp;file=index.ts"></iframe>
+
+<p><strong>Note:</strong> You might notice that calculating values over time is something that can be really useful to calculate state. My friend <a href="https://twitter.com/juristr" target="_blank">Juri Strumpflohner</a> has written an interesting <a href="https://juristr.com/blog/2018/10/simple-state-management-with-scan/" target="_blank">article</a> about this very topic.</p>
+
+<h2 id="will-you-please-tell-us-why-there-is-no-arrayscan">Will you please tell us why there is no Array.scan</h2>
+
+<p>Now that we know what the <code>scan</code> operator for RxJS does, let’s revisit the definition:</p>
+
+<blockquote>
+  <p>Applies an accumulator function over the source <code>Observable</code>, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
+
+<p>We already know what the accumulator function is. We also get what the seed value is (our initial value, in our example 0). But I want to focus on the other part of the definition, ‘returns each intermediate result’.</p>
+
+<p>Let’s try and reason why it would make sense to return each intermediate result. We know that <code>Observable</code>s can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered ‘over time’ it is very useful in a lot of scenarios to have temporary values.</p>
+
+<p>Let’s think about Arrays for a second. Arrays are datastructures. These datastructures are <strong>always sync</strong>. When you get an Array, it already ‘holds’ all of the values. If we think that the <code>scan</code> operator will emit temporary results as values might be delivered over time, it doesn’t make sense that there is a <code>scan</code> operator for Arrays. Arrays are never async, so temporary calculated values wouldn’t have any benefit!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>As Arrays are <strong>sync</strong> datastructures, having an operator/method that emits temporary results when accumulating the values from an Array, doesn’t makes sense.
+For <code>Observable</code>s it does makes sense as the values (are|can be) delivered over time.</p>
 
 
 	  ]]></description>
@@ -1201,242 +1290,6 @@ setTimeout(() =&gt; {
 <h3 id="fixing-the-problem">Fixing the problem</h3>
 
 <p>Whenever the stream we are multicasting will have multiple values, or even don’t complete on their own, it might be better to use the combination <code>publishReplay(1).refCount()</code> for the time being.</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>RxJS polling strategies</title>
-	  <link>//rxjs-polling/</link>
-	  <author></author>
-	  <pubDate>2018-04-19T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-polling/</guid>
-	  <description><![CDATA[
-	     <p>Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.</p>
-
-<p>Polling is something where RxJS really shines. We will look at different polling strategies and how we can implement them.</p>
-
-<p><strong>Note:</strong> The examples in this post will use Angular but the concepts can be ported everywhere.</p>
-
-<ul>
-  <li><a href="#simple-polling">Simple polling</a></li>
-  <li><a href="#polling-and-refresh-button">Combining polling with refresh button</a></li>
-  <li><a href="#polling-and-reset">Polling and reset</a></li>
-  <li><a href="#polling-when-data-is-resolved">Polling when data is resolved</a></li>
-</ul>
-
-<h3 id="simple-polling">Simple polling</h3>
-
-<p>First we will take a look at a simple example where we want to fetch new data every 5 seconds. Let’s first try and think about what we need.</p>
-
-<ul>
-  <li>a backend call</li>
-  <li>a trigger that tells us when we need to execute our backend call</li>
-</ul>
-
-<h4 id="backend-call">Backend call</h4>
-
-<p>Executing a backend call is easy. We can create a stream that will execute a backend call when subscribed to like this.</p>
-
-<pre><code class="language-typescript">const bitcoin$ = this.http.get('https://blockchain.info/ticker');
-</code></pre>
-
-<h4 id="trigger">Trigger</h4>
-
-<p>Next thing we need is a trigger that will tell us when it is time to fetch our data. In a world without RxJS we would probably use <code>setInterval</code>. This function allows us to pass it a callback that gets executed every ‘x’ seconds.
-With RxJS however, we have to change the way we think. We can no longer think in terms of callbacks, we have to think in terms of streams. If we apply this to the trigger we need, we want a stream that fires every ‘x’ seconds. 
-Drawn in a ASCII marble diagram, this is what we want:</p>
-
-<pre><code>----1----2----3----4----5...
-</code></pre>
-
-<p>RxJS has a static <code>interval</code> function that will create this streams for us. We can pass it a number which will denote the time between the events.</p>
-
-<pre><code class="language-typescript">const trigger$ = interval(1000);
-</code></pre>
-
-<p>This is not enough however. Our trigger stream should also trigger at start time. Otherwise, we would only fetch data after ‘1000ms’ (with the example above).</p>
-
-<p>RxJS provides another static function, ‘timer’, that will help us to create the following stream:</p>
-
-<pre><code>0----1----2----3----4----5...
-</code></pre>
-
-<p>Code wise, this looks like this:</p>
-
-<pre><code class="language-typescript">const trigger$ = timer(0, 1000);
-</code></pre>
-
-<h4 id="combine-to-polling-stream">Combine to polling stream</h4>
-
-<p>Now we have the two streams that we need, it is time to combine them. If we think about it, we basically want to re-execute our <code>bitcoin$</code> to refetch the data, every time our <code>trigger$</code> fires. We want to map our trigger value to another observable/async action. To do that, we need to use a flattening operator. As flattening operators are not part of this post, you can read more about them <a href="https://blog.angularindepth.com/switchmap-bugs-b6de69155524" target="_blank">here</a>.</p>
-
-<p>In our case, we are going to use the <code>concatMap</code> operator. This operator will execute all the <code>bitcoin$</code> without cancelling them. Let’s take a look at the code:</p>
-
-<pre><code class="language-typescript">this.polledBitcoin$ = timer(0, 1000).pipe(
-        concatMap(_ =&gt; bitcoin$),
-        map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
-      );
-</code></pre>
-<p>We create a new stream, <code>this.polledBitcoin$</code> by mapping every event that the <code>trigger$</code> emits to our <code>bitcoin$</code>. The <code>concatMap</code> operator will subscribe to the <code>bitcoin$</code> internally and emit the result of that stream as events on the <code>polledBitcoin$</code>.</p>
-
-<p>When we draw this out into a ASCII marble diagram, it looks like this:</p>
-
-<pre><code>bitcoin:            -(b|)
-trigger$:           0------1------2------3------4------5...
-                    \      \      \      \      \      \
-                     -(b|)  -(b|)  -(b|)  -(b|)  -(b|)  -(b|)
- 
- 
-polledBitcoin$     ----b------b------b------b------b------b 
-</code></pre>
-
-<p>We have our <code>bitcoin$</code> that will, when subscribed to, take some time, and then emit the event and complete.</p>
-
-<p>We have our <code>trigger$</code> where we map the values to the <code>bitcoin$</code>. The <code>concatMap</code> operator flattens the result and we get our <code>polledBitcoin$</code>. A stream that will fetch the value of bitcoin every second.</p>
-
-<p>The live example can be found here:</p>
-
-<iframe style="width: 100%; height: 500px" src="https://stackblitz.com/edit/angular-abcqen?embed=1&amp;file=app/app.component.ts"></iframe>
-
-<p><strong>Note:</strong> You can open the devtools on the network tab to see the network requests. There are other Stackblitz demos in this post so you might want to open it in Stackblitz to be sure that the network tab only shows requests from a single demo.</p>
-
-<h3 id="polling-and-refresh-button">Polling and refresh button</h3>
-
-<p>Sometimes, users can be pretty impatient and want to have the control to fetch the data. We can accomplish this by adding a button that, when clicked, will fetch the data as well. But we want also want to keep our polling.</p>
-
-<p>Let’s first try to think reactive on how we can accomplish this. We already have a stream that polls the data. We can create a stream that fetches the data whenever the button is clicked. When we have both of these streams, we can actually just combine them using the <code>merge</code> operator to get one stream that is both triggered by the polling and the button click.</p>
-
-<p>We can simply add a button to our example and a click listener. When the button is clicked, we need to convert this click into a stream, since we will need a stream to ‘start with’. For this we can leverage a <code>Subject</code>.</p>
-
-<pre><code class="language-typescript">manualRefresh = new Subject();
-
-refreshDataClick() {
-    this.manualRefresh.next('');
-}
-</code></pre>
-
-<p>Now that we have a stream that is fired every time the button is clicked, we can simply use the same way of working that we had before. But now, our ‘source’ stream is not a <code>timer</code> but a <code>subject</code>.</p>
-
-<pre><code class="language-typescript">this.manualRefresh
-	.pipe(
-       concatMap(_ =&gt; bitcoin$),
-   );
-</code></pre>
-
-<p>Next thing we need to do is combine both of our streams that can trigger a backend call (and remove the double <code>concatMap</code> operator).</p>
-
-<pre><code class="language-typescript">this.polledBitcoin$ = timer(0, 10000).pipe(
-        merge(this.manualRefresh),
-        concatMap(_ =&gt; bitcoin$),
-        map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
-      );
-</code></pre>
-
-<p>That’s it. Now whenever the button is clicked or the timer triggers, a backend call will be done.</p>
-
-<p>The live code example can be found here:</p>
-
-<iframe src="https://stackblitz.com/edit/angular-zytccc?embed=1&amp;file=app/app.component.ts" style="height: 500px; width:100%"></iframe>
-
-<h3 id="polling-and-reset">Polling and reset</h3>
-
-<p>The previous polling strategy can introduce some unnecessary backend calls. Let’s think about the following scenario. Our timer stream triggers every 10s. After the app has started and has been running for 19s, the user clicks the button, triggering a backend call. And after 20s our timer stream fires as well, also triggering a backend call. This means that at both the 19th and the 20th second, we are fetching the data. This might be a little overkill.</p>
-
-<p>Let’s think about how we can fix this. We already have a stream that will fetch the data immediately and then again and again with 10s in between. And actually, that’s all we need. When we have this stream, and the user clicks the button, we can just restart this stream. Since, when we restart this stream, we are fetching the data immediately (which is what we want when the user clicks), and again after 10 seconds. The ASCII marble diagram looks like this:</p>
-
-<pre><code>bitcoin:            -(b|)
-user clicks:                            C 
-trigger$:           0------1------2-----!0------1------2-----|
-                    \      \      \      \      \      \      
-                     -(b|)  -(b|)  -(b|)  -(b|)  -(b|)  -(b|)
- 
- 
-polledBitcoin$     ----b------b------b------b------b------b-- 
-</code></pre>
-
-<p><strong>Note:</strong> In ASCII marble diagrams, the ‘!’ means that the stream is unsubscribed from.</p>
-
-<p>In the marble diagram above, ‘C’ denotes the user click. In that case, we want to unsubscribe from the previous execution of our <code>trigger$</code> and execute it again. Let’s see how we can do this in the code:</p>
-
-<pre><code>load$ = new BehaviorSubject('');
-
-this.polledBitcoin$ = this.load$.pipe(
-      switchMap(_ =&gt; timer(0, 10000).pipe(
-         concatMap(_ =&gt; bitcoin$),
-         map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
-      )
-   )
-);
-</code></pre>
-<p>First thing we need to change is move from a <code>Subject</code> to a <code>BehaviorSubject</code>. A <code>BehaviorSubject</code> has an initial value and will replay the last value when subscribed to. Here, we are interested in the fact that it has an initial value.</p>
-
-<p>Next thing we do is use this subject to create our <code>polledBitcoin$</code>. We wrapped the stream from our previous examples in a <code>switchMap</code>. Whenever the <code>load$</code> emits, this stream will be started. If there was a previous execution still working, this execution will be stopped in favor of a new one. And that’s exactly what we need. Thanks to the initial value in the <code>BehaviorSubject</code>, we know that the stream will be started whenever the stream is initially subscribed to.</p>
-
-<p>Now, whenever the user clicks on the reload button, the data will be fetched and the timer is reset! We can use this technique in different scenarios as well. For example, when the user swipes down on a mobile device. Nice right!</p>
-
-<p>You can find the example code here:</p>
-<iframe src="https://stackblitz.com/edit/angular-srtgmv" style="width: 100%; height: 500px"></iframe>
-
-<h3 id="polling-when-data-is-resolved">Polling when data is resolved</h3>
-
-<p>The last polling strategy I want to take a look at is one where we only start a next request after the first one has finished plus ‘x’ seconds. This can be helpful in some cases.</p>
-
-<p>With the previous example in mind, Let’s say we poll every 5 seconds and at one point, our backend call takes 4 seconds. This would mean that, 1 second after we finally gotten our result, we fetch it again. This might not always be what we want.</p>
-
-<p>Again, Let’s start by thinking about what we want in a reactive way. First of all, we need to know when our backend call has ended. When it has ended, we need to wait ‘x’ seconds before starting the next one. Let’s break it down.</p>
-
-<p>Knowing when our backend call has ended is pretty easy. Whenever a value passes the <code>bitcoin$</code>, we know the backend call is done. After that has happened, we need to create a stream that, waits ‘x’ seconds and then triggers a new call. Let’s try and create a stream that, when subscribed to, waits 5 seconds, has the option to trigger a new call and then completes.</p>
-
-<pre><code class="language-typescript">load$ = new BehaviorSubject('');
-
-const whenToRefresh$ = of('').pipe(
-      delay(5000),
-      tap(_ =&gt; load$.next(''),
-      skip(1),
-);
-</code></pre>
-
-<p>We created a stream using the static <code>of</code>. This will fire an event immediately when subscribed to. We then delay this event with 5000ms by using the <code>delay</code> operator. We then use a <code>tap</code> where we can actually trigger the next request, and finally <code>skip</code> since we do not want to use the <code>''</code> event anywhere, it was just a trigger.</p>
-
-<p>Next thing we need to do is integrate this into our other code. Let’s see how we can accomplish this:</p>
-
-<pre><code class="language-typescript">const poll$ = concat(bitcoin$, whenToRefresh$);
-
-this.polledBitcoin$ = this.load$.pipe(
-  concatMap(_ =&gt; poll$),
-  map((response: {EUR: {last: number}}) =&gt; response.EUR.last),
-);
-</code></pre>
-
-<p>We removed the <code>timer</code> operator here and replaced it with our <code>BehaviorSubject</code>. We changed our stream inside the <code>concatMap</code> operator. Here we used <code>concat</code> to combine the <code>bitcoin$</code> with our <code>whenToRefresh$</code> we created above. What <code>concat</code> does is, execute the <code>bitcoin$</code> first and whenever that one completes, starts the other stream.</p>
-
-<p>This is ideal, since we need to wait for the <code>whenToRefresh$</code> to start till the backend call completes. When it completed, the <code>whenToRefresh$</code> is started and will wait 5000ms and then next the <code>load$</code> to start the whole thing again.</p>
-
-<p>Drawn out into an ASCII marble diagram, it looks like this.</p>
-
-<pre><code>bitcoin$:         -----(b|)
-load$:       f-------------f-------------f....
-(poll$)                    \
-(poll$)      \              -----b-------N....
-              -----b-------N
-                   
-                   
-polledBitcoin$:   ------b-------------b-------....
-</code></pre>
-
-<p>We can see that, whenever the first backend call was started, we wait 5000ms (here an amount of ‘-‘) before next’ing the <code>load$</code> to start the thing again.</p>
-
-<p>A live example of the code can be found here:</p>
-
-<iframe src="https://stackblitz.com/edit/angular-4nqhgq?embed=1&amp;file=src/app/app.component.ts" style="width: 100%; height: 500px"></iframe>
-
-<p><strong>Note:</strong> to really see that the next call is only scheduled 5000ms after the previous one finished, you can use the network tab and throttle the network to ‘slow 3g’.</p>
-
-<h3 id="conclusion">Conclusion</h3>
-
-<p>RxJS and polling is a match made in heaven. There a number of different ways to implement polling which all have there trade offs. Understanding the differences between the ones described above will get you a long way.</p>
 
 
 	  ]]></description>
