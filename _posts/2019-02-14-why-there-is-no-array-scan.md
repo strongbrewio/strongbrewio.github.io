@@ -5,7 +5,7 @@ published: true
 description: Why we have a scan operator for Observables but not for Arrays
 author: kwintenp
 comments: true
-date: 2019-01-05
+date: 2019-02-14
 subclass: 'post'
 categories: 'RxJS'
 disqus: true
