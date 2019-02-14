@@ -13,15 +13,15 @@ tags: RxJS
 cover: 'assets/images/cover/cover3.jpg'
 ---
 
-A while ago, during a training I was explaining the `scan` operator in RxJS and how you can use it to accumulate a 'calculated' value over time. At some point one of the participants asked why there isn't a `scan` operator for `Arrays`? They both have a `reduce` method, so why no `scan` right?
+A while ago, during a training, I was explaining the `scan` operator in RxJS and how you can use it to accumulate a 'calculated' value over time. At some point one of the participants asked why there isn't a `scan` operator for `Arrays`? They both have a `reduce` method, so why no `scan` right?
 
-And actually it's a really interesting question which showed he didn't understand important differences between `Arrays` and `Observables`.
+And actually it's a really interesting question which showed he didn't understand important differences between `Arrays` and `Observable`s.
 
 ## What does `scan` do in RxJS
 
 Let's take a look at the definition of the scan operator (from the <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-scan" target="_blank">ReactiveX.io</a> site):
 
-> Applies an accumulator function over the source Observable, and returns each intermediate result, with an optional seed value.
+> Applies an accumulator function over the source `Observable, and returns each intermediate result, with an optional seed value.
 
 If you don't know what the `scan` operator does, this definition might not make that much sense. Let's first look at an example on how we can use the operator and then revisit this.
 
@@ -77,18 +77,18 @@ You can find the StackBlitz example below (open the console to see the result):
 
 Now that we know what the `scan` operator for RxJS does, let's revisit the definition:
 
-> Applies an accumulator function over the source Observable, and returns each intermediate result, with an optional seed value.
+> Applies an accumulator function over the source `Observable`, and returns each intermediate result, with an optional seed value.
 
 We already know what the accumulator function is. We also get what the seed value is (our initial value, in our example 0). But I want to focus on the other part of the definition, 'returns each intermediate result'. 
 
-Let's try and reason why it would make sense to return each intermediate result. We know that `Observables` can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered 'over time' it is very useful in a lot of scenarios to have temporary values.
+Let's try and reason why it would make sense to return each intermediate result. We know that `Observable`s can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered 'over time' it is very useful in a lot of scenarios to have temporary values.
 
 Let's think about Arrays for a second. Arrays are datastructures. These datastructures are **always sync**. When you get an Array, it already 'holds' all of the values. If we think that the `scan` operator will emit temporary results as values might be delivered over time, it doesn't make sense that there is a `scan` operator for Arrays. Arrays are never async, so temporary calculated values wouldn't have any benefit!
 
 ## Conclusion
 
 As Arrays are **sync** datastructures, having an operator/method that emits temporary results when accumulating the values from an Array, doesn't makes sense.
-For `Observables` it does makes sense as the values (are|can be) delivered over time.
+For `Observable`s it does makes sense as the values (are|can be) delivered over time.
 
 
 
