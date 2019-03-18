@@ -2694,7 +2694,42 @@ body.page-template .post-title {
     .rxjs-spotlight {
         margin-right: 0px;
     }
+
+    #app {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        z-index: 99999;
+    }
 }
+
+@media only screen and (min-width: 1000px) {
+    #app {
+        width: 100vw;
+        position: relative;
+        left: calc(50% + 50px);
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        z-index: 99999;
+    }
+}
+
+div.video div.fluid-width-video-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+hr.v-divider {
+    margin: 0 !important;
+}
+
+
+
+
 
 
 /* footer */
