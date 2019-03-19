@@ -18,6 +18,8 @@ This is a video course on how you can create the operators from RxJS from scratc
 
 PS: More video's will be added over time!
 
+Source code can be found <a href="https://github.com/KwintenP/rxjs-operators-from-scratch" target="_blank">here</a>.
+
 {% include course.html %}
 
 
