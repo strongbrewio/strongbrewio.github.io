@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Video course - Build the operators from RxJS from scratch</title>
+        
+          <description>&lt;p&gt;This is a video course on how you can create the operators from RxJS from scratch. For more information about this course, you can watch the intro video.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 18 Mar 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//build-the-operators-from-rxjs-from-scratch/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//build-the-operators-from-rxjs-from-scratch/</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Why we have a scan for Observables but not for Arrays</title>
         
           <description>&lt;p&gt;A while ago, during a training, I was explaining the &lt;code&gt;scan&lt;/code&gt; operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a &lt;code&gt;scan&lt;/code&gt; operator for &lt;code&gt;Arrays&lt;/code&gt;? They both have a &lt;code&gt;reduce&lt;/code&gt; method, so why no &lt;code&gt;scan&lt;/code&gt; right?&lt;/p&gt;
@@ -76,8 +91,8 @@
         
         <pubDate>Tue, 15 Jan 2019 00:00:00 +0000</pubDate>
         <link>
-        https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams/</link>
-        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams/</guid>
+        https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams-copy/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams-copy/</guid>
       </item>
       
     

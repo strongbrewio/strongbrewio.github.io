@@ -12,6 +12,25 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Video course - Build the operators from RxJS from scratch</title>
+	  <link>//build-the-operators-from-rxjs-from-scratch/</link>
+	  <author></author>
+	  <pubDate>2019-03-18T00:00:00+00:00</pubDate>
+	  <guid>//build-the-operators-from-rxjs-from-scratch/</guid>
+	  <description><![CDATA[
+	     <p>This is a video course on how you can create the operators from RxJS from scratch. For more information about this course, you can watch the intro video.</p>
+
+<p>PS: More video’s will be added over time!</p>
+
+<p>Source code can be found <a href="https://github.com/KwintenP/rxjs-operators-from-scratch" target="_blank">here</a>.</p>
+
+<div id="app"></div>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Why we have a scan for Observables but not for Arrays</title>
 	  <link>//why-there-is-no-array-scan/</link>
 	  <author></author>
@@ -379,10 +398,10 @@ const disabled$ = selectedItems$.pipe(
 
 	<item>
 	  <title>RxJS patterns - Mapping function calls to streams</title>
-	  <link>//rxjs-patterns-mapping-function-calls-to-streams/</link>
+	  <link>//rxjs-patterns-mapping-function-calls-to-streams-copy/</link>
 	  <author></author>
 	  <pubDate>2019-01-15T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-patterns-mapping-function-calls-to-streams/</guid>
+	  <guid>//rxjs-patterns-mapping-function-calls-to-streams-copy/</guid>
 	  <description><![CDATA[
 	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
 
@@ -1232,64 +1251,6 @@ Aside from the option to change the limit and offset values, there is also a ‘
 <p>When combining streams with the <code>combineLatest</code> operator, where the source streams might have new values within the same call stack, you might get unexpected behavior. You can fix this by adding a <code>debounceTime(0)</code> right after the <code>combineLatest</code>.</p>
 
 <p><strong>Note:</strong> Special thanks to <a href="https://twitter.com/elmd_" target="_blank">Dominic Elm</a>, <a href="https://twitter.com/ncjamieson" target="_blank">Nicholas Jamieson</a>, <a href="https://twitter.com/chaos_monster" target="_blank">Martin Sonnenholzer</a>, <a href="https://twitter.com/maartentibau" target="_blank">Maarten Tibau</a> and <a href="https://twitter.com/frederikprijck" target="_blank">Frederik Prijck</a> for reviewing!</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Be careful when using shareReplay</title>
-	  <link>//share-replay-issue/</link>
-	  <author></author>
-	  <pubDate>2018-04-23T00:00:00+00:00</pubDate>
-	  <guid>//share-replay-issue/</guid>
-	  <description><![CDATA[
-	     <p>This post describes an issue with the current <code>shareReplay</code> operator in RxJS. There has been an open issue for this on Github, but as it has been open for quite some time now. The issue might introduce some memory leaks, so I decided to write about it.</p>
-
-<p>You can find the Github issue <a href="https://github.com/ReactiveX/rxjs/issues/3336" target="_blank">here</a>. There is already a PR for this issue that has been discussed <a href="https://github.com/ReactiveX/rxjs/pull/3354" target="_blank">here</a>. However, it is still unclear what the desired behavior should be. This needs to be discussed by the core team members.</p>
-
-<p>Hopefully this will get resolved and it will get fixed really quick :). For the time being, it made sense to warn people about it.</p>
-
-<h2 id="lets-identify-the-issue">Let’s identify the issue</h2>
-
-<p>Let’s take a look at the following code.</p>
-
-<pre><code class="language-typescript">const interval$ = interval(1000)
-  .pipe(
-     tap(console.log),
-     mapTo('nextValue'),
-     take(10),
-     shareReplay(1),
-  );
-</code></pre>
-
-<p>We are defining an interval stream. Let’s assume that we need this interval stream to create multiple other streams. In that case, we need to transform our stream from a cold stream to a hot one by multicasting it. If we do not do this we are basically subscribing multiple times to the interval stream, and we are triggering the interval multiple times.</p>
-
-<p>Using the <code>shareReplay</code> operator, we are multicasting our <code>interval$</code>. So far so good right?!</p>
-
-<p>Let’s subscribe to this stream and stop subscribing after ‘3000ms’.</p>
-
-<pre><code class="language-typescript">const subscription = interval$.subscribe(console.log);
-
-setTimeout(() =&gt; {
-  subscription.unsubscribe();
-}, 3000);
-</code></pre>
-<p><code>shareReplay</code> uses a <code>refCount</code> under the hood. This will make sure that the source stream is subscribed to when the subscribers count goes up to 1 or higher. Whenever we unsubscribe, the <code>refCount</code> of the subscription is dropping to 0. In that case, we expect that the source stream (being our interval) is cleaned up and it stops emitting values.</p>
-
-<p>Let’s see what happens. A live example of the code can be found here:</p>
-
-<p><a class="jsbin-embed" href="http://jsbin.com/kocagizoje/embed?js,console">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?4.1.4"></script></p>
-
-<p>As you can see, the interval part of our stream keeps emitting whenever we unsubscribe. This might lead to some unexpected behavior in our code, or even memory leaks. Whenever the <code>interval$</code> has no more subscribers, it doesn’t make sense to keep the source subscription active.</p>
-
-<h3 id="defining-the-problem">Defining the problem</h3>
-
-<p>Whenever we are using the <code>shareReplay</code> operator, we must be very careful. The <code>shareReplay</code> operator does not clean up streams when they have not yet completed. In our case, the <code>interval$</code> keeps emitting values after we stopped listening. This will introduce a memory leak into our application.</p>
-
-<h3 id="fixing-the-problem">Fixing the problem</h3>
-
-<p>Whenever the stream we are multicasting will have multiple values, or even don’t complete on their own, it might be better to use the combination <code>publishReplay(1).refCount()</code> for the time being.</p>
 
 
 	  ]]></description>

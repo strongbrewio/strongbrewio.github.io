@@ -12,6 +12,25 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>Video course - Build the operators from RxJS from scratch</title>
+	  <link>//build-the-operators-from-rxjs-from-scratch/</link>
+	  <author></author>
+	  <pubDate>2019-03-18T00:00:00+00:00</pubDate>
+	  <guid>//build-the-operators-from-rxjs-from-scratch/</guid>
+	  <description><![CDATA[
+	     <p>This is a video course on how you can create the operators from RxJS from scratch. For more information about this course, you can watch the intro video.</p>
+
+<p>PS: More video’s will be added over time!</p>
+
+<p>Source code can be found <a href="https://github.com/KwintenP/rxjs-operators-from-scratch" target="_blank">here</a>.</p>
+
+<div id="app"></div>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>Why we have a scan for Observables but not for Arrays</title>
 	  <link>//why-there-is-no-array-scan/</link>
 	  <author></author>
@@ -379,10 +398,10 @@ const disabled$ = selectedItems$.pipe(
 
 	<item>
 	  <title>RxJS patterns - Mapping function calls to streams</title>
-	  <link>//rxjs-patterns-mapping-function-calls-to-streams/</link>
+	  <link>//rxjs-patterns-mapping-function-calls-to-streams-copy/</link>
 	  <author></author>
 	  <pubDate>2019-01-15T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-patterns-mapping-function-calls-to-streams/</guid>
+	  <guid>//rxjs-patterns-mapping-function-calls-to-streams-copy/</guid>
 	  <description><![CDATA[
 	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
 

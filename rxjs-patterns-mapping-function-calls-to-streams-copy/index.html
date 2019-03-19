@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Page Meta -->
-    <title>Do we really need Redux or @ngrx/store</title>
-    <meta name="description" content="This article explains the cases when Redux is a good idea or when it is overkill for your application" />
+    <title>RxJS patterns - Mapping function calls to streams</title>
+    <meta name="description" content="RxJS patterns mapping function calls to streams" />
 
     <!-- Mobile Meta -->
     <meta name="HandheldFriendly" content="True" />
@@ -31,32 +31,32 @@
 
 
     <!-- Ghost outputs important style and meta data with this tag -->
-        <link rel="canonical" href="https://blog.strongbrew.io//do-we-really-need-redux/" />
+        <link rel="canonical" href="https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams-copy/" />
     <meta name="referrer" content="origin" />
     <link rel="next" href="/page2/" />
 
     <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Do we really need Redux or @ngrx/store" />
-    <meta property="og:description" content="This article explains the cases when Redux is a good idea or when it is overkill for your application" />
-    <meta property="og:url" content="https://blog.strongbrew.io///do-we-really-need-redux/" />
-    <meta property="og:image" content="/assets/images/cover/cover1.jpg" />
+    <meta property="og:title" content="RxJS patterns - Mapping function calls to streams" />
+    <meta property="og:description" content="RxJS patterns mapping function calls to streams" />
+    <meta property="og:url" content="https://blog.strongbrew.io///rxjs-patterns-mapping-function-calls-to-streams-copy/" />
+    <meta property="og:image" content="/assets/images/cover/cover8.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Do we really need Redux or @ngrx/store" />
-    <meta name="twitter:description" content="This article explains the cases when Redux is a good idea or when it is overkill for your application" />
-    <meta name="twitter:url" content="https://blog.strongbrew.io///do-we-really-need-redux/" />
-    <meta name="twitter:image:src" content="/assets/images/cover/cover1.jpg" />
+    <meta name="twitter:title" content="RxJS patterns - Mapping function calls to streams" />
+    <meta name="twitter:description" content="RxJS patterns mapping function calls to streams" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///rxjs-patterns-mapping-function-calls-to-streams-copy/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover8.jpg" />
 
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",
     "@type": "Website",
     "publisher": "Strongbrew: Angular and RxJS blog",
-    "name": "Do we really need Redux or @ngrx/store",
-    "url": "https://blog.strongbrew.io///do-we-really-need-redux/",
-    "image": "/assets/images/cover/cover1.jpg",
-    "description": "This article explains the cases when Redux is a good idea or when it is overkill for your application"
+    "name": "RxJS patterns - Mapping function calls to streams",
+    "url": "https://blog.strongbrew.io///rxjs-patterns-mapping-function-calls-to-streams-copy/",
+    "image": "/assets/images/cover/cover8.jpg",
+    "description": "RxJS patterns mapping function calls to streams"
 }
     </script>
 
@@ -143,7 +143,7 @@
 <!-- #post -->
 
 <header id="header" class="main-header post-head "
-        style="background-image: url(/assets/images/cover/cover1.jpg) ">
+        style="background-image: url(/assets/images/cover/cover8.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         
     </nav>
@@ -200,25 +200,25 @@
     <article class="post">
         <div class="post-inner">
             <header class="post-header">
-                <h1 class="post-title">Do we really need Redux or @ngrx/store</h1>
+                <h1 class="post-title">RxJS patterns - Mapping function calls to streams</h1>
                 <section class="post-meta">
                     <!-- <a href='/'></a> -->
 
                     
                     
-                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
                     
                     
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
                     
                     
-                    <time class="post-date" datetime="2018-04-13">13 Apr 2018
+                    <time class="post-date" datetime="2019-01-15">15 Jan 2019
                     </time>
                     <!-- [[tags prefix=" on "]] -->
                     
                     on
                     
                     
-                    <a href='/tag/Redux'>Redux</a>
+                    <a href='/tag/RxJS'>Rxjs</a>
                     
                     
                     
@@ -227,102 +227,92 @@
 
             <section class="post-content">
 
-                <h2 id="about-this-article">About this article</h2>
+                <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
 
-<p>If you are writing Angular, Vue or React applications, chances are big that you have used or encountered the Redux pattern.
-Redux helps us to structure statemanagement in an immutable matter which is great, but in order to use it correctly, we have to write a bunch of boilerplate code.
-In this article I would like to tackle the question on when to use Redux and why.
-The referred plugins/code samples are written in an Angular context. But the principles explained in this articles work for other frameworks as well. This also means that we are using the <a href="https://github.com/ngrx/platform/blob/master/docs/store/README.md">@ngrx/store</a> package instead of the <a href="https://redux.js.org/">Redux</a> package</p>
-
-<h2 id="to-redux-or-not-to-redux">To Redux or not to Redux?</h2>
-
-<p>First of all it’s important to note that Redux solves certain problems for us. If we are not experiencing those problems, then there is a big chance that the Redux pattern
-is overkill for our application.</p>
-
-<p>The first question that we might want to ask ourselves is:
-<strong>Does My application have state?</strong> State can be the value of a pager that we want to remember, or the fact that a sidebar is collapsed or not. State could be a cached set of data coming from our backend, or user information that we need throughout the whole application.
-It could be a simple value that we want to remember in memory when we are navigating between pages.</p>
-
-<p>Let’s sum up some examples where the Redux principle might shine in our applications:</p>
 <ul>
-  <li>Storing state (like the value of a search filter so it’s still available when the user navigates back to a certain grid)</li>
-  <li>Sharing state between components that have their own route, and thus won’t have a parent component to pass them the state through inputs or properties</li>
-  <li>Optimistic updates: Check <a href="https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/">this article</a></li>
-  <li>Real-time updates: Check <a href="https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/">this article</a></li>
-  <li>When we want undo/redo logic</li>
-  <li>When we want to keep track of all the state changes and debug them with awesome tooling (Redux devtools)</li>
-  <li>When we want an organised way of handling session storage or localstorage. Check <a href="https://github.com/btroncone/ngrx-store-localstorage">this plugin</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
 </ul>
 
-<p>When we are writing Angular applications it’s a best-practice to work with immutable data structures. That way we can make use of the <a href="https://angular-2-training-book.rangle.io/handout/change-detection/change_detection_strategy_onpush.html">OnPush changedetectionstrategy</a> that angular provides us, which results in better performance and less unexpected behavior. In React we could use a <a href="https://reactjs.org/docs/react-api.html#reactpurecomponent">Pure component</a> for that. So, for this article let’s assume that immutable datastructures are the way to go and that our application needs it.</p>
+<p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
 
-<p>While we know that Redux forces you to use immutable datastructures, let’s still challenge the need of Redux shall we?
-If statemanagement is trivial to our applications and we just want to store values we could work with a state service instead of Redux.</p>
+<p>For example, we have a date picker to which we can pass a function <code>dateChange</code> that gets called when the date is updated. Whenever our date changes, we want to perform a backend call to fetch some data and show it onto the screen.</p>
 
-<pre><code class="language-typescript">@Injectable()
-export class UsersService {
-    private _users$ = new BehaviorSubject([]);
+<p>In RxJS code, I would write something like this:</p>
 
-    get users$(): Observable&lt;User[]&gt; {
-        return this._users$.asObservable();
-    }
+<pre><code class="language-typescript">const dateChange$ = ...
 
-    // IMPORTANT: since we use an immutable dataflow
-    // we have to make sure users is a new instance
-    setUsers(users: User[]): void {
-        this._users$.next(...users);
-    }
-}
-
+const data$ = dateChange$.pipe(
+	switchMap(date =&gt; this.service.getData(date)),
+);
 </code></pre>
 
-<p>This example shows how we can set the simple value of an array of users by calling the <code>setUsers()</code>function. It will store the value into a BehaviorSubject which we will consume as an observable. The spread operator (<code>...</code>) will create a new instance of the <code>users</code> array. That way we know that we are working in an immutable manner. This was pretty easy and we don’t need Redux anymore, nor all the boilerplate that we would had to write. So if the state of our application only contains a few simple properties, the Redux pattern might be overkill.</p>
+<p>In this scenario, I’m defining <code>data$</code> in terms of what it depends on, being the <code>dateChange$</code>. Because we define it like this and RxJS is a push based paradigm, every time the <code>dateChange$</code> changes, the <code>data$</code> will be updated and get a new value.</p>
 
-<p>But what if we need to do more then just set the value of <code>users</code>. What if we want to add and remove users from that stream, and we would have to do it in an immutable manner? Checkout the following example for instance.</p>
+<p>But the problem here is, how do we get a <code>dateChange$</code>. We are integrating with a third party library that is going to call a function every time the date changes, it does not give us a stream. And we need a stream to write the reactive code we had in the snippet above.</p>
 
-<pre><code class="language-typescript">@Injectable()
-export class UsersService {
-    private _users$ = new BehaviorSubject([]);
+<h2 id="transforming-a-function-into-an-observable">Transforming a function into an Observable</h2>
 
-    get users$(): Observable&lt;User[]&gt; {
-        return this._users$.asObservable();
-    }
+<p>An <code>Observable</code> is something that encapsulates ‘work’ (to understand what I mean with ‘work’ please read the first pattern I covered <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/#what-is-work" target="_blank">here</a>). The encapsulation here means that we cannot define what that ‘work’ is. Once we get an <code>Observable</code> we can no longer change that ‘work’.</p>
 
-    setUsers(users: User[]): void {
-        this._users$.next(...users);
-    }
+<p>However, there is a building block in RxJS were we can decide whatever an <code>Observable</code> produces and this is called a <code>Subject</code>!</p>
 
-    addUser(user: User): void {
-        // We cannot use array.push because we only want to
-        // pass immutable data to the streame
-        // for the OnPush strategy remmber?
-        this._users$.next([...this._users$.getValue(), user])
-    }
+<p>A complicated definition of a <code>Subject</code> is that it is both an <code>Observable</code> and an <code>Observer</code>. I like to think of it as being an <code>Observable</code> that has no work encapsulated and where you can produce the values. So you can send the next, error and/or complete event(s).</p>
 
-    removeUser(id: string) {
-        // Again, we have to create a new Array instance to not break the
-        // immutable dataflow
-        this._users$.next(this._users$.getValue().filter(v =&gt; v.id !== id));
-    }
-}
+<p>Let’s see a code example on how we can leverage a <code>Subject</code> to transform a function call into an <code>Observable</code>.</p>
 
-</code></pre>
-<p>The code above is starting to feel a bit weird, and it seems like we are writing reducer logic inside of this state service to keep it immutable. We have also created our own observable implementation so we could subscribe to the changes of our state service. While it could still be overkill to use redux if this is the only state in our application, it might become complex if we are working with multiple states, nested states, etc.</p>
+<pre><code class="language-typescript">const dateChange$ = new Subject();
 
-<p>Another example is caching. People use redux to cache data results. A simple <code>shareReplay</code> operator might to the trick as well.</p>
-
-<pre><code class="language-typescript">fetchUsers(): Observable&lt;User[]&gt; {
-    ...
-    return this.httpClient.get('').pipe(shareReplay(1));
-}
+someLibrary.onDateChange(
+	date =&gt; dateChange$.next(date)
+);
 </code></pre>
 
-<h2 id="summary">Summary</h2>
+<p>And that’s it! We pass a function to the third party library that only emits the value it gets onto the created <code>dateChange$</code> <code>Subject</code>. And because a <code>Subject</code> is also an <code>Observable</code>, we can just plug this into the snippet we had above.</p>
 
-<p>I would suggest to not use Redux untill we actually need it, and in my experience most applications that I have written in the past did need redux at a certain point. That being said I also wrote a bunch of applications that didn’t need it at all (CRUD applications for instance.</p>
+<pre><code class="language-typescript">const dateChange$ = new Subject();
 
-<p>It’s up to you if you want to use Redux or not, <strong>but keep your applications immutable at all times</strong>.
-It will save you a lot of energy in debugging and it makes sure that you can optimise the change detection cycle in your applications.</p>
+someLibrary.onDateChange(
+	date =&gt; dateChange$.next(date)
+);
+
+const data$ = dateChange$.pipe(
+	switchMap(date =&gt; this.service.getData(date)),
+);
+</code></pre>
+<p>Tada!</p>
+
+<h3 id="other-ways">Other ways</h3>
+
+<p>There are two other operators you can use to accomplish the same thing. The first one is called <code>fromEvent</code>. This one is perfect to integrate with API’s that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>):</p>
+
+<pre><code class="language-typescript">const somethingElement = document.getElementById('something');
+
+// a stream of all clicks on the somethingElement
+const click$ = fromEvent(somethingElement, 'click');
+</code></pre>
+
+<p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
+
+<pre><code class="language-typescript">fromEventPattern(handler =&gt; someLibrary.onDateChange(handler))
+ .subscribe(console.log);
+</code></pre>
+
+<p>You can pass it a function that receives a <code>handler</code>. You can pass that <code>handler</code> to any callback based API which will be transformed into a stream.</p>
+
+<p><strong>Note</strong>: If you can use <code>fromEvent</code> or <code>fromEventPattern</code> you definitely should. The way to do it with a <code>Subject</code> is demonstrated since that is the most straight forward way and works in any scenario. But, if possible, use the operators.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Some concrete examples where to use this are:</p>
+
+<ul>
+  <li>When a function gets called by a third party library and we need a stream</li>
+  <li>To transform <code>@Output</code>s in Angular into streams</li>
+  <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
+</ul>
+
 
 
             </section>
@@ -335,24 +325,26 @@ It will save you a lot of energy in debugging and it makes sure that you can opt
                 
                 
                 
+                
+                
                 <figure class="author-image">
-                    <a class="img" href="/author/brechtbilliet"
-                       style="background-image: url(/assets/images/brecht.png)"><span class="hidden">brechtbilliet's Picture</span></a>
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
                 </figure>
                 
 
                 <section class="author">
-                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
 
                     
-                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
                     
                     <div class="author-meta">
                         <span
                             class="author-location icon-location"> Belgium</span>
-                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        
                         <span class="author-link icon-twitter"><a
-                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
                     </div>
                 </section>
 
@@ -361,27 +353,26 @@ It will save you a lot of energy in debugging and it makes sure that you can opt
                 <section class="share">
                     <h4>Share this post</h4>
                     <a class="icon-twitter"
-                       href="http://twitter.com/share?text=Do we really need Redux or @ngrx/store&amp;url=https://blog.strongbrew.io/do-we-really-need-redux"
+                       href="http://twitter.com/share?text=RxJS patterns - Mapping function calls to streams&amp;url=https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams-copy"
                        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                         <span class="hidden">Twitter</span>
                     </a>
                     <a class="icon-facebook"
-                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/do-we-really-need-redux"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams-copy"
                        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                         <span class="hidden">Facebook</span>
                     </a>
                     <a class="icon-google-plus"
-                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/do-we-really-need-redux"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams-copy"
                        onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
                         <span class="hidden">Google+</span>
                     </a>
                 </section>
                 
                 
-                
-                
 
                 <!-- Add Disqus Comments -->
+                
                 
                 
                 <div id="disqus_thread"></div>
@@ -408,7 +399,7 @@ It will save you a lot of energy in debugging and it makes sure that you can opt
         var d = document, s = d.createElement('script');
 
         // IMPORTANT: Replace EXAMPLE with your forum shortname!
-        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
 
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
@@ -420,7 +411,6 @@ It will save you a lot of energy in debugging and it makes sure that you can opt
         comments powered by Disqus.
     </a>
 </noscript>
-                
                 
                 
 
