@@ -55,7 +55,7 @@ The `sidebarCollapsed$` stream starts out with `false`, later on it becomes `tru
 </my-awesome-sidebar>
 ```
 The `async` pipe will subscribe to the `sidebarCollapsed$` pass it to the component, mark it for check and will automatically unsubscribe when the component gets destroyed.
-Keeping state in an observable pattern is nice because we can subscribe to the changes. Oh, and did I mention it plays super nice with Angular?
+Keeping state in an observer pattern is nice because we can subscribe to the changes. Oh, and did I mention it plays super nice with Angular?
 
 We can either use a `BehaviorSubject` or state management frameworks that support Observables. Here are some really great ones with Observable support:
 
