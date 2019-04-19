@@ -128,12 +128,14 @@ Eg: When an `ItemComponent` has a property `selectedItems` which is an array of 
 It belongs to that component, therefore the component should be responsible for it. Child components can consume that state but should *never mutate it*. Those components can notify their parent that is responsible for it, which could update it in an immutable way. For more information about smart and dumb components [look here](https://blog.strongbrew.io/components-demystified/#smart-vs-dumb-components).
 
 Personally, I try to avoid state management frameworks for managing component state because it's the responsibility of that component to manage that state.
-
 There are however good reasons to use state management frameworks to manage component state:
 
 - When the state management is very complex
 - If we want to do [optimistic updates](https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux/) 
 - If we want to use it for [realtime stuff](https://blog.strongbrew.io/How-we-made-our-app-real-time-in-6-lines-of-code/)
+
+If the state management of the component becomes a bit too complex and we don't want to use a state management framework just yet, we could use a state reducer in the component itself.
+
 
 ### Persisted state
 
@@ -197,4 +199,12 @@ However, there are a few downsides as well:
 
 ## Wrapping up
 
-State management is a topic surrounded with discussions and opinions. There is no right or wrong, use what works for you and your team. There are awesome libraries out there, use them if it benefits you, but at least think about it before you use them.
+State management is a topic surrounded with discussions and opinions. There is no right or wrong, use what works for you and your team. There are awesome libraries out there, use them if it benefits you, but at least think about it before you use them. That's the goal of this article after all, to get everyone to start thinking about state managment rather than jumping to the first solution.
+
+## Special thanks
+
+Special thanks to the awesome reviewers:
+
+[Tim Deschryver](https://twitter.com/tim_deschryver)
+[Jeffrey Bosch](https://twitter.com/jefiozie)
+[Ruben Vermeulen](https://twitter.com/rubverm)
