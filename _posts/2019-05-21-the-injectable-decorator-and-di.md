@@ -44,7 +44,7 @@ In any IOC (inversion of control) container (used for DI), you always need two t
 
 In Angular, we can register a service for a token and pass it a provider in two different ways. 
 
-We can register a service with a specific `@NgModule` by passing a service to the providers' array. In this scenario, our token is the typescript type `SomeService`. The provider is the `useClass` strategy which also points to the `SomeService`. This provider strategy basically says that this dependency can be instantiated by `new ... ()`ing it.
+We can register a service with a specific `@NgModule` by passing a service to the providers array. In this scenario, our token is the typescript type `SomeService`. The provider is the `useClass` strategy which also points to the `SomeService`. This provider strategy basically says that this dependency can be instantiated by `new ... ()`ing it.
 
 ```typescript
 @NgModule({
@@ -93,7 +93,7 @@ export class SomeService {
 
 Let's try and reason about what happens when we want to get an instance of this `SomeService`. First of all, this `SomeService` will need to be registered with Angular so let's assume it is. When Angular wants to create this service, it will need to pass it an instance of the `HttpClient`. So how can it do that?
 
-Well, first of all, Angular will need to know which dependency is requested. Remember that we use a token to register a dependency? Well, with the same token (and this is really important), we can ask Angular for an instance of that dependency. So what Angular can do is, by investigating our constructor, it can see that we are requesting a service for the token `HttpClient`. And if a service has been registered with that token, Angular will give use it to instantiate the `SomeService` and give us the instance it created.
+Well, first of all, Angular will need to know which dependency is requested. Remember that we use a token to register a dependency? Well, with the same token (and this is really important), we can ask Angular for an instance of that dependency. So what Angular can do is, by investigating our constructor, it can see that we are requesting a service for the token `HttpClient`. And if a service has been registered with that token, Angular will use it to instantiate the `SomeService` and give us the instance it created.
 
 But wait a minute 🤔, the token we are talking about is a Typescript type. And when our code is running in the browser, we are running Javascript. And when we transpile from Typescript to Javascript, we lose all the types. So how can Angular know what token we are requesting in our constructor???
 
@@ -117,7 +117,7 @@ var SomeService = /** @class */ (function () {
 
 As you can see, the decorator adds metadata so that when this service is instantiated, Angular knows what services are requested and we don't lose the token information. 
 
-Important to note here is that Angular is NOT using the `@Injectable` decorator to register the service. It is only using the decorator so it knows what dependencies the service actually requests. 
+Important to note here is that Angular is NOT using the `@Injectable` decorator to register the service. It is only using the decorator to figure out which dependencies the service actually requests. 
 
 **Note:** Other decorators such as `@Component` will also add this metadata to the transpiled class (as components can also have dependencies of course).
 
