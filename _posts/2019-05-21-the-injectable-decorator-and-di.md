@@ -155,7 +155,7 @@ So to the participants that answered this question wrong because of the question
 
 I hope this clarifies it a bit. And even though you probably best add the decorator to every service, understanding how it works under the hood is in my opinion still a crucial aspect to become a better Angular developer!
 
-
+Thanks to <a href="https://twitter.com/jvandemo" target="_blank">Jurgen</a> for the review!
 
 
 
