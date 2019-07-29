@@ -1,11 +1,11 @@
 ---
 layout: post
 title: Managing state in Angular
-published: false
+published: true
 description: 
 author: brechtbilliet
 comments: true
-date: 2019-04-11
+date: 2019-07-29
 subclass: 'post'
 categories: 'brechtbilliet'
 disqus: true
