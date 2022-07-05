@@ -14,7 +14,10 @@
     <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}" />
     <meta name="twitter:url" content="{{ site.url }}{% if site.baseurl %}{{ site.baseurl }}{% endif %}{{ page.url }}" />
     <meta name="twitter:image:src" content="{{ site.baseurl }}{% if page.cover %}{{ page.cover }}{% else %}assets/images/cover1.jpg{% endif %}" />
+    {% if page.author == 'brechtbilliet'%}
+    <meta http-equiv="refresh" content="0;url=https://blog.brecht.io{{ page.url }}" />
 
+    {% endif %}
     <script type="application/ld+json">
 {
     "@context": "http://schema.org",

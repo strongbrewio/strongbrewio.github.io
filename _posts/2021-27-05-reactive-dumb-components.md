@@ -15,11 +15,11 @@ cover: 'assets/images/cover/cover4.jpg'
 
 ## Reactive dumb components
 
-When we write RxJS logic inside our presentation layer we mostly wind up with Reactive flows inside our smart components (container components). The reasoning behind this, is quite easy:
+When we write RxJS logic inside our presentation layer we mostly wind up with reactive flows inside our smart components (container components). The reasoning behind this, is quite easy:
 
 Because these smart components are the orchestration vessels of our application, they communicate with reactive asynchronous flows such as XHR-calls and state management, but also with events emitted by the dumb components.
 
-That being said, dumb components may also benefit from RxJS flows. Especially when the dumb component has multiple `@Input()` properties that rely on different sets of asynchronous data.
+That being said, dumb components may also benefit from reactive flows. Especially when the dumb component has multiple `@Input()` properties that rely on different sets of asynchronous data.
 The usual way of handling these types of changes is the use of imperative `if else code` inside the `ngOnChanges` lifecycle hook.
 
 Take this situation for example: We have a `CompanyDetail` component that has the responsibility to visualize a company with all its sites. 
