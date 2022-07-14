@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Why we have a scan for Observables but not for Arrays</title>
+    <meta name="description" content="Why we have a scan operator for Observables but not for Arrays" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//why-there-is-no-array-scan/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why we have a scan for Observables but not for Arrays" />
+    <meta property="og:description" content="Why we have a scan operator for Observables but not for Arrays" />
+    <meta property="og:url" content="https://blog.strongbrew.io///why-there-is-no-array-scan/" />
+    <meta property="og:image" content="/assets/images/cover/cover3.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Why we have a scan for Observables but not for Arrays" />
+    <meta name="twitter:description" content="Why we have a scan operator for Observables but not for Arrays" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///why-there-is-no-array-scan/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover3.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "Why we have a scan for Observables but not for Arrays",
+    "url": "https://blog.strongbrew.io///why-there-is-no-array-scan/",
+    "image": "/assets/images/cover/cover3.jpg",
+    "description": "Why we have a scan operator for Observables but not for Arrays"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover3.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Why we have a scan for Observables but not for Arrays</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2019-02-14">14 Feb 2019
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>A while ago, during a training, I was explaining the <code>scan</code> operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a <code>scan</code> operator for <code>Arrays</code>? They both have a <code>reduce</code> method, so why no <code>scan</code> right?</p>
+
+<p>And actually it’s a really interesting question which showed he didn’t understand important differences between <code>Arrays</code> and <code>Observable</code>s.</p>
+
+<h2 id="what-does-scan-do-in-rxjs">What does <code>scan</code> do in RxJS</h2>
+
+<p>Let’s take a look at the definition of the scan operator (from the <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-scan" target="_blank">ReactiveX.io</a> site):</p>
+
+<blockquote>
+  <p>Applies an accumulator function over the source `Observable, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
+
+<p>If you don’t know what the <code>scan</code> operator does, this definition might not make that much sense. Let’s first look at an example on how we can use the operator and then revisit this.</p>
+
+<p>Let’s say that we have an <code>Observable&lt;number&gt;</code> and we want to visualize the sum of all of the numbers on the screen. This is something we can use the <code>scan</code> operator for.</p>
+
+<pre><code class="language-typescript">const numbers$ = Observable.create(observer =&gt; {
+  observer.next(1);
+  setTimeout(() =&gt; observer.next(2), 100);
+  setTimeout(() =&gt; observer.next(3), 200);
+  setTimeout(() =&gt; observer.next(4), 400);
+  setTimeout(() =&gt; observer.next(5), 300);
+  setTimeout(() =&gt; observer.next(6), 500);
+})
+
+numbers$.pipe(
+  scan(
+  	(acc, cur) =&gt; {
+    	return acc + cur;
+  	}, 
+  	0 // &lt;-- initial value
+  )
+).subscribe(console.log);
+</code></pre>
+
+<p>The <code>scan</code> operator allows us to calculate the value by passing in an accumulator function. This function will get called with the ‘previous’ or initial value and the ‘current’ value and allows us to calculate the sum.</p>
+
+<p>Let’s type out the values that will go into the accumulator function.</p>
+
+<p>On the first run, the initial value will be used (second parameter passed to the <code>scan</code> operator) and the first value from the <code>Observable</code>. The calculated value will be 1 (as per our function implementation).</p>
+
+<pre><code class="language-typescript">// acc: 0, cur: 1 -&gt; 1
+</code></pre>
+
+<p>Next time the function gets called, the <code>acc</code> is going to be the previously returned value and the <code>cur</code> is the next value from the <code>Observable</code>. This process repeats for every value emitted by the <code>Observable</code>. Below you can see all of the other inputs and outputs of the accumulator function.</p>
+
+<pre><code class="language-typescript">// acc: 1, 		cur: 2 -&gt; 3
+// acc: 3, 		cur: 3 -&gt; 6
+// acc: 6, 		cur: 4 -&gt; 10
+// acc: 10, 	cur: 5 -&gt; 15
+// acc: 15, 	cur: 6 -&gt; 21
+</code></pre>
+
+<p>You can find the StackBlitz example below (open the console to see the result):</p>
+
+<iframe style="width: 100%; height: 400px" src="https://stackblitz.com/edit/rxjs-ylayki?embed=1&amp;file=index.ts"></iframe>
+
+<p><strong>Note:</strong> You might notice that calculating values over time is something that can be really useful to calculate state. My friend <a href="https://twitter.com/juristr" target="_blank">Juri Strumpflohner</a> has written an interesting <a href="https://juristr.com/blog/2018/10/simple-state-management-with-scan/" target="_blank">article</a> about this very topic.</p>
+
+<h2 id="will-you-please-tell-us-why-there-is-no-arrayscan">Will you please tell us why there is no Array.scan</h2>
+
+<p>Now that we know what the <code>scan</code> operator for RxJS does, let’s revisit the definition:</p>
+
+<blockquote>
+  <p>Applies an accumulator function over the source <code>Observable</code>, and returns each intermediate result, with an optional seed value.</p>
+</blockquote>
+
+<p>We already know what the accumulator function is. We also get what the seed value is (our initial value, in our example 0). But I want to focus on the other part of the definition, ‘returns each intermediate result’.</p>
+
+<p>Let’s try and reason why it would make sense to return each intermediate result. We know that <code>Observable</code>s can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered ‘over time’ it is very useful in a lot of scenarios to have temporary values.</p>
+
+<p>Let’s think about Arrays for a second. Arrays are datastructures. These datastructures are <strong>always sync</strong>. When you get an Array, it already ‘holds’ all of the values. If we think that the <code>scan</code> operator will emit temporary results as values might be delivered over time, it doesn’t make sense that there is a <code>scan</code> operator for Arrays. Arrays are never async, so temporary calculated values wouldn’t have any benefit!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>As Arrays are <strong>sync</strong> datastructures, having an operator/method that emits temporary results when accumulating the values from an Array, doesn’t makes sense.
+For <code>Observable</code>s it does makes sense as the values (are|can be) delivered over time.</p>
+
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Why we have a scan for Observables but not for Arrays&amp;url=https://blog.strongbrew.io/why-there-is-no-array-scan"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/why-there-is-no-array-scan"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/why-there-is-no-array-scan"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

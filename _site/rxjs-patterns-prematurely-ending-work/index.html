@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>RxJS patterns - Prematurely ending work</title>
+    <meta name="description" content="RxJS patterns prematurely ending work" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="RxJS patterns - Prematurely ending work" />
+    <meta property="og:description" content="RxJS patterns prematurely ending work" />
+    <meta property="og:url" content="https://blog.strongbrew.io///rxjs-patterns-prematurely-ending-work/" />
+    <meta property="og:image" content="/assets/images/cover/cover8.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RxJS patterns - Prematurely ending work" />
+    <meta name="twitter:description" content="RxJS patterns prematurely ending work" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///rxjs-patterns-prematurely-ending-work/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover8.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "RxJS patterns - Prematurely ending work",
+    "url": "https://blog.strongbrew.io///rxjs-patterns-prematurely-ending-work/",
+    "image": "/assets/images/cover/cover8.jpg",
+    "description": "RxJS patterns prematurely ending work"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover8.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">RxJS patterns - Prematurely ending work</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2019-01-30">30 Jan 2019
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
+</ul>
+
+<p>The next pattern I want to discuss when we you want to prematurely end work. There are many scenarios when you would want to do this. We can start some work (aka an <code>Observable</code>) and want to kill that subscription if our  user navigates to a different page, the user changes something which should trigger a different call, …</p>
+
+<h2 id="how-can-we-do-it">How can we do it</h2>
+
+<p>One thing I really like about RxJS is how declarative it is. You can quite often translate what you want into a sentence and translate that sentence into code.</p>
+
+<p>Let’s say that we want to listen to a certain stream, until a certain event happens. An extremely common scenario is when you are working with a UI framework that works with components. Often you want to: ‘Listen to this specific <code>Observable</code> until the component gets destroyed’.</p>
+
+<p>Translated into code, we could have something like this:</p>
+
+<pre><code class="language-typescript">workWeWantToDo$.pipe(
+	listenTillThisEventHappens(componentDestroyed)
+).subscribe();
+</code></pre>
+<p><strong>Note:</strong> <code>listenTillThisEventHappens</code> is not an operator :).</p>
+
+<p>The <code>listenTillThisEventHappens</code> can be replaced by the <code>takeUntil</code> operator which does exactly this. And we can create a stream from a lifecycle hook that gets called via our UI framework. Checkout the other pattern ‘mapping function calls to streams’ to see how you can accomplish this.</p>
+
+<p>The resulting code is:</p>
+
+<pre><code class="language-typescript">workWeWantToDo$.pipe(
+	takeUntil(componentDestroy$)
+).subscribe();
+</code></pre>
+
+<p>When creating this <code>Observable</code> we use the <code>takeUntil</code> operator. This operator will subscribe to the stream above (if it was subscribed to itself of course) and will proxy these values until the <code>componentDestroy$</code> emits. Then the <code>takeUntil</code> will kill the subscription.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Everytime you are thinking: ‘I want to stop this when that happens’.</p>
+
+<ul>
+  <li>To kill subscriptions when a component is destroyed</li>
+  <li>When trying to know when a user stopped dragging. You can have a stream that listens for ‘dragDown’ and take values until a ‘dragUp’ events happens.</li>
+</ul>
+
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=RxJS patterns - Prematurely ending work&amp;url=https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

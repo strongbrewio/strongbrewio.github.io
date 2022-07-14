@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Strongbrew: Angular and RxJS blog - Articles</title>
+    <description></description>
+    <link>
+    https://blog.strongbrew.io/</link>
+    
+      
+      <item>
+        <title>Video course - Build the operators from RxJS from scratch</title>
+        
+          <description>&lt;p&gt;This is a video course on how you can create the operators from RxJS from scratch. For more information about this course, you can watch the intro video.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 18 Mar 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//build-the-operators-from-rxjs-from-scratch/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//build-the-operators-from-rxjs-from-scratch/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Why we have a scan for Observables but not for Arrays</title>
+        
+          <description>&lt;p&gt;A while ago, during a training, I was explaining the &lt;code&gt;scan&lt;/code&gt; operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a &lt;code&gt;scan&lt;/code&gt; operator for &lt;code&gt;Arrays&lt;/code&gt;? They both have a &lt;code&gt;reduce&lt;/code&gt; method, so why no &lt;code&gt;scan&lt;/code&gt; right?&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//why-there-is-no-array-scan/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//why-there-is-no-array-scan/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS patterns - Prematurely ending work</title>
+        
+          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 30 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-prematurely-ending-work/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS patterns - Conditionally executing work</title>
+        
+          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 29 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>A generic way of handling loading-status, saving-status and validation errors in Angular</title>
+        
+          <description>&lt;p&gt;When writing Angular applications there are always pieces of functionality that are being rewritten over and over again. 3 common usecases are:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 25 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS patterns - Mapping function calls to streams</title>
+        
+          <description>&lt;p&gt;This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 15 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams-copy/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-mapping-function-calls-to-streams-copy/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS patterns - restarting work</title>
+        
+          <description>&lt;p&gt;Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-patterns-restarting-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-patterns-restarting-work/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Migrating to Nx</title>
+        
+          <description>&lt;p&gt;I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say, this has been a real eye opening experience. I’ve gotten to the point that everyone that is remotely interested into talking to me is going to get a pitch on why monorepos are the best and how Nx can help us in achieving this. I even gave a talk about this very topic at NG-BE which you can find &lt;a href=&quot;https://www.youtube.com/watch?v=d04U7SjORTI&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 05 Jan 2019 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//migrating-to-nx/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//migrating-to-nx/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Opinionated guidelines for large nx angular projects</title>
+        
+          <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Sat, 08 Dec 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//opinionated-guidelines-for-large-nx-angular-projects/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//opinionated-guidelines-for-large-nx-angular-projects/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Safe HTTP calls with RxJS</title>
+        
+          <description>&lt;p&gt;Hi there, since it’s very busy lately this will probably be my one of my shortest articles ever.
+Maybe that’s a good thing, because now you don’t have an excuse not to read it. It’s short, compact
+and maybe you will learn a thing or two.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 24 Oct 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//safe-http-calls-with-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//safe-http-calls-with-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Using nx-etc checkout feature</title>
+        
+          <description>&lt;p&gt;Using &lt;a href=&quot;https://nrwl.io/nx&quot;&gt;Nx&lt;/a&gt; we can build applications using a monorepo style of development. If your monorepo contains a lot of applications and libraries, the development process might be impacted a little.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sun, 14 Oct 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//using-nx-etc-checkout-feature/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//using-nx-etc-checkout-feature/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Building a safe autocomplete operator in RxJS</title>
+        
+          <description>&lt;p&gt;A well-known use case of RxJS is creating a simple autocomplete search in only a few lines of code.
+This article is not just about creating our own autocomplete operator, we will create an autocomplete operator that is completely safe (we will cover the perception of safe later in this article).&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 13 Jul 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//building-a-safe-autocomplete-operator-with-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//building-a-safe-autocomplete-operator-with-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Thinking reactive with the SIP principle</title>
+        
+          <description>&lt;p&gt;A few months back we released &lt;a href=&quot;https://blog.strongbrew.io/rxjs-best-practices-in-angular/&quot;&gt;RxJS best practices in Angular&lt;/a&gt; and a while before that &lt;a href=&quot;https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs/&quot;&gt;Thinking reactively in Angular and RxJS&lt;/a&gt;. 
+Both of these articles are focussing on “trying to make the mind switch towards reactive programming”.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 30 Jun 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//the-sip-principle/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//the-sip-principle/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>A glitch in combineLatest (and how to fix it!)</title>
+        
+          <description>&lt;p&gt;The &lt;code&gt;combineLatest&lt;/code&gt; operator is probably one of my favorite ones, that I believe everyone should know. You should never try to learn all of them but &lt;code&gt;combineLatest&lt;/code&gt;, to me, is definitely one of those ~15 you should probably understand.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 12 Jun 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//combine-latest-glitch/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//combine-latest-glitch/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Redux (@ngrx/store) best practices</title>
+        
+          <description>&lt;p&gt;&lt;a href=&quot;https://github.com/ngrx/platform/blob/master/docs/store/README.md&quot;&gt;@ngrx/store&lt;/a&gt; is a library that tries to solve the problems of state management through the principles of &lt;a href=&quot;https://redux.js.org/&quot;&gt;Redux&lt;/a&gt;. The difference between Redux and @ngrx/store is that @ngrx/store is written specifically for &lt;a href=&quot;https://angular.io&quot;&gt;Angular&lt;/a&gt; and it embraces the use of Observables from &lt;a href=&quot;http://reactivex.io/rxjs/&quot;&gt;RxJS&lt;/a&gt;.
+The combination of redux principles and RxJS can be very powerful when it comes to writing reactive applications.
+Since a lot of Angular projects use @ngrx/store, it might be a good idea to write down some best-practices.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 27 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//Redux-best-practices/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//Redux-best-practices/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Be careful when using shareReplay</title>
+        
+          <description>&lt;p&gt;This post describes an issue with the current &lt;code&gt;shareReplay&lt;/code&gt; operator in RxJS. There has been an open issue for this on Github, but as it has been open for quite some time now. The issue might introduce some memory leaks, so I decided to write about it.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//share-replay-issue/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//share-replay-issue/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS polling strategies</title>
+        
+          <description>&lt;p&gt;Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Thu, 19 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-polling/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-polling/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Do we really need Redux or @ngrx/store</title>
+        
+          <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Fri, 13 Apr 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//do-we-really-need-redux/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//do-we-really-need-redux/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Nx on your CI, how does it work?</title>
+        
+          <description>&lt;p&gt;Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of &lt;a href=&quot;https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2&quot; target=&quot;_blank&quot;&gt;schematics&lt;/a&gt; that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 13 Mar 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//how-nx-affected-apps-works/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//how-nx-affected-apps-works/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Pre-rendering Angular Applications</title>
+        
+          <description>&lt;h2 id=&quot;why-should-we-pre-render-angular-applications&quot;&gt;Why should we pre-render Angular applications?&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Sun, 04 Mar 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//prerendering-angular-apps/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//prerendering-angular-apps/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>What are schedulers in RxJS</title>
+        
+          <description>&lt;p&gt;One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used to execute tasks. The main reason for this is that the authors of RxJS did a great job in abstracting this logic. They used the principle of least concurrency as the default scheduling strategy which makes sure that in most cases, we don’t have to think about changing the default.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 05 Feb 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//what-are-schedulers-in-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//what-are-schedulers-in-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Displaying components based on the role of a user</title>
+        
+          <description>&lt;p&gt;At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 15 Jan 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//display-a-component-based-on-role/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//display-a-component-based-on-role/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>RxJS best practices in Angular</title>
+        
+          <description>&lt;p&gt;This article is all about the do’s and don’ts when it comes to writing reactive applications with &lt;a href=&quot;http://reactivex.io/&quot;&gt;RxJS&lt;/a&gt; in &lt;a href=&quot;https://angular.io/&quot;&gt;Angular&lt;/a&gt; applications. 
+The best practices described in this article are based on personal experiences and can be assumed as personal opinions.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Thu, 04 Jan 2018 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//rxjs-best-practices-in-angular/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//rxjs-best-practices-in-angular/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Safe image requests in angular</title>
+        
+          <description>&lt;p&gt;We all know how to load images in a web-application right? We would just make use of the img DOM-element, define its src attribute and we are good to go. Everything would happen automatically. However, there is a big security-issue with this approach.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 24 Oct 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//safe-image-requests-in-angular/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//safe-image-requests-in-angular/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Code formatting and RxJS</title>
+        
+          <description>&lt;p&gt;One of the main benefits of RxJS to me is that it provides code that is ‘readable’. It provides us with a declarative programming approach where implementation details are hidden away. We are just describing what needs to be done, not how it should be done. This makes code you look at easy to understand.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 08 Sep 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//code-formatting-with-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//code-formatting-with-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Multicasting operators in RxJS</title>
+        
+          <description>&lt;p&gt;With the arrival of RxJS 5.4 a while back, the RxJS team has given us yet another way to support multicasting in our applications. They introduced the &lt;code&gt;shareReplay&lt;/code&gt; operator. With this new one around the corner, you might start wondering when to use which multicasting operator. Well, it’s your lucky day cause that’s what this post is all about.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sun, 20 Aug 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//multicasting-operators-in-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//multicasting-operators-in-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>A scalable angular architecture (part 2)</title>
+        
+          <description>&lt;h1 id=&quot;the-sandbox-pattern&quot;&gt;The sandbox pattern&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sun, 13 Aug 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//A-scalable-angular-architecture-part2/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//A-scalable-angular-architecture-part2/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Introducing Rx devtools</title>
+        
+          <description>&lt;p&gt;Ever since I first started using RxJS up until this very day, it has become my absolute favorite way of coding. I cannot believe to work in a world without observables anymore nor can I understand on how I was able to write code before. I have started sharing the knowlegde I had through blogposts, workshops and coaching.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//introducing-rx-devtools/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//introducing-rx-devtools/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Thinking reactively in Angular and RXJS</title>
+        
+          <description>&lt;h2 id=&quot;foreword&quot;&gt;Foreword&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Tue, 25 Jul 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//thinking-reactively-in-angular-and-rxjs/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//thinking-reactively-in-angular-and-rxjs/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>How to setup marble testing</title>
+        
+          <description>&lt;p&gt;In an earlier blogpost, I showed you guys how to do client side filtering with streams (&lt;a href=&quot;http://blog.kwintenp.com/client-side-filtering-with-streams/&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;). I tried to show you how you could use marble diagrams to draw out how the data will flow in your streams. Turns out that drawing your marble diagrams up front can help you a lot in testing your code as well. Using the marble diagram testing provided by RxJS, we can easily test the code we’ve written in the previous post. Let’s see how.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 15 Feb 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//how-to-setup-marble-testing/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//how-to-setup-marble-testing/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Using decorators and observables to implement retry</title>
+        
+          <description>&lt;p&gt;Last week, I was at a meetup in Ghent where I was talking with &lt;a href=&quot;https://twitter.com/stefanlapers&quot; target=&quot;_blank&quot;&gt;Stefan Lapers&lt;/a&gt; about programming languages in general. We started talking about writing your backend using either Java or node.js. We agreed that node.js has massive potential but in a lot of situations companies choose Java because of it’s maturity. If you’re using a microservices based architecture for example, you can rely heavily on spring cloud which does a whole bunch of stuff for you so you can focus on functionality.
+One element in spring cloud is hystrix. When you’re doing a network call which is protected by hystrix, you can, by just adding an annotation, tell how many times you want to retry this if it fails and even provide a fallback if it fails entirely.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 15 Feb 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//decorators-and-observables-to-implement-retry-logic/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//decorators-and-observables-to-implement-retry-logic/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Client side filtering using streams</title>
+        
+          <description>&lt;p&gt;I have been coaching people in using RxJS for a while now. During this time, I’ve noticed that the hardest part for people to learn is not the API, concept or operators but the paradigm switch. Thinking reactively is not something that comes easily and you really have to get your hands dirty to get there.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 15 Feb 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//client-side-filtering-with-streams/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//client-side-filtering-with-streams/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>My favorite metaphor for hot vs cold observables</title>
+        
+          <description>&lt;p&gt;A few weeks ago, I was at NG-BE (best conference of the year btw), where I was giving a workshop on RxJS and @ngrx/store in Angular 2 applications. In this course, we also explain hot vs cold observables.
+When I try to explain new concepts to people, I either try to start from a known concept and build my way up to the new thing or use a metaphor. I’ve been looking for a similar approach to explain the hot vs cold observables concept but didn’t found one myself.
+At the conference, I started talking with &lt;a href=&quot;https://www.linkedin.com/in/lander-verhack-a404a04b&quot; target=&quot;_blank&quot;&gt;Lander Verhack&lt;/a&gt;. Lander gives trainings at U2U and he told me a great metaphor for this concept. I’ll try to explain it below but all credits go to him for coming up with it.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 10 Jan 2017 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//my-favorite-metaphor-for-hot-vs-cold-observables/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//my-favorite-metaphor-for-hot-vs-cold-observables/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Infinite scroll in Angular an RxJS</title>
+        
+          <description>&lt;h2 id=&quot;about-this-article&quot;&gt;About this article&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Wed, 21 Dec 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//infinite-scroll-with-rxjs-and-angular2/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//infinite-scroll-with-rxjs-and-angular2/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>How share() can reduce network requests</title>
+        
+          <description>&lt;p&gt;As you hopefully all know, observables you get back from the Angular 2 Http service are cold. A cold observable only starts when you subscribe to to it and is unicast (for every subscription to the Http observable, a network call is triggered).&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 20 Dec 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//how-share()-can-reduce-network-requests/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//how-share()-can-reduce-network-requests/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Type safe actions in reducers</title>
+        
+          <description>&lt;p&gt;I’ve been using TypeScript and Redux for a while now. One thing that’s been bothering me from day one is the lack of typing on actions, or so I thought. Until the following twitter conversation last week caught my eye.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 21 Nov 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//type-safe-actions-in-reducers/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//type-safe-actions-in-reducers/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>A scalable Angular 2 architecture</title>
+        
+          <description>&lt;h2 id=&quot;foreword&quot;&gt;Foreword&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Wed, 09 Nov 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//A-scalable-angular2-architecture/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//A-scalable-angular2-architecture/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Cancellable optimistic updates in Angular 2 and Redux</title>
+        
+          <description>&lt;p&gt;&lt;a href=&quot;https://angular.io/&quot;&gt;Angular 2&lt;/a&gt; and &lt;a href=&quot;https://github.com/reactjs/redux&quot;&gt;redux&lt;/a&gt; are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the &lt;a href=&quot;https://github.com/ngrx/store&quot;&gt;@ngrx/store&lt;/a&gt; variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the &lt;a href=&quot;http://redux.js.org/&quot;&gt;documentation&lt;/a&gt; first.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 23 Sep 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//Cancellable-optimistic-updates-in-Angular2-and-Redux/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//Cancellable-optimistic-updates-in-Angular2-and-Redux/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>combineReducers enhanced</title>
+        
+          <description>&lt;p&gt;When working with redux or ngrx/store, you get a lovely utillity method called &lt;code&gt;combineReducers&lt;/code&gt; that solves a pretty annoying problem for you. This method could however be further improved and we’ll see why in a bit.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Thu, 15 Sep 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//combinereducers-enhanced/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//combinereducers-enhanced/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>How we made our app real-time in 6 lines of code</title>
+        
+          <description>&lt;p&gt;&lt;a href=&quot;https://blog.kwintenp.com/&quot;&gt;Kwinten Pisman&lt;/a&gt; and me were working on a workshop this weekend with the focus on Reactive applications with &lt;a href=&quot;http://angular.io&quot;&gt;Angular 2&lt;/a&gt;, &lt;a href=&quot;https://github.com/ReactiveX/rxjs&quot;&gt;RXJS&lt;/a&gt; and &lt;a href=&quot;https://github.com/ngrx&quot;&gt;@ngrx&lt;/a&gt;. Something that can’t miss in a reactive workshop are real-time updates. The application we are trying to make real-time is the &lt;a href=&quot;http://winecellar.surge.sh&quot;&gt;winecellar&lt;/a&gt; app (you can register an account here if you want to test it).&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sun, 11 Sep 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//How-we-made-our-app-real-time-in-6-lines-of-code/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//How-we-made-our-app-real-time-in-6-lines-of-code/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Components demystified</title>
+        
+          <description>&lt;h2 id=&quot;table-of-contents&quot;&gt;Table of Contents&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Tue, 30 Aug 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//components-demystified/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//components-demystified/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>Modals in Angular 2</title>
+        
+          <description>&lt;p&gt;&lt;strong&gt;Updated at 3 september 2016 (RC.6 compliant)&lt;/strong&gt;&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 24 Aug 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//Modals-in-angular2/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//Modals-in-angular2/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>How to write clean reducers (and test them!)</title>
+        
+          <description>&lt;p&gt;Last week, someone asked me how I kept my reducers clean and how to properly test them. Since it wasn’t the first time someone asked me that, I decided to write it down for future reference.
+Here it is!&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Mon, 22 Aug 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//how-to-write-clean-reducers-and-test-them/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//how-to-write-clean-reducers-and-test-them/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>How the hell does zone.js really work?</title>
+        
+          <description>&lt;p&gt;If you’ve read about Angular 2 change detection, you will probably have heard about zones. Zones is a feature that was ported from Dart and is used internally by Angular 2 to determine if a change detection cycle should be triggered.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Thu, 09 Jun 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//how-the-hell-do-zones-really-work/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//how-the-hell-do-zones-really-work/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>The smart vs dumb component quiz</title>
+        
+          <description>&lt;p&gt;If you follow the blogs of some of the more well known SPA guru’s, you will most definitely have heard of the concept of &lt;code&gt;smart&lt;/code&gt; and &lt;code&gt;dumb&lt;/code&gt; components. If you haven’t, here’s a listing of some of those blogposts:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Fri, 22 Apr 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//the-smart-vs-dumb-components-quiz/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//the-smart-vs-dumb-components-quiz/</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>The $onChanges lifecycle-hook in depth</title>
+        
+          <description>&lt;p&gt;With the release of Angular 1.5.3 we got some awesome new features. As you all know, the point of the Angular 1.5 releases are to bring us closer to the Angular 2 way of working. With that in mind, the latest new feature we’ve got are Lifecycle hooks. What those are and how you can use them has already been perfectly explained by Pascal Precht on &lt;a href=&quot;http://blog.thoughtram.io/angularjs/2016/03/29/exploring-angular-1.5-lifecycle-hooks.html&quot;&gt;his blog&lt;/a&gt;. For the remainder of this blog, I’m going to assume you have read it.
+I’m not going to try and do the same, instead I want to look at a specific lifecycle hook in depth, &lt;code&gt;$onChanges&lt;/code&gt;. We’ll look at how it is implemented by Angular, how we can use it with some examples, a pitfall when using it with non-primitives and how we can fix it.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Wed, 06 Apr 2016 00:00:00 +0000</pubDate>
+        <link>
+        https://blog.strongbrew.io//the-onchanges-lifecycle-hook/</link>
+        <guid isPermaLink="true">https://blog.strongbrew.io//the-onchanges-lifecycle-hook/</guid>
+      </item>
+      
+    
+  </channel>
+</rss>

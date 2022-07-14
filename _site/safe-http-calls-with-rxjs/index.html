@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Safe HTTP calls with RxJS</title>
+    <meta name="description" content="How to make sure our ajax calls are being executed on bad connections" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//safe-http-calls-with-rxjs/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Safe HTTP calls with RxJS" />
+    <meta property="og:description" content="How to make sure our ajax calls are being executed on bad connections" />
+    <meta property="og:url" content="https://blog.strongbrew.io///safe-http-calls-with-rxjs/" />
+    <meta property="og:image" content="/assets/images/cover/cover3.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Safe HTTP calls with RxJS" />
+    <meta name="twitter:description" content="How to make sure our ajax calls are being executed on bad connections" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///safe-http-calls-with-rxjs/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover3.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "Safe HTTP calls with RxJS",
+    "url": "https://blog.strongbrew.io///safe-http-calls-with-rxjs/",
+    "image": "/assets/images/cover/cover3.jpg",
+    "description": "How to make sure our ajax calls are being executed on bad connections"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover3.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Safe HTTP calls with RxJS</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                    
+                    
+                    
+                    
+                    <time class="post-date" datetime="2018-10-24">24 Oct 2018
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>Hi there, since it’s very busy lately this will probably be my one of my shortest articles ever.
+Maybe that’s a good thing, because now you don’t have an excuse not to read it. It’s short, compact
+and maybe you will learn a thing or two.</p>
+
+<h2 id="the-problem">The problem</h2>
+
+<p>The article is all about making sure our HTTP calls don’t die on bad connections, since strangely enough, <strong>404 responses can kill your application when using RxJS</strong>.</p>
+
+<p>Remember that RxJS observables have 3 types of events right?</p>
+<ul>
+  <li><code>next</code>: passing in a new value into the observable</li>
+  <li><code>error</code>: when an error occurs</li>
+  <li><code>complete</code>: When the observable is completed</li>
+</ul>
+
+<p>We should not forget that <strong>an Error event will actually stop the observable</strong>. It will cease to exist.</p>
+
+<p>You might say: “That’s not that bad, we’ll just create a new one every time we want to fetch data”.</p>
+
+<p>When you are approaching your application the <em>reactive way</em>, this scenario might be problematic:
+Imagine a typeahead search where we want to retrieve results for every input value. We have an observable of searchterms and we trigger the
+HTTP request for every value using a <code>switchMap</code>.</p>
+
+<pre><code class="language-typescript">// this observable contains the values
+// of what the user is searching for
+// over time
+const searchTerm$: Observable&lt;string&gt;;
+
+// when the term receives a new value...
+// go fetch some data
+const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; fetchData(term))
+)
+
+// subscribe to the observable to start listening
+results$.subscribe((response: Result[]) =&gt; {
+    console.log(response);
+})
+</code></pre>
+<p>This all works fine, until an error happens in the observable. This could come from a bad connection, server down-time or anything that went wrong during the HTTP request (500, 404, …) 
+If the user is having a bad connection which might result in a <code>404</code>, the observable will stop and the application will be broken. The user can search for results as much as he or she wants, the HTTP calls will never happen again.</p>
+
+<h2 id="catcherror">catchError</h2>
+
+<p>We could use the <code>catchError</code> operator that will basically catch the error for us, and return a brand new observable(containing the error).
+That observable will have the error as a value, instead of throwing it again as an error.
+That way we could actually show the user a decent message.
+This might look something like this:</p>
+
+<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; 
+        fetchData(term).pipe(
+            // return an observable with the error inside
+            catchError(e =&gt; of(e))
+        )
+    )
+)
+results$.subscribe(
+    (response: Result[] | HttpErrorResponse) =&gt; {
+        if(response instanceof HttpErrorResponse){
+            console.log('oh no:(');
+            return;
+        }
+        console.log('do something fancy');
+    });
+)
+</code></pre>
+
+<p>Ps: I’m not trying to say that this is the best idea to catch errors. I’m just showing you around some basics.</p>
+
+<p>Do note that the <code>catchError</code> operator is applied to the result observable that <code>fetchData()</code> returns, and not added as the second operator of the first pipe. 
+From the moment an observable receives an error, it will die… That’s why it’s important to catch the error on the inner observable.</p>
+
+<h2 id="retrywhen">retryWhen</h2>
+
+<p>Ok, great! The application won’t break anymore, but now imagine the following scenario: Our user is sitting in the train and drives through a tunnel. The connection is gone for a few seconds and the user won’t get results.</p>
+
+<p>We could fix that by telling RxJS to retry a few times</p>
+
+<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; 
+        fetchData(term).pipe(
+            retryWhen(e$ =&gt; e$.pipe(
+                // try again after 2 seconds
+                delay(2000),
+                // stop trying after 5 times
+                take(4)
+            )
+            // still keep the observable alive if
+            // the first 5 times fail
+            catchError(e =&gt; of(e))
+        )
+    )
+)
+</code></pre>
+
+<p>You can find more information about <code>retryWhen</code><a href="https://www.learnrxjs.io/operators/error_handling/retrywhen.html">here</a></p>
+
+<h2 id="using-the-online-event">Using the online event</h2>
+
+<p>Even though this is a good solution, there is room for improvement. A great choice is to use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/NavigatorOnLine/Online_and_offline_events">online</a> event from HTML5 to tell the browser to retry when the user regains internet connection. It’s even shorter than before and it’s super elegant</p>
+
+<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
+    switchMap(term =&gt; 
+        fetchData(term).pipe(
+            retryWhen(() =&gt; fromEvent(window, 'online'))
+            // still keep the observable alive if
+            // the server would return a different
+            // HTTP error
+            catchError(e =&gt; of(e))
+        )
+    )
+)
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>RxJS gives us great control over HTTP calls! If we know how error handling works it becomes a breeze to take our HTTP calls to the next level.
+This doesn’t only apply to typeahead searches but to every observable where we combine an existing stream with an error-affected one like HTTP. For instance: this can also happen in NgRx effects or with the angular router.</p>
+
+<p>There, I told you it would be short, I hope you learned something though.</p>
+
+<p>Also be sure to check this article: <a href="https://blog.angularindepth.com/power-of-rxjs-when-using-exponential-backoff-a4b8bde276b0">Power of RxJS when using exponential backoff</a></p>
+
+<h2 id="special-thanks">Special thanks</h2>
+
+<ul>
+  <li><a href="https://twitter.com/AmarildoKurtaj">@AmarildoKurtaj</a> The last example was based on his idea</li>
+</ul>
+
+<p>Reviewers:</p>
+<ul>
+  <li><a href="https://twitter.com/fmalcher01">Ferdinand Malcher</a></li>
+  <li><a href="https://twitter.com/FabianGosebrink">Fabian Gosebrink</a></li>
+  <li><a href="https://twitter.com/tim_deschryver">Tim deschryver</a></li>
+  <li><a href="https://twitter.com/webdave_de">David Müllerchen</a></li>
+  <li><a href="https://twitter.com/rubenverm">Ruben Vermeulen</a></li>
+</ul>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.png)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                    
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Safe HTTP calls with RxJS&amp;url=https://blog.strongbrew.io/safe-http-calls-with-rxjs"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/safe-http-calls-with-rxjs"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/safe-http-calls-with-rxjs"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>RxJS patterns - Conditionally executing work</title>
+    <meta name="description" content="RxJS patterns conditionally executing work" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//rxjs-patterns-conditionally-executing-work/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="RxJS patterns - Conditionally executing work" />
+    <meta property="og:description" content="RxJS patterns conditionally executing work" />
+    <meta property="og:url" content="https://blog.strongbrew.io///rxjs-patterns-conditionally-executing-work/" />
+    <meta property="og:image" content="/assets/images/cover/cover8.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RxJS patterns - Conditionally executing work" />
+    <meta name="twitter:description" content="RxJS patterns conditionally executing work" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///rxjs-patterns-conditionally-executing-work/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover8.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "RxJS patterns - Conditionally executing work",
+    "url": "https://blog.strongbrew.io///rxjs-patterns-conditionally-executing-work/",
+    "image": "/assets/images/cover/cover8.jpg",
+    "description": "RxJS patterns conditionally executing work"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover8.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">RxJS patterns - Conditionally executing work</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2019-01-29">29 Jan 2019
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:</p>
+
+<ul>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
+  <li><a href="https://blog.strongbrew.io/xjs-patterns-mapping-function-calls-to-streams/" target="_blank">mapping a function to a stream</a></li>
+  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
+</ul>
+
+<p>The next pattern I want to discuss is executing conditional work. Sometimes, you have a stream and if some condition is met, you want to do some extra step.</p>
+
+<p>But, we do not have an <code>if-else</code> operator. And that makes sense. If we had such an operator, the entire <code>Observable</code> chain would be broken. Luckily there are a few ways to introduce conditional work inside of our <code>Observable</code> chains.</p>
+
+<h2 id="executing-conditional-work">Executing conditional work</h2>
+
+<p>Let’s imagine that we have list of items in a webshop. In that list, we can check one or more items that we want to buy. When the user clicks on the ‘buy’ button, we first want to check if one of the items delays the delivery date by a huge amount. If so, we want to show a popup to notify the user. He can either decline and change his order or accept this.</p>
+
+<p>In this use case, we have two <code>if-else</code>s.</p>
+<ul>
+  <li>If there is an order which has an item that pushes the delivery date we need to show a popup. Otherwise we don’t.</li>
+  <li>If the popup is shown, and the user accepts, we do a backend call to actually register the order. Otherwise we don’t and the popup should close so the user can maybe remove that specific item.</li>
+</ul>
+
+<p>Let’s first take a look at what the code could look like.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	'ifElse'(() =&gt; {
+		// 
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+).subscribe(_ =&gt; // route to a different page here);
+</code></pre>
+
+<p><strong>Note:</strong> <code>ifElse</code> is not a real operator 🙃</p>
+
+<p>So we start with our <code>selectedItems$</code>. We then want to add our conditional logic. If we pass our conditional logic (either no delay or we showed the popup and the user accepted), we can perform the backend call. We can do this with the <code>switchMap</code> operator and using the <code>selectedItems</code>. At last we subscribe and we route to a different page if the call was successfull.</p>
+
+<p>Now, how can we plug 	in in that conditional logic? First of all, let’s think about how we can show a popup. We can have a function, that adds a popup to the DOM and returns an Observable with the result. The type signature for that function could look like this:</p>
+
+<pre><code class="language-typescript">showDialog(): Observable&lt;boolean&gt;;
+</code></pre>
+
+<p>So, inside of the <code>Observable</code> chain we had above, we want to conditionally execute the <code>Observable</code> that we get from the <code>showDialog</code> function so the dialog is shown. But, we only want to show this in case we have an item that delays the delivery date.</p>
+
+<p>Let’s first implement what we need to do when there is no delivery delay (happy path 😄).</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	map(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return selectedItems;
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>We add an if statement inside of a <code>map</code> operator. If the condition is not met, so there is no delayed delivery, we just return the <code>selectedItems</code> so these can be used in the <code>switchMap</code> operator to do the backend call.</p>
+
+<p>So far so good. BUT, how will we implement the else?</p>
+
+<p>Inside of the <code>map</code> operator, we can implement the else case. In that else case, we want to show the dialog. This means, we are going to map to the result of the <code>showDialog</code> function.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	map(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return selectedItems;
+		} else {
+			return showDialog();
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>Of course, this introduces a problem inside of our code. The if statement will still work, but the else statement is posing a problem here. If the else is executed, the stream that is returned by the <code>map</code> operator (so before the <code>switchMap</code>) is of type <code>Observable&lt;Observable&lt;&lt;boolean&gt;&gt;</code>. That’s not what we need. The <code>switchMap</code> operator needs to be applied to an <code>Observable</code> with our selected items.</p>
+
+<p>To fix this, we don’t need to return the <code>dialog$</code> but:</p>
+
+<ul>
+  <li>Subscribe to this stream (remember, <code>Observable</code>s are lazy and subscribing will trigger the dialog to be shown)</li>
+  <li>Listen for the result of that <code>dialog$</code>, remember, the user can either accept or decline, and handle this properly</li>
+</ul>
+
+<p>First step in fixing this, we can change the operator that we are using. If we change the <code>map</code> operator to a flattening operator such as <code>switchMap</code> or <code>concatMap</code>, we can return the <code>Observable</code> from the <code>showDialog</code> function and the operator will flatten it from an <code>Observable&lt;Observable&lt;boolean&gt;&gt;</code> to an <code>Observable&lt;boolean&gt;</code>.</p>
+
+<p>Let’s take a look at the code:</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog();
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>As you can see we changed from a <code>map</code> to a <code>switchMap</code>. Because we changed the operator, we have to make sure that every branch in the function we pass to <code>switchMap</code> returns an <code>Observable</code>. That’s why we changed the <code>selectedItems</code> to <code>of(selectedItems)</code>.</p>
+
+<p>With this code, we are going to show the popup only if the condition is met. So we have a part of the conditional logic that we need. But, the overall code is not yet complete. The type of the <code>Observable</code> created by the first <code>switchMap</code> is <code>Observable&lt;boolean|Array&lt;Item&gt;</code>. And that’s not what we want. We don’t want that boolean in there.</p>
+
+<p>The last thing we need to do is check the value that we get back from the <code>dialog$</code>. This will return <code>true</code> if the user accepted the delay or <code>false</code> if the user denied. In that last case, we don’t want to call the backend and this stream should stop.</p>
+
+<p>Let’s add this:</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog().pipe(
+				map(res =&gt; {
+					if(res) {
+						return of(selectedItems);
+					} else {
+						return never();
+					}
+				}),
+			);
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+
+<p>Before returning the stream we get from the <code>showDialog</code> function, we are going to map its result to what we want.</p>
+
+<p>If the result was <code>true</code> we are going to return our <code>selectedItems</code>. But, since this is wrapped inside of a <code>switchMap</code> operator, we need to wrap this into an <code>Observable</code> using the static <code>of</code> operator.</p>
+
+<p>If the result was <code>false</code>, we can return the <code>never()</code> <code>Observable</code>. This is an <code>Observable</code> that will have no events whatsover. By doing this, the <code>Observable</code> chain is interrupted and <code>switchMap</code> that executes the backend call will never get an event and thus will not get executed (the one doing the backend call 🙃).</p>
+
+<p>As as a last step, we want to make sure that we only take a single value. We start from the <code>selectedItems$</code> which can have potentially multiple values. For example when:</p>
+
+<ul>
+  <li>the user gets the popup,</li>
+  <li>decides to cancel</li>
+  <li>selects or deselects a new item</li>
+</ul>
+
+<p>the subscription would still be active. If the user selects a new item, the logic in our stream would fire immediately. We can fix this quite easily with the <code>take</code> operator.</p>
+
+<pre><code class="language-typescript">selectedItems$.pipe(
+	take(1),
+	switchMap(selectedItems =&gt; {
+		// if none of the items has a late delivery
+		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
+			return of(selectedItems);
+		} else {
+			return showDialog().pipe(
+				map(res =&gt; {
+					if(res) {
+						return of(selectedItems);
+					} else {
+						return never();
+					}
+				}),
+			);
+		}
+	}),
+	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
+);
+</code></pre>
+<p>And that’s it. This code does what we want! 🎉🎉</p>
+
+<p>You can find a working (slightly contrived example) below. Click the buttons to trigger a delivery with or without delay. You can open the console to see a log statement being logged everytime the backend call would be executed.</p>
+
+<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/rxjs-hsqluy?embed=1&amp;file=index.ts"></iframe>
+
+<h2 id="using-the-tap-operator">Using the <code>tap</code> operator</h2>
+
+<p>You can also hook into the <code>Observable</code> chain using the <code>tap</code> operator and maybe do some conditional work there. For example, to disable or enable a certain button:</p>
+
+<pre><code class="language-typescript">const selectedItems$ = ...
+
+selectedItems$.pipe(
+	tap(selectedItems =&gt; {
+		if(selectedItems.length === 5) {
+			this.newOrderBtnDisabled = true;
+		} else {
+			this.newOrderBtnDisabled = false;
+		}
+	})
+);
+</code></pre>
+
+<p>I would argue however that it is better to create a new stream that contains the ‘disable’ state of that button. This can be achieved like this:</p>
+
+<pre><code class="language-typescript">const selectedItems$ = ...
+
+const disabled$ = selectedItems$.pipe(
+	map(selectedItems =&gt; selectedItems &gt; 5)
+);
+</code></pre>
+
+<p>This gives you exactly the same result and we do not need ‘if-else’ logic here.</p>
+
+<h2 id="when-to-use-this">When to use this</h2>
+
+<p>Some examples where to use this pattern is:</p>
+
+<ul>
+  <li>when a popup can decide if the action should be executed</li>
+  <li>when creating a generic component that can show a spinner or not based on some configuration</li>
+  <li>when creating a wizard and you only want to continue to the next step if the user current step is validated through a backend call</li>
+</ul>
+
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=RxJS patterns - Conditionally executing work&amp;url=https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

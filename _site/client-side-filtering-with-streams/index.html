@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Client side filtering using streams</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//client-side-filtering-with-streams/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Client side filtering using streams" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="https://blog.strongbrew.io///client-side-filtering-with-streams/" />
+    <meta property="og:image" content="/assets/images/cover/cover8.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Client side filtering using streams" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///client-side-filtering-with-streams/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover8.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "Client side filtering using streams",
+    "url": "https://blog.strongbrew.io///client-side-filtering-with-streams/",
+    "image": "/assets/images/cover/cover8.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover8.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Client side filtering using streams</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2017-02-15">15 Feb 2017
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>I have been coaching people in using RxJS for a while now. During this time, I’ve noticed that the hardest part for people to learn is not the API, concept or operators but the paradigm switch. Thinking reactively is not something that comes easily and you really have to get your hands dirty to get there.</p>
+
+<p>Below I will show a piece of code that is used to do some basic client side filtering. It’s a snippet of code from somebody that I was coaching which perfecly shows how someone just starting with RxJS often handles this situation. Later on, we will update this to show how you would implement this with the reactive paradigm.</p>
+
+<h3 id="example-case">Example case</h3>
+
+<p>The example application we will be using is really easy. We have service which fetches a number of Star Wars characters from the swapi.com API. We will show these in a list and provide a select element to filter the fetched characters based on the gender.
+The screen looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/2s9e877rpdaa5w0/Screenshot%202017-02-25%2011.16.57.png?raw=1" alt="example-app" /></p>
+
+<p>You can find the live example <a href="http://blog-kwintenp-examples.surge.sh/client-side-filter/withStream" target="_blank">here</a>.</p>
+
+<h3 id="client-side-filtering-without-streams">Client side filtering without streams</h3>
+
+<p>First we are going to look at an example where we implement the client side filtering without streams. Of course, we are going to use a stream to fetch the data from the backend, but afterwards, the implementation will be imperative.</p>
+
+<pre><code class="language-typescript">// keep a local list of all the characters
+characters: Array&lt;StarWarsCharacter&gt;;
+// keep a list of all the filtered characters
+filteredCharacters: Array&lt;StarWarsCharacter&gt;;
+
+constructor(private starWarsService: StarWarsService) {}
+
+// at startup time, we fetch the characters and save them
+// to our local copy. We keep a local copy of the entire
+// array since we will need it later on when the filter changes
+ngOnInit() {
+  this.starWarsService.getCharacters()
+    .subscribe((fetchedCharacters) =&gt; {
+        this.characters = fetchedCharacters;
+        this.filteredCharacters = fetchedCharacters;
+    })
+}
+
+// when the filter value changes, we filter the local list of
+// characters and save the result to the
+// filteredCharacters array. Here we reuse the entire array
+// to create a new one.
+filterChanged(value: string)
+  if (value === "All") {
+    this.filteredCharacters = this.characters;
+  } else {
+    this.filteredCharacters =
+       this.characters.pipe(
+          filter(
+            (character: StarWarsCharacter) =&gt; {
+               character.gender.toLowerCase() === value.toLowerCase()
+            }
+          ),
+       );
+  }
+}
+</code></pre>
+<p>At startup time, we fetch the characters and save them in two local arrays, <code>characters</code> and <code>filteredCharacters</code>. When the filter actually changes, we use the local copy of the characters to filter out all the correct ones and create a new array. We then assign this new array to the <code>filteredCharacters</code> reference.
+The component’s html looks like this:</p>
+
+<pre><code class="language-html">&lt;h1&gt;Client side filtering without streams example&lt;/h1&gt;
+&lt;div class="row"&gt;
+  &lt;div class="col-sm-3"&gt;
+    &lt;!-- Component that holds the select and throws an event --&gt;
+    &lt;!-- when it changes --&gt;
+    &lt;app-gender-filter (filterChange)="filterChanged($event)"&gt;
+    &lt;/app-gender-filter&gt;
+  &lt;/div&gt;
+  &lt;div class="col-sm-9"&gt;&lt;/div&gt;
+  &lt;div class="col-sm-6"&gt;
+    &lt;!-- component that holds the list and displays the --&gt;
+    &lt;!-- characters --&gt;
+    &lt;app-character-list [characters]="filteredCharacters"&gt;
+    &lt;/app-character-list&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+</code></pre>
+
+<p>While this all works perfectly, it’s not the best solution possible with the reactive paradigm in mind. We have to hold a local copy of the characters array, which kind of bugs me.
+It’s also not really flexible. Here, we are fetching the characters via a backend call. This will thus only hold one result. But what if it’s an observable we get from Firebase? In that case the characters array can change as well. To be able to update the view properly when the characters change, we would also have to keep a local copy of the filter to update the <code>filteredCharacters</code> array reference accordingly.
+And what if you would have a multitude of filters… This would result in a multitude of local variables to keep track of.</p>
+
+<p>Using streams we can make this much more flexible!</p>
+
+<h3 id="client-side-filtering-with-streams">Client side filtering with streams</h3>
+
+<p>Let’s first of all try to think what should happen by thinking in streams of data. We will then try to reason about how we can use these streams, combine them and create a result.</p>
+
+<p>If you think about it, we have two inputs that might change our view. On the one hand, we have our list of characters, which should be displayed. And on the other hand we have the dropdown which might filter this list.</p>
+
+<p>Let’s look at the marble diagrams of what these streams might look like:</p>
+
+<p><img src="https://www.dropbox.com/s/89blsfj9aoybdg0/Screenshot%202017-03-04%2016.10.54.png?raw=1" alt="marble-diagram" /></p>
+
+<p>The resulting stream we want is one that holds an array with the filtered characters. If you think about the two input streams we just created, this resulting stream is actually a combination of both of the input streams.
+If we have characters, we want to combine these with the filter and display them onto the screen. If the filter changes, we want to re-execute this logic. If we would have new characters (think about a stream from Firebase), we would also want to re-execute this logic.</p>
+
+<p>It turns out that RxJS provides us with a perfect operator to do something like this: <code>combineLatest</code>. This operator merges streams by executing a projector function on the latest values of these streams.
+The resulting stream looks like this:</p>
+
+<p><img src="https://www.dropbox.com/s/zhj0xvz6d5e84m4/Screenshot%202017-03-04%2016.12.24.png?raw=1" alt="marble-diagram" /></p>
+
+<p><strong>Note:</strong> You can notice here that the result stream only holds a value when both of the streams have emitted a single value. This is a precondition of the <code>combineLatest</code> operator. It will only emit an event onto the newly created stream if all source observables have emitted at least one element. If we think about our example, this means that the gender filter should already have a value to start with.</p>
+
+<p>Let’s take a look at the code!</p>
+
+<pre><code class="language-typescript">export class ClientSideFilterComponent implements OnInit {
+  filter$: BehaviorSubject&lt;string&gt;;
+  characters$: Observable&lt;StarWarsCharacter[]&gt;;
+  filteredCharacters$: Observable&lt;StarWarsCharacter[]&gt;;
+
+  constructor(private starWarsService: StarWarsService) {
+  }
+
+  ngOnInit() {
+    // We create a stream ourselves to map an event form the child
+    // component to a stream of 'filter values'.
+    // We use a BehaviorSubject because this will have an initial 
+    // value. This is important because the combineLatest operator
+    // we will use below only works if every stream has emitted 
+    // at least one value.
+    this.filter$ = new BehaviorSubject("All");
+
+    // we keep the stream containing our characters
+    this.characters$  = this.starWarsService.getCharacters();
+
+    // we create a new stream based on the two input
+    // streams we defined
+    this.filteredCharacters$ = this.createFilterCharacters(
+            this.filter$,
+            this.characters$
+    );
+  }
+
+  public createFilterCharacters(
+            filter$: Observable&lt;string&gt;,
+            characters$: Observable&lt;StarWarsCharacter[]&gt;) {
+    // We combine both of the input streams using the combineLatest
+    // operator. Every time one of the two streams we are combining
+    // here changes value, the project function is re-executed and
+    // the result stream will get a new value. In our case this is
+    // a new array with all the filtered characters.
+    return combineLatest(
+      characters$,
+      filter$, (characters: StarWarsCharacter[], filter: string) =&gt; {
+        // this is the project function where we imperatively
+        // implement the filtering logic
+        if (filter === "All") return characters;
+        return characters.filter(
+                (character: StarWarsCharacter) =&gt;
+                    character.gender.toLowerCase()
+                        === filter.toLowerCase()
+        );
+      });
+  }
+
+  filterChanged(value: string) {
+    // Everytime we have new value, we pass it to the filter$
+    this.filter$.next(value);
+  })
+}
+</code></pre>
+<p>We can use the new stream we created to bind in the view using the async pipe from Angular like this:</p>
+
+<pre><code class="language-html">&lt;h1&gt;Client side filtering with streams example&lt;/h1&gt;
+&lt;div class="row"&gt;
+  &lt;div class="col-sm-3"&gt;
+    &lt;app-gender-filter (filterChange)="filterChanged($event)"&gt;
+    &lt;/app-gender-filter&gt;
+  &lt;/div&gt;
+  &lt;div class="col-sm-9"&gt;&lt;/div&gt;
+  &lt;div class="col-sm-6"&gt;
+    &lt;!-- Using the async pipe we bind it in the app-character-list --&gt;
+    &lt;!-- component --&gt;
+    &lt;app-character-list [characters]="filteredCharacters$ | async"&gt;
+    &lt;/app-character-list&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+</code></pre>
+
+<p>If we look at the code we have now, it’s much more flexible. We do not have to write any extra code if the <code>characters$</code>  would have any new values. We do not need to hold any local copies (this is done implicitely by the <code>combineLatest</code> operator). If we would want to add new filters, it’s just a matter of adding another stream to the <code>combineLatest$</code> operator.
+We also don’t have to manually unsubscribe from the filteredCharacters$, the async pipe handles this for us.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>By thinking in input streams and output streams, we were able to map the inputs we had to a result. We bound the stream in the view layer. Using streams up until the html of our component, we eliminated the need for local copies of data and made our code more robust and open to changes. If we now want to add another filter on top of the list, it’s a piece of cake!</p>
+
+<p>You can find the code on <a href="https://github.com/KwintenP/blog-examples/tree/master/src/app/home/client-side-filter" target="_blank"> Github </a>.</p>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Client side filtering using streams&amp;url=https://blog.strongbrew.io/client-side-filtering-with-streams"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/client-side-filtering-with-streams"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/client-side-filtering-with-streams"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

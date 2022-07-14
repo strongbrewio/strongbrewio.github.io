@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Thinking reactively in Angular and RXJS</title>
+    <meta name="description" content="RxJS is an awesome library that can help us with creating reactive web applications. Reactive web applications can be overwhelming in the beginning, but eventually, they can be really rewarding.This article is all about making the paradigm switch from thinking imperatively towards thinking reactively." />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//thinking-reactively-in-angular-and-rxjs/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Thinking reactively in Angular and RXJS" />
+    <meta property="og:description" content="RxJS is an awesome library that can help us with creating reactive web applications. Reactive web applications can be overwhelming in the beginning, but eventually, they can be really rewarding.This article is all about making the paradigm switch from thinking imperatively towards thinking reactively." />
+    <meta property="og:url" content="https://blog.strongbrew.io///thinking-reactively-in-angular-and-rxjs/" />
+    <meta property="og:image" content="/assets/images/cover/cover12.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Thinking reactively in Angular and RXJS" />
+    <meta name="twitter:description" content="RxJS is an awesome library that can help us with creating reactive web applications. Reactive web applications can be overwhelming in the beginning, but eventually, they can be really rewarding.This article is all about making the paradigm switch from thinking imperatively towards thinking reactively." />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///thinking-reactively-in-angular-and-rxjs/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover12.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "Thinking reactively in Angular and RXJS",
+    "url": "https://blog.strongbrew.io///thinking-reactively-in-angular-and-rxjs/",
+    "image": "/assets/images/cover/cover12.jpg",
+    "description": "RxJS is an awesome library that can help us with creating reactive web applications. Reactive web applications can be overwhelming in the beginning, but eventually, they can be really rewarding.This article is all about making the paradigm switch from thinking imperatively towards thinking reactively."
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover12.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Thinking reactively in Angular and RXJS</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                    
+                    
+                    
+                    
+                    <time class="post-date" datetime="2017-07-25">25 Jul 2017
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>,
+                    
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <h2 id="foreword">Foreword</h2>
+
+<p>RxJS is an awesome library that can help us with creating <strong>reactive web applications</strong>. Reactive web applications can be overwhelming in the beginning, but eventually, they can be really rewarding.</p>
+
+<p>This article is all about making the paradigm switch from thinking imperatively towards <strong>thinking reactively</strong>.
+In this article, we will explain how to write a reactive calendar application in only a few lines of code (<strong>spoiler: It’s gonna be real time too</strong>).</p>
+
+<p>We will use Angular, Angular Material, TypeScript, RxJS, Firebase, and AngularFire as our main technology stack. Keep in mind that this article really focusses on reactive programming. Don’t expect a deep dive into all RxJS operators, but rather expect an explanation of how to draw, think, and reason about reactive web applications. We will learn <strong>how to think in streams</strong>. If you haven’t heard of streams yet, please read <a href="https://gist.github.com/staltz/868e7e9bc2a7b8c1f754">this awesome article</a> first.</p>
+
+<p><strong>Note:</strong> This article contains personal terminology.</p>
+
+<h2 id="the-reactive-calendar">The Reactive Calendar</h2>
+<p>This is the application we are going to write. It’s a small but complete calendar application that allows us to:</p>
+
+<ul>
+  <li>Switch between different view modes: day, week, month.</li>
+  <li>Navigate to previous and next days, weeks, and months.</li>
+  <li>Add, update, and remove appointments.</li>
+  <li>Search for specific appointments.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar1.png" alt="Reactive calendar" /></p>
+
+<p>The user can interact with the following UI elements:</p>
+
+<ul>
+  <li><strong>Next button:</strong> Allows the user to go to the next day in day mode, week in week mode, etc.</li>
+  <li><strong>Previous button:</strong> Allows the user to go to the previous day in day mode, week in week mode, etc.</li>
+  <li><strong>Day, week, month buttons:</strong> Allows the user to switch between the different view modes</li>
+  <li><strong>Search term input:</strong> Allows the user to filter the appointments on the fly</li>
+  <li><strong>Plus-buttons in the grid:</strong> Allows the user to create new appointments</li>
+  <li><strong>Trashcan buttons in the grid:</strong> Allows the user to remove appointments</li>
+  <li><strong>Description inputs:</strong> Allows the user to update the description of an appointment</li>
+</ul>
+
+<p>I decided to use Firebase as a backend and because of that, our application will be realtime and offline first by default!</p>
+
+<p><strong>Note:</strong> One small issue, I’ve been a bit lazy so we can only create lunch appointments. =) But hey! Consider it some homework.</p>
+
+<h2 id="setting-up-the-project">Setting Up the Project</h2>
+
+<p>I’ve created the git branch <strong>initial</strong> to get us started. It contains the default logic/components, setup, and styles. There is no reactive code written yet, just plain Angular code. The goal is to write the reactive part ourselves.</p>
+
+<h3 id="the-component-tree">The Component Tree</h3>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar3.png" alt="The component tree" />
+The dumb components (blue) are already implemented. The <code>app-root</code> (orange) is the one and only smart component in the application and the only place where we will write code.</p>
+
+<p>If you don’t know the difference between smart and dumb components, <a href="http://blog.brecht.io/components-demystified/#smart-vs-dumb-components">read this first</a>.</p>
+
+<h3 id="installing-the-project-locally">Installing the Project Locally</h3>
+<p>First of all, we have to clone the project locally and check out the <strong>initial</strong> branch. This branch already contains all the uninteresting parts that don’t have anything to do with this article.</p>
+
+<p>In the terminal, we have to go to the folder where we want to install the project and run the following commands:</p>
+
+<pre><code>$ git clone git@github.com:brechtbilliet/reactive-calendar.git
+$ cd reactive-calendar/reactive-calendar
+$ git checkout initial
+$ npm install
+</code></pre>
+
+<h3 id="setting-up-firebase">Setting Up Firebase</h3>
+
+<p>We are using <a href="https://firebase.google.com/">Firebase</a> as our backend because it requires minimal setup, it’s realtime by default, and <a href="https://github.com/angular/angularfire2">AngularFire</a> gives us streams for free. We can complete the Firebase configuration in a few steps:</p>
+
+<ul>
+  <li>Go to <a href="https://firebase.google.com/">https://firebase.google.com</a>, click on the “GO TO CONSOLE” button, and choose your Google account.</li>
+  <li>Click on the “Add project” button and choose a name for your project. Let’s take <strong>“reactive-calendar”</strong> to keep it simple.</li>
+  <li>Click on the “CREATE PROJECT” button. Now we should be redirected to <a href="https://console.firebase.google.com/project/reactive-calendar/overview">something like this</a>.</li>
+  <li>In the Authentication tab, go to “SIGN-IN METHOD” and enable the “Anonymous” setting.</li>
+  <li>Click on database and navigate to the rules tab. Set the read and write property to “true” and click “publish”:
+    <pre><code class="language-json">{
+  "rules": {
+      ".read": "true",
+      ".write": "true"
+  }
+}
+</code></pre>
+  </li>
+  <li>Go back to the overview by clicking on the home icon, and then select “Add Firebase to your web app”.</li>
+  <li>Copy the config with the correct properties and replace the firebaseConfig object in src/app/app.module.ts with these properties.
+It might look something like this:</li>
+</ul>
+
+<pre><code class="language-typescript">const firebaseConfig = {
+    apiKey: "AIzaSyBuqjTJd5v6xTf8D2EZmvFUl8lseH8lVuHU",
+    authDomain: "reactive-calendar.firebaseapp.com",
+    databaseURL: "https://reactive-calendar.firebaseio.com",
+    projectId: "reactive-calendar",
+    storageBucket: "reactive-calendar.appspot.com",
+    messagingSenderId: "3978123451455750"
+};
+</code></pre>
+
+<p>Let’s continue. Start the project by running the following command and open your browser on <a href="http://localhost:4200">http://localhost:4200</a>.</p>
+
+<pre><code>npm start
+</code></pre>
+
+<p>As you can see, this just handles static data, the buttons/inputs won’t work, and the appointments are not loaded yet.
+This is where we start from.</p>
+
+<h2 id="thinking-reactively">Thinking Reactively</h2>
+
+<p>Now comes the tricky part. We are trying to forget imperative programming for now, and we are trying to evolve into a reactive mindset.</p>
+
+<h3 id="marble-diagrams">Marble Diagrams</h3>
+
+<p>To be able to think reactively, we need some kind of graphic model so we can picture streams in our head. Marble diagrams are a great way to do that.
+As you can see in the image below, a marble represents a value over time.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar12.png" alt="Marble diagrams" /></p>
+
+<p>The website <a href="http://rxmarbles.com/">rxmarbles.com</a> has a great playground for learning how to use and draw marble diagrams.</p>
+
+<h4 id="ascii-documentation">ASCII Documentation</h4>
+
+<p>One could argue that code should not be documented and be self-explanatory. I don’t believe that to be the case when writing complex streams. When we document complex streams, we can see what’s going on inside the stream, which makes it easier for our colleagues.
+Streams can be documented by ASCII documentation. Since that is not really part of this article, I’m only going to show a small example below.</p>
+
+<pre><code class="language-typescript">// a$ gets three values over time and then stops
+// a$: -------a-----b-----c|
+
+// b$ has an initial value (a), has three values in total
+// and will keep on living
+// b$: a------b-----c------...
+</code></pre>
+
+<h3 id="imperative-programming-what-does-the-app-have-to-do">Imperative Programming: What Does the App Have to Do?</h3>
+
+<p>When we think about the functionality of our application, we quickly notice that there are quite a few corner cases and special scenarios. For every interaction the user makes in the UI, the app needs to handle that specific interaction accordingly. Sometimes it has to combine these interactions and handle that specific combination as well. Take this crazy (but simple) example, for instance.</p>
+
+<blockquote>
+When the view mode is changed to week mode, and the previous view mode was month mode, and the month was June, and the year was 2017, and an appointment was added, while the search term was set to "Brecht", then we would have to update...
+</blockquote>
+
+<p>Yes, we would have to update a bunch of stuff. This is imperative thinking, and it can become exhausting. There is a big chance that we forget certain corner cases. Let’s not even imagine that we have to combine that with asynchronous actions as well.</p>
+
+<p>In the image below, we see all the different interactions the user has in the calendar application.
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar2.png" alt="Application events" /></p>
+
+<p>As we can see, for every specific interaction, the UI will have to update specific things.</p>
+
+<h3 id="reactive-programming-what-data-will-change-and-what-data-do-the-components-need">Reactive programming: What Data Will Change, and What Data Do the Components Need?</h3>
+
+<h4 id="source-streams">Source Streams</h4>
+
+<p>Now, let’s completely stop with what we are thinking. Let’s free our minds and stop thinking about corner cases and special scenarios. We have to learn to think in streams. A stream is a collection of events that will change over time. Think about what can change in your application and call these streams of data. Let’s call them <strong>source streams</strong>.</p>
+
+<p><strong>Note:</strong> For readability purposes, we will suffix all the streams with a <code>$</code> symbol.</p>
+
+<p>We can come up with 4 source streams:</p>
+
+<ul>
+  <li><strong>navigation$:</strong> Can contain the values: -1, 0 or 1</li>
+  <li><strong>viewMode$:</strong> Can contain the values: DAY, WEEK, or MONTH</li>
+  <li><strong>searchTerm$:</strong> The value of the search field</li>
+  <li><strong>appointments$:</strong> This is an array of appointments that comes from Firebase</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar4.png" alt="data streams" /></p>
+
+<p>That was pretty easy. We just had to think about the events that can occur in our application. A user can navigate, change view mode, search for appointments, and the appointments in Firebase can change. This is the beginning of thinking reactively. Don’t think about who triggers what. Think about the changes as streams.</p>
+
+<p>It’s always a good idea to draw marble diagrams to make it easier to reason.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar5.png" alt="data stream diagram" /></p>
+
+<p><code>The appointments$</code> is a stream that will be provided to us by AngularFire, but the <code>viewMode$</code>, <code>searchTerm$</code>, and <code>navigation$</code> are simple behavior subjects. We use subjects because we need to control the values of the streams ourselves, and we use the <code>BehaviorSubject</code> in particular because all our source streams need an initial value.</p>
+
+<pre><code class="language-typescript">export class AppComponent {
+    ...
+    // this is how we can retrieve the list of appointments from angularfire
+    appointments$ = this.db.list('/appointments');
+     // 0--------(+1)----(+1)----(-1)-------------...
+    viewMode$ = new BehaviorSubject(VIEW_MODE.MONTH);
+    navigation$ = new BehaviorSubject(0);
+    searchTerm$ = new BehaviorSubject('');
+
+	// because we set up the angularfire configuration correctly, we can just
+	// inject the angularfiredatabase right here and use it
+    constructor(private db: AngularFireDatabase) {
+    }
+    ...
+}
+
+</code></pre>
+
+<p>These subjects get values from the simple interactions from the template.</p>
+
+<pre><code class="language-typescript">@Component({
+    ...
+    template: `
+        &lt;topbar
+                (next)="onNext()"
+                (previous)="onPrevious()"
+                (setViewMode)="onSetViewMode($event)"
+                (searchChanged)="onSearchChanged($event)"&gt;
+        &lt;/topbar&gt;
+        ...
+    `
+})
+export class AppComponent {
+    ...
+    
+    onSetViewMode(viewMode: string): void {
+        // when the viewmode changes, update its subject
+        this.viewMode$.next(viewMode);
+    }
+
+    onPrevious(): void {
+        // when the user clicks the previous button
+        // update the navigation subject
+        this.navigation$.next(-1);
+    }
+
+    onNext(): void {
+        // when the user clicks the next button
+        // update the navigation subject
+        this.navigation$.next(1);
+    }
+
+    onSearchChanged(e: string): void {
+        // when the user searches
+        // update the searchterm subject
+        this.searchTerm$.next(e);
+    }
+}
+
+</code></pre>
+
+<h4 id="presentational-streams">Presentational Streams</h4>
+
+<p>Now we have to think about the data that our components need, because those components will need to be updated based on those source streams.
+Let’s take this code sample, for instance:</p>
+
+<pre><code class="language-html">&lt;div [ngSwitch]="XX" class="main"&gt;
+    &lt;day-view
+            *ngSwitchCase="'DAY'"
+            [appointments]="XX"
+            [date]="XX"
+            ...&gt;
+    &lt;/day-view&gt;
+    &lt;week-view
+            *ngSwitchCase="'WEEK'"
+            [appointments]="XX"
+            [year]="XX"
+            [week]="XX"
+            ...&gt;
+    &lt;/week-view&gt;
+    &lt;month-view
+            *ngSwitchCase="'MONTH'"
+            [month]="XX"
+            [year]="XX"
+            [appointments]="xxx"
+            ...&gt;
+    &lt;/month-view&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>I marked the input properties with XX to show what our components need in terms of data. These places will need streams as well. Let’s call them <strong>presentational streams</strong>.</p>
+
+<p>Let’s try to fill in these gaps, shall we?</p>
+
+<p><strong>Note:</strong> We use the <a href="https://angular.io/api/common/AsyncPipe">async pipe</a> from Angular to subscribe/unsubscribe the streams automatically.</p>
+
+<pre><code class="language-html">&lt;div [ngSwitch]="viewMode$|async" class="main"&gt;
+    &lt;day-view
+            *ngSwitchCase="'DAY'"
+            [appointments]="filteredAppointments$|async"
+            [date]="currentDate$|async"
+            ...&gt;
+    &lt;/day-view&gt;
+    &lt;week-view
+            *ngSwitchCase="'WEEK'"
+            [appointments]="filteredAppointments$|async"
+            [year]="currentYear$|async"
+            [week]="currentWeek$|async"
+            ...&gt;
+    &lt;/week-view&gt;
+    &lt;month-view
+            *ngSwitchCase="'MONTH'"
+            [month]="currentMonth$|async"
+            [year]="currentYear$|async"
+            [appointments]="filteredAppointments$|async"
+            ...&gt;
+    &lt;/month-view&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>We have gathered the 6 following presentational streams:</p>
+
+<ul>
+  <li><strong>viewMode$ (string):</strong> needed to determine which view has to be shown</li>
+  <li><strong>filteredAppointments$ (Array &lt; Appointment &gt;):</strong> needed by day view, week view, and month view to render the correct appointments</li>
+  <li><strong>currentDate$ (date):</strong> the current date for the day view</li>
+  <li><strong>currentWeek$ (number):</strong> the current week for the week view</li>
+  <li><strong>currentYear$ (number):</strong> needed by week view and month view</li>
+  <li><strong>currentMonth$ (number):</strong> needed by the month view</li>
+</ul>
+
+<p>Okay, great, we know the source streams, which are the sources of change in our application.
+We know the presentational streams, which are simply the streams that our components need. Now it’s time for the cool part: <strong>We need to create those presentational streams based on the source streams</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar6.png" alt="sources to presentational streams" /></p>
+
+<p>The first presentational stream we need is <code>viewMode$</code>. This is already an easy one, since <code>viewMode$</code> is also a source stream.</p>
+
+<h4 id="currentdate">currentDate$</h4>
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar7.png" alt="currentDate$" /></p>
+
+<p><strong>Note:</strong> We use moment.js for date calculation. The suffix M after the currentDate property shows that the type is <code>Moment</code>. So in short, it’s not just a date, but a moment wrapper.</p>
+
+<pre><code class="language-typescript">// we will need this stream a few times, so let's extract the stream 
+// in a currentDateM first
+
+// viewMode$:     M------------------W---------------D--------...
+// navigation$:   0---(+1)-(-1)----------(+1)-(-1)------------...
+// currentDateM$: d---d----d---------d---d----d------d--------...
+private currentDateM = this.viewMode$.flatMap((viewMode: string) =&gt; {
+    // every time the viewMode changes, the navigation should be reset as well
+    // the dateM variable will contain the navigation and because of the 
+    // flatMap it will reset every time the view mode changes
+    // if the navigation$ changes afterwards it will manipulate the dateM object
+    // by adding months, weeks, or days depending on the viewMode
+    const dateM = moment();
+    return this.navigation$
+        .map((action: number) =&gt; {
+            switch (viewMode) {
+                case VIEW_MODE.MONTH:
+                    return dateM.startOf('month').add(action, "months");
+                case VIEW_MODE.WEEK:
+                    return dateM.startOf('week').add(action, "weeks");
+                case VIEW_MODE.DAY:
+                    return dateM.startOf('day').add(action, "days");
+            }
+            return dateM;
+        })
+})
+currentDate$ = this.currentDateM$.map(dateM =&gt; dateM.toDate());
+
+</code></pre>
+
+<h4 id="currentweek">currentWeek$</h4>
+
+<p>Based on the <code>currentDateM$</code> we can calculate the current week. The <code>currentDateM$</code> is just a moment object of the current date based on the navigation and viewMode.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar8.png" alt="currentWeek$" /></p>
+
+<pre><code class="language-typescript">currentWeek$ = this.currentDateM$.map(dateM =&gt; dateM.week());
+</code></pre>
+
+<h4 id="currentmonth">currentMonth$</h4>
+
+<p>Just like we calculated the <code>currentWeek$</code> based on the <code>currentDateM$</code>, we can do the same thing here.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar9.png" alt="currentMonth$" /></p>
+
+<pre><code class="language-typescript">currentMonth$ = this.currentDateM$.map(dateM =&gt; dateM.month());
+</code></pre>
+<h4 id="currentyear">currentYear$</h4>
+
+<p>Just like we calculated the <code>currentWeek$</code> and the <code>currentMonth$</code> based on the <code>currentDateM$</code>, we can do the same thing here.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar10.png" alt="currentYear$" /></p>
+
+<pre><code class="language-typescript">currentYear$ = this.currentDateM$.map(dateM =&gt; dateM.year());
+</code></pre>
+
+<h4 id="filteredappointments">filteredAppointments$</h4>
+
+<p>This is the most important stream. It is used to show the appointments in all the different views, and it is dependent on a bunch of streams:</p>
+
+<ul>
+  <li>viewMode$</li>
+  <li>currentDateM$</li>
+  <li>appointments$</li>
+  <li>searchTerm$</li>
+</ul>
+
+<p>This looks a bit more complex, but let’s give it a go.</p>
+
+<p><strong>Note:</strong> the <code>[]</code> in the image below stands for an empty array, the <code>[.]</code> for an array with one value, and so on.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/reactivecalendar/reactivecalendar11.png" alt="filteredAppointment$" /></p>
+
+<p>Let’s take the time to process this image. The operator we will use to combine all these streams is called <strong>combineLatest</strong>. It will create a stream that will wait until all streams have a value and will start emitting values for every change of every stream.</p>
+
+<p>So basically, it gives us a function where we have all the information we need. The appointments in Firebase, the view mode, the search term, and the current date. Based on those values, we can calculate the appointments for every view:</p>
+
+<pre><code class="language-typescript">filteredAppointments$ = Observable.combineLatest(
+    [this.viewMode$, this.currentDateM$, 
+    this.appointments$, this.searchTerm$],
+    (viewMode: string, currentDateM: Moment, 
+        appointments: Array&lt;Appointment&gt;, searchTerm: string) =&gt; {
+        switch (viewMode) {
+            // calculate the appointments for the month-view based on
+            // the current date, the appointments in firebase 
+            // and the searchterm
+            case VIEW_MODE.MONTH:
+                return appointments
+                    .filter(item =&gt; moment(item.date).format('MM/YYYY') === currentDateM.format('MM/YYYY'))
+                    .filter(item =&gt; this.filterByTerm(item, searchTerm));
+             // calculate the appointments for the week-view based on
+             // the current date, the appointments in firebase
+             // and the searchterm
+            case VIEW_MODE.WEEK:
+                return appointments
+                    .filter(item =&gt; moment(item.date).format('ww/YYYY') === currentDateM.format('ww/YYYY'))
+                    .filter(item =&gt; this.filterByTerm(item, searchTerm));
+            // calculate the appointments for the day-view based on
+            // the current date, the appointments in firebase
+            // and the searchterm
+            case VIEW_MODE.DAY:
+                return appointments
+                    .filter(item =&gt; moment(item.date).format('DD/MM/YYYY') === currentDateM.format('DD/MM/YYYY'))
+                    .filter(item =&gt; this.filterByTerm(item, searchTerm));
+
+        }
+    });
+
+private filterByTerm(appointment: Appointment, term: string): boolean {
+    return appointment.description.toLowerCase().indexOf(term.toLowerCase()) &gt; -1;
+}
+</code></pre>
+
+<p>This is all we have to do in order to create a kick-ass realtime reactive calendar application. We have created it in no time and with only a few lines of code. If we think about it, we will soon realize that all corner cases have been covered.</p>
+
+<h2 id="performance-improvements">Performance Improvements</h2>
+
+<p>The complete component looks like the code snippet below now. The calendar should be completely functional in your browser.</p>
+
+<pre><code class="language-typescript">import { Component } from '@angular/core';
+import { VIEW_MODE } from '../../constants';
+import * as moment from 'moment';
+import { Appointment } from '../../types/appointment.type';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
+import Moment = moment.Moment;
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
+
+@Component({
+    selector: 'app-root',
+    template: `
+        &lt;topbar
+                (next)="onNext()"
+                (previous)="onPrevious()"
+                (setViewMode)="onSetViewMode($event)"
+                (searchChanged)="onSearchChanged($event)"&gt;
+        &lt;/topbar&gt;
+        &lt;div [ngSwitch]="viewMode$|async"&gt;
+            &lt;day-view
+                    *ngSwitchCase="VIEW_MODE.DAY"
+                    [appointments]="filteredAppointments$|async"
+                    [date]="currentDate$|async"
+                    (removeAppointment)="onRemoveAppointment($event)"
+                    (addAppointment)="onAddAppointment($event)"
+                    (updateAppointment)="onUpdateAppointment($event)"
+            &gt;
+            &lt;/day-view&gt;
+            &lt;week-view
+                    *ngSwitchCase="VIEW_MODE.WEEK"
+                    [appointments]="filteredAppointments$|async"
+                    [year]="currentYear$|async"
+                    [week]="currentWeek$|async"
+                    (removeAppointment)="onRemoveAppointment($event)"
+                    (addAppointment)="onAddAppointment($event)"
+                    (updateAppointment)="onUpdateAppointment($event)"
+            &gt;
+            &lt;/week-view&gt;
+            &lt;month-view
+                    *ngSwitchCase="VIEW_MODE.MONTH"
+                    [month]="currentMonth$|async"
+                    [year]="currentYear$|async"
+                    [appointments]="filteredAppointments$|async"
+                    (removeAppointment)="onRemoveAppointment($event)"
+                    (addAppointment)="onAddAppointment($event)"
+                    (updateAppointment)="onUpdateAppointment($event)"
+            &gt;
+            &lt;/month-view&gt;
+        &lt;/div&gt;
+    `,
+    styleUrls: ['./app.component.less']
+})
+export class AppComponent {
+    VIEW_MODE = VIEW_MODE;
+    viewMode$ = new BehaviorSubject(VIEW_MODE.MONTH);
+    // 0--------(+1)----(+1)----(-1)-------------...
+    navigation$ = new BehaviorSubject&lt;number&gt;(0);
+    searchTerm$ = new BehaviorSubject('');
+
+    // -----MONTH---------------------YEAR------...
+    // -----MONTH-------------------------------...
+    // -----(d)---------------------------------...
+    // --------(+1)----(+1)----(-1)-------------...
+    // -----d---d-------d-------d-----d----------...
+
+    private currentDateM$ = this.viewMode$.flatMap((viewMode: string) =&gt; {
+        let dateM = moment();
+        return this.navigation$
+            .map((action: number) =&gt; {
+                switch (viewMode) {
+                    case VIEW_MODE.MONTH:
+                        return dateM.startOf('month').add(action, 'months');
+                    case VIEW_MODE.WEEK:
+                        return dateM.startOf('week').add(action, 'weeks');
+                    case VIEW_MODE.DAY:
+                        return dateM.startOf('day').add(action, 'days');
+                }
+                return dateM;
+            })
+    });
+
+    currentDate$ = this.currentDateM$.map(dateM =&gt; dateM.toDate());
+    currentYear$ = this.currentDateM$.map(dateM =&gt; dateM.year());
+    currentMonth$ = this.currentDateM$.map(dateM =&gt; dateM.month());
+    currentWeek$ = this.currentDateM$.map(dateM =&gt; dateM.week());
+    appointments$ = this.db.list('/appointments');
+    filteredAppointments$ = Observable.combineLatest([this.viewMode$, this.currentDateM$, this.appointments$, this.searchTerm$],
+        (viewMode: string, currentDateM: Moment, appointments: Array&lt;Appointment&gt;, searchTerm: string) =&gt; {
+            switch (viewMode) {
+                case VIEW_MODE.MONTH:
+                    return appointments
+                        .filter(item =&gt; moment(item.date).format('MM/YYYY') === currentDateM.format('MM/YYYY'))
+                        .filter(item =&gt; this.filterByTerm(item, searchTerm));
+                case VIEW_MODE.WEEK:
+                    return appointments
+                        .filter(item =&gt; moment(item.date).format('ww/YYYY') === currentDateM.format('ww/YYYY'))
+                        .filter(item =&gt; this.filterByTerm(item, searchTerm));
+                case VIEW_MODE.DAY:
+                    return appointments
+                        .filter(item =&gt; moment(item.date).format('DD/MM/YYYY') === currentDateM.format('DD/MM/YYYY'))
+                        .filter(item =&gt; this.filterByTerm(item, searchTerm));
+
+            }
+        });
+
+    constructor(private db: AngularFireDatabase) {
+    }
+
+    private filterByTerm(appointment: Appointment, term: string): boolean {
+        return appointment.description.toLowerCase().indexOf(term.toLowerCase()) &gt; -1;
+    }
+
+    onSetViewMode(viewMode: string): void {
+        this.viewMode$.next(viewMode);
+    }
+
+    onPrevious(): void {
+        this.navigation$.next(-1);
+    }
+
+    onNext(): void {
+        this.navigation$.next(1);
+    }
+
+    onSearchChanged(e: string): void {
+        this.searchTerm$.next(e);
+    }
+
+    onRemoveAppointment(id: string): void {
+        this.appointments$.remove(id);
+    }
+
+    onAddAppointment(date: Date): void {
+        this.appointments$.push(new Appointment(date.toDateString(), ''));
+    }
+
+    onUpdateAppointment(appointment: Appointment): void {
+        this.db.object('appointments/' + appointment.$key).set({
+            description: appointment.description,
+            date: appointment.date
+        });
+    }
+}
+
+</code></pre>
+
+<p>There is only one problem. We use the same observables multiple times in our template. Since observables are cold by default, they will get executed every time there is a subscription. In Angular, this means a subscription for every async pipe. For performance reasons, we only want to recalculate these streams when something actually changes. For that purpose, we can try to use the <code>share()</code> operator from RxJS. The <code>share()</code> operator is an alias for <code>publish().refCount()</code> and will share the subscription.</p>
+
+<p>However, that creates some problems with Angular and its async pipe.
+The situation of the problem goes like this:</p>
+
+<ul>
+  <li>Since we are using BehaviorSubjects, the streams will get an initial value (which is what we want, of course).</li>
+  <li>The share() operator will emit that value on the first subscription</li>
+  <li>When the app is initialized, the async pipes will start subscribing to the stream.</li>
+  <li>Because the first async pipe triggered the first emit the rest of the async pipes will miss that value.</li>
+</ul>
+
+<p><strong>Solution: shareReplay() will emit those values but keep track of them. That way, the async pipes will never miss a value.</strong></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We have created a completely reactive calendar that is performant and fixes a bunch of corner cases in only a few lines of code. Just by thinking about source streams and presentational streams, it wasn’t even that hard. I hope that I can encourage more people to take on this reactive approach and start writing kick-ass applications.</p>
+
+<h2 id="special-thanks">Special Thanks</h2>
+
+<p>I would like to give special thanks to the awesome people that reviewed this post and gave me pointers:</p>
+
+<ul>
+  <li>Dominic Elm (<a href="https://twitter.com/elmd_">@elmd_</a>)</li>
+  <li>Manfred Steyer (<a href="https://twitter.com/manfredsteyer">@manfredsteyer</a>)</li>
+  <li>David Müllerchen (<a href="https://twitter.com/webdave_de">@webdave_de</a>)</li>
+  <li>Maxim Robert (<a href="https://twitter.com/sizerone">@sizerOne</a>)</li>
+</ul>
+
+<p>Thanks, guys! It means a lot!</p>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.png)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                    
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Thinking reactively in Angular and RXJS&amp;url=https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

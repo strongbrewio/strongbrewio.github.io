@@ -2,10 +2,10 @@
 layout: post
 title: Reactive dumb components
 description:  How to make dumb components reactive without imperative ngOnChanges programming
-published: false
+published: true
 author: brechtbilliet
 comments: true
-date: 2021-27-05
+date: 2021-05-17
 subclass: 'post'
 categories: 'Rxjs'
 disqus: true

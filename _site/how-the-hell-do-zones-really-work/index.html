@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>How the hell does zone.js really work?</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//how-the-hell-do-zones-really-work/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How the hell does zone.js really work?" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="https://blog.strongbrew.io///how-the-hell-do-zones-really-work/" />
+    <meta property="og:image" content="/assets/images/cover/cover3.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How the hell does zone.js really work?" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///how-the-hell-do-zones-really-work/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover3.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "How the hell does zone.js really work?",
+    "url": "https://blog.strongbrew.io///how-the-hell-do-zones-really-work/",
+    "image": "/assets/images/cover/cover3.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover3.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">How the hell does zone.js really work?</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2016-06-09">09 Jun 2016
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>If you’ve read about Angular 2 change detection, you will probably have heard about zones. Zones is a feature that was ported from Dart and is used internally by Angular 2 to determine if a change detection cycle should be triggered.</p>
+
+<p>If you go to the <a href="https://github.com/angular/zone.js/" target="_blank">github</a> page of zone.js, you can find the following definition of a Zone:</p>
+
+<blockquote>
+  <p>A Zone is an execution context that persists across async tasks. You can think of it as thread-local storage for JavaScript VMs.</p>
+</blockquote>
+
+<p>If you’re like me, this will probably not make too much sense the first time you read it. To better understand what this means, I recommend watching this talk by Brian Ford <a href="https://www.youtube.com/watch?v=3IqtmUscE_U" target="_blank">at ngConf 2014</a> and read this post by thoughtram on <a href="http://blog.thoughtram.io/angular/2016/01/22/understanding-zones.html" target="_blank">understanding zones</a>.
+However, even after watching the talk and reading the blogpost, I was still intrigued to find out how this actually works. How can zone.js monkey-patch browser events and how do the examples provided on their github page really work. The purpose of this blogpost is to share what I’ve learned during my discovery.</p>
+
+<h5 id="how-are-events-monkey-patched-and-what-does-that-even-mean">How are events monkey-patched and what does that even mean?</h5>
+<p>To see how events are monkey-patched, I decided to look into the source code. The following is a simplified conceptual snippet of what zone.js does at startup time.</p>
+
+<pre><code class="language-typescript">function zoneAwareAddEventListener() {...}
+function zoneAwareRemoveEventListener() {...}
+function zoneAwarePromise() {...}
+function patchTimeout() {...}
+window.prototype.addEventListener = zoneAwareAddEventListener;
+window.prototype.removeEventListener = zoneAwareRemoveEventListener;
+window.prototype.promise = zoneAwarePromise;
+window.prototype.setTimeout = patchTimeout;
+</code></pre>
+<p><strong>NOTE:</strong> zone.js patches even more events which I omitted since the concept is the same.</p>
+
+<p>It turns out, zone.js overrides some of the functions on the window prototype and replaces the defaults with a proxy. This means that every event scheduled or every promise created after loading the file, will be wrapped in the proxy. This concept is called monkey-patching.</p>
+
+<h5 id="time-to-explain-by-example">Time to explain by example</h5>
+<p>Lets take a look at the first example from the readme of the zone.js github repository (Here’s the <a href="http://plnkr.co/edit/Ul44DohpdBfMKjgssspw?p=preview" target="_blank">plnkr</a> you can play around with).</p>
+
+<pre><code class="language-typescript">//load zone.js
+Zone.current.fork({}).run(function () {
+    Zone.current.inTheZone = true;
+
+    setTimeout(function () {
+        console.log('in the zone: ' + !!Zone.current.inTheZone);
+    }, 0);
+});
+
+console.log('in the zone: ' + !!Zone.current.inTheZone);
+</code></pre>
+
+<p>If you were to execute this, you’d get the following result:</p>
+
+<pre><code class="language-typescript">'in the zone: false'
+'in the zone: true'
+</code></pre>
+
+<p>Normally, you’d expect the result of both statements to be true since we’re logging the same property in both places.</p>
+
+<p>To understand how this works, we need to zoom in on some parts of the snippet.</p>
+
+<h5 id="creating-and-running-something-in-a-zone">Creating and running something in a Zone</h5>
+<pre><code class="language-typescript">Zone.current.fork({}).run( .... );
+</code></pre>
+<p>When zone.js is loaded, it creates a global property which you can use to access the root Zone. In this example, a Zone is created by forking the root Zone via the <code>Zone.current</code> property. We call the run function on the created object to run something <strong>inside this Zone</strong>.</p>
+
+<p><img src="http://www.jacquitalbot.com/wp-content/uploads/2013/11/in-the-zone.jpg" /></p>
+
+<h5 id="the-function-executed-in-the-zone">The function executed in the Zone</h5>
+<p>Next we look at the function that is run inside the Zone.</p>
+
+<pre><code class="language-typescript">....
+Zone.current.inTheZone = true;
+
+setTimeout(function () {
+        console.log('in the zone: ' + !!Zone.current.inTheZone);
+    }, 0);
+....
+</code></pre>
+
+<p>It first attaches a boolean to the <code>Zone.current</code> property. It then sets up a timer to log the property after the call stack has been cleared (if you do not know what this means, I suggest looking at the following <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">talk</a>).</p>
+<h5 id="the-log-statement-outside-of-the-zone">The log statement outside of the Zone</h5>
+<p>Lastly, the same statement is logged <strong>outside of the zone</strong>.</p>
+
+<pre><code class="language-typescript">....
+console.log('in the zone: ' + !!Zone.current.inTheZone);
+</code></pre>
+
+<p>We again point to the same <code>Zone.current</code> property. How could this not log the same result if we’re pointing to the same property in both log statements?</p>
+
+<h5 id="zone-setup-and-teardown">Zone setup and teardown</h5>
+<p>Every time something is run <strong>inside a Zone</strong> or <strong>a monkey-patched event is triggered</strong>, the Zone or the proxy <strong>sets up the Zone</strong> before executing the function or callbacks. The proxy is able to setup the Zone since it holds <strong>a reference to the Zone in which it was created</strong>.
+During setup, the state linked to this specific Zone is restored so that even timeouts, event listener, … are executed like they were executed immediately. You could think of a Zone as being an <strong>execution context that persists across async tasks</strong>, as the definition states.</p>
+
+<p>To further clarify, take a look at the next snippet. I re-arranged the code in the way it is executed and added zone setup and teardown points. Look at the comments for more information.</p>
+
+<pre><code class="language-typescript">// load zone.js. As stated before,
+// this will monkey-patch all browser events.
+
+Zone.current.fork({}).run(function () {
+    // SETUP ZONE
+    // trigger: A call to the run function is made. This will first
+    //          setup the zone before executing the function param.
+    // actions:
+    //      - Zone.current property is set to the Zone
+    //        in which the function is executed. In this case, it's
+    //        the one we creating by forking the root Zone. Let's
+    //        call it exampleZone from this point onwards.
+    //      - Zone lifecycle hooks are called (we'll get back
+    //        to that later).
+
+    // a boolean is attached to the Zone.current property. Due
+    // to the zone setup, this points to the exampleZone.
+    Zone.current.inTheZone = true;
+
+    // a timeout is registered. This isn't the 'default' timeout
+    // since these are monkey-patched. So here, we are actually
+    // setting up the proxy. What's important to remember is that
+    // this proxy will hold a reference to the Zone in which it
+    // was created, in this case the 'exampleZone'. This will be
+    // used later.
+    setTimeout(
+       ...., 0);
+
+    // TEARDOWN ZONE
+    // trigger: The function that was to be executed
+    //          inside the Zone has ended.
+    // actions:
+    //      - Zone.current property is reset to the root Zone
+    //      - Zone lifecycle hooks are called
+});
+
+// Log statement. The Zone.current property is currently
+// pointing to the root Zone. Since this does not know an
+// 'inTheZone' property, this will log false.
+console.log('in the zone: ' + !!Zone.current.inTheZone);
+
+// The stack is cleared and the timer callback is executed
+
+// SETUP ZONE
+// trigger: The monkey-patched event is fired. The proxy wrapper
+//          will trigger a Zone setup. Remember that the proxy
+//          wrapper holds a reference to the Zone in which it
+//          was created.
+// actions:
+//      - Zone.current property is set to the exampleZone (the
+//        proxy holds a reference to the exampleZone)
+//      - Zone lifecycle hooks are called
+function () {
+        // The exampleZone does contain the 'inTheZone'
+        // property. So this will log true.
+        console.log('in the zone: ' + !!Zone.current.inTheZone);
+}
+// TEARDOWN ZONE
+    // trigger: The event callback has ended and the proxy
+    //          does a Zone teardown.
+    // actions:
+    //      - Zone.current property is reset to the root Zone
+    //      - Zone lifecycle hooks are called
+</code></pre>
+
+<p>Zone.js is able to setup and teardown the Zone when executing the timeout callback thanks to the monkey-patching of that event.
+This should clear things up a bit!</p>
+
+<h6 id="how-does-angular-2-leverage-zones">How does Angular 2 leverage zones</h6>
+<p>I took a look inside the Angular 2 source code to determine how they leverage zones. Take a look at the next snippet:</p>
+
+<pre><code class="language-typescript">....
+new NgZoneImpl({
+      trace: enableLongStackTrace,
+      onEnter: () =&gt; {
+        // console.log('ZONE.enter', this._nesting, this._isStable);
+        this._nesting++;
+        if (this._isStable) {
+          this._isStable = false;
+          this._onUnstable.emit(null);
+        }
+      },
+      onLeave: () =&gt; {
+        this._nesting--;
+        // console.log('ZONE.leave', this._nesting, this._isStable);
+        this._checkStable();
+      },
+      setMicrotask: (hasMicrotasks: boolean) =&gt; {
+        this._hasPendingMicrotasks = hasMicrotasks;
+        this._checkStable();
+      },
+      setMacrotask: (hasMacrotasks: boolean) =&gt;
+            { this._hasPendingMacrotasks = hasMacrotasks; },
+      onError: (error: NgZoneError) =&gt;
+            this._onErrorEvents.emit(error)
+    });
+....
+</code></pre>
+
+<p>This is from the <a href="https://github.com/angular/angular/blob/master/packages/core/src/zone/ng_zone.ts" target="_blank">NgZone.ts</a> source file. Zone.js exposes lifecycle hooks. This is a listing of the events Angular 2 listens to. Since everything in Angular 2 is run in a single Zone, ngZone, Angular 2 can leverage this to determine when it should perform a Change Detection cycle based on those callbacks. This removes the need to manually call <code>$digest</code> like in Angular 1.
+Pretty neat right!</p>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=How the hell does zone.js really work?&amp;url=https://blog.strongbrew.io/how-the-hell-do-zones-really-work"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/how-the-hell-do-zones-really-work"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/how-the-hell-do-zones-really-work"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

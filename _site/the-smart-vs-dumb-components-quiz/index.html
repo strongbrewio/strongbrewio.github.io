@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>The smart vs dumb component quiz</title>
+    <meta name="description" content="" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//the-smart-vs-dumb-components-quiz/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="The smart vs dumb component quiz" />
+    <meta property="og:description" content="" />
+    <meta property="og:url" content="https://blog.strongbrew.io///the-smart-vs-dumb-components-quiz/" />
+    <meta property="og:image" content="/assets/images/cover/cover2.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The smart vs dumb component quiz" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///the-smart-vs-dumb-components-quiz/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover2.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "The smart vs dumb component quiz",
+    "url": "https://blog.strongbrew.io///the-smart-vs-dumb-components-quiz/",
+    "image": "/assets/images/cover/cover2.jpg",
+    "description": ""
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover2.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">The smart vs dumb component quiz</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2016-04-22">22 Apr 2016
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>If you follow the blogs of some of the more well known SPA guru’s, you will most definitely have heard of the concept of <code>smart</code> and <code>dumb</code> components. If you haven’t, here’s a listing of some of those blogposts:</p>
+
+<ul>
+  <li>
+    <p><a href="http://teropa.info/blog/2016/02/22/dumb-components-and-visual-feedback-in-angular-apps.html" target="_blank">Tero Parviainen: Dumb Components and Visual Feedback in Angular Apps</a></p>
+  </li>
+  <li>
+    <p><a href="https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0#.wnlz25kho" target="_blank">Dan Abramov: Presentational and Container Components</a></p>
+  </li>
+  <li>
+    <p><a href="https://toddmotto.com/stateless-react-components/" target="_blank">Todd Motto: Stateless React components</a></p>
+  </li>
+</ul>
+
+<p><strong>Note: These articles often use different names for the same concept. For the sake of it, I’ll be using <code>smart</code> and <code>dumb</code> to define the components.</strong></p>
+
+<p>Their even was a talk on <a href="https://www.youtube.com/watch?v=WfRmhYgwIho" target="_blank">NG-NL</a> by Shai Reznik on the topic, which was hilarious by the way.</p>
+
+<p>What’s noticeable is that the concept is applicable to different technologies. It isn’t something that only applies to Angular or React. It’s applicable to every SPA technology out there, making it even more interesting to really understand what it means.</p>
+
+<p>Even if you’ve read every blogpost and watched the youtube video, putting the theory into practice isn’t as easy as you might expect. If you think you’re really getting what is meant by <code>smart</code> and <code>dumb</code> components, you can try and answer the following questions my good friend <a href="https://twitter.com/brechtbilliet" target="_blank">Brecht Billiet</a> has came up with. I’ve added explanations and examples where possible.</p>
+
+<h4 id="question-time">Question Time</h4>
+<p>1: Is a <code>dumb</code> component reusable?
+2: Should a <code>dumb</code> component know about the application’s state?
+3: Should a <code>dumb</code> component do data fetching?
+4: Should a <code>dumb</code> component redirect to another route?
+5: Should a <code>dumb</code> component have DI in his constructor?
+6: Should a <code>dumb</code> component dispatch events?
+7: Should a <code>dumb</code> component contain logic?
+8: Is a component that contains child elements a <code>smart</code>?</p>
+
+<h4 id="answers">Answers</h4>
+
+<h6 id="1-is-a-dumb-component-reusable">1: Is a <code>dumb</code> component reusable?</h6>
+<p>Of course it is! That’s the whole point. <code>Dumb</code> components have a clear API with inputs and outputs. This makes it easy to reuse the component.</p>
+
+<h6 id="2-should-a-dumb-component-know-about-the-applications-state">2: Should a <code>dumb</code> component know about the application’s state?</h6>
+<p>It should <strong>not</strong> know anything about application state. If your component knew something about the state of the application, it would lose it’s ability to be reusable. But even more important, by using components that do not know anything about the state, you’re reducing the complexity of these components and your SPA as whole. You don’t have to think about the fact that these component might update your state which is a huge benefit.</p>
+
+<h6 id="3-should-a-dumb-component-do-data-fetching">3: Should a <code>dumb</code> component do data fetching?</h6>
+<p>No it should not. If your <code>dumb</code> component is used to visualise data, you should pass the data as a parameter to your component.
+If you’re, for example, creating widgets that are being used across multiple applications, dumb components are the way to go. If you’d do the data fetching in the <code>dumb</code> component, you wouldn’t be able to use it as a widget.</p>
+
+<h6 id="4-should-a-dumb-component-redirect-to-another-route">4: Should a <code>dumb</code> component redirect to another route?</h6>
+<p>No. If you’d do this, your component knows about the application’s state and is no long reusable across different applications, since the route changes will be different.</p>
+
+<h6 id="5-should-a-dumb-component-have-di-in-his-constructor">5: Should a <code>dumb</code> component have DI in his constructor?</h6>
+<p>It depends but mostly no. In general, the component <strong>must not</strong> rely on DI.
+A case where it might be acceptable is when using feature toggles to hide or show some parts.</p>
+
+<pre><code class="language-typescript">class SmartComponent {
+  public template: string = `&lt;dumb&gt;&gt;&lt;/dumb&gt;`;
+}
+class DumbComponent {
+  public template: string =
+              `&lt;div&gt;showing&lt;/div&gt;
+               &lt;div ng-if="$ctrl.featureModel.isActive()"&gt;
+                   not-showing
+               &lt;/div&gt;`;
+  public controller: Function = DumbController;
+}
+class DumbController {
+  public static $inject: Array&lt;string&gt; = ["featureModel"];
+  constructor(public featureModel){}
+}
+class FeatureService{
+  public isActive(): boolean {
+    return false;
+  }
+}
+</code></pre>
+<p>Here we have an example where a <code>smart</code> component contains a <code>dumb</code> component. The <code>dumb</code> component relies on the <code>featureService</code> to know if it should show a <code>div</code> or not.
+You don’t want to pollute the API of the <code>dumb</code> component by passing a <code>show</code> variable since this might be a temporary intervention. Check here for the <a href="http://plnkr.co/edit/Iz6C7F5QAveS60l6y9wB?p=preview" target="_blank">plnkr</a>.
+Another example where DI is an option in a dumb component is when you want to use a TranslationService. This does not update application state nor does is perform a route change or influence other components in your application. You can use DI in that component without the component losing the label of being ‘dumb’.</p>
+
+<h6 id="6-should-a-dumb-component-dispatch-events">6: Should a <code>dumb</code> component dispatch events?</h6>
+<p>Yes! When using this paradigm, you’d most certainly want to use a unidirectional flow of data. If you only pass data from the top of your component tree to the bottom, you must have a way for the <code>dumb</code> components to notify it’s parent component when something changes or needs to be done.</p>
+
+<p>Check out this <a href="http://plnkr.co/edit/kG60UcrSWzwfRjANRzGT?p=preview" target="_blank">plnkr</a>.</p>
+
+<pre><code class="language-typescript">class SmartComponent {
+  public template: string =
+        `&lt;dumb  text="$ctrl.text"
+                on-change="$ctrl.onChange(text)"&gt;
+         &gt;&lt;/dumb&gt;`;
+  public controller: Function = SmartController;
+}
+class SmartController {
+  public text: string = "initial value";
+  public onChange(text: string): void {
+    console.log(text);
+  }
+}
+class DumbComponent {
+  public bindings: any = {
+    onChange: "&amp;",
+    text: "&lt;"
+  };
+  public template: string =
+              `&lt;input ng-model="$ctrl.text"&gt;
+              &lt;button   type="button"
+                        ng-click="$ctrl.onChange({text: $ctrl.text})"&gt;
+              Call to smart component&lt;/button&gt;`;
+}
+</code></pre>
+<p>This example has a <code>smart</code> component that contains a <code>dumb</code> component. The <code>smart</code> component passes a text and a callback method to the <code>dumb</code>. When the <code>dumb</code> component has updated the property it uses the callback method to notify the <code>smart</code> component. The responsibility of the dumb component here is: ‘Accept some data modify it and return it via the callback method’.</p>
+
+<p><strong>Note: I really think you should be able to describe a dumb component’s functionality in a single sentence. It’s a nice trick in knowing if the component should be dumb or smart.</strong></p>
+
+<h6 id="7-should-a-dumb-component-contain-logic">7: Should a <code>dumb</code> component contain logic?</h6>
+<p>It can. But it can only be logic that relates to the component itself. This logic is not business logic.
+You could, for example, hold a boolean value whether something in the component is collapsed or not.</p>
+
+<h6 id="8-is-a-component-that-contains-child-elements-a-smart">8: Is a component that contains child elements a <code>smart</code>?</h6>
+<p>No. It is perfectly acceptable for a <code>dumb</code> component to contain other <code>dumb</code> components. Of course, a <code>dumb</code> component cannot contain a <code>smart</code> component.</p>
+
+<p>EDIT: As <a href="https://disqus.com/by/ArekSliwa/">@areksliwa</a> pointed out in the comments, when you have a layout component where some content is being projected into via content projection, it can happen that a dumb component (the layout component) contains a smart component. This can happen for a tab(s) component for example.</p>
+
+<p>Can you think of some more questions? Please let me know :).</p>
+
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=The smart vs dumb component quiz&amp;url=https://blog.strongbrew.io/the-smart-vs-dumb-components-quiz"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/the-smart-vs-dumb-components-quiz"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/the-smart-vs-dumb-components-quiz"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

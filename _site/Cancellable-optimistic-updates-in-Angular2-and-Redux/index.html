@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Cancellable optimistic updates in Angular 2 and Redux</title>
+    <meta name="description" content="Angular 4 and redux] are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the @ngrx/store variant of the redux principle. Because I'm one of them I will be using @ngrx/store instead of redux.js for this article. Don't let that bother you, what you are about to read can be used with redux.js in the exact same way." />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//Cancellable-optimistic-updates-in-Angular2-and-Redux/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cancellable optimistic updates in Angular 2 and Redux" />
+    <meta property="og:description" content="Angular 4 and redux] are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the @ngrx/store variant of the redux principle. Because I'm one of them I will be using @ngrx/store instead of redux.js for this article. Don't let that bother you, what you are about to read can be used with redux.js in the exact same way." />
+    <meta property="og:url" content="https://blog.strongbrew.io///Cancellable-optimistic-updates-in-Angular2-and-Redux/" />
+    <meta property="og:image" content="/assets/images/cover/cover6.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cancellable optimistic updates in Angular 2 and Redux" />
+    <meta name="twitter:description" content="Angular 4 and redux] are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the @ngrx/store variant of the redux principle. Because I'm one of them I will be using @ngrx/store instead of redux.js for this article. Don't let that bother you, what you are about to read can be used with redux.js in the exact same way." />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///Cancellable-optimistic-updates-in-Angular2-and-Redux/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover6.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "Cancellable optimistic updates in Angular 2 and Redux",
+    "url": "https://blog.strongbrew.io///Cancellable-optimistic-updates-in-Angular2-and-Redux/",
+    "image": "/assets/images/cover/cover6.jpg",
+    "description": "Angular 4 and redux] are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the @ngrx/store variant of the redux principle. Because I'm one of them I will be using @ngrx/store instead of redux.js for this article. Don't let that bother you, what you are about to read can be used with redux.js in the exact same way."
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover6.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+    <div class="container">
+        <div class="spotlight">
+            <h2>Become an Angular architect!</h2>
+            <ul class="techlogos">
+                <li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>
+            </ul>
+            <div class="img-wrapper">
+                <img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">
+                <a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">
+                    <span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Cancellable optimistic updates in Angular 2 and Redux</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                    
+                    
+                    
+                    
+                    <time class="post-date" datetime="2016-09-23">23 Sep 2016
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Angular'>Angular</a>,
+                    
+                    
+                    
+                    <a href='/tag/Redux'>Redux</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p><a href="https://angular.io/">Angular 2</a> and <a href="https://github.com/reactjs/redux">redux</a> are 2 technologies that are getting a lot of traction these days. Angular 2 is a SPA (single-page-app) framework and redux is a state management tool. Most developers that are using Angular 2 are using the <a href="https://github.com/ngrx/store">@ngrx/store</a> variant of the redux principle. Because I’m one of them I will be using @ngrx/store instead of redux.js for this article. Don’t let that bother you, what you are about to read can be used with redux.js in the exact same way. If you have never heard about redux, I strongly advice to read the <a href="http://redux.js.org/">documentation</a> first.</p>
+
+<h2 id="optimistic-updates">Optimistic updates</h2>
+
+<p>Redux has a client-side store that has all the data and state your client-side application needs. Therefore, it is the single source of truth for your frontend. When something in that store changes, your components get updated automatically. Let’s say that we are implementing a winecellar application which will obviously contain an array of wines.</p>
+
+<p><strong>Scenario: we want to remove a wine from the winecellar.</strong></p>
+
+<p>A user goes to the index page of our application, clicks a delete button in the datagrid which will call an angular service to remove a wine. The service does an HTTP call to a server, and when the wine finally gets deleted, the service responds with a 200 response (ok). When that happens we can update the redux store and our view gets updated.
+<img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario1.png" alt="Scenario 1" /></p>
+
+<p>The code explained above might look like this:</p>
+
+<pre><code class="language-typescript">remove(wine: Wine): void {
+    this.http.delete(`${API_URL}/wines/${wine._id}`).subscribe(() =&gt; {
+    	// dispatch the action to the store, when the call was successful
+    	this.store.dispatch({type: REMOVE_WINE, payload: {_id: wine._id}});
+    });
+}
+</code></pre>
+
+<p>This is the traditional way of doing things, but I think we can do it better. What if we would update the store, regardless of the HTTP response the server returns? We click the delete button in the datagrid, call the angular service like we already did. But in that service we update the store directly (parallel with the http call)</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario2.png" alt="Scenario 2" /></p>
+
+<p>The code explained above might look like this:</p>
+
+<pre><code class="language-typescript">remove(wine: Wine): void {
+	// dispatch directly to the store
+	this.store.dispatch({type: REMOVE_WINE, payload: {_id: wine._id}};
+	// we still have to subscribe because http calls return cold observables
+    this.http.delete(`${API_URL}/wines/${wine._id}`).subscribe();
+}
+</code></pre>
+
+<p>This is a pretty nice change: Our application has just gotten a lot <strong>faster and snappier</strong>. Every time the user does an action, the store gets updated immediately, which means that the components will get updated immediately as well. We never have to wait for http responses again.</p>
+
+<p>There is one exception to this rule: When <strong>adding</strong> data, the backend has to return an ID which means that for POST calls we will have to postpone the store update until we get a 200 response. (otherwise we would have id-less wines in our store, and we can’t have that)</p>
+
+<h2 id="what-if-the-server-call-fails">What if the server-call fails?</h2>
+
+<p>What if the user’s internet-connection is lost? Or the backend doesn’t return a 200 response but an error. Our store will already be updated, the wine will be lost when it’s in fact still in the database. In some scenarios you want to prevent that kind of behavior. In those cases we want to rollback that specific action, but not interfere with the rest of the actions. It has to be completely safe.</p>
+
+<p><img src="https://raw.githubusercontent.com/brechtbilliet/brechtbilliet.github.io/master/_posts/optimisticupdates/optimisticupdates_scenario3.png" alt="Scenario 3" /></p>
+
+<p>We would like to implement something like this:</p>
+
+<pre><code class="language-typescript">remove(wine: Wine): void {
+	// create an action
+	let action = {type: REMOVE_WINE, payload: {_id: wine._id}};
+	//dispatch the action to the store
+	this.store.dispatch(action);
+	// call the backend
+    this.http.delete(`${API_URL}/wines/${wine._id}`)
+    	.subscribe(
+    		// on success, do nothing
+    		() =&gt; {}, 
+	    	// on error, rollback the action
+	    	() =&gt; {
+	    		this.store.dispatch({type: "UNDO_ACTION", payload: action});
+	    	// maybe show somekind of errormessage to show the user that it's action failed
+    	});
+}
+</code></pre>
+
+<p>It turns out that when using the redux pattern, this only takes 12 lines of code (without comments :-)). We will have to create a parent reducer that will delegate to our root reducer. The parent reducer will keep track of all the actions, so they can be rolled back.
+The implementation looks like this:</p>
+
+<pre><code class="language-typescript">import {ApplicationState} from "../statemanagement/state/ApplicationState";
+import {Action, ActionReducer} from "@ngrx/store";
+
+export function handleUndo(rootReducer: ActionReducer&lt;ApplicationState&gt;)
+	: ActionReducer&lt;ApplicationState&gt; {
+	// keep the executedActions
+    let executedActions: Array&lt;Action&gt; = [];
+    return (state: ApplicationState, action: Action) =&gt; {
+        if (action.type === "UNDO_ACTION") {
+        	// if the action is UNDO_ACTION, 
+        	// then call all the actions again on the rootReducer, 
+        	// except the one we want to rollback
+            let newState: any = {};
+            executedActions = executedActions.filter(eAct =&gt; eAct !== action.payload);
+            // update the state for every action untill we get the
+            // exact same state as before, but without the action we want to rollback
+            executedActions.forEach(executedAction =&gt; 
+            	newState = rootReducer(newState, executedAction));
+            return newState;
+        }
+        // push every action that isn't an UNDO_ACTION to the executedActions property
+        executedActions.push(action);
+        // just delegate
+        return rootReducer(state, action);
+    };
+}
+</code></pre>
+
+<p>So basically, when an action is being rolled back, every action that has been taken before is being executed on a piece of state again. When that piece of state is updated, it will return it and the store will be updated with the same state, except the one that our rolled back action created.</p>
+
+<p>To make sure the actions can be undone, we have to make redux use the piece of code above. This is how you could use it in Angular 2.</p>
+
+<pre><code class="language-typescript">@NgModule({
+	// instead of passing the rootReducer directly
+	// like we would have done before, wrap it in the handleUndo function
+    imports: [StoreModule.provideStore(handleUndo(rootReducer))/*, ...*/],
+    /* ... */
+})
+export class AppModule {
+}
+</code></pre>
+
+<h2 id="possible-improvements">Possible improvements</h2>
+
+<p>Won’t it become slow after a while, replaying all these actions?
+Some facts:</p>
+<ul>
+<li>Actions are very cheap</li>
+<li>They will update the store only once, we execute the actions ourselves, so ui won't get updated</li>
+<li>Actions only get replayed when there is an error</li>
+<li>The devtools also work like that, enables [timetraveling](https://onsen.io/blog/react-redux-devtools-with-time-travel)</li>
+</ul>
+<p>What if it would become slow?
+We can implement a buffer. Let’s say that we only want the last 100 actions to be kept.</p>
+
+<pre><code class="language-typescript">export function handleUndo(rootReducer: ActionReducer&lt;ApplicationState&gt;, 
+	bufferSize = 100): ActionReducer&lt;ApplicationState&gt; {
+    let executedActions: Array&lt;Action&gt; = [];
+    let initialState = undefined;
+    return (state: ApplicationState, action: Action) =&gt; {
+        if (action.type === "UNDO_ACTION") {
+        	// if the action is UNDO_ACTION, 
+        	// then call all the actions again on the rootReducer, 
+        	// except the one we want to rollback
+            let newState: any = initialState;
+            executedActions = executedActions.filter(eAct =&gt; eAct !== action.payload);
+            // update the state for every action untill we get the
+            // exact same state as before, but without the action we want to rollback
+            executedActions.forEach(executedAction =&gt; 
+            	newState = rootReducer(newState, executedAction));
+            return newState;
+        }
+       	// push every action that isn't an UNDO_ACTION to the executedActions property
+		executedActions.push(action);
+        let updatedState =  rootReducer(state, action);
+        if (executedActions.length === bufferSize + 1) {
+            let firstAction = executedActions[0];
+            // calculate the state x (buffersize) actions ago
+            initialState = rootReducer(initialState, firstAction);
+            // keep the correct actions
+            executedActions = executedActions.slice(1, bufferSize + 1);
+        }
+        return updatedState;
+    };
+}
+</code></pre>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>The redux pattern has opened amazing doors for frontend development. Just like <a href="http://blog.brecht.io/How-we-made-our-app-real-time-in-6-lines-of-code/">realtime</a> became a breeze we can do optimistic updates with almost no effort.
+The reason why you would do optimistic updates is that your application becomes amazingly fast and snappy! When implementing optimistic updates, the user will experience a native, mobile feeling.</p>
+
+<p>Here you can find the npm package I’ve created for angular, called <a href="https://www.npmjs.com/package/ngrx-undo">ngrx-undo</a></p>
+
+<p>Let me know if you enjoyed this article!</p>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.png)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                    
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Cancellable optimistic updates in Angular 2 and Redux&amp;url=https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/Cancellable-optimistic-updates-in-Angular2-and-Redux"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>
