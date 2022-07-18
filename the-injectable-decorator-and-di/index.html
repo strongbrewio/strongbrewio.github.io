@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>The @Injectable decorator and its relationship to dependency injection</title>
+    <meta name="description" content="A post on the relationship between the @Injectable decorator and dependency injection" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//the-injectable-decorator-and-di/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="The @Injectable decorator and its relationship to dependency injection" />
+    <meta property="og:description" content="A post on the relationship between the @Injectable decorator and dependency injection" />
+    <meta property="og:url" content="https://blog.strongbrew.io///the-injectable-decorator-and-di/" />
+    <meta property="og:image" content="/assets/images/cover/cover5.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The @Injectable decorator and its relationship to dependency injection" />
+    <meta name="twitter:description" content="A post on the relationship between the @Injectable decorator and dependency injection" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///the-injectable-decorator-and-di/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover5.jpg" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "The @Injectable decorator and its relationship to dependency injection",
+    "url": "https://blog.strongbrew.io///the-injectable-decorator-and-di/",
+    "image": "/assets/images/cover/cover5.jpg",
+    "description": "A post on the relationship between the @Injectable decorator and dependency injection"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/COVID">COVID</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Rxjs">Rxjs</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover5.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+    <!--<div class="container">-->
+        <!--<div class="spotlight">-->
+            <!--<h2>Become an Angular architect!</h2>-->
+            <!--<ul class="techlogos">-->
+                <!--<li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>-->
+            <!--</ul>-->
+            <!--<div class="img-wrapper">-->
+                <!--<img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">-->
+                <!--<a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">-->
+                    <!--<span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>-->
+                <!--</a>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">The @Injectable decorator and its relationship to dependency injection</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    
+                    
+                    <a href='/author/kwintenp'>Kwinten Pisman</a>
+                    
+                    
+                    <time class="post-date" datetime="2019-05-19">19 May 2019
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/RxJS'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <p>Last week, I had the pleasure of being a jury member of the Angular Challenge 2019. This is a competition organized by the organizers of NG-BE (<a href="https://twitter.com/jvandemo" target="_blank">Jurgen</a> en <a href="https://twitter.com/samvloeberghs" target="_blank">Sam</a>) where Angular developers can come together to test their knowledge. The first step is online and the best participants are asked to join in for an in-person contest.</p>
+
+<p>As a jury member, it was my duty to create questions for both these rounds. One of my questions that was used last week seemed to have caused a little controversy. In this post, I would like to explain the question, the correct answers and apologize for those who found the question to be unclear or misleading.</p>
+
+<h2 id="the-question">The question</h2>
+
+<p>Let’s look at the <strong>question</strong>:</p>
+
+<p>Which of the following statements regarding the <code>@Injectable</code> decorator
+are true?</p>
+
+<p><strong>Answers:</strong></p>
+
+<ol>
+  <li>@Injectable needs to be added to every service.</li>
+  <li>@Injectable needs to be added to services that use DI.</li>
+  <li>@Injectable is optional if you don’t use the ‘providedIn’ option.</li>
+  <li>@Injectable in combination with the ‘providedIn’ option means the
+service doesn’t need to be added in the providers’ array of a
+module.</li>
+</ol>
+
+<p>As you can see from the question (and title of this post), it was about the <code>@Injectable</code> decorator and its effect on dependency injection(DI) in Angular. The correct answer to this question is option 2 and 4.</p>
+
+<p>The reason that some people answered this wrong is that they misunderstood the relation between what the <code>@Injectable</code> operator really does and DI in Angular. So let’s dive in a little deeper here.</p>
+
+<h2 id="adding-injectable-is-not-registering-the-service">Adding @Injectable is not registering the service</h2>
+
+<p>In any IOC (inversion of control) container (used for DI), you always need two things. First of all, you need a token. A token is something unique that is used to register something with the container. Next thing we need is a provider that explains to the DI container how it can create an instance of a certain dependency.</p>
+
+<p>In Angular, we can register a service for a token and pass it a provider in two different ways.</p>
+
+<p>We can register a service with a specific <code>@NgModule</code> by passing a service to the providers array. In this scenario, our token is the typescript type <code>SomeService</code>. The provider is the <code>useClass</code> strategy which also points to the <code>SomeService</code>. This provider strategy basically says that this dependency can be instantiated by <code>new ... ()</code>ing it.</p>
+
+<pre><code class="language-typescript">@NgModule({
+  ...
+  providers: [
+    // long hand syntax
+  	{provide: SomeService, useClass: SomeService},
+  	// short hand syntax
+  	SomeService
+  ],
+})
+</code></pre>
+<p>Because the token and the provider are the same, we can use the short-hand syntax.</p>
+
+<p><strong>Note:</strong> The <code>@NgModule</code> is not the only place where you can add a service to the providers array. The concept of registering is the same with <code>@Components</code> and <code>@Directives</code>.</p>
+
+<p>The second way that we can register a service is by using the <code>providedIn</code> option.</p>
+
+<pre><code class="language-typescript">@Injectable({
+  providedIn: 'root'
+})
+export class SomeService {
+
+  constructor() { }
+}
+</code></pre>
+
+<p>In this scenario, we are registering the service with the root <code>@NgModule</code> (but only if the service is injected in a service, component or directive that Angular knows). The token here is <code>SomeService</code> and the same strategy as in the example above will be used. This is called a tree-shakable provider.</p>
+
+<h3 id="but-what-about-injectable">But what about @Injectable?</h3>
+
+<p>As you can see, I’ve not yet mentioned what the <code>@Injectable</code> decorator does (without the <code>providedIn</code> at least). That’s because the <code>@Injectable</code> decorator has nothing to do with registering services with the IOC container. So what is it used for?</p>
+
+<p>Well, it is pretty standard that our <code>SomeService</code> can also have some dependencies. For instance, we can use the <code>HttpClient</code>.</p>
+
+<pre><code class="language-typescript">import { HttpClient } from '@angular/common/http';
+
+@Injectable()
+export class SomeService {
+
+  constructor(private httpClient: HttpClient) { }
+}
+</code></pre>
+
+<p>Let’s try and reason about what happens when we want to get an instance of this <code>SomeService</code>. First of all, this <code>SomeService</code> will need to be registered with Angular so let’s assume it is. When Angular wants to create this service, it will need to pass it an instance of the <code>HttpClient</code>. So how can it do that?</p>
+
+<p>Well, first of all, Angular will need to know which dependency is requested. Remember that we use a token to register a dependency? Well, with the same token (and this is really important), we can ask Angular for an instance of that dependency. So what Angular can do is, by investigating our constructor, it can see that we are requesting a service for the token <code>HttpClient</code>. And if a service has been registered with that token, Angular will use it to instantiate the <code>SomeService</code> and give us the instance it created.</p>
+
+<p>But wait a minute 🤔, the token we are talking about is a Typescript type. And when our code is running in the browser, we are running Javascript. And when we transpile from Typescript to Javascript, we lose all the types. So how can Angular know what token we are requesting in our constructor???</p>
+
+<p>Thanks to the <code>@Injectable</code> decorator! The decorator is going to add metadata information to our transpiled class to make sure that the type information that is needed to identify the tokens is not lost. To prove this, let’s take a look at the transpiled code for our <code>SomeService</code>.</p>
+
+<pre><code class="language-typescript">var SomeService = /** @class */ (function () {
+    function SomeService(httpClient) {
+        this.httpClient = httpClient;
+    }
+    SomeService = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
+        __metadata(
+        	"design:paramtypes", 
+        	[_angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpClient"]]
+        )
+    ], SomeService);
+    return SomeService;
+}());
+</code></pre>
+
+<p>As you can see, the decorator adds metadata so that when this service is instantiated, Angular knows what services are requested and we don’t lose the token information.</p>
+
+<p>Important to note here is that Angular is NOT using the <code>@Injectable</code> decorator to register the service. It is only using the decorator to figure out which dependencies the service actually requests.</p>
+
+<p><strong>Note:</strong> Other decorators such as <code>@Component</code> will also add this metadata to the transpiled class (as components can also have dependencies of course).</p>
+
+<h3 id="back-to-the-question">Back to the question</h3>
+
+<p>Now, with all of this in mind, let’s look back at the <strong>question</strong>.</p>
+
+<p>Which of the following statements regarding the <code>@Injectable</code> decorator
+are true?</p>
+
+<p><strong>Answers:</strong></p>
+
+<ol>
+  <li>@Injectable needs to be added to every service.</li>
+  <li>@Injectable needs to be added to services that use DI.</li>
+  <li>@Injectable is optional if you don’t use the ‘providedIn’ option.</li>
+  <li>@Injectable in combination with the ‘providedIn’ option means the
+service doesn’t need to be added in the providers array of a
+module.</li>
+</ol>
+
+<p>The first and second option are basically the opposite, meaning if one is true the other is false and vice versa. If we have a service, that is registered with Angular and doesn’t require DI (meaning it doesn’t have any dependencies itself), we don’t need the <code>@Injectable</code> decorator. This decorator only gives Angular information about the dependencies this service wants, but if it doesn’t have any, then the decorator is optional! So the second option is correct and the first one false.</p>
+
+<p>The third option is false because if our service has dependencies, that means the <code>@Injectable</code> operator is needed! Otherwise Angular doesn’t know the tokens that are needed. This is unrelated to whether or not the <code>providedIn</code> option is used.</p>
+
+<p>The fourth option is correct as we’ve seen above.</p>
+
+<p>To demonstrate all of this, you can use this <a href="https://stackblitz.com/edit/angular-pr34ij" target="_blank">stackblitz</a>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The <code>@Injectable</code> decorator is related to but not necessarily crucial for every service when using DI in Angular. I must admit that, in hindsight, the question is a little misleading in the sense that for option 2 stating ‘services that use DI’ is not the best way to phrase it. I meant a service that has dependencies of its own. And secondly, it’s always best to add the decorator anyway. There isn’t really a benefit in omitting it (bytes gained is marginal). If you wouldn’t have it and you add a dependency later on, you might get some weird bugs as well.</p>
+
+<p>So to the participants that answered this question wrong because of the question being unclear, I do apologize!</p>
+
+<p><strong>Note:</strong> The Angular docs actually make some wrong statements about the <code>@Injectable</code> decorator. Frederik Prijck, who participated in the challenge is going to create a PR to make sure it gets fixed ASAP!</p>
+
+<p>I hope this clarifies it a bit. And even though you probably best add the decorator to every service, understanding how it works under the hood is in my opinion still a crucial aspect to become a better Angular developer!</p>
+
+<p>Thanks to <a href="https://twitter.com/jvandemo" target="_blank">Jurgen</a> for the review!</p>
+
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/kwintenp"
+                       style="background-image: url(/assets/images/kwintenp.jpg)"><span class="hidden">kwintenp's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/kwintenp">Kwinten Pisman</a></h4>
+
+                    
+                    <p> Freelance frontend architect. Occasional blogger. Reactive fan.</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/kwintenp"> https://twitter.com/kwintenp</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=The @Injectable decorator and its relationship to dependency injection&amp;url=https://blog.strongbrew.io/the-injectable-decorator-and-di"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/the-injectable-decorator-and-di"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/the-injectable-decorator-and-di"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://kwintenpghostio.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

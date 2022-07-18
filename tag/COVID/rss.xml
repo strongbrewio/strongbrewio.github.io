@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   
+      <title>blog.strongbrew.io</title>
+   
+   <link>https://blog.strongbrew.io/</link>
+   <description></description>
+   <language>en-uk</language>
+   <managingEditor> </managingEditor>
+   <atom:link href="rss" rel="self" type="application/rss+xml" />
+   
+	<item>
+	  <title>How covid affected StrongBrew</title>
+	  <link>//how-covid-affected-strongbrew/</link>
+	  <author></author>
+	  <pubDate>2020-11-03T00:00:00+01:00</pubDate>
+	  <guid>//how-covid-affected-strongbrew/</guid>
+	  <description><![CDATA[
+	     <h2 id="covid">Covid</h2>
+
+<p>These are challenging times… Harsh times for people and companies. Even for some companies it results in fatal decisions.</p>
+
+<p>Unfortunately we were impacted by COVID as well, as we haven’t earned a single dime since March 2020.
+If we take this painful aspect into consideration in combination with the fact that Kwinten is pursuing a new job at Stackblitz we decided to stop the legal entity StrongBrew VOF. StrongBrew VOF is no more… I (Brecht) personally want to thank Kwinten for this awesome adventure and I hope we can work together once again in the future.</p>
+
+<p>That being said… I will continue all StrongBrew activities except the trainings. The brews that we have given, both locally and internationally will not be updated anymore, nor will they be given in companies. We want to thank all of you for following our trainings, reading our content and trusting us with important problems.</p>
+
+<h2 id="blog">Blog</h2>
+
+<p>Most articles of the blog are more than a year old. My goal is to pump new life into the blog and help you all with technical content and personal experience. I still do Angular/RxJS/Architecture on a full time basis and recently started freelancing for a new awesome startup called <a href="https://www.rosa.be/">rosa</a>.</p>
+
+<p>The techstack we use there is:</p>
+<ul>
+  <li>Angular</li>
+  <li>Nx</li>
+  <li>Typescript</li>
+  <li>RxJS</li>
+  <li>Nest.js</li>
+  <li>a bunch other cool technologies</li>
+</ul>
+
+<h2 id="what-can-i-still-do-for-your-company-remotely">What can I still do for your company (remotely)</h2>
+
+<p>In these challenging times we still believe your company can benefit from the services of StrongBrew.
+The services listed below is something that I still do 1/5th of my time:</p>
+
+<ul>
+  <li>Code reviews</li>
+  <li>Pair programming sessions</li>
+  <li>Help you with the interview process of your possible employees</li>
+  <li>Help you with kickstarting a new project</li>
+  <li>Overal architectural support</li>
+  <li>Tackle very specific problems</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Unfortunately our company has died a slow death, but you will be hearing more of StrongBrew in the near future. Stay safe! Stay healthy! And if you have questions don’t hesitate to reach out.
+Cheers! Brecht.</p>
+
+	  ]]></description>
+	</item>
+
+
+</channel>
+</rss>

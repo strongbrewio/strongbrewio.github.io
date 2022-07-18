@@ -15,7 +15,7 @@
 	  <title>A glitch in combineLatest (and how to fix it!)</title>
 	  <link>//combine-latest-glitch/</link>
 	  <author></author>
-	  <pubDate>2018-06-12T00:00:00+00:00</pubDate>
+	  <pubDate>2018-06-12T00:00:00+02:00</pubDate>
 	  <guid>//combine-latest-glitch/</guid>
 	  <description><![CDATA[
 	     <p>The <code>combineLatest</code> operator is probably one of my favorite ones, that I believe everyone should know. You should never try to learn all of them but <code>combineLatest</code>, to me, is definitely one of those ~15 you should probably understand.</p>
@@ -154,7 +154,7 @@ Aside from the option to change the limit and offset values, there is also a ‘
 	  <title>Be careful when using shareReplay</title>
 	  <link>//share-replay-issue/</link>
 	  <author></author>
-	  <pubDate>2018-04-23T00:00:00+00:00</pubDate>
+	  <pubDate>2018-04-23T00:00:00+02:00</pubDate>
 	  <guid>//share-replay-issue/</guid>
 	  <description><![CDATA[
 	     <p>This post describes an issue with the current <code>shareReplay</code> operator in RxJS. There has been an open issue for this on Github, but as it has been open for quite some time now. The issue might introduce some memory leaks, so I decided to write about it.</p>
@@ -212,7 +212,7 @@ setTimeout(() =&gt; {
 	  <title>RxJS polling strategies</title>
 	  <link>//rxjs-polling/</link>
 	  <author></author>
-	  <pubDate>2018-04-19T00:00:00+00:00</pubDate>
+	  <pubDate>2018-04-19T00:00:00+02:00</pubDate>
 	  <guid>//rxjs-polling/</guid>
 	  <description><![CDATA[
 	     <p>Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.</p>
@@ -448,7 +448,7 @@ polledBitcoin$:   ------b-------------b-------....
 	  <title>Nx on your CI, how does it work?</title>
 	  <link>//how-nx-affected-apps-works/</link>
 	  <author></author>
-	  <pubDate>2018-03-13T00:00:00+00:00</pubDate>
+	  <pubDate>2018-03-13T00:00:00+01:00</pubDate>
 	  <guid>//how-nx-affected-apps-works/</guid>
 	  <description><![CDATA[
 	     <p>Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of <a href="https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2" target="_blank">schematics</a> that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.</p>
@@ -645,7 +645,7 @@ private processNode(projectName: string, node: ts.Node): void {
 	  <title>What are schedulers in RxJS</title>
 	  <link>//what-are-schedulers-in-rxjs/</link>
 	  <author></author>
-	  <pubDate>2018-02-05T00:00:00+00:00</pubDate>
+	  <pubDate>2018-02-05T00:00:00+01:00</pubDate>
 	  <guid>//what-are-schedulers-in-rxjs/</guid>
 	  <description><![CDATA[
 	     <p>One topic in RxJS for which it is quite hard to find proper documentation/blogposts, is ‘Schedulers’. ‘Schedulers’ are a way to control the timing strategy used to execute tasks. The main reason for this is that the authors of RxJS did a great job in abstracting this logic. They used the principle of least concurrency as the default scheduling strategy which makes sure that in most cases, we don’t have to think about changing the default.</p>
@@ -782,7 +782,7 @@ Next we can see that the ‘asap’ is logged before the ‘async’. That is be
 	  <title>Displaying components based on the role of a user</title>
 	  <link>//display-a-component-based-on-role/</link>
 	  <author></author>
-	  <pubDate>2018-01-15T00:00:00+00:00</pubDate>
+	  <pubDate>2018-01-15T00:00:00+01:00</pubDate>
 	  <guid>//display-a-component-based-on-role/</guid>
 	  <description><![CDATA[
 	     <p>At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.</p>
@@ -916,7 +916,7 @@ export class HasRoleDirective implements OnInit, OnDestroy {
 	  <title>Code formatting and RxJS</title>
 	  <link>//code-formatting-with-rxjs/</link>
 	  <author></author>
-	  <pubDate>2017-09-08T00:00:00+00:00</pubDate>
+	  <pubDate>2017-09-08T00:00:00+02:00</pubDate>
 	  <guid>//code-formatting-with-rxjs/</guid>
 	  <description><![CDATA[
 	     <p>One of the main benefits of RxJS to me is that it provides code that is ‘readable’. It provides us with a declarative programming approach where implementation details are hidden away. We are just describing what needs to be done, not how it should be done. This makes code you look at easy to understand.</p>
@@ -1088,7 +1088,7 @@ By extracting nested observables to a separate variable and naming this new obse
 	  <title>Multicasting operators in RxJS</title>
 	  <link>//multicasting-operators-in-rxjs/</link>
 	  <author></author>
-	  <pubDate>2017-08-20T00:00:00+00:00</pubDate>
+	  <pubDate>2017-08-20T00:00:00+02:00</pubDate>
 	  <guid>//multicasting-operators-in-rxjs/</guid>
 	  <description><![CDATA[
 	     <p>With the arrival of RxJS 5.4 a while back, the RxJS team has given us yet another way to support multicasting in our applications. They introduced the <code>shareReplay</code> operator. With this new one around the corner, you might start wondering when to use which multicasting operator. Well, it’s your lucky day cause that’s what this post is all about.</p>
@@ -1291,7 +1291,7 @@ We subscribe immediately and after three seconds. We can see that, even though t
 	  <title>Introducing Rx devtools</title>
 	  <link>//introducing-rx-devtools/</link>
 	  <author></author>
-	  <pubDate>2017-08-04T00:00:00+00:00</pubDate>
+	  <pubDate>2017-08-04T00:00:00+02:00</pubDate>
 	  <guid>//introducing-rx-devtools/</guid>
 	  <description><![CDATA[
 	     <p>Ever since I first started using RxJS up until this very day, it has become my absolute favorite way of coding. I cannot believe to work in a world without observables anymore nor can I understand on how I was able to write code before. I have started sharing the knowlegde I had through blogposts, workshops and coaching.</p>
@@ -1323,168 +1323,154 @@ If you find any bugs, which I’m certain you will, please report them in the fo
 	</item>
 
 	<item>
-	  <title>How to setup marble testing</title>
-	  <link>//how-to-setup-marble-testing/</link>
+	  <title>Using decorators and observables to implement retry</title>
+	  <link>//decorators-and-observables-to-implement-retry-logic/</link>
 	  <author></author>
-	  <pubDate>2017-02-15T00:00:00+00:00</pubDate>
-	  <guid>//how-to-setup-marble-testing/</guid>
+	  <pubDate>2017-02-15T00:00:00+01:00</pubDate>
+	  <guid>//decorators-and-observables-to-implement-retry-logic/</guid>
 	  <description><![CDATA[
-	     <p>In an earlier blogpost, I showed you guys how to do client side filtering with streams (<a href="http://blog.kwintenp.com/client-side-filtering-with-streams/" target="_blank">here</a>). I tried to show you how you could use marble diagrams to draw out how the data will flow in your streams. Turns out that drawing your marble diagrams up front can help you a lot in testing your code as well. Using the marble diagram testing provided by RxJS, we can easily test the code we’ve written in the previous post. Let’s see how.</p>
+	     <p>Last week, I was at a meetup in Ghent where I was talking with <a href="https://twitter.com/stefanlapers" target="_blank">Stefan Lapers</a> about programming languages in general. We started talking about writing your backend using either Java or node.js. We agreed that node.js has massive potential but in a lot of situations companies choose Java because of it’s maturity. If you’re using a microservices based architecture for example, you can rely heavily on spring cloud which does a whole bunch of stuff for you so you can focus on functionality.
+One element in spring cloud is hystrix. When you’re doing a network call which is protected by hystrix, you can, by just adding an annotation, tell how many times you want to retry this if it fails and even provide a fallback if it fails entirely.</p>
 
-<h3 id="setting-up-the-marble-diagram-testing">Setting up the marble diagram testing</h3>
+<p>When I was driving home later that night, I was thinking to myself that using observables and typescript decorators, it should be possible to implement something similar myself. The next morning I tried it out and about 30 minutes later I had a working version. Here it is.</p>
 
-<p>The steps to set this up are really easy. First we need to copy two files from the RxJS source code into our own codebase. This is the <code>marble-testing.ts</code> and <code>test-helper.ts</code> file which you can find <a href="https://github.com/ReactiveX/rxjs/tree/master/spec/helpers" target="_blank">here</a>.
-The next thing you need to do is import these files in a test where you want to use the marble testing.</p>
+<h2 id="the-example">The example</h2>
 
-<pre><code class="language-typescript">import "./helpers/test-helper.ts";
-// I'll come back to these imports later
-import { hot, cold, expectObservable } 
-	from './helpers/marble-testing';
-</code></pre>
+<p>In the example below, we have a service which fetches a number of Star Wars characters from the backend, at least it tries. It seems I kind of screwed up the implementation a little :).</p>
 
-<p>That’s it, you are ready to start testing!</p>
-
-<h3 id="example">Example</h3>
-
-<p>The marble diagram for the example looks like this:</p>
-
-<p><img src="https://www.dropbox.com/s/zhj0xvz6d5e84m4/Screenshot%202017-03-04%2016.12.24.png?raw=1" alt="marble-diagram" /></p>
-
-<p>We have a stream containing the characters (which will come from the backend) and one containing a value to filter the characters based on the gender. We use the <code>combineLatest</code> operator to create a new stream which hold the filtered characters. The code to create this stream based on the two input streams looks like this:</p>
-
-<pre><code class="language-typescript">public createFilterCharacters(
-        filter$: Observable&lt;string&gt;,
-        characters$: Observable&lt;StarWarsCharacter[]&gt;) {
-  return combineLatest(characters$, filter$,
-     (characters: StarWarsCharacter[], filter: string) =&gt; {
-      if (filter === 'All') {
-        return characters;
-      }
-      return characters.filter(
-            (character: StarWarsCharacter) =&gt;
-              character.gender.toLowerCase() === filter.toLowerCase()
-      );
-  });
+<pre><code class="language-typescript">public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
+    return throw('Failing on purpose');
 }
 </code></pre>
-<p>Every time the filter stream produces a new value, we loop over the array of characters and filter out the correct ones.</p>
+<p>Instead of actually doing a backend call, I’m just returning an observable which will throw as soon as it’s subscribed to. This is of course not to handy but for demonstration purposes, it’s quite ideal.
+Using the decorator I created myself, we can make this code a little more resillient (we’ll dive into how this decorator is constructed later on).</p>
 
-<h4 id="testing-without-marble-diagrams">Testing without marble diagrams</h4>
-<p>Trying to test this code without using marble diagram testing is quite verbose. First of all, we would need to create two streams ourselves to mock the character and gender filter streams. Then we would need to feed them to the method and take back the resulting stream. In our test, we would have to subscribe ourselves to this stream to check if the resulting next events are the ones we expect in the order we expect them. 
-Let’s look at what that code would look like:</p>
-
-<pre><code class="language-typescript"> it('on createFilterCharacters without marble testing', () =&gt; {
-    // create a characters$ stream
-    const characters$ = Observable.of([obiWan, c3po, leia]);
-    // create a gender$ stream which is used to filter
-    const gender$ = new BehaviorSubject&lt;string&gt;('All');
-
-
-    let times = 0;
-    // Feed the two streams to the method and subscribe to the result
-    component.createFilterCharacters(gender$, characters$).subscribe(
-      (val) =&gt; {
-        // Based on the number of values that have passed here
-        // check the value to see if it is what we expect
-        if (times === 0) {
-          expect(val).toEqual([obiWan, c3po, leia]);
-          times++;
-        } else if (times === 1) {
-          expect(val).toEqual([obiWan]);
-          times++;
-        } else if (times === 2) {
-          expect(val).toEqual([c3po]);
-          times++;
-        } else if (times === 3) {
-          expect(val).toEqual([leia]);
-          times++;
-        }
-      }
-    );
-
-    // pass new values to the gender subject to emulate the
-    // gender filter change
-    gender$.next("Male");
-    gender$.next("N/A");
-    gender$.next("Female");
-  });
+<pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
+public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
+    return throw('Failing on purpose');
+}
 </code></pre>
 
-<h4 id="testing-with-marble-testing">Testing with marble testing</h4>
-<p>We can write this a lot easier using marble diagram testing. To do this, we need to define ASCII marble diagrams and create observables from them. We can define the character stream like this:</p>
+<p>I’ve added the <code>retry</code> decorator. The first argument it takes tells the decorator the times it should retry the backend call. The second parameter is the fallback that will be used if the backend keeps on failing.</p>
 
-<pre><code class="language-typescript">import { cold } from './helpers/marble-testing';
+<p>The following is a gif of what happens when you try to run this code:</p>
 
-// Here we create an ASCII marble diagram that 
-// represents our characters stream. Since this
-// is a backend call in real life, this will 
-// first take some time before a value is ready.
-// We represent this by using the '-'. It will take
-// 4 ticks or '-' before the result arrives. We
-// define the result with a c here and close with a
-// '|'. This denotes that the stream completes.
-const charactersASCII = "----c|";
-// We define an object that represents the values
-// in the stream above. We used the 'c' to denote 
-// a 'next' event and we use the same 'c' in the 
-// object below to point to the actual value.
-const charactersValues = {c: [obiWan, c3po, leia]};
+<p><img src="https://www.dropbox.com/s/7natkxyj02o3xmd/Mar-08-2017%2019-32-51.gif?raw=1" alt="example-gif" /></p>
 
-// The ASCII and the values above aren't streams
-// of course. And our method is expecting a stream.
-// Using the 'cold' helper method from the 
-// marble-testing, we can create a stream from
-// the ASCII and the values.
-const characters$ = cold(charactersASCII, charactersValues);
-</code></pre>
-<p>Now we created a stream that resembles our characters stream.</p>
+<p>You can see that there are 3 tries before the method returns the fallback we defined. Pretty cool right.</p>
 
-<p><img src="https://www.dropbox.com/s/zyr7j5goywo3asy/Screenshot%202017-05-06%2018.14.21.png?raw=1" alt="marble-diagram" /></p>
+<p>A second example is if you click the button below the first example. This will actually try to do the real request.
+The code for this backend call looks like this:</p>
 
-<p>Let’s create the second stream. It looks the exact same way but we use the <code>hot</code> helper function instead since we are working with a subject here.</p>
-
-<pre><code class="language-typescript">import { hot } from './helpers/marble-testing';
-
-const gender = "a------b---c--d";
-const genderValues = {a: "All", b: "Male", c: "N/A", d: "Female"};
-
-const genderFilter$ = hot(gender, genderValues)
-</code></pre>
-<p>Now that we have created streams based on our ASCII marble diagrams, we can feed them to the function we are testing. But what do we do with the observable that is returned from this function? Luckily we can use another helper function provided by RxJS for that. 
-Let’s take a look at the full example.</p>
-
-<pre><code class="language-typescript"> it('on createFilterCharacters with marble testing', () =&gt; {
-    const charactersAscii = "----c|";
-    const charactersValues = {c: [obiWan, c3po, leia]};
-
-    const gender = "a------b---c--d";
-    const genderValues = 
-    	{a: "All", b: "Male", c: "N/A", d: "Female"};
-
-	 // Call the function we are testing with 
-	 // the observables created. 
-    const result$ = component.createFilterCharacters(
-    	hot(gender, genderValues), 
-    	cold(charactersAscii, charactersValues)
-    );
-
-    // Use the expectObservable helper function. This
-    // takes an observable and compares it to a marble
-    // diagram for correctness.
-    expectObservable(result$)
-    	.toBe(
-    		"----a--b---c--d", 
-    		{
-    		    a: charactersValues.c,
-    		    b: [obiWan],
-    		    c: [c3po],
-    		    d: [leia]}
-    	);
-  });
+<pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
+public getCharacters(): Observable&lt;StarWarsCharacter[]&gt; {
+    return this.http.get('https://swapi.co/api/people/')
+      .pipe(
+         map((response: Response) =&gt; response.json().results)
+      );
+}
 </code></pre>
 
-<h3 id="conclusion">Conclusion</h3>
-<p>Using marble diagram testing, we can write tests way faster and very easy. If we use marble diagrams up front to think about our streams, we can use this to test our code as well.</p>
+<p>For the retry example here to work, you have to go offline first, which will cause the request to fail. If you then try to run this code, you can see in the network tab it actually tries to do 3 requests, which fail because we are offline. After three attempts, the fallback is returned.</p>
+
+<p><img src="https://www.dropbox.com/s/494jhrwvtdelo09/Mar-08-2017%2019-35-31.gif?raw=1" alt="example-gif" /></p>
+
+<p>You can find the live working example <a href="http://blog-kwintenp-examples.surge.sh/home/retry" target="_blank">here</a>. Open up your console to see the number of tries and inspect the network tab with the second example.</p>
+
+<h2 id="the-implementation">The implementation</h2>
+
+<p>To implement this, there are two important things we need to do. First is implementing the logic to retry the call if it failed. We can levarage streams for this. Next we need to extract that logic into a typescript decorator.</p>
+
+<h3 id="observable-composition">Observable composition</h3>
+
+<p>Retrying a subscription after it has failed is fairly easy using RxJS. We can use the <code>retryWhen</code> operator for this. Let’s look at some code.</p>
+
+<pre><code class="language-typescript">private starWarsService: StarWarsService;
+
+characters$: Observable&lt;StarWarsCharacter&gt; = 
+	// we call the starWarsService to get the characters
+	this.starWarsService
+		.getCharacters()
+		// we use the retryWhen operator to retry a number of times
+		.pipe(
+		    retryWhen((errors: Observable&lt;any&gt;) =&gt; {
+		       // we use the scan operator to count the number of tries
+               return errors.scan((errorCount, err) =&gt; {
+                 console.log('Try ' + (errorCount + 1));
+                 if (errorCount &gt;= 3) {
+                    throw err;
+                 }
+                 return errorCount + 1;
+               }, 0).delay(1000);
+             }),
+            // we catch the error if it keeps on failing and return
+            // the fallback
+          catchError(() =&gt; of(fallback))
+      );
+</code></pre>
+<p>I’m not going to go into the details of the RxJS implementation, that whould require a totally separate post.
+What this code does however, is create an observable that, once subscribed to, will try to execute the backend call. If it fails, which it will in our case, it will re-execute it 2 more times with a single second delay in between. If it still fails, it will return the fallback we can define.</p>
+
+<p>That’s the exact logic we want our decorator to do. So let’s see how we can extract this logic in the decorator.</p>
+
+<h3 id="creating-a-decorator">Creating a decorator</h3>
+
+<p>There are different types of decorators. We can put a decorator on a class, method, property or accessor method. In our case, we are going to use the method decorator. A method decorator is in fact nothing more than a function that gets called at runtime. You can find more information on what decorators are and how to use them <a href="https://www.typescriptlang.org/docs/handbook/decorators.html#method-decorators" target="_blank">here</a></p>
+
+<p>Using a method decorator, you can replace, observe or modify the method definition. What we are going to do is really easy. Lets take a look at the image below.</p>
+
+<p><img src="https://www.dropbox.com/s/o3xef1gl9f4jlmd/Screenshot%202017-03-05%2014.14.48.png?raw=1" alt="method decorator" /></p>
+
+<p>At runtime, when the method we are decorating gets called, the decorator will be called first (1). We are going to call the actual function (2) which is going to return an observable in our case (3). Before returning the observable to the caller of our decorated function (5), we are going to augment the observable with our retry logic (4) and return this new observable.</p>
+
+<p>Lets take a look at the code:</p>
+
+<pre><code class="language-typescript">// defining the decorator is the same as the defining a
+// function with the same name
+export function retry(times = 3, fallback: any) {
+  return (target, key, descriptor) =&gt; {
+    // the descriptor holds a reference to the actual method
+    // we are decorating
+    const originalMethod = descriptor.value;
+    // we replace the old function with a new function
+    descriptor.value = function () {
+      // call the original method and
+      // augment the resulting observable
+      // with the retry and fallback mechanism
+      // we defined above
+      return originalMethod.apply(this)
+        .pipe(
+           retryWhen((errors) =&gt; {
+             return errors.scan((errorCount, err) =&gt; {
+               console.log('Try ' + (errorCount + 1));
+               if (errorCount &gt;= times - 1) {
+                 throw err;
+               }
+               return errorCount + 1;
+             }, 0).delay(1000);
+           }),
+           catchError(() =&gt; of(fallback));
+        )
+    };
+    // return edited descriptor as opposed to
+    // overwriting the descriptor
+    return descriptor;
+  };
+}
+</code></pre>
+<p>In the decorator we take the original function. We replace this function with a new one that executes the original one and augments the resulting observable with our retry logic.</p>
+
+<p>Once you’ve understood the syntax of the method decorator, this implementation is pretty straight forward. It now allows us to add the decorator on top of every function that returns an observable like this:</p>
+
+<pre><code class="language-typescript">@retry(3, [{name: 'Obi Wan', birth_year: '1234', gender: 'Male'}])
+public getCharactersAndFail(): Observable&lt;StarWarsCharacter[]&gt; {
+    return throw('Failing on purpose');
+}
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Using the ease of composing of observables and decorators in typescript, we were able to create something really fast which can be reused throughout our entire application. It shouldn’t stop with a retry decorator. We could apply this principle to a whole bunch of RxJS related issues like catching errors for example.</p>
 
 	  ]]></description>
 	</item>

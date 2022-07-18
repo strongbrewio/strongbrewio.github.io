@@ -15,7 +15,7 @@
 	  <title>Migrating to Nx</title>
 	  <link>//migrating-to-nx/</link>
 	  <author></author>
-	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <pubDate>2019-01-05T00:00:00+01:00</pubDate>
 	  <guid>//migrating-to-nx/</guid>
 	  <description><![CDATA[
 	     <p>I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say, this has been a real eye opening experience. I’ve gotten to the point that everyone that is remotely interested into talking to me is going to get a pitch on why monorepos are the best and how Nx can help us in achieving this. I even gave a talk about this very topic at NG-BE which you can find <a href="https://www.youtube.com/watch?v=d04U7SjORTI" target="_blank">here</a>.</p>

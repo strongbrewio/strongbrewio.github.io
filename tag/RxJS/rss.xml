@@ -12,1246 +12,344 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
-	  <title>Video course - Build the operators from RxJS from scratch</title>
-	  <link>//build-the-operators-from-rxjs-from-scratch/</link>
+	  <title>Reactive dumb components</title>
+	  <link>//reactive-dumb-components/</link>
 	  <author></author>
-	  <pubDate>2019-03-18T00:00:00+00:00</pubDate>
-	  <guid>//build-the-operators-from-rxjs-from-scratch/</guid>
+	  <pubDate>2021-05-17T00:00:00+02:00</pubDate>
+	  <guid>//reactive-dumb-components/</guid>
 	  <description><![CDATA[
-	     <p>This is a video course on how you can create the operators from RxJS from scratch. For more information about this course, you can watch the intro video.</p>
+	     <h2 id="reactive-dumb-components">Reactive dumb components</h2>
 
-<p>PS: More video’s will be added over time!</p>
+<p>When we write RxJS logic inside our presentation layer we mostly wind up with reactive flows inside our smart components (container components). The reasoning behind this, is quite easy:</p>
 
-<p>Source code can be found <a href="https://github.com/KwintenP/rxjs-operators-from-scratch" target="_blank">here</a>.</p>
+<p>Because these smart components are the orchestration vessels of our application, they communicate with reactive asynchronous flows such as XHR-calls and state management, but also with events emitted by the dumb components.</p>
 
-<div id="app"></div>
+<p>That being said, dumb components may also benefit from reactive flows. Especially when the dumb component has multiple <code>@Input()</code> properties that rely on different sets of asynchronous data.
+The usual way of handling these types of changes is the use of imperative <code>if else code</code> inside the <code>ngOnChanges</code> lifecycle hook.</p>
 
+<p>Take this situation for example: We have a <code>CompanyDetail</code> component that has the responsibility to visualize a company with all its sites. 
+The component has a previous and a next button to navigate between the sites, we also want to show how many sites there are and we want to show the name and address of every specific site.
+The <code>sites</code> <code>@Input()</code> property is asynchronous because it is dependant on an XHR request and the <code>currentSiteId</code> <code>@Input()</code> property is asynchronous because it is dependant on the router params which is an observable behind the scenes and will change over time when the user is navigating between the different sites of a company.</p>
 
-	  ]]></description>
-	</item>
+<p>For this component to properly work we have to make sure that the <code>sites</code> property has a value at the right time and the <code>currentSiteId</code> also has a value at the right time, we can already imagine racing conditions etc.
+The component is also responsibile to calculate whether the previous button and next button are disabled or not. When these buttons are clicked, it also has to calculate the next or previous siteId to emit that value to its smart component.</p>
 
-	<item>
-	  <title>Why we have a scan for Observables but not for Arrays</title>
-	  <link>//why-there-is-no-array-scan/</link>
-	  <author></author>
-	  <pubDate>2019-02-14T00:00:00+00:00</pubDate>
-	  <guid>//why-there-is-no-array-scan/</guid>
-	  <description><![CDATA[
-	     <p>A while ago, during a training, I was explaining the <code>scan</code> operator in RxJS and how you can use it to accumulate a ‘calculated’ value over time. At some point one of the participants asked why there isn’t a <code>scan</code> operator for <code>Arrays</code>? They both have a <code>reduce</code> method, so why no <code>scan</code> right?</p>
+<p>Here we can see the app inside this <a href="https://stackblitz.com/edit/reactive-dumb-components?file=src%2Fapp%2Fcontainers%2Fcompany%2Fcompany.component.ts">Stackblitz example</a></p>
 
-<p>And actually it’s a really interesting question which showed he didn’t understand important differences between <code>Arrays</code> and <code>Observable</code>s.</p>
+<p>This is the smart component that will use the <code>app-company-detail</code> as a dumb component.</p>
 
-<h2 id="what-does-scan-do-in-rxjs">What does <code>scan</code> do in RxJS</h2>
-
-<p>Let’s take a look at the definition of the scan operator (from the <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-scan" target="_blank">ReactiveX.io</a> site):</p>
-
-<blockquote>
-  <p>Applies an accumulator function over the source `Observable, and returns each intermediate result, with an optional seed value.</p>
-</blockquote>
-
-<p>If you don’t know what the <code>scan</code> operator does, this definition might not make that much sense. Let’s first look at an example on how we can use the operator and then revisit this.</p>
-
-<p>Let’s say that we have an <code>Observable&lt;number&gt;</code> and we want to visualize the sum of all of the numbers on the screen. This is something we can use the <code>scan</code> operator for.</p>
-
-<pre><code class="language-typescript">const numbers$ = Observable.create(observer =&gt; {
-  observer.next(1);
-  setTimeout(() =&gt; observer.next(2), 100);
-  setTimeout(() =&gt; observer.next(3), 200);
-  setTimeout(() =&gt; observer.next(4), 400);
-  setTimeout(() =&gt; observer.next(5), 300);
-  setTimeout(() =&gt; observer.next(6), 500);
+<pre><code class="language-typescript">@Component({
+  selector: 'app-company',
+  template: `
+    &lt;app-company-detail
+      [currentSiteId]="currentSiteId$ | async"
+      [sites]="sites$ | async"
+      (siteChanged)="siteChanged($event)"
+    &gt;&lt;/app-company-detail&gt;
+  `,
+  styleUrls: ['./company.component.css']
 })
-
-numbers$.pipe(
-  scan(
-  	(acc, cur) =&gt; {
-    	return acc + cur;
-  	}, 
-  	0 // &lt;-- initial value
-  )
-).subscribe(console.log);
-</code></pre>
-
-<p>The <code>scan</code> operator allows us to calculate the value by passing in an accumulator function. This function will get called with the ‘previous’ or initial value and the ‘current’ value and allows us to calculate the sum.</p>
-
-<p>Let’s type out the values that will go into the accumulator function.</p>
-
-<p>On the first run, the initial value will be used (second parameter passed to the <code>scan</code> operator) and the first value from the <code>Observable</code>. The calculated value will be 1 (as per our function implementation).</p>
-
-<pre><code class="language-typescript">// acc: 0, cur: 1 -&gt; 1
-</code></pre>
-
-<p>Next time the function gets called, the <code>acc</code> is going to be the previously returned value and the <code>cur</code> is the next value from the <code>Observable</code>. This process repeats for every value emitted by the <code>Observable</code>. Below you can see all of the other inputs and outputs of the accumulator function.</p>
-
-<pre><code class="language-typescript">// acc: 1, 		cur: 2 -&gt; 3
-// acc: 3, 		cur: 3 -&gt; 6
-// acc: 6, 		cur: 4 -&gt; 10
-// acc: 10, 	cur: 5 -&gt; 15
-// acc: 15, 	cur: 6 -&gt; 21
-</code></pre>
-
-<p>You can find the StackBlitz example below (open the console to see the result):</p>
-
-<iframe style="width: 100%; height: 400px" src="https://stackblitz.com/edit/rxjs-ylayki?embed=1&amp;file=index.ts"></iframe>
-
-<p><strong>Note:</strong> You might notice that calculating values over time is something that can be really useful to calculate state. My friend <a href="https://twitter.com/juristr" target="_blank">Juri Strumpflohner</a> has written an interesting <a href="https://juristr.com/blog/2018/10/simple-state-management-with-scan/" target="_blank">article</a> about this very topic.</p>
-
-<h2 id="will-you-please-tell-us-why-there-is-no-arrayscan">Will you please tell us why there is no Array.scan</h2>
-
-<p>Now that we know what the <code>scan</code> operator for RxJS does, let’s revisit the definition:</p>
-
-<blockquote>
-  <p>Applies an accumulator function over the source <code>Observable</code>, and returns each intermediate result, with an optional seed value.</p>
-</blockquote>
-
-<p>We already know what the accumulator function is. We also get what the seed value is (our initial value, in our example 0). But I want to focus on the other part of the definition, ‘returns each intermediate result’.</p>
-
-<p>Let’s try and reason why it would make sense to return each intermediate result. We know that <code>Observable</code>s can be asynchronous. They are wrappers around values that are pushed towards us, either sync or async. Since those values are delivered ‘over time’ it is very useful in a lot of scenarios to have temporary values.</p>
-
-<p>Let’s think about Arrays for a second. Arrays are datastructures. These datastructures are <strong>always sync</strong>. When you get an Array, it already ‘holds’ all of the values. If we think that the <code>scan</code> operator will emit temporary results as values might be delivered over time, it doesn’t make sense that there is a <code>scan</code> operator for Arrays. Arrays are never async, so temporary calculated values wouldn’t have any benefit!</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>As Arrays are <strong>sync</strong> datastructures, having an operator/method that emits temporary results when accumulating the values from an Array, doesn’t makes sense.
-For <code>Observable</code>s it does makes sense as the values (are|can be) delivered over time.</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>RxJS patterns - Prematurely ending work</title>
-	  <link>//rxjs-patterns-prematurely-ending-work/</link>
-	  <author></author>
-	  <pubDate>2019-01-30T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-patterns-prematurely-ending-work/</guid>
-	  <description><![CDATA[
-	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
-
-<ul>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
-</ul>
-
-<p>The next pattern I want to discuss when we you want to prematurely end work. There are many scenarios when you would want to do this. We can start some work (aka an <code>Observable</code>) and want to kill that subscription if our  user navigates to a different page, the user changes something which should trigger a different call, …</p>
-
-<h2 id="how-can-we-do-it">How can we do it</h2>
-
-<p>One thing I really like about RxJS is how declarative it is. You can quite often translate what you want into a sentence and translate that sentence into code.</p>
-
-<p>Let’s say that we want to listen to a certain stream, until a certain event happens. An extremely common scenario is when you are working with a UI framework that works with components. Often you want to: ‘Listen to this specific <code>Observable</code> until the component gets destroyed’.</p>
-
-<p>Translated into code, we could have something like this:</p>
-
-<pre><code class="language-typescript">workWeWantToDo$.pipe(
-	listenTillThisEventHappens(componentDestroyed)
-).subscribe();
-</code></pre>
-<p><strong>Note:</strong> <code>listenTillThisEventHappens</code> is not an operator :).</p>
-
-<p>The <code>listenTillThisEventHappens</code> can be replaced by the <code>takeUntil</code> operator which does exactly this. And we can create a stream from a lifecycle hook that gets called via our UI framework. Checkout the other pattern ‘mapping function calls to streams’ to see how you can accomplish this.</p>
-
-<p>The resulting code is:</p>
-
-<pre><code class="language-typescript">workWeWantToDo$.pipe(
-	takeUntil(componentDestroy$)
-).subscribe();
-</code></pre>
-
-<p>When creating this <code>Observable</code> we use the <code>takeUntil</code> operator. This operator will subscribe to the stream above (if it was subscribed to itself of course) and will proxy these values until the <code>componentDestroy$</code> emits. Then the <code>takeUntil</code> will kill the subscription.</p>
-
-<h2 id="when-to-use-this">When to use this</h2>
-
-<p>Everytime you are thinking: ‘I want to stop this when that happens’.</p>
-
-<ul>
-  <li>To kill subscriptions when a component is destroyed</li>
-  <li>When trying to know when a user stopped dragging. You can have a stream that listens for ‘dragDown’ and take values until a ‘dragUp’ events happens.</li>
-</ul>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>RxJS patterns - Conditionally executing work</title>
-	  <link>//rxjs-patterns-conditionally-executing-work/</link>
-	  <author></author>
-	  <pubDate>2019-01-29T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-patterns-conditionally-executing-work/</guid>
-	  <description><![CDATA[
-	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the other ones:</p>
-
-<ul>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
-  <li><a href="https://blog.strongbrew.io/xjs-patterns-mapping-function-calls-to-streams/" target="_blank">mapping a function to a stream</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
-</ul>
-
-<p>The next pattern I want to discuss is executing conditional work. Sometimes, you have a stream and if some condition is met, you want to do some extra step.</p>
-
-<p>But, we do not have an <code>if-else</code> operator. And that makes sense. If we had such an operator, the entire <code>Observable</code> chain would be broken. Luckily there are a few ways to introduce conditional work inside of our <code>Observable</code> chains.</p>
-
-<h2 id="executing-conditional-work">Executing conditional work</h2>
-
-<p>Let’s imagine that we have list of items in a webshop. In that list, we can check one or more items that we want to buy. When the user clicks on the ‘buy’ button, we first want to check if one of the items delays the delivery date by a huge amount. If so, we want to show a popup to notify the user. He can either decline and change his order or accept this.</p>
-
-<p>In this use case, we have two <code>if-else</code>s.</p>
-<ul>
-  <li>If there is an order which has an item that pushes the delivery date we need to show a popup. Otherwise we don’t.</li>
-  <li>If the popup is shown, and the user accepts, we do a backend call to actually register the order. Otherwise we don’t and the popup should close so the user can maybe remove that specific item.</li>
-</ul>
-
-<p>Let’s first take a look at what the code could look like.</p>
-
-<pre><code class="language-typescript">selectedItems$.pipe(
-	'ifElse'(() =&gt; {
-		// 
-	}),
-	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
-).subscribe(_ =&gt; // route to a different page here);
-</code></pre>
-
-<p><strong>Note:</strong> <code>ifElse</code> is not a real operator 🙃</p>
-
-<p>So we start with our <code>selectedItems$</code>. We then want to add our conditional logic. If we pass our conditional logic (either no delay or we showed the popup and the user accepted), we can perform the backend call. We can do this with the <code>switchMap</code> operator and using the <code>selectedItems</code>. At last we subscribe and we route to a different page if the call was successfull.</p>
-
-<p>Now, how can we plug 	in in that conditional logic? First of all, let’s think about how we can show a popup. We can have a function, that adds a popup to the DOM and returns an Observable with the result. The type signature for that function could look like this:</p>
-
-<pre><code class="language-typescript">showDialog(): Observable&lt;boolean&gt;;
-</code></pre>
-
-<p>So, inside of the <code>Observable</code> chain we had above, we want to conditionally execute the <code>Observable</code> that we get from the <code>showDialog</code> function so the dialog is shown. But, we only want to show this in case we have an item that delays the delivery date.</p>
-
-<p>Let’s first implement what we need to do when there is no delivery delay (happy path 😄).</p>
-
-<pre><code class="language-typescript">selectedItems$.pipe(
-	map(selectedItems =&gt; {
-		// if none of the items has a late delivery
-		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
-			return selectedItems;
-		}
-	}),
-	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
-);
-</code></pre>
-
-<p>We add an if statement inside of a <code>map</code> operator. If the condition is not met, so there is no delayed delivery, we just return the <code>selectedItems</code> so these can be used in the <code>switchMap</code> operator to do the backend call.</p>
-
-<p>So far so good. BUT, how will we implement the else?</p>
-
-<p>Inside of the <code>map</code> operator, we can implement the else case. In that else case, we want to show the dialog. This means, we are going to map to the result of the <code>showDialog</code> function.</p>
-
-<pre><code class="language-typescript">selectedItems$.pipe(
-	map(selectedItems =&gt; {
-		// if none of the items has a late delivery
-		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
-			return selectedItems;
-		} else {
-			return showDialog();
-		}
-	}),
-	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
-);
-</code></pre>
-
-<p>Of course, this introduces a problem inside of our code. The if statement will still work, but the else statement is posing a problem here. If the else is executed, the stream that is returned by the <code>map</code> operator (so before the <code>switchMap</code>) is of type <code>Observable&lt;Observable&lt;&lt;boolean&gt;&gt;</code>. That’s not what we need. The <code>switchMap</code> operator needs to be applied to an <code>Observable</code> with our selected items.</p>
-
-<p>To fix this, we don’t need to return the <code>dialog$</code> but:</p>
-
-<ul>
-  <li>Subscribe to this stream (remember, <code>Observable</code>s are lazy and subscribing will trigger the dialog to be shown)</li>
-  <li>Listen for the result of that <code>dialog$</code>, remember, the user can either accept or decline, and handle this properly</li>
-</ul>
-
-<p>First step in fixing this, we can change the operator that we are using. If we change the <code>map</code> operator to a flattening operator such as <code>switchMap</code> or <code>concatMap</code>, we can return the <code>Observable</code> from the <code>showDialog</code> function and the operator will flatten it from an <code>Observable&lt;Observable&lt;boolean&gt;&gt;</code> to an <code>Observable&lt;boolean&gt;</code>.</p>
-
-<p>Let’s take a look at the code:</p>
-
-<pre><code class="language-typescript">selectedItems$.pipe(
-	switchMap(selectedItems =&gt; {
-		// if none of the items has a late delivery
-		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
-			return of(selectedItems);
-		} else {
-			return showDialog();
-		}
-	}),
-	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
-);
-</code></pre>
-
-<p>As you can see we changed from a <code>map</code> to a <code>switchMap</code>. Because we changed the operator, we have to make sure that every branch in the function we pass to <code>switchMap</code> returns an <code>Observable</code>. That’s why we changed the <code>selectedItems</code> to <code>of(selectedItems)</code>.</p>
-
-<p>With this code, we are going to show the popup only if the condition is met. So we have a part of the conditional logic that we need. But, the overall code is not yet complete. The type of the <code>Observable</code> created by the first <code>switchMap</code> is <code>Observable&lt;boolean|Array&lt;Item&gt;</code>. And that’s not what we want. We don’t want that boolean in there.</p>
-
-<p>The last thing we need to do is check the value that we get back from the <code>dialog$</code>. This will return <code>true</code> if the user accepted the delay or <code>false</code> if the user denied. In that last case, we don’t want to call the backend and this stream should stop.</p>
-
-<p>Let’s add this:</p>
-
-<pre><code class="language-typescript">selectedItems$.pipe(
-	switchMap(selectedItems =&gt; {
-		// if none of the items has a late delivery
-		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
-			return of(selectedItems);
-		} else {
-			return showDialog().pipe(
-				map(res =&gt; {
-					if(res) {
-						return of(selectedItems);
-					} else {
-						return never();
-					}
-				}),
-			);
-		}
-	}),
-	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
-);
-</code></pre>
-
-<p>Before returning the stream we get from the <code>showDialog</code> function, we are going to map its result to what we want.</p>
-
-<p>If the result was <code>true</code> we are going to return our <code>selectedItems</code>. But, since this is wrapped inside of a <code>switchMap</code> operator, we need to wrap this into an <code>Observable</code> using the static <code>of</code> operator.</p>
-
-<p>If the result was <code>false</code>, we can return the <code>never()</code> <code>Observable</code>. This is an <code>Observable</code> that will have no events whatsover. By doing this, the <code>Observable</code> chain is interrupted and <code>switchMap</code> that executes the backend call will never get an event and thus will not get executed (the one doing the backend call 🙃).</p>
-
-<p>As as a last step, we want to make sure that we only take a single value. We start from the <code>selectedItems$</code> which can have potentially multiple values. For example when:</p>
-
-<ul>
-  <li>the user gets the popup,</li>
-  <li>decides to cancel</li>
-  <li>selects or deselects a new item</li>
-</ul>
-
-<p>the subscription would still be active. If the user selects a new item, the logic in our stream would fire immediately. We can fix this quite easily with the <code>take</code> operator.</p>
-
-<pre><code class="language-typescript">selectedItems$.pipe(
-	take(1),
-	switchMap(selectedItems =&gt; {
-		// if none of the items has a late delivery
-		if(!selectedItems.find(item =&gt; item.lateDelivery)) {
-			return of(selectedItems);
-		} else {
-			return showDialog().pipe(
-				map(res =&gt; {
-					if(res) {
-						return of(selectedItems);
-					} else {
-						return never();
-					}
-				}),
-			);
-		}
-	}),
-	switchMap(selectedItems =&gt; this.service.buy(selectedItems))
-);
-</code></pre>
-<p>And that’s it. This code does what we want! 🎉🎉</p>
-
-<p>You can find a working (slightly contrived example) below. Click the buttons to trigger a delivery with or without delay. You can open the console to see a log statement being logged everytime the backend call would be executed.</p>
-
-<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/rxjs-hsqluy?embed=1&amp;file=index.ts"></iframe>
-
-<h2 id="using-the-tap-operator">Using the <code>tap</code> operator</h2>
-
-<p>You can also hook into the <code>Observable</code> chain using the <code>tap</code> operator and maybe do some conditional work there. For example, to disable or enable a certain button:</p>
-
-<pre><code class="language-typescript">const selectedItems$ = ...
-
-selectedItems$.pipe(
-	tap(selectedItems =&gt; {
-		if(selectedItems.length === 5) {
-			this.newOrderBtnDisabled = true;
-		} else {
-			this.newOrderBtnDisabled = false;
-		}
-	})
-);
-</code></pre>
-
-<p>I would argue however that it is better to create a new stream that contains the ‘disable’ state of that button. This can be achieved like this:</p>
-
-<pre><code class="language-typescript">const selectedItems$ = ...
-
-const disabled$ = selectedItems$.pipe(
-	map(selectedItems =&gt; selectedItems &gt; 5)
-);
-</code></pre>
-
-<p>This gives you exactly the same result and we do not need ‘if-else’ logic here.</p>
-
-<h2 id="when-to-use-this">When to use this</h2>
-
-<p>Some examples where to use this pattern is:</p>
-
-<ul>
-  <li>when a popup can decide if the action should be executed</li>
-  <li>when creating a generic component that can show a spinner or not based on some configuration</li>
-  <li>when creating a wizard and you only want to continue to the next step if the user current step is validated through a backend call</li>
-</ul>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>RxJS patterns - Mapping function calls to streams</title>
-	  <link>//rxjs-patterns-mapping-function-calls-to-streams-copy/</link>
-	  <author></author>
-	  <pubDate>2019-01-15T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-patterns-mapping-function-calls-to-streams-copy/</guid>
-	  <description><![CDATA[
-	     <p>This post is part of a series of blogpost on different RxJS patterns that I use quite often. Here are the previous ones:</p>
-
-<ul>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/" target="_blank">Restarting work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
-</ul>
-
-<p>Now, I want to cover how you map function calls to streams. Sometimes we need to transform a function call into a stream. Let’s say that we are integrating with an external library. We can pass a function to this library and every time this function gets called, we need to perform an action.</p>
-
-<p>For example, we have a date picker to which we can pass a function <code>dateChange</code> that gets called when the date is updated. Whenever our date changes, we want to perform a backend call to fetch some data and show it onto the screen.</p>
-
-<p>In RxJS code, I would write something like this:</p>
-
-<pre><code class="language-typescript">const dateChange$ = ...
-
-const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date)),
-);
-</code></pre>
-
-<p>In this scenario, I’m defining <code>data$</code> in terms of what it depends on, being the <code>dateChange$</code>. Because we define it like this and RxJS is a push based paradigm, every time the <code>dateChange$</code> changes, the <code>data$</code> will be updated and get a new value.</p>
-
-<p>But the problem here is, how do we get a <code>dateChange$</code>. We are integrating with a third party library that is going to call a function every time the date changes, it does not give us a stream. And we need a stream to write the reactive code we had in the snippet above.</p>
-
-<h2 id="transforming-a-function-into-an-observable">Transforming a function into an Observable</h2>
-
-<p>An <code>Observable</code> is something that encapsulates ‘work’ (to understand what I mean with ‘work’ please read the first pattern I covered <a href="https://blog.strongbrew.io/rxjs-patterns-restarting-work/#what-is-work" target="_blank">here</a>). The encapsulation here means that we cannot define what that ‘work’ is. Once we get an <code>Observable</code> we can no longer change that ‘work’.</p>
-
-<p>However, there is a building block in RxJS were we can decide whatever an <code>Observable</code> produces and this is called a <code>Subject</code>!</p>
-
-<p>A complicated definition of a <code>Subject</code> is that it is both an <code>Observable</code> and an <code>Observer</code>. I like to think of it as being an <code>Observable</code> that has no work encapsulated and where you can produce the values. So you can send the next, error and/or complete event(s).</p>
-
-<p>Let’s see a code example on how we can leverage a <code>Subject</code> to transform a function call into an <code>Observable</code>.</p>
-
-<pre><code class="language-typescript">const dateChange$ = new Subject();
-
-someLibrary.onDateChange(
-	date =&gt; dateChange$.next(date)
-);
-</code></pre>
-
-<p>And that’s it! We pass a function to the third party library that only emits the value it gets onto the created <code>dateChange$</code> <code>Subject</code>. And because a <code>Subject</code> is also an <code>Observable</code>, we can just plug this into the snippet we had above.</p>
-
-<pre><code class="language-typescript">const dateChange$ = new Subject();
-
-someLibrary.onDateChange(
-	date =&gt; dateChange$.next(date)
-);
-
-const data$ = dateChange$.pipe(
-	switchMap(date =&gt; this.service.getData(date)),
-);
-</code></pre>
-<p>Tada!</p>
-
-<h3 id="other-ways">Other ways</h3>
-
-<p>There are two other operators you can use to accomplish the same thing. The first one is called <code>fromEvent</code>. This one is perfect to integrate with API’s that exposes functions where you can pass in a string describing the event type and a function to be called whenever such an event happens. This is ideal for DOM events for example (but not limited to as you can see <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-fromEvent" target="_blank">here</a>):</p>
-
-<pre><code class="language-typescript">const somethingElement = document.getElementById('something');
-
-// a stream of all clicks on the somethingElement
-const click$ = fromEvent(somethingElement, 'click');
-</code></pre>
-
-<p>The other operator is called <code>fromEventPattern</code>. This can be used to integrate with the exact example described above. The code with <code>fromEventPattern</code> looks like this:</p>
-
-<pre><code class="language-typescript">fromEventPattern(handler =&gt; someLibrary.onDateChange(handler))
- .subscribe(console.log);
-</code></pre>
-
-<p>You can pass it a function that receives a <code>handler</code>. You can pass that <code>handler</code> to any callback based API which will be transformed into a stream.</p>
-
-<p><strong>Note</strong>: If you can use <code>fromEvent</code> or <code>fromEventPattern</code> you definitely should. The way to do it with a <code>Subject</code> is demonstrated since that is the most straight forward way and works in any scenario. But, if possible, use the operators.</p>
-
-<h2 id="when-to-use-this">When to use this</h2>
-
-<p>Some concrete examples where to use this are:</p>
-
-<ul>
-  <li>When a function gets called by a third party library and we need a stream</li>
-  <li>To transform <code>@Output</code>s in Angular into streams</li>
-  <li>Basically most scenarios where we need a stream but don’t get it from some API</li>
-</ul>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>RxJS patterns - restarting work</title>
-	  <link>//rxjs-patterns-restarting-work/</link>
-	  <author></author>
-	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
-	  <guid>//rxjs-patterns-restarting-work/</guid>
-	  <description><![CDATA[
-	     <p>Having used RxJS for a while now, I’ve started to see patterns that I’m using over and over again. In this blogpost, or better, series of blogposts, I want to share those patterns that I’m frequently using so that you can apply them in your own code.</p>
-
-<p>Here are the other patterns:</p>
-<ul>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-mapping-function-calls-to-streams/" target="_blank">Mapping function calls to streams</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-conditionally-executing-work/" target="_blank">conditionally executing work</a></li>
-  <li><a href="https://blog.strongbrew.io/rxjs-patterns-prematurely-ending-work/" target="_blank">prematurely ending work</a></li>
-</ul>
-
-<p>I’ll do this by describing them as high level as possible, but still provide you with some examples on where they can be applied.</p>
-
-<h2 id="what-is-work">What is ‘work’?</h2>
-
-<p>When conducting interviews and discussing RxJS, I tend to ask people how they would describe an <code>Observable</code> in only a couple of sentences. I’m well aware that this is difficult and quite hard to describe. Here is my personal attempt:</p>
-
-<blockquote>
-  <p>An <code>Observable</code> is a wrapper around some work. That work can be triggered by subscribing in response to which one or multiple results can be pushed towards us. This might happen both synchronously and asynchronously.</p>
-</blockquote>
-
-<p>The reason I’m mentioning this is because it will help me in explaining what I mean with the term ‘work’ in the context of an <code>Observable</code>. Whatever is being triggered by subscribing to an <code>Observable</code> is something that I will refer to as ‘work’.</p>
-
-<h2 id="why-do-we-need-to-restart-work">Why do we need to restart work?</h2>
-
-<p>Let’s say that we have an <code>Observable</code> whose ‘work’ is actually triggering a backend call. We might want to execute this backend call multiple times, hence we want the ‘work’ that this specific <code>Observable</code> does to be executed multiple times.</p>
-
-<p>Thanks to the fact that <code>Observables</code> are cold by default, we can accomplish this by subscribing to this <code>Observable</code> multiple times. Every subscription will trigger a backend call.</p>
-
-<h2 id="how-can-we-do-this">How can we do this?</h2>
-
-<h3 id="non-reactive">Non reactive</h3>
-
-<p>A non-reactive solution to do so could be wrapping the subscription in a function and calling it over and over again every time we wish to subscribe.</p>
-
-<pre><code class="language-typescript">const executeBackendCall = () =&gt; {
-	this.someObs$.subscribe((result) =&gt; {
-	   // do something here
-	}
+export class CompanyComponent {
+  // fetch the sites
+  sites$ = this.sitesService.getSites();
+  // get the asynchronous siteId from the router params
+  currentSiteId$ = this.activatedRoute.params.pipe(map(p =&gt; p.siteId));
+
+  // the dumb app-company-detail component is responsible
+  // to calculate the siteId that we need to go to
+  siteChanged(id: string): void {
+    this.router.navigate([id]);
+  }
+
+  constructor(
+    private sitesService: SitesService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {}
 }
 </code></pre>
 
-<p>But this obviously has some downsides to it. Aside from the fact that is not reactive, we have a subscription to manage for every function call, we can no longer chain this with other operators (as we manually subscribe), and so on.</p>
+<p>The imperative implementation of the dumb component looks like this:</p>
 
-<h3 id="reactive">Reactive</h3>
-
-<p>We want to implement this in a more reactive way. We can do this by no longer thinking in terms of function calls but in term of a series of triggers where we want to do something. We need a stream that is triggered every time we want a certain action to occur.</p>
-
-<p>Let’s assume we have such a stream. Whenever that stream fires, we want to do some ‘work’. Remember that ‘work’ is something that is encapsulated in an <code>Observable</code>.</p>
-
-<p>Translated to code this means that we want to map a next event to an <code>Observable</code>.</p>
-
-<pre><code class="language-typescript">const work$: Observable&lt;T&gt; = ...
-const trigger$ = ...
-
-const workExecutedOnTrigger$: Observable&lt;Observable&lt;T&gt;&gt; = trigger$.pipe(
-	map(triggerValue =&gt; work$)
-);
-</code></pre>
-
-<p>In this piece of code we have an <code>Observable</code> called <code>work$</code>, containing the ‘work’ we want to do when the <code>trigger$</code> fires. 
-We can create a new stream called <code>workExecutedOnTrigger$</code> that maps the trigger event to the <code>work$</code>.</p>
-
-<p>The problem with this code is that the result of this action is an <code>Observable&lt;Observable&lt;T&gt;&gt;</code> (also called a higher order observable) whilst we would actually like to have an <code>Observable&lt;T&gt;</code>.</p>
-
-<p>To accomplish this, we can use a flattening operator. We could use <code>switchMap</code> for example.</p>
-
-<pre><code class="language-typescript">const work$ = ...
-const trigger$ = ...
-
-const workExecutedOnTrigger$: Observable&lt;T&gt; = trigger$.pipe(
-	switchMap(triggerValue =&gt; work$)
-);
-</code></pre>
-
-<p>And this is it! Now we have an observable <code>workExecutedOnTrigger$</code> that will execute our <code>work$</code> and will restart that every time our <code>trigger$</code> fires. It is restarted as the <code>switchMap</code> operator will do the following:</p>
-
-<ol>
-  <li>the <code>trigger$</code> fires a next event</li>
-  <li>the <code>switchMap</code> operator takes that event and maps it to <code>work$</code></li>
-  <li>the <code>switchMap</code> operator subscribes to that stream</li>
-  <li>Every event emitted by the <code>work$</code> is being passed down</li>
-  <li>if the <code>trigger$</code> fires a new event, the previous execution of <code>work$</code> is unsubscribed from</li>
-  <li>Step 2 through 5 is repeated</li>
-</ol>
-
-<p>Thanks to the <code>switchMap</code> operator, we can restart the ‘inner’ <code>work$</code>. This means that we can <strong>restart our work</strong>.</p>
-
-<p><strong>Note:</strong> To create the <code>trigger$</code> we can use a <code>Subject</code>. I’ll cover this in the next pattern ‘mapping function calls to streams’.</p>
-
-<h2 id="when-to-use-it">When to use it</h2>
-
-<p>As promised, here are some concrete example when you would use this:</p>
-
-<ul>
-  <li>In an autocomplete, we want to execute a backend call every time the user types something new. We want to restart the call to the backend.</li>
-  <li>We fetch some data when the page loads for the first time. When we want to do this a second time (after data has been updated for example), we want to re-execute that call.</li>
-</ul>
-
-<pre><code class="language-typescript">this.data$ = this.load$.pipe(
-   switchMap(_ =&gt; this.service.loadData())
-);
-</code></pre>
-<p>In this example <code>load$</code> will emit at start up and every time the data needs to be loaded. This is a very common scenario where this concept of restarting work can be used.</p>
-
-<h2 id="special-thanks">Special thanks</h2>
-
-<p>Special thanks to <a href="https://twitter.com/elmd_" target="blank">Dominic Elm</a> for reviewing!</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Safe HTTP calls with RxJS</title>
-	  <link>//safe-http-calls-with-rxjs/</link>
-	  <author></author>
-	  <pubDate>2018-10-24T00:00:00+00:00</pubDate>
-	  <guid>//safe-http-calls-with-rxjs/</guid>
-	  <description><![CDATA[
-	     <p>Hi there, since it’s very busy lately this will probably be my one of my shortest articles ever.
-Maybe that’s a good thing, because now you don’t have an excuse not to read it. It’s short, compact
-and maybe you will learn a thing or two.</p>
-
-<h2 id="the-problem">The problem</h2>
-
-<p>The article is all about making sure our HTTP calls don’t die on bad connections, since strangely enough, <strong>404 responses can kill your application when using RxJS</strong>.</p>
-
-<p>Remember that RxJS observables have 3 types of events right?</p>
-<ul>
-  <li><code>next</code>: passing in a new value into the observable</li>
-  <li><code>error</code>: when an error occurs</li>
-  <li><code>complete</code>: When the observable is completed</li>
-</ul>
-
-<p>We should not forget that <strong>an Error event will actually stop the observable</strong>. It will cease to exist.</p>
-
-<p>You might say: “That’s not that bad, we’ll just create a new one every time we want to fetch data”.</p>
-
-<p>When you are approaching your application the <em>reactive way</em>, this scenario might be problematic:
-Imagine a typeahead search where we want to retrieve results for every input value. We have an observable of searchterms and we trigger the
-HTTP request for every value using a <code>switchMap</code>.</p>
-
-<pre><code class="language-typescript">// this observable contains the values
-// of what the user is searching for
-// over time
-const searchTerm$: Observable&lt;string&gt;;
-
-// when the term receives a new value...
-// go fetch some data
-const results$ = searchTerm$.pipe(
-    switchMap(term =&gt; fetchData(term))
-)
-
-// subscribe to the observable to start listening
-results$.subscribe((response: Result[]) =&gt; {
-    console.log(response);
+<pre><code class="language-typescript">@Component({
+  selector: 'app-company-detail',
+  template: `
+    &lt;button [disabled]="previousDisabled" (click)="previousClicked()"&gt;
+      Previous site
+    &lt;/button&gt;
+    &lt;button [disabled]="nextDisabled" (click)="nextClicked()"&gt;
+      Next site
+    &lt;/button&gt;
+     / 
+    &lt;h2&gt;&lt;/h2&gt;
+    &lt;p&gt;Address: &lt;/p&gt;
+  `,
+  styleUrls: ['./company-detail.component.css']
 })
-</code></pre>
-<p>This all works fine, until an error happens in the observable. This could come from a bad connection, server down-time or anything that went wrong during the HTTP request (500, 404, …) 
-If the user is having a bad connection which might result in a <code>404</code>, the observable will stop and the application will be broken. The user can search for results as much as he or she wants, the HTTP calls will never happen again.</p>
-
-<h2 id="catcherror">catchError</h2>
-
-<p>We could use the <code>catchError</code> operator that will basically catch the error for us, and return a brand new observable(containing the error).
-That observable will have the error as a value, instead of throwing it again as an error.
-That way we could actually show the user a decent message.
-This might look something like this:</p>
-
-<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
-    switchMap(term =&gt; 
-        fetchData(term).pipe(
-            // return an observable with the error inside
-            catchError(e =&gt; of(e))
-        )
-    )
-)
-results$.subscribe(
-    (response: Result[] | HttpErrorResponse) =&gt; {
-        if(response instanceof HttpErrorResponse){
-            console.log('oh no:(');
-            return;
-        }
-        console.log('do something fancy');
-    });
-)
-</code></pre>
-
-<p>Ps: I’m not trying to say that this is the best idea to catch errors. I’m just showing you around some basics.</p>
-
-<p>Do note that the <code>catchError</code> operator is applied to the result observable that <code>fetchData()</code> returns, and not added as the second operator of the first pipe. 
-From the moment an observable receives an error, it will die… That’s why it’s important to catch the error on the inner observable.</p>
-
-<h2 id="retrywhen">retryWhen</h2>
-
-<p>Ok, great! The application won’t break anymore, but now imagine the following scenario: Our user is sitting in the train and drives through a tunnel. The connection is gone for a few seconds and the user won’t get results.</p>
-
-<p>We could fix that by telling RxJS to retry a few times</p>
-
-<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
-    switchMap(term =&gt; 
-        fetchData(term).pipe(
-            retryWhen(e$ =&gt; e$.pipe(
-                // try again after 2 seconds
-                delay(2000),
-                // stop trying after 5 times
-                take(4)
-            )
-            // still keep the observable alive if
-            // the first 5 times fail
-            catchError(e =&gt; of(e))
-        )
-    )
-)
-</code></pre>
-
-<p>You can find more information about <code>retryWhen</code><a href="https://www.learnrxjs.io/operators/error_handling/retrywhen.html">here</a></p>
-
-<h2 id="using-the-online-event">Using the online event</h2>
-
-<p>Even though this is a good solution, there is room for improvement. A great choice is to use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/NavigatorOnLine/Online_and_offline_events">online</a> event from HTML5 to tell the browser to retry when the user regains internet connection. It’s even shorter than before and it’s super elegant</p>
-
-<pre><code class="language-typescript">const results$ = searchTerm$.pipe(
-    switchMap(term =&gt; 
-        fetchData(term).pipe(
-            retryWhen(() =&gt; fromEvent(window, 'online'))
-            // still keep the observable alive if
-            // the server would return a different
-            // HTTP error
-            catchError(e =&gt; of(e))
-        )
-    )
-)
-</code></pre>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>RxJS gives us great control over HTTP calls! If we know how error handling works it becomes a breeze to take our HTTP calls to the next level.
-This doesn’t only apply to typeahead searches but to every observable where we combine an existing stream with an error-affected one like HTTP. For instance: this can also happen in NgRx effects or with the angular router.</p>
-
-<p>There, I told you it would be short, I hope you learned something though.</p>
-
-<p>Also be sure to check this article: <a href="https://blog.angularindepth.com/power-of-rxjs-when-using-exponential-backoff-a4b8bde276b0">Power of RxJS when using exponential backoff</a></p>
-
-<h2 id="special-thanks">Special thanks</h2>
-
-<ul>
-  <li><a href="https://twitter.com/AmarildoKurtaj">@AmarildoKurtaj</a> The last example was based on his idea</li>
-</ul>
-
-<p>Reviewers:</p>
-<ul>
-  <li><a href="https://twitter.com/fmalcher01">Ferdinand Malcher</a></li>
-  <li><a href="https://twitter.com/FabianGosebrink">Fabian Gosebrink</a></li>
-  <li><a href="https://twitter.com/tim_deschryver">Tim deschryver</a></li>
-  <li><a href="https://twitter.com/webdave_de">David Müllerchen</a></li>
-  <li><a href="https://twitter.com/rubenverm">Ruben Vermeulen</a></li>
-</ul>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Building a safe autocomplete operator in RxJS</title>
-	  <link>//building-a-safe-autocomplete-operator-with-rxjs/</link>
-	  <author></author>
-	  <pubDate>2018-07-13T00:00:00+00:00</pubDate>
-	  <guid>//building-a-safe-autocomplete-operator-with-rxjs/</guid>
-	  <description><![CDATA[
-	     <p>A well-known use case of RxJS is creating a simple autocomplete search in only a few lines of code.
-This article is not just about creating our own autocomplete operator, we will create an autocomplete operator that is completely safe (we will cover the perception of safe later in this article).</p>
-
-<p>When creating a standard autocomplete with RxJS we most likely implement a <code>debounceTime</code> operator to throttle the text that the user is typing into the autocomplete and we use a <code>switchMap</code> operator instead of a <code>mergeMap</code> operator to abort previous calls.</p>
-
-<p>The implementation of this autocomplete might look like this:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        // wait until the user stops typing for a second
-        debounceTime(1000),
-        // higher order observable, abort previous
-        // call if still busy
-        switchMap(term =&gt; getAutocompleteSuggestions(term))
-    )
-</code></pre>
-
-<h2 id="the-problem">The problem</h2>
-
-<p>When the user stops typing for 1 second, the browser will create a new XHR call. From that moment on, when the user types again and a previous XHR call is still busy, the browser will abort that XHR call to avoid racing conditions, and create a new XHR call. This is due to the <code>switchMap</code> operator since it will unsubscribe from the previous observable.</p>
-
-<p>Although that’s great, there is one problem though. What if the user starts typing again when an XHR call is still busy? 
-Since we have implemented a <code>debounceTime</code> operator, the call will not be aborted until one second has passed.
-In that period of time new results might be returned and showed to the user, which might not be what we want since <strong>they are not relevant anymore</strong>.</p>
-
-<p>What we want is that the XHR call gets aborted from the moment the user starts typing again, we don’t want to wait for a second.
-This sounds like an ideal scenario to write our custom operator.
-But, before creating our own operator, let’s just combine some operators to get the job done.</p>
-
-<p>A possible solution for this problem is using a <code>takeUntil</code> operator on the observable that will trigger the XHR call.
-The <code>takeUntil</code> operator will complete the observable as soon as it gets a value. We want to complete (and therefore abort) the observable when the user types again. With that knowledge we can write something like this:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        debounceTime(1000),
-        switchMap(term =&gt; 
-            getAutocompleteSuggestions(term)
-                .pipe(
-                    takeUntil(term$) // this still won't work
-                )
-            )
-        )
-    )
-</code></pre>
-
-<p>Sadly, this does not work yet.</p>
-
-<p>Our <code>term$</code> observable is a <code>BehaviorSubject</code> for two reasons:</p>
-<ul>
-  <li>We want to pass an initial value to the subject</li>
-  <li>A <code>BehaviorSubject</code> is a <code>ReplaySubject(1)</code> behind the scenes that keeps track of the last value. This is important if we want to subscribe to that observable in a later stage (which is kinda what we do with the <code>takeUntil</code> operator).</li>
-</ul>
-
-<p>Because the <code>term$</code> observable is keeping track of the last value, the <code>takeUntil</code> operator will always have a value, resulting in the fact that every XHR call gets aborted immediately. This is not what we want.
-We want to skip one value of the <code>term$</code> observable every time.
-We can achieve that with the <code>skip</code> operator as shown in the following example:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        debounceTime(1000),
-        switchMap(term =&gt; 
-            getAutocompleteSuggestions(term)
-                .pipe(
-                    takeUntil(
-                        //skip 1 value
-                        term$.pipe(skip(1))
-                    )
-                        
-                )
-            )
-        )
-    )
-</code></pre>
-
-<p>Now the following scenario works:</p>
-<ul>
-  <li>User types ‘l’</li>
-  <li>Application waits for a second</li>
-  <li>Application creates an XHR call</li>
-  <li>User types ‘lu’</li>
-  <li>Even though the XHR call wasn’t finished yet it gets aborted immediately (it doesn’t wait for a second anymore to abort that XHR call)</li>
-</ul>
-
-<p>Because of that the user never gets irrelevant data on its screen.</p>
-
-<h2 id="extracting-the-logic-into-a-custom-operator">Extracting the logic into a custom operator</h2>
-
-<p>We don’t want to write this logic every time, so let’s extract this logic into a custom written operator.</p>
-
-<p>Turns out that creating custom operators is super easy. An operator is just a function that returns a function that gets the source observable.</p>
-
-<pre><code class="language-typescript">const autocomplete = (/* additional parameters */) =&gt; 
-    (source$) =&gt; source$.pipe(/* do stuff */ )
-</code></pre>
-
-<p>We can pass the <code>time</code> and <code>selector</code> function as parameters and use the operators we have written to create our own custom operator.
-The operator looks like this:</p>
-
-<pre><code class="language-typescript">const autocomplete = (time, selector) =&gt; (source$) =&gt;
-  source$.pipe(
-    debounceTime(time),
-    switchMap((...args: any[]) =&gt; selector(...args)
-        .pipe(
-            takeUntil(
-                source$
-                    .pipe(
-                        skip(1)
-                    )
-            )
-        )
-    )
-  )
-</code></pre>
-
-<p>Using our operator is super easy:</p>
-
-<pre><code class="language-typescript">const term$ = new BehaviorSubject('');
-const results$ = term$
-    .pipe(
-        autocomplete(1000, term =&gt; getAutocompleteSuggestions(term))
-    )
-</code></pre>
-
-<p>You can find the sourcecode on stackblitz.</p>
-<iframe src="https://stackblitz.com/edit/safe-switchmap?embed=1&amp;file=src/app/app.component.ts" style="width: 100%; height: 500px"></iframe>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>The combination of <code>debounceTime</code> and <code>switchMap</code> don’t always cover everything. Showing irrelevant data to our users might not be what we want and creating our own operators is super easy! I hope you enjoyed the article.</p>
-
-<h2 id="special-thanks">Special thanks</h2>
-
-<p>A special thanks for the awesome reviewers:</p>
-
-<ul>
-  <li>Nicholas Jamieson <a href="https://twitter.com/ncjamieson">@ncjamieson</a></li>
-  <li>Philippe Martin <a href="https://twitter.com/feloy2">@feloy2</a></li>
-  <li>Jan-Niklas Wortmann <a href="https://twitter.com/niklas_wortmann">@niklas_wortmann</a></li>
-  <li>Maarten Tibau <a href="https://twitter.com/maartentibau">@maartentibau</a></li>
-  <li>Kwinten Pisman <a href="https://twitter.com/kwintenp">@kwintenp</a></li>
-</ul>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>Thinking reactive with the SIP principle</title>
-	  <link>//the-sip-principle/</link>
-	  <author></author>
-	  <pubDate>2018-06-30T00:00:00+00:00</pubDate>
-	  <guid>//the-sip-principle/</guid>
-	  <description><![CDATA[
-	     <p>A few months back we released <a href="https://blog.strongbrew.io/rxjs-best-practices-in-angular/">RxJS best practices in Angular</a> and a while before that <a href="https://blog.strongbrew.io/thinking-reactively-in-angular-and-rxjs/">Thinking reactively in Angular and RxJS</a>. 
-Both of these articles are focussing on “trying to make the mind switch towards reactive programming”.</p>
-
-<p>However, sometimes we like to have structured opinionated ways of tackling problems, especially when things become complex. We like a roadmap of some kind, something to fall back on, something to guide us through these complex reactive scenarios.</p>
-
-<p>While writing RxJS code for small pragmatic solutions can be super easy, it might become complex when combining multiple streams or doing other advanced stuff.</p>
-
-<p>We as StrongBrew are huge fans of reactive programming and we use our reactive mindset in Angular on a daily basis.
-In this article we will learn a principle that helps us to tackle very complex RxJS situations in an opinionated structured way.</p>
-
-<p>The code of this article is written with <a href="https://angular.io">Angular</a> but the concepts can be used with every framework.</p>
-
-<h2 id="the-situation">The situation</h2>
-
-<p>We are going to build an application to search for starships in the <a href="https://swapi.co">swapi api</a>. The application counts a few features:</p>
-<ul>
-  <li>It has to load data on page load</li>
-  <li>The user can search for starships by entering text in the searchbox</li>
-  <li>The user can load starships by a chosen model</li>
-  <li>The user can load starships by a random model</li>
-  <li>There is a loading indicator that needs to be shown when the data is being loaded</li>
-  <li>Previous XHR calls should be canceled to avoid race conditions</li>
-  <li>We want to filter the results by the number of passengers allowed on the ship. <strong>Note: This is a clientside filter</strong></li>
-</ul>
-
-<p>As we can see, there is quite a lot of asynchronous logic going on here, and if we would implement this in an imperative way, it would be pretty hard to keep it simple. However, the application can easily be written with the use of RxJS. In this application we don’t want to think in actions anymore, we want to think in streams of data. <strong>Everything is a stream!</strong></p>
-
-<h2 id="the-sip-principle">The SIP principle</h2>
-<p>With StrongBrew, we came up with a simple principle of handling this reactive mindset. We call it the <strong>SIP principle</strong>.
-The SIP principle stands for the following:</p>
-<ul>
-  <li>S: Source streams</li>
-  <li>I: Intermediate streams</li>
-  <li>P: Presentation streams</li>
-</ul>
-
-<h3 id="source-streams">Source streams</h3>
-
-<p>These streams will contain all the user interaction. They are generally bound to the outputs of our dumb components. A source stream could also contain real-time data, but we won’t cover that part in this article.
-Let’s have a look at our application and look for the source streams there:
-(the left column pretty much contains all the user interaction)
-<img src="/assets/images/posts/sip-principle/source-streams.png" alt="Source streams" /></p>
-
-<p>After executing the first step of the SIP principle we have found 4 source streams.
-<code>searchTerm$</code>, <code>selectedModel$</code>, <code>randomModel$</code> and <code>numberOfPassengers$</code>.</p>
-
-<p>What’s important to note here is that we named these streams as <strong>streams of data</strong> rather than naming them as streams of actions. We want to stop thinking in actions and start thinking in streams of data, remember? That’s why we didn’t name the first stream <code>search$</code> (which would be an action), we rather named it <code>searchTerm$</code> so we know it contains a search term.</p>
-
-<p>Source streams are <strong>mostly subjects</strong> or streams that come from the framework, e.g. a routing params stream.</p>
-
-<p>In our application the source streams will look like this:</p>
-
-<pre><code class="language-typescript">searchTerm$ = new ReplaySubject&lt;string&gt;(1);
-selectedModel$ = new ReplaySubject&lt;string&gt;(1);
-randomModel$ = new ReplaySubject&lt;string&gt;(1);
-// needs an initial value
-numberOfPassengers$ = new BehaviorSubject(1000000); 
-</code></pre>
-
-<p>These subjects will be populated by the outputs as shown below:</p>
-
-<pre><code class="language-html">&lt;sidebar 
-    (search)="searchTerm$.next($event)"
-    (selectModel)="selectedModel$.next($event)"
-    (randomModel)="randomModel$.next($event)"
-    (changeNumberOfPassengers)="numberOfPassengers$.next($event)"
-&gt;
-&lt;/sidebar&gt;
-...
-</code></pre>
-
-<h3 id="presentation-streams">Presentation streams</h3>
-
-<p>After finding the source streams we need to find the presentation streams.
-These are the streams that our template needs to render properly. These are quite easy to find. We just have to look at the template and see which inputs our components expect. We can have a look at our template. (The outputs are stripped for readability purposes).</p>
-
-<pre><code class="language-html">  &lt;sidebar class="sidebar" 
-    [models]="fixedModels" 
-    [numberOfPassengers]=""
-  &gt;
-  &lt;/sidebar&gt;
-  &lt;div class="main"&gt;
-    &lt;starship-list 
-        [starships]=""
-        [loading]=""&gt;
-    &lt;/starship-list&gt;
-  &lt;/div&gt;
-</code></pre>
-
-<p>We can instantly see that we need 3 presentation streams:
-We need the number of passengers, the starships that need to be shown and whether the application is loading or not. Let’s fill in the blanks, shall we?!</p>
-
-<pre><code class="language-html">  &lt;sidebar class="sidebar" 
-    [models]="fixedModels" 
-    [numberOfPassengers]="numberOfPassengers$|async"
-  &gt;
-  &lt;/sidebar&gt;
-  &lt;div class="main"&gt;
-    &lt;starship-list 
-        [starships]="filteredResults$|async"
-        [loading]="loading$|async"&gt;
-    &lt;/starship-list&gt;
-  &lt;/div&gt;
-</code></pre>
-
-<p>So after step 2 we have found the following presentation streams: <code>numberOfPassengers$</code>, <code>filteredResults$</code> and <code>loading$</code>.</p>
-
-<h3 id="starting-with-the-sip-diagram">Starting with the SIP diagram</h3>
-
-<p>Let’s visualize these streams by creating a SIP diagram:</p>
-
-<p><img src="/assets/images/posts/sip-principle/sp.png" alt="Source streams, presentation streams" /></p>
-
-<p>The goal is to calculate the presentation streams, based on the source streams. There are 2 presentation streams that we need to calculate: <code>filteredResults$</code> and <code>loading$</code>. We don’t need to calculate <code>numberOfPassengers$</code> since it’s the same stream as the source stream.</p>
-
-<p>Let’s start with the <code>filteredResults$</code>. The <code>filteredResults$</code> is dependent on <code>searchTerm$</code>, <code>selectedModel$</code>, <code>randomModel$</code> and <code>numberOfPassengers$</code>. To make this calculation easier we can use intermediate streams.</p>
-
-<h3 id="intermediate-streams">Intermediate streams</h3>
-
-<p>Intermediate streams are streams that are used to make the bridge between the source streams and presentation streams easier.
-Let’s create a <code>query$</code> stream and a <code>results$</code> stream to make the calculation easier.</p>
-
-<p><img src="/assets/images/posts/sip-principle/sip1.png" alt="SIP 1" /></p>
-
-<p>We will use custom marble diagrams to visualize the different parts of the SIP diagram throughout this article.</p>
-
-<h4 id="calculating-the-query">Calculating the query$</h4>
-
-<p>The first intermediate stream that we have to create is the <code>query$</code> which is simply a merge from the <code>searchTerm$</code>, <code>selectedModel$</code> and <code>randomModel$</code>.</p>
-
-<p><img src="/assets/images/posts/sip-principle/query.png" alt="Query" /></p>
-
-<p>As we can see these 3 streams are being merged into one new <code>query$</code>. We don’t have to worry about when a user searches or selects a model, or even requests a random model. We only care about that simple stream of data, the <code>query$</code>.</p>
-
-<h4 id="calculating-the-results">Calculating the results$</h4>
-
-<p>Every time the <code>query$</code> gets a new value we want to fetch data from the API. For that we will use the <code>switchMap</code> operator.</p>
-
-<p><img src="/assets/images/posts/sip-principle/results.png" alt="Results" /></p>
-
-<h4 id="calculating-filteredresults">Calculating filteredResults$</h4>
-
-<p>We are ready to finish up the <code>filteredResults$</code> stream.
-If we look back at the previous SIP diagram we can see that we can create that stream by combining the <code>results$</code> and the <code>numberOfPassengers$</code>.</p>
-
-<p><img src="/assets/images/posts/sip-principle/filteredResults.png" alt="Filtered results" /></p>
-
-<h4 id="the-loading">The loading$</h4>
-
-<p>The next presentation stream that we want to create is called the <code>loading$</code>. Let’s update the SIP diagram accordingly. The <code>loading$</code> is based on the <code>query$</code> and the <code>results$</code>.</p>
-
-<p><img src="/assets/images/posts/sip-principle/sip2.png" alt="sip 2" /></p>
-
-<p>Every time the <code>query$</code> gets a new value the <code>loading$</code> should get the value <code>true</code>. Everytime the <code>result$</code> gets a new value the <code>loading$</code> should get the value <code>false</code>.
-So if we map every value of the <code>query$</code> to <code>true</code> and if we map every value of the <code>results$</code> to <code>false</code>, and merge those 2, we have created our <code>loading$</code> stream.</p>
-
-<p>Let’s create one last marble diagram for that.
-<img src="/assets/images/posts/sip-principle/loading.png" alt="Loading" /></p>
-
-<h3 id="what-do-we-need-to-share">What do we need to share?</h3>
-
-<p>We have came a long way, we have created the complete SIP diagram. We have visualized all the streams by creating marble diagrams, but if we look closely at the SIP diagram we might notice a problem.
-There are 2 arrows leaving the <code>query$</code> and 2 arrows leaving the <code>results$</code>. Every arrow stands for a subscription on the observable where the arrow starts.
-When working with cold observables, the producer function for that observable is executed every time we subscribe. Since <code>query$</code> is a hot stream, it doesn’t really matter, but <code>results$</code> will trigger an HTTP call every time it gets subscribed to. In short: the subscription on <code>loading$</code> and <code>filteredResults$</code> will trigger a subscription on <code>results$</code> twice. The SIP diagram show us which subscriptions need to be shared.</p>
-
-<p><img src="/assets/images/posts/sip-principle/sip3.png" alt="sip3" /></p>
-
-<h2 id="check-it-out">Check it out</h2>
-
-<p>The SIP diagram is complete now and we can start coding. Since this article is really about the SIP principle I won’t explain the code in detail. However, you can find the complete code in the StackBlitz below.</p>
-<iframe src="https://stackblitz.com/edit/sip-principle?embed=1&amp;file=app/app.component.ts" style="width: 100%; height: 500px"></iframe>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Before starting with implementing complex RxJS screens. Take a whiteboard and draw the flow first. The SIP principle that we created works for us but isn’t the only way to go of course.</p>
-
-<p>If you check the code inside the StackBlitz, you might be surprised about the amount of lines of code that we need to create this application. We have only a few lines of real logic, and we have covered most corner cases by thinking reactive.</p>
-
-<p>Because of the use of the <code>async</code> pipe we don’t need to unsubscribe from any stream manually since the <code>async</code> pipe does that for us.</p>
-
-<h2 id="special-thanks">Special thanks</h2>
-
-<p><a href="https://twitter.com/jvandemo">Jurgen van de Moere</a> for helping us with finding the right acronym.</p>
-
-<p>And the awesome reviewers:</p>
-<ul>
-  <li><a href="https://twitter.com/manfredsteyer">Manfred Steyer</a></li>
-  <li><a href="https://twitter.com/niklas_wortmann">Jan-Niklas Wortmann</a></li>
-  <li><a href="https://twitter.com/tim_deschryver">Tim Deschryver</a></li>
-  <li><a href="https://twitter.com/webdave_de">David Müllerchen</a></li>
-</ul>
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>A glitch in combineLatest (and how to fix it!)</title>
-	  <link>//combine-latest-glitch/</link>
-	  <author></author>
-	  <pubDate>2018-06-12T00:00:00+00:00</pubDate>
-	  <guid>//combine-latest-glitch/</guid>
-	  <description><![CDATA[
-	     <p>The <code>combineLatest</code> operator is probably one of my favorite ones, that I believe everyone should know. You should never try to learn all of them but <code>combineLatest</code>, to me, is definitely one of those ~15 you should probably understand.</p>
-
-<p><strong>Note:</strong> If you are unfamiliar with this operator, I suggest you check it out immediately <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-combineLatest" target="_blank">here</a> or <a href="http://reactive.how/combinelatest" target="_blank">here</a>.</p>
-
-<p>Even though it is one of the most well known operators, it can potentially introduce some weird behaviour. Let’s try and find the weird behaviour and see how we can fix it.</p>
-
-<h2 id="identifying-the-problem">Identifying the problem</h2>
-
-<p>To do so, I created an application that visualizes a number of pokemon based on a limit and offset parameter.</p>
-
-<p><img src="https://www.dropbox.com/s/u1autxtkhlp3nfk/Screenshot%202018-06-09%2013.44.16.png?raw=1" alt="example-app-screenshot" /></p>
-
-<p>Every time the limit <strong>or</strong> the offset changes, a backend call is triggered that will update the list of pokemon to be shown.</p>
-
-<p>Let’s take a look at how we can set up our stream to make this work. We will start by looking at the marble diagram.</p>
-
-<p><img src="https://vectr.com/tmp/f1jfpxhCHV/b8pN04Jr9.svg?width=1000&amp;height=461.54&amp;select=b8pN04Jr9page0" alt="marble-diagram" /></p>
-
-<p>We have a stream of the limit values and one for the offset values. We combine these streams using <strong><code>combineLatest</code> to create a stream that will have a new value every time one of the source streams changes</strong>. We then use <code>switchMap</code> to fetch the data from the backend based on these values to get a <code>pokemon$</code>. Because we use <code>switchMap</code>, if a call is not finished yet, it will be cancelled when a new call is initiated by changing the limit or offset.</p>
-
-<p>Code wise this looks like this:</p>
-
-<pre><code class="language-typescript">this.pokemon$ = combineLatest(limit$, offset$)
-       .pipe(
-        map(data =&gt; ({limit: data[0], offset: data[1]})),
-        switchMap(data =&gt; this.pokemonService.getPokemon(data.limit, data.offset)),
-        map((response: {results: Pokemon[]}) =&gt; response.results),
-      );
-</code></pre>
-
-<p>Here is the live example you can play with:</p>
-
-<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-deqtkx?embed=1&amp;file=src/app/app.component.ts"></iframe>
-
-<p><strong>Note:</strong> If you open Chrome’s DevTools, head over to the ‘Network’ tab and update the values pretty quick, you can see the calls being cancelled.</p>
-
-<h3 id="i-thought-their-was-some-weird-behavior">I thought their was some weird behavior?</h3>
-
-<p>Everything seems to work fine right? So where is the hiccup?
-Aside from the option to change the limit and offset values, there is also a ‘reset’ button. This button will set the values back to 5 and 0.</p>
-
-<pre><code class="language-typescript">reset() {
-    this.limitControl.setValue(5);
-    this.offsetControl.setValue(0);
+export class CompanyDetailComponent implements OnChanges{
+  @Input() currentSiteId: string;
+  @Input() sites: any[];
+  @Output() siteChanged = new EventEmitter&lt;string&gt;();
+
+  // we need to keep track of 5 different local properties
+  // and calculate and set their values at the right time
+  currentIndex = 0;
+  previousDisabled: boolean;
+  nextDisabled: boolean;
+  currentSite: any;
+  currentSiteNumber: number;
+
+  ngOnChanges(): void {
+    // this can become complex really fast
+    if(this.currentSiteId &amp;&amp; this.sites?.length &gt; 0){
+      this.currentIndex = this.sites?.map(site =&gt; site?.id).indexOf(this.currentSiteId);    
+      this.currentSite = this.sites[this.currentIndex];
+      this.currentSiteNumber = this.currentIndex + 1;
+      this.previousDisabled = this.currentIndex === 0;
+      this.nextDisabled = this.currentIndex === this.sites?.length -1
+    }
+  }
+
+  previousClicked(): void {
+      this.siteChanged.emit(this.sites[this.currentIndex -1].id);    
+  }
+
+  nextClicked(): void {
+      this.siteChanged.emit(this.sites[this.currentIndex +1].id);    
+  }
 }
 </code></pre>
 
-<p>To see the hiccup, open Chrome’s DevTools, open the ‘Network’ tab and check what happens when you click the button.</p>
+<p>We can see that all the calculation is happening inside the ngOnChanges.
+Although this solution is perfectly fine, there is a more reactive way of approaching this. For this specific example it could be overkill but it might teach you how to tackle more complex situations when tackling <code>@Input()</code> changes.</p>
 
-<p><img src="https://www.dropbox.com/s/dxcct5dld4wf0c3/combine-latest-glitch.gif?raw=1" alt="gif-reset-clicked" /></p>
+<p>Think about a complex calendar view that has to do a bunch of calculations based on dozens of <code>@Input()</code> properties for instance, where a bunch of them are happening synchronous and there are async properties depending on other async properties.
+Think about <code>@Input()</code> components that are useless unless other <code>@Input()</code> components have their values. Or what if you like to combine the <code>@Input()</code> properties with other async objects inside the dumb component. In the following example every piece of code inside this component is a stream. The first thing we want to do is create observables from the <code>@Input()</code> properties. I like to use this approach when multiple <code>@Input()</code> properties need eachother to compute a specific value.</p>
 
-<p>Whenever the button is clicked, we can see that a call is initiated but immediately cancelled and a new call is started. That’s a little strange no?</p>
+<pre><code class="language-typescript">export class CompanyDetailComponent{
+  // input state subjects
+  private currentSiteId$$ = new ReplaySubject&lt;string&gt;(1);
+  private sites$$ = new ReplaySubject&lt;any[]&gt;(1);
 
-<h3 id="explaining-the-behavior">Explaining the behavior</h3>
-
-<p>Actually, this makes sense. In the description of the marble diagram above, there was a highlight:</p>
-
-<blockquote>
-  <p>‘<code>combineLatest</code> creates a stream that will have a new value every time one of the source streams changes’.</p>
-</blockquote>
-
-<p>By clicking the reset button, we updated both of our source streams by resetting both the limit and offset value at the same time. The effect of this action was that the stream created by <code>combineLatest</code> fired twice, thus starting two backend requests, thus, cancelling one immediately because we used <code>switchMap</code>.</p>
-
-<p>To make it even more clear, lets put it in steps.</p>
-
-<ul>
-  <li><code>combineLatest</code> holds the last values from all source streams (in the gif, the begin scenario was, limit = 8, offset = 2)</li>
-  <li>the reset button is clicked</li>
-  <li>limit is set to 5</li>
-  <li><code>combineLatest</code> sees a new value coming in for limit and emits a new combination, limit = 5, offset = 2</li>
-  <li><code>switchMap</code> gets these values and subscribes to the stream that triggers a backend call</li>
-  <li>offset is set to 0</li>
-  <li><code>combineLatest</code> sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0</li>
-  <li><code>switchMap</code> gets these values, unsubscribes (and thus cancels) the previous request and starts a new one</li>
-</ul>
-
-<p>Something you might have not expected in this flow is that, whenever the limit is set, this change propagates to <code>combineLatest</code> directly before changing the offset.</p>
-
-<p><strong>Note:</strong> This is possible because RxJS does not have the notion of transactions. In a ‘true’ Functional Reactive Programming implementation, this would not be possible. Transactions would make sure there can be no simultaneous events. This is food for another post though :).</p>
-
-<h3 id="how-can-we-fix-this">How can we fix this?</h3>
-
-<p>If there was a way we could make sure that changes that happen in the same call stack (which is what is happening when clicking the reset button), are discarded in favor of the last change, we could fix our problem.</p>
-
-<p>This means, that when <code>combineLatest</code> emits two values in the same call stack, the last one is send through when the call stack is cleared.</p>
-
-<p>To do this, we can leverage <code>debounceTime</code> with a value of 0 directly after the <code>combineLatest</code>. This will make sure only the last value is passed through to the <code>switchMap</code> and this after the call stack has been cleared.</p>
-
-<p><strong>Note:</strong> If you do not know what the call stack is, watch one of my favorite talks ever by Philip Roberts that covers it <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ" target="_blank">here</a>.
-<strong>Note2:</strong> Whenever there is a mention of ‘in the same call stack’ this could be replaced with ‘changes that occur during the same turn of the event loop’.</p>
-
-<p>Let’s put this in steps again to make it clear.</p>
-
-<ul>
-  <li><code>combineLatest</code> holds the last values from all source streams (in the gif, the begin scenario was, limit = 8, offset = 2)</li>
-  <li>the reset button is clicked</li>
-  <li>limit is set to 5</li>
-  <li>the <code>combineLatest</code> operator sees a new value coming in for limit and emits a new combination, limit = 5, offset = 2</li>
-  <li>the <code>debounceTime</code> operator sees a new value and (because of the 0) will wait until the call stack is cleared to pass it on</li>
-  <li>offset is set to 0</li>
-  <li>the <code>combineLatest</code> operator sees a new value coming in for offset and emits a new combination, limit = 5, offset = 0</li>
-  <li>the <code>debounceTime</code> operator sees again a new value, will discard of the old one, and will wait for the stack to be cleared to pass it on</li>
-  <li>the call stack is cleared</li>
-  <li>the <code>debounceTime</code> operator sees no new value is given and will pass the combination, limit = 5, offset = 0, on</li>
-  <li>the <code>switchMap</code> operator gets these values and subscribes to the stream that triggers a backend call</li>
-</ul>
-
-<p>The updated code looks like this:</p>
-
-<pre><code class="language-typescript">this.pokemon$ = combineLatest(limit$, offset$)
-       .pipe(
-        map(data =&gt; ({limit: data[0], offset: data[1]})),
-        debounceTime(0),
-        switchMap(data =&gt; this.pokemonService.getPokemon(data.limit, data.offset)),
-        map((response: {results: Pokemon[]}) =&gt; response.results),
-      );
+  // input stream setters
+  @Input() set currentSiteId(v: string){
+    if(v){ // we don't care about null values in this case
+      this.currentSiteId$$.next(v);
+    }
+  };
+  @Input() set sites(v: any[]){
+    if(v){ // we don't care about null values in this case
+      this.sites$$.next(v);
+    }
+  };
+}
 </code></pre>
 
-<p>You can play with the updated example here and see that the issue no longer happens.</p>
+<p><em>Note: We use the <code>$$</code> suffix so we can see the observable is a <code>Subject</code>.</em></p>
 
-<iframe style="width: 100%; height: 450px" src="https://stackblitz.com/edit/angular-gnlpt6?embed=1&amp;file=src/app/app.component.ts"></iframe>
+<p>We have now created observables from these <code>@Input()</code> properties. I have created the library <a href="https://www.npmjs.com/package/ngx-reactivetoolkit">ngx-reactivetoolkit</a> to make this even easier. We can see an example on how this cleans up the code right below:</p>
+
+<pre><code class="language-typescript">export class CompanyDetailComponent{
+  @Input() currentSiteId: string
+  @Input()  sites: any[]
+  @Changes('currentSiteId') currentSiteId$;
+  @Changes('sites') sites$;
+}
+</code></pre>
+
+<p>For this article we will continue with the native approach but be sure to check it out if you find the time. The toolkit might also gave some other good stuff that could help you.</p>
+
+<p>Moving on… Remember that we mentioned that everything could be a stream? This also means our template events can be linked to streams.</p>
+
+<pre><code class="language-html">&lt;button [disabled]="previousDisabled$|async" (click)="previousClicked()"&gt;
+  Previous site
+&lt;/button&gt;
+&lt;button [disabled]="nextDisabled$|async" (click)="nextClicked()"&gt;
+  Next site
+&lt;/button&gt;
+</code></pre>
+
+<pre><code class="language-typescript">  // this will be used to communicate with the siteChanged @Output()
+  private nav$$ = new Subject&lt;number&gt;();
+
+  previousClicked(): void {
+    this.nav$$.next(-1); // decrement
+  }
+  
+  nextClicked(): void {
+    this.nav$$.next(+1); // increment
+  }
+</code></pre>
+
+<p>The next thing that we want to do is determine the presentation streams and the Output streams. For the presentation streams we can simply have a look at the template:</p>
+
+<pre><code class="language-html">&lt;button [disabled]="previousDisabled$|async" (click)="previousClicked()"&gt;
+  Previous site
+&lt;/button&gt;
+&lt;button [disabled]="nextDisabled$|async" (click)="nextClicked()"&gt;
+  Next site
+&lt;/button&gt;
+/ 
+&lt;ng-container *ngIf="currentSite$|async as currentSite"&gt;
+  ...
+&lt;/ng-container&gt;
+
+</code></pre>
+
+<p>When looking at this template we can easily determine the presentation streams. These are all the streams that use an <code>async</code> pipe.</p>
+
+<ul>
+  <li><code>previousDisabled$</code></li>
+  <li><code>nextDisabled$</code></li>
+  <li><code>currentSiteNumber$</code></li>
+  <li><code>totalSites$</code></li>
+  <li><code>currentSite$</code></li>
+</ul>
+
+<p>The only <code>@Output()</code> stream for this template is for the <code>siteChanged</code> <code>@Output()</code>. Did you know an <code>EventEmitter</code> is an observable behind the scenes? Well, it is and we can replace the <code>EventEmitter</code> with any kind of observable.</p>
+
+<p>This means that this code:</p>
+
+<pre><code class="language-typescript">@Output() siteChanged = new EventEmitter();
+</code></pre>
+
+<p>can be refactored to:</p>
+
+<pre><code class="language-typescript">@Output() siteChanged = this.siteChanged$;
+</code></pre>
+
+<p>Again, for this example the solution might be personal preference but when the flows become more complex we believe this approach can really shine! Think about a search component that looks like this…</p>
+
+<pre><code class="language-typescript">@Output() search$ = this.searchControl.valueChanges$.pipe(
+    debounceTime(100),
+    distinctUntilChanged()
+)
+</code></pre>
+
+<p>This can become very powerful very fast!</p>
+
+<p>The next thing that we want to do is calculate intermediate private streams. If you don’t know what we mean with that, please check out the article on the <a href="https://blog.strongbrew.io/the-sip-principle/">SIP principle</a>. We use these intermediate streams to calculate the presentation streams, which are the streams that we will use in our template, and in the <code>@Output()</code> streams</p>
+
+<p>The <code>currentIndex$</code> stream and the <code>indexWithSites$</code> stream are streams that are being used to calculate the presentationstreams. The <code>siteChanged$</code> stream will be used by the <code>siteChanged</code> <code>@Output()</code> property later on
+We can see the calculation in this example:</p>
+
+<pre><code class="language-typescript">// intermediate streams
+// the current index, calculated by the current site id and the sites
+private currentIndex$ = combineLatest([this.currentSiteId$$, this.sites$$])
+  .pipe(
+    map(([currentSiteId, sites]) =&gt; 
+      sites?.map(site =&gt; site?.id).indexOf(currentSiteId)    
+    )
+  );
+
+// an array that always contains the currentIndex and all the sites
+private indexWithSites$ = combineLatest([this.currentIndex$, this.sites$$]);
+
+// every time the nav button is clicked, we need to calculate the id that
+// needs to be emitted to the siteChanged @Output()
+private siteChanged$ = this.nav$$.pipe(
+  withLatestFrom(this.sites$$, this.currentIndex$),
+  map(([navigationIndex, sites, currentIndex]) =&gt; 
+    sites[currentIndex + navigationIndex]?.id
+  )
+)
+</code></pre>
+
+<p>Now we can start by implementing the  presentation streams and the <code>@Output()</code> stream.
+In the code snippet below we can see the complete code: You can also check the <a href="https://stackblitz.com/edit/reactive-dumb-components-reactive?file=src/app/components/company-detail/company-detail.component.ts">StackBlitz example</a></p>
+
+<pre><code class="language-typescript">
+@Component({
+  selector: 'app-company-detail',
+  template: `
+    &lt;button [disabled]="previousDisabled$|async" (click)="previousClicked()"&gt;
+      Previous site
+    &lt;/button&gt;
+    &lt;button [disabled]="nextDisabled$|async" (click)="nextClicked()"&gt;
+      Next site
+    &lt;/button&gt;
+    / 
+    &lt;ng-container *ngIf="currentSite$|async as currentSite"&gt;
+      &lt;h2&gt;&lt;/h2&gt;
+      &lt;p&gt;Address: &lt;/p&gt;
+    &lt;/ng-container&gt;
+
+  `,
+  styleUrls: ['./company-detail.component.css']
+})
+export class CompanyDetailComponent{
+  // local state subjects and input state subjects
+  private nav$$ = new Subject&lt;number&gt;();
+  private currentSiteId$$ = new ReplaySubject&lt;string&gt;(1);
+  private sites$$ = new ReplaySubject&lt;any[]&gt;(1);
+
+  // input stream setters
+  @Input() set currentSiteId(v: string){
+    if(v){
+      this.currentSiteId$$.next(v);
+    }
+  };
+  @Input() set sites(v: any[]){
+    if(v){
+      this.sites$$.next(v);
+    }
+  };
+
+  // intermediate streams
+  private currentIndex$ = combineLatest([this.currentSiteId$$, this.sites$$])
+    .pipe(
+      map(([currentSiteId, sites]) =&gt; 
+        sites?.map(site =&gt; site?.id).indexOf(currentSiteId)    
+      )
+    );
+  private indexWithSites$ = combineLatest([this.currentIndex$, this.sites$$]);
+
+  private siteChanged$ = this.nav$$.pipe(
+    withLatestFrom(this.sites$$, this.currentIndex$),
+    map(([navigationIndex, sites, currentIndex]) =&gt; 
+     sites[currentIndex + navigationIndex]?.id
+    )
+  )
+
+  // output streams and presentational streams
+  @Output() siteChanged = this.siteChanged$;
+  previousDisabled$ = this.currentIndex$.pipe(
+    map(currentIndex =&gt;currentIndex === 0)
+  )
+  nextDisabled$ = this.indexWithSites$.pipe(
+    map(([currentIndex, sites]) =&gt; currentIndex === sites?.length -1)
+  )
+  currentSite$ = this.indexWithSites$.pipe(
+    map(([currentIndex, sites]) =&gt; sites[currentIndex])
+  )
+  totalSites$ = this.sites$$.pipe(
+    map(sites =&gt; sites?.length)
+  )
+  currentSiteNumber$ = this.currentIndex$.pipe(
+    map(v =&gt; v + 1)
+  )
+
+  previousClicked(): void {
+    this.nav$$.next(-1);    
+  }
+  
+  nextClicked(): void {
+    this.nav$$.next(+1);    
+  }
+}
+
+</code></pre>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>When combining streams with the <code>combineLatest</code> operator, where the source streams might have new values within the same call stack, you might get unexpected behavior. You can fix this by adding a <code>debounceTime(0)</code> right after the <code>combineLatest</code>.</p>
+<p>We can make components completely reactive if we want to by:</p>
+<ul>
+  <li>Binding other observables to <code>@Output()</code> properties</li>
+  <li>Using setters to populate <code>@Input()</code> properties</li>
+  <li>We can use <code>ngx-reactivetoolkit</code> to make the code cleaner</li>
+</ul>
 
-<p><strong>Note:</strong> Special thanks to <a href="https://twitter.com/elmd_" target="_blank">Dominic Elm</a>, <a href="https://twitter.com/ncjamieson" target="_blank">Nicholas Jamieson</a>, <a href="https://twitter.com/chaos_monster" target="_blank">Martin Sonnenholzer</a>, <a href="https://twitter.com/maartentibau" target="_blank">Maarten Tibau</a> and <a href="https://twitter.com/frederikprijck" target="_blank">Frederik Prijck</a> for reviewing!</p>
-
+<p>For simple component this can be seen as overkill, but it could definitely help when dumb components become more complex and rely of different streams of data that are happening asynchronously.</p>
 
 	  ]]></description>
 	</item>

@@ -15,7 +15,7 @@
 	  <title>A generic way of handling loading-status, saving-status and validation errors in Angular</title>
 	  <link>//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</link>
 	  <author></author>
-	  <pubDate>2019-01-25T00:00:00+00:00</pubDate>
+	  <pubDate>2019-01-25T00:00:00+01:00</pubDate>
 	  <guid>//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</guid>
 	  <description><![CDATA[
 	     <p>When writing Angular applications there are always pieces of functionality that are being rewritten over and over again. 3 common usecases are:</p>
@@ -415,7 +415,7 @@ export function ValidationErrors() {
 	  <title>Migrating to Nx</title>
 	  <link>//migrating-to-nx/</link>
 	  <author></author>
-	  <pubDate>2019-01-05T00:00:00+00:00</pubDate>
+	  <pubDate>2019-01-05T00:00:00+01:00</pubDate>
 	  <guid>//migrating-to-nx/</guid>
 	  <description><![CDATA[
 	     <p>I have been using a monorepo with Nx for a while now (~1 year, an almost infinite period in javascript land 😂). And I must say, this has been a real eye opening experience. I’ve gotten to the point that everyone that is remotely interested into talking to me is going to get a pitch on why monorepos are the best and how Nx can help us in achieving this. I even gave a talk about this very topic at NG-BE which you can find <a href="https://www.youtube.com/watch?v=d04U7SjORTI" target="_blank">here</a>.</p>
@@ -469,7 +469,7 @@ export function ValidationErrors() {
 	  <title>Opinionated guidelines for large nx angular projects</title>
 	  <link>//opinionated-guidelines-for-large-nx-angular-projects/</link>
 	  <author></author>
-	  <pubDate>2018-12-08T00:00:00+00:00</pubDate>
+	  <pubDate>2018-12-08T00:00:00+01:00</pubDate>
 	  <guid>//opinionated-guidelines-for-large-nx-angular-projects/</guid>
 	  <description><![CDATA[
 	     <h2 id="about-this-article">About this article</h2>
@@ -873,7 +873,7 @@ I couldn’t have done it without you!</p>
 	  <title>Using nx-etc checkout feature</title>
 	  <link>//using-nx-etc-checkout-feature/</link>
 	  <author></author>
-	  <pubDate>2018-10-14T00:00:00+00:00</pubDate>
+	  <pubDate>2018-10-14T00:00:00+02:00</pubDate>
 	  <guid>//using-nx-etc-checkout-feature/</guid>
 	  <description><![CDATA[
 	     <p>Using <a href="https://nrwl.io/nx">Nx</a> we can build applications using a monorepo style of development. If your monorepo contains a lot of applications and libraries, the development process might be impacted a little.</p>
@@ -904,7 +904,7 @@ You can find an overview of the lib in the video below.</p>
 	  <title>Redux (@ngrx/store) best practices</title>
 	  <link>//Redux-best-practices/</link>
 	  <author></author>
-	  <pubDate>2018-04-27T00:00:00+00:00</pubDate>
+	  <pubDate>2018-04-27T00:00:00+02:00</pubDate>
 	  <guid>//Redux-best-practices/</guid>
 	  <description><![CDATA[
 	     <p><a href="https://github.com/ngrx/platform/blob/master/docs/store/README.md">@ngrx/store</a> is a library that tries to solve the problems of state management through the principles of <a href="https://redux.js.org/">Redux</a>. The difference between Redux and @ngrx/store is that @ngrx/store is written specifically for <a href="https://angular.io">Angular</a> and it embraces the use of Observables from <a href="http://reactivex.io/rxjs/">RxJS</a>.
@@ -1380,7 +1380,7 @@ we can send actions to our application and those actions won’t just perform st
 	  <title>RxJS polling strategies</title>
 	  <link>//rxjs-polling/</link>
 	  <author></author>
-	  <pubDate>2018-04-19T00:00:00+00:00</pubDate>
+	  <pubDate>2018-04-19T00:00:00+02:00</pubDate>
 	  <guid>//rxjs-polling/</guid>
 	  <description><![CDATA[
 	     <p>Polling is a common scenario in a lot of Single Page Applications. We want our user to see the latest data without them taking any actions. In some scenarios, we might even want to display this data real time. In most cases however, this is overkill and requires changes at the backend of our application. Polling is a really good ‘near immediate’ alternative.</p>
@@ -1616,7 +1616,7 @@ polledBitcoin$:   ------b-------------b-------....
 	  <title>Nx on your CI, how does it work?</title>
 	  <link>//how-nx-affected-apps-works/</link>
 	  <author></author>
-	  <pubDate>2018-03-13T00:00:00+00:00</pubDate>
+	  <pubDate>2018-03-13T00:00:00+01:00</pubDate>
 	  <guid>//how-nx-affected-apps-works/</guid>
 	  <description><![CDATA[
 	     <p>Nx from Nrwl is a collection of tools that can help us build Angular applications using a monorepo. In essence, Nx is a set of <a href="https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2" target="_blank">schematics</a> that work on top of the @angular/cli. These schematics can be used to create apps and libs inside of a single @angular/cli project. Having multiple apps is supported by default and Nx leverages this feature and makes the process a little easier.</p>
@@ -1813,7 +1813,7 @@ private processNode(projectName: string, node: ts.Node): void {
 	  <title>Pre-rendering Angular Applications</title>
 	  <link>//prerendering-angular-apps/</link>
 	  <author></author>
-	  <pubDate>2018-03-04T00:00:00+00:00</pubDate>
+	  <pubDate>2018-03-04T00:00:00+01:00</pubDate>
 	  <guid>//prerendering-angular-apps/</guid>
 	  <description><![CDATA[
 	     <h2 id="why-should-we-pre-render-angular-applications">Why should we pre-render Angular applications?</h2>
@@ -2106,7 +2106,7 @@ function renderToHtml(url: string, folderPath: string): void {
 	  <title>Displaying components based on the role of a user</title>
 	  <link>//display-a-component-based-on-role/</link>
 	  <author></author>
-	  <pubDate>2018-01-15T00:00:00+00:00</pubDate>
+	  <pubDate>2018-01-15T00:00:00+01:00</pubDate>
 	  <guid>//display-a-component-based-on-role/</guid>
 	  <description><![CDATA[
 	     <p>At some moment in time, almost every application will have certain parts that need to be restricted to users with the proper roles. When we need to protect a certain route from unauthorized access, Angular provides us with a guard.</p>
@@ -2240,7 +2240,7 @@ export class HasRoleDirective implements OnInit, OnDestroy {
 	  <title>RxJS best practices in Angular</title>
 	  <link>//rxjs-best-practices-in-angular/</link>
 	  <author></author>
-	  <pubDate>2018-01-04T00:00:00+00:00</pubDate>
+	  <pubDate>2018-01-04T00:00:00+01:00</pubDate>
 	  <guid>//rxjs-best-practices-in-angular/</guid>
 	  <description><![CDATA[
 	     <p>This article is all about the do’s and don’ts when it comes to writing reactive applications with <a href="http://reactivex.io/">RxJS</a> in <a href="https://angular.io/">Angular</a> applications. 

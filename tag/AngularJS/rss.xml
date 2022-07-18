@@ -15,7 +15,7 @@
 	  <title>The $onChanges lifecycle-hook in depth</title>
 	  <link>//the-onchanges-lifecycle-hook/</link>
 	  <author></author>
-	  <pubDate>2016-04-06T00:00:00+00:00</pubDate>
+	  <pubDate>2016-04-06T00:00:00+02:00</pubDate>
 	  <guid>//the-onchanges-lifecycle-hook/</guid>
 	  <description><![CDATA[
 	     <p>With the release of Angular 1.5.3 we got some awesome new features. As you all know, the point of the Angular 1.5 releases are to bring us closer to the Angular 2 way of working. With that in mind, the latest new feature we’ve got are Lifecycle hooks. What those are and how you can use them has already been perfectly explained by Pascal Precht on <a href="http://blog.thoughtram.io/angularjs/2016/03/29/exploring-angular-1.5-lifecycle-hooks.html">his blog</a>. For the remainder of this blog, I’m going to assume you have read it.

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Page Meta -->
+    <title>Reactive dumb components</title>
+    <meta name="description" content="How to make dumb components reactive without imperative ngOnChanges programming" />
+
+    <!-- Mobile Meta -->
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand icon -->
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- Styles'n'Scripts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+
+    <!-- highlight.js -->
+    <link href="/assets/css/prism.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+    <!-- Ghost outputs important style and meta data with this tag -->
+        <link rel="canonical" href="https://blog.strongbrew.io//reactive-dumb-components/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Strongbrew: Angular and RxJS blog" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Reactive dumb components" />
+    <meta property="og:description" content="How to make dumb components reactive without imperative ngOnChanges programming" />
+    <meta property="og:url" content="https://blog.strongbrew.io///reactive-dumb-components/" />
+    <meta property="og:image" content="/assets/images/cover/cover4.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Reactive dumb components" />
+    <meta name="twitter:description" content="How to make dumb components reactive without imperative ngOnChanges programming" />
+    <meta name="twitter:url" content="https://blog.strongbrew.io///reactive-dumb-components/" />
+    <meta name="twitter:image:src" content="/assets/images/cover/cover4.jpg" />
+    
+    <meta http-equiv="refresh" content="0;url=https://blog.brecht.io/reactive-dumb-components/" />
+
+
+    
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Strongbrew: Angular and RxJS blog",
+    "name": "Reactive dumb components",
+    "url": "https://blog.strongbrew.io///reactive-dumb-components/",
+    "image": "/assets/images/cover/cover4.jpg",
+    "description": "How to make dumb components reactive without imperative ngOnChanges programming"
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Strongbrew: Angular and RxJS blog" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+    <div class="topbar">
+        <div class="container">
+            <a class="logo-wrapper" href="https://strongbrew.io">
+                <img src="/assets/images/logo_website.png" alt="">
+            </a>
+            <div class="menu-wrapper">
+                <ul class="menu">
+                    <li><a href="https://strongbrew.io/about">Home</a></li>
+                    <li><a href="https://strongbrew.io/brews" rel="noopener" routerLinkActive="active">Brews</a></li>
+                    <li><a href="/" class="active">Blog</a></li>
+                    <li><a href="https://strongbrew.io/consultancy" rel="noopener" routerLinkActive="active">Consultancy</a></li>
+                    <li><a href="https://strongbrew.io/angular-codereview" rel="noopener" routerLinkActive="active">Code review</a></li>
+                    <li><a href="https://strongbrew.io/contact" rel="noopener" routerLinkActive="active">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- The blog navigation links -->
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a
+                href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a
+                href="/about">About</a></li>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/AngularJS">AngularJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Angular">Angular</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Redux">Redux</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/RxJS">RxJS</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Typescript">Typescript</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Nx">Nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/@ngrx">@ngrx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/nx">nx</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/architecture">architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Architecture">Architecture</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/errorhandling">errorhandling</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/interceptors">interceptors</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/decorators">decorators</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/COVID">COVID</a>
+        
+            <li class="nav-fables " role="presentation"><a href="/tag/Rxjs">Rxjs</a>
+        
+        <li class="nav-author " role="presentation"><a
+                href="/author/brechtbilliet">Brecht</a></li>
+        <li class="nav-author " role="presentation"><a
+                href="/author/kwintenp">Kwinten</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+<!-- The comment above "< default" means - insert everything in this file into -->
+<!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header id="header" class="main-header post-head "
+        style="background-image: url(/assets/images/cover/cover4.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        
+    </nav>
+    <!--<div class="container">-->
+        <!--<div class="spotlight">-->
+            <!--<h2>Become an Angular architect!</h2>-->
+            <!--<ul class="techlogos">-->
+                <!--<li><span><img alt="Angular" src="/assets/images/angular.png"></span></li>-->
+            <!--</ul>-->
+            <!--<div class="img-wrapper">-->
+                <!--<img alt="" class="spotlight-ghent" src="/assets/images/ghent.jpg" tabindex="0">-->
+                <!--<a class="button" href="https://strongbrew.io/become-an-angular-architect-ghent">-->
+                    <!--<span>Get your ticket: April 26th GHENT</span>&nbsp;<i class="fa fa-chevron-right"></i>-->
+                <!--</a>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+</header>
+
+<div class="followme followme-abs" id="followme">
+<h5>We can help you!</h5>
+    <a href="https://strongbrew.io/angular-codereview" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Code review</span>
+    </a>
+    <a href="https://strongbrew.io/consultancy" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Consultancy</span>
+    </a>
+    <a href="https://strongbrew.io/brews" class="button" rel="noopener">
+        <img src="/assets/images/angular.png" alt="">
+        <span>Trainings</span>
+    </a>
+</div>
+
+
+<script type="text/javascript">
+    var followMe = document.getElementById('followme');
+    var header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if(window.scrollY > header.offsetHeight + 113) {
+            followMe.classList.remove('followme-abs');
+            followMe.classList.add('followme-fixed');
+        } else {
+            followMe.classList.remove('followme-fixed');
+            followMe.classList.add('followme-abs');
+        }
+    });
+</script>
+
+
+<main class="content" role="main">
+
+    <article class="post">
+        <div class="post-inner">
+            <header class="post-header">
+                <h1 class="post-title">Reactive dumb components</h1>
+                <section class="post-meta">
+                    <!-- <a href='/'></a> -->
+
+                    
+                    
+                    <a href='/author/brechtbilliet'>Brecht Billiet</a>
+                    
+                    
+                    
+                    
+                    <time class="post-date" datetime="2021-05-17">17 May 2021
+                    </time>
+                    <!-- [[tags prefix=" on "]] -->
+                    
+                    on
+                    
+                    
+                    <a href='/tag/Rxjs'>Rxjs</a>
+                    
+                    
+                    
+                </section>
+            </header>
+
+            <section class="post-content">
+
+                <h2 id="reactive-dumb-components">Reactive dumb components</h2>
+
+<p>When we write RxJS logic inside our presentation layer we mostly wind up with reactive flows inside our smart components (container components). The reasoning behind this, is quite easy:</p>
+
+<p>Because these smart components are the orchestration vessels of our application, they communicate with reactive asynchronous flows such as XHR-calls and state management, but also with events emitted by the dumb components.</p>
+
+<p>That being said, dumb components may also benefit from reactive flows. Especially when the dumb component has multiple <code>@Input()</code> properties that rely on different sets of asynchronous data.
+The usual way of handling these types of changes is the use of imperative <code>if else code</code> inside the <code>ngOnChanges</code> lifecycle hook.</p>
+
+<p>Take this situation for example: We have a <code>CompanyDetail</code> component that has the responsibility to visualize a company with all its sites. 
+The component has a previous and a next button to navigate between the sites, we also want to show how many sites there are and we want to show the name and address of every specific site.
+The <code>sites</code> <code>@Input()</code> property is asynchronous because it is dependant on an XHR request and the <code>currentSiteId</code> <code>@Input()</code> property is asynchronous because it is dependant on the router params which is an observable behind the scenes and will change over time when the user is navigating between the different sites of a company.</p>
+
+<p>For this component to properly work we have to make sure that the <code>sites</code> property has a value at the right time and the <code>currentSiteId</code> also has a value at the right time, we can already imagine racing conditions etc.
+The component is also responsibile to calculate whether the previous button and next button are disabled or not. When these buttons are clicked, it also has to calculate the next or previous siteId to emit that value to its smart component.</p>
+
+<p>Here we can see the app inside this <a href="https://stackblitz.com/edit/reactive-dumb-components?file=src%2Fapp%2Fcontainers%2Fcompany%2Fcompany.component.ts">Stackblitz example</a></p>
+
+<p>This is the smart component that will use the <code>app-company-detail</code> as a dumb component.</p>
+
+<pre><code class="language-typescript">@Component({
+  selector: 'app-company',
+  template: `
+    &lt;app-company-detail
+      [currentSiteId]="currentSiteId$ | async"
+      [sites]="sites$ | async"
+      (siteChanged)="siteChanged($event)"
+    &gt;&lt;/app-company-detail&gt;
+  `,
+  styleUrls: ['./company.component.css']
+})
+export class CompanyComponent {
+  // fetch the sites
+  sites$ = this.sitesService.getSites();
+  // get the asynchronous siteId from the router params
+  currentSiteId$ = this.activatedRoute.params.pipe(map(p =&gt; p.siteId));
+
+  // the dumb app-company-detail component is responsible
+  // to calculate the siteId that we need to go to
+  siteChanged(id: string): void {
+    this.router.navigate([id]);
+  }
+
+  constructor(
+    private sitesService: SitesService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {}
+}
+</code></pre>
+
+<p>The imperative implementation of the dumb component looks like this:</p>
+
+<pre><code class="language-typescript">@Component({
+  selector: 'app-company-detail',
+  template: `
+    &lt;button [disabled]="previousDisabled" (click)="previousClicked()"&gt;
+      Previous site
+    &lt;/button&gt;
+    &lt;button [disabled]="nextDisabled" (click)="nextClicked()"&gt;
+      Next site
+    &lt;/button&gt;
+     / 
+    &lt;h2&gt;&lt;/h2&gt;
+    &lt;p&gt;Address: &lt;/p&gt;
+  `,
+  styleUrls: ['./company-detail.component.css']
+})
+export class CompanyDetailComponent implements OnChanges{
+  @Input() currentSiteId: string;
+  @Input() sites: any[];
+  @Output() siteChanged = new EventEmitter&lt;string&gt;();
+
+  // we need to keep track of 5 different local properties
+  // and calculate and set their values at the right time
+  currentIndex = 0;
+  previousDisabled: boolean;
+  nextDisabled: boolean;
+  currentSite: any;
+  currentSiteNumber: number;
+
+  ngOnChanges(): void {
+    // this can become complex really fast
+    if(this.currentSiteId &amp;&amp; this.sites?.length &gt; 0){
+      this.currentIndex = this.sites?.map(site =&gt; site?.id).indexOf(this.currentSiteId);    
+      this.currentSite = this.sites[this.currentIndex];
+      this.currentSiteNumber = this.currentIndex + 1;
+      this.previousDisabled = this.currentIndex === 0;
+      this.nextDisabled = this.currentIndex === this.sites?.length -1
+    }
+  }
+
+  previousClicked(): void {
+      this.siteChanged.emit(this.sites[this.currentIndex -1].id);    
+  }
+
+  nextClicked(): void {
+      this.siteChanged.emit(this.sites[this.currentIndex +1].id);    
+  }
+}
+</code></pre>
+
+<p>We can see that all the calculation is happening inside the ngOnChanges.
+Although this solution is perfectly fine, there is a more reactive way of approaching this. For this specific example it could be overkill but it might teach you how to tackle more complex situations when tackling <code>@Input()</code> changes.</p>
+
+<p>Think about a complex calendar view that has to do a bunch of calculations based on dozens of <code>@Input()</code> properties for instance, where a bunch of them are happening synchronous and there are async properties depending on other async properties.
+Think about <code>@Input()</code> components that are useless unless other <code>@Input()</code> components have their values. Or what if you like to combine the <code>@Input()</code> properties with other async objects inside the dumb component. In the following example every piece of code inside this component is a stream. The first thing we want to do is create observables from the <code>@Input()</code> properties. I like to use this approach when multiple <code>@Input()</code> properties need eachother to compute a specific value.</p>
+
+<pre><code class="language-typescript">export class CompanyDetailComponent{
+  // input state subjects
+  private currentSiteId$$ = new ReplaySubject&lt;string&gt;(1);
+  private sites$$ = new ReplaySubject&lt;any[]&gt;(1);
+
+  // input stream setters
+  @Input() set currentSiteId(v: string){
+    if(v){ // we don't care about null values in this case
+      this.currentSiteId$$.next(v);
+    }
+  };
+  @Input() set sites(v: any[]){
+    if(v){ // we don't care about null values in this case
+      this.sites$$.next(v);
+    }
+  };
+}
+</code></pre>
+
+<p><em>Note: We use the <code>$$</code> suffix so we can see the observable is a <code>Subject</code>.</em></p>
+
+<p>We have now created observables from these <code>@Input()</code> properties. I have created the library <a href="https://www.npmjs.com/package/ngx-reactivetoolkit">ngx-reactivetoolkit</a> to make this even easier. We can see an example on how this cleans up the code right below:</p>
+
+<pre><code class="language-typescript">export class CompanyDetailComponent{
+  @Input() currentSiteId: string
+  @Input()  sites: any[]
+  @Changes('currentSiteId') currentSiteId$;
+  @Changes('sites') sites$;
+}
+</code></pre>
+
+<p>For this article we will continue with the native approach but be sure to check it out if you find the time. The toolkit might also gave some other good stuff that could help you.</p>
+
+<p>Moving on… Remember that we mentioned that everything could be a stream? This also means our template events can be linked to streams.</p>
+
+<pre><code class="language-html">&lt;button [disabled]="previousDisabled$|async" (click)="previousClicked()"&gt;
+  Previous site
+&lt;/button&gt;
+&lt;button [disabled]="nextDisabled$|async" (click)="nextClicked()"&gt;
+  Next site
+&lt;/button&gt;
+</code></pre>
+
+<pre><code class="language-typescript">  // this will be used to communicate with the siteChanged @Output()
+  private nav$$ = new Subject&lt;number&gt;();
+
+  previousClicked(): void {
+    this.nav$$.next(-1); // decrement
+  }
+  
+  nextClicked(): void {
+    this.nav$$.next(+1); // increment
+  }
+</code></pre>
+
+<p>The next thing that we want to do is determine the presentation streams and the Output streams. For the presentation streams we can simply have a look at the template:</p>
+
+<pre><code class="language-html">&lt;button [disabled]="previousDisabled$|async" (click)="previousClicked()"&gt;
+  Previous site
+&lt;/button&gt;
+&lt;button [disabled]="nextDisabled$|async" (click)="nextClicked()"&gt;
+  Next site
+&lt;/button&gt;
+/ 
+&lt;ng-container *ngIf="currentSite$|async as currentSite"&gt;
+  ...
+&lt;/ng-container&gt;
+
+</code></pre>
+
+<p>When looking at this template we can easily determine the presentation streams. These are all the streams that use an <code>async</code> pipe.</p>
+
+<ul>
+  <li><code>previousDisabled$</code></li>
+  <li><code>nextDisabled$</code></li>
+  <li><code>currentSiteNumber$</code></li>
+  <li><code>totalSites$</code></li>
+  <li><code>currentSite$</code></li>
+</ul>
+
+<p>The only <code>@Output()</code> stream for this template is for the <code>siteChanged</code> <code>@Output()</code>. Did you know an <code>EventEmitter</code> is an observable behind the scenes? Well, it is and we can replace the <code>EventEmitter</code> with any kind of observable.</p>
+
+<p>This means that this code:</p>
+
+<pre><code class="language-typescript">@Output() siteChanged = new EventEmitter();
+</code></pre>
+
+<p>can be refactored to:</p>
+
+<pre><code class="language-typescript">@Output() siteChanged = this.siteChanged$;
+</code></pre>
+
+<p>Again, for this example the solution might be personal preference but when the flows become more complex we believe this approach can really shine! Think about a search component that looks like this…</p>
+
+<pre><code class="language-typescript">@Output() search$ = this.searchControl.valueChanges$.pipe(
+    debounceTime(100),
+    distinctUntilChanged()
+)
+</code></pre>
+
+<p>This can become very powerful very fast!</p>
+
+<p>The next thing that we want to do is calculate intermediate private streams. If you don’t know what we mean with that, please check out the article on the <a href="https://blog.strongbrew.io/the-sip-principle/">SIP principle</a>. We use these intermediate streams to calculate the presentation streams, which are the streams that we will use in our template, and in the <code>@Output()</code> streams</p>
+
+<p>The <code>currentIndex$</code> stream and the <code>indexWithSites$</code> stream are streams that are being used to calculate the presentationstreams. The <code>siteChanged$</code> stream will be used by the <code>siteChanged</code> <code>@Output()</code> property later on
+We can see the calculation in this example:</p>
+
+<pre><code class="language-typescript">// intermediate streams
+// the current index, calculated by the current site id and the sites
+private currentIndex$ = combineLatest([this.currentSiteId$$, this.sites$$])
+  .pipe(
+    map(([currentSiteId, sites]) =&gt; 
+      sites?.map(site =&gt; site?.id).indexOf(currentSiteId)    
+    )
+  );
+
+// an array that always contains the currentIndex and all the sites
+private indexWithSites$ = combineLatest([this.currentIndex$, this.sites$$]);
+
+// every time the nav button is clicked, we need to calculate the id that
+// needs to be emitted to the siteChanged @Output()
+private siteChanged$ = this.nav$$.pipe(
+  withLatestFrom(this.sites$$, this.currentIndex$),
+  map(([navigationIndex, sites, currentIndex]) =&gt; 
+    sites[currentIndex + navigationIndex]?.id
+  )
+)
+</code></pre>
+
+<p>Now we can start by implementing the  presentation streams and the <code>@Output()</code> stream.
+In the code snippet below we can see the complete code: You can also check the <a href="https://stackblitz.com/edit/reactive-dumb-components-reactive?file=src/app/components/company-detail/company-detail.component.ts">StackBlitz example</a></p>
+
+<pre><code class="language-typescript">
+@Component({
+  selector: 'app-company-detail',
+  template: `
+    &lt;button [disabled]="previousDisabled$|async" (click)="previousClicked()"&gt;
+      Previous site
+    &lt;/button&gt;
+    &lt;button [disabled]="nextDisabled$|async" (click)="nextClicked()"&gt;
+      Next site
+    &lt;/button&gt;
+    / 
+    &lt;ng-container *ngIf="currentSite$|async as currentSite"&gt;
+      &lt;h2&gt;&lt;/h2&gt;
+      &lt;p&gt;Address: &lt;/p&gt;
+    &lt;/ng-container&gt;
+
+  `,
+  styleUrls: ['./company-detail.component.css']
+})
+export class CompanyDetailComponent{
+  // local state subjects and input state subjects
+  private nav$$ = new Subject&lt;number&gt;();
+  private currentSiteId$$ = new ReplaySubject&lt;string&gt;(1);
+  private sites$$ = new ReplaySubject&lt;any[]&gt;(1);
+
+  // input stream setters
+  @Input() set currentSiteId(v: string){
+    if(v){
+      this.currentSiteId$$.next(v);
+    }
+  };
+  @Input() set sites(v: any[]){
+    if(v){
+      this.sites$$.next(v);
+    }
+  };
+
+  // intermediate streams
+  private currentIndex$ = combineLatest([this.currentSiteId$$, this.sites$$])
+    .pipe(
+      map(([currentSiteId, sites]) =&gt; 
+        sites?.map(site =&gt; site?.id).indexOf(currentSiteId)    
+      )
+    );
+  private indexWithSites$ = combineLatest([this.currentIndex$, this.sites$$]);
+
+  private siteChanged$ = this.nav$$.pipe(
+    withLatestFrom(this.sites$$, this.currentIndex$),
+    map(([navigationIndex, sites, currentIndex]) =&gt; 
+     sites[currentIndex + navigationIndex]?.id
+    )
+  )
+
+  // output streams and presentational streams
+  @Output() siteChanged = this.siteChanged$;
+  previousDisabled$ = this.currentIndex$.pipe(
+    map(currentIndex =&gt;currentIndex === 0)
+  )
+  nextDisabled$ = this.indexWithSites$.pipe(
+    map(([currentIndex, sites]) =&gt; currentIndex === sites?.length -1)
+  )
+  currentSite$ = this.indexWithSites$.pipe(
+    map(([currentIndex, sites]) =&gt; sites[currentIndex])
+  )
+  totalSites$ = this.sites$$.pipe(
+    map(sites =&gt; sites?.length)
+  )
+  currentSiteNumber$ = this.currentIndex$.pipe(
+    map(v =&gt; v + 1)
+  )
+
+  previousClicked(): void {
+    this.nav$$.next(-1);    
+  }
+  
+  nextClicked(): void {
+    this.nav$$.next(+1);    
+  }
+}
+
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We can make components completely reactive if we want to by:</p>
+<ul>
+  <li>Binding other observables to <code>@Output()</code> properties</li>
+  <li>Using setters to populate <code>@Input()</code> properties</li>
+  <li>We can use <code>ngx-reactivetoolkit</code> to make the code cleaner</li>
+</ul>
+
+<p>For simple component this can be seen as overkill, but it could definitely help when dumb components become more complex and rely of different streams of data that are happening asynchronously.</p>
+
+
+            </section>
+
+            <footer class="post-footer">
+
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+
+                
+                
+                
+                <figure class="author-image">
+                    <a class="img" href="/author/brechtbilliet"
+                       style="background-image: url(/assets/images/brecht.png)"><span class="hidden">brechtbilliet's Picture</span></a>
+                </figure>
+                
+
+                <section class="author">
+                    <h4><a href="/author/brechtbilliet">Brecht Billiet</a></h4>
+
+                    
+                    <p> Software architect/trainer/coach/speaker/blogger</p>
+                    
+                    <div class="author-meta">
+                        <span
+                            class="author-location icon-location"> Belgium</span>
+                        <span class="author-link icon-link"><a href="http://www.brecht.io/"> brecht.io</a></span>
+                        <span class="author-link icon-twitter"><a
+                            href="https://twitter.com/brechtbilliet"> https://twitter.com/brechtbilliet</a></span>
+                    </div>
+                </section>
+
+                <!-- /author  -->
+
+                <section class="share">
+                    <h4>Share this post</h4>
+                    <a class="icon-twitter"
+                       href="http://twitter.com/share?text=Reactive dumb components&amp;url=https://blog.strongbrew.io/reactive-dumb-components"
+                       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                        <span class="hidden">Twitter</span>
+                    </a>
+                    <a class="icon-facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=https://blog.strongbrew.io/reactive-dumb-components"
+                       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                        <span class="hidden">Facebook</span>
+                    </a>
+                    <a class="icon-google-plus"
+                       href="https://plus.google.com/share?url=https://blog.strongbrew.io/reactive-dumb-components"
+                       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                        <span class="hidden">Google+</span>
+                    </a>
+                </section>
+                
+                
+                
+                
+
+                <!-- Add Disqus Comments -->
+                
+                
+                <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT
+     *  THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR
+     *  PLATFORM OR CMS.
+     *
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT:
+     *  https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        // Replace PAGE_URL with your page's canonical URL variable
+        this.page.url = PAGE_URL;
+
+        // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.identifier = PAGE_IDENTIFIER;
+    };
+    */
+
+    (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+        var d = document, s = d.createElement('script');
+
+        // IMPORTANT: Replace EXAMPLE with your forum shortname!
+        s.src = 'https://brechtbilliet.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+    Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript" rel="nofollow">
+        comments powered by Disqus.
+    </a>
+</noscript>
+                
+                
+                
+
+            </footer>
+        </div>
+
+    </article>
+
+</main>
+
+
+<!-- /post -->
+
+
+        <!-- The tiny footer at the very bottom -->
+        <footer class="ftr">
+            <div class="container">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <h3>Social</h3>
+                        <ul>
+                            <li>
+                                <i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/strongbrew_io" rel="noopener" target="_blank">Twitter</a>
+                            </li>
+                            <li><i class="fab fa-facebook"></i>&nbsp;
+                                <a href="https://facebook.com/strongbrewio" rel="noopener" target="_blank">Facebook</a>
+                            </li>
+                            <li><i class="fab fa-linkedin"></i>&nbsp;
+                                <a href="https://www.linkedin.com/company/strongbrew/" rel="noopener" target="_blank">Linkedin</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/brechtbilliet" rel="noopener" target="_blank">Twitter
+                                Brecht</a></li>
+                            <li><i class="fab fa-twitter"></i>&nbsp;<a href="https://twitter.com/kwintenp" rel="noopener" target="_blank">Twitter
+                                Kwinten</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-mid">
+                        <h3>Sitemap</h3>
+                        <ul>
+                            <li><a href="https://strongbrew.io/about">Home</a></li>
+                            <li><a href="https://strongbrew.io/brews">Brews</a></li>
+                            <li><a href="https://blog.strongbrew.io" rel="noopener">Blog</a></li>
+                            <li><a href="https://strongbrew.io/consultancy">Angular consultancy</a></li>
+                            <li><a href="https://strongbrew.io/angular-codereview">Angular codereview</a></li>
+                            <li><a href="https://strongbrew.io/microbrews">Microbrews</a></li>
+                            <li><a href="https://strongbrew.io/contact">Contact</a></li>
+                            <li><a href="https://platform.strongbrew.io" rel="noopener" target="_blank">Strongbrew Platform</a></li>
+                            <li><a href="https://strongbrew.slack.com" rel="noopener" target="_blank">Slack</a></li>
+                            <li><a href="https://strongbrew.io/privacy-policy">Privacy policy information</a></li>
+                            <li><a href="javascript:void(0)" id="changePreferences">Change privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-right">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li>
+                                Provinciebaan 120 <br>9270 Laarne, Belgium
+                            </li>
+                            <li><i class="fa fa-envelope"></i>&nbsp;<a href="mailto:info@strongbrew.io" rel="noopener" target="_blank">info@strongbrew.io</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    Strongbrew.io
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- highlight.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- jQuery needs to come before `` so that jQuery can be used in code injection -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Ghost outputs important scripts and data with this tag -->
+    <!--  -->
+    <!-- Fitvids makes video embeds responsive and awesome -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <!-- The main JavaScript file for Casper -->
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
+    <!-- Cookie Consent by https://PrivacyPolicies.com -->
+    <script type="text/javascript" src="//PrivacyPolicies.com/cookie-consent/releases/3.0.0/cookie-consent.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","change_preferences_selector":"#changePreferences","language":"en","website_name":"StrongBrew Blog","cookies_policy_url":"https://strongbrew.io/privacy-policy"});
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script type="text/plain" cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=UA-112030289-1"></script>
+    <script type="text/plain" cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112030289-1');
+</script>
+
+    <!-- end of Google Analytics-->
+
+    <noscript><a href="https://privacypolicies.com/cookie-consent/">Cookie Consent by PrivacyPolicies.com</a></noscript>
+    <!-- End Cookie Consent -->
+
+    
+</body>
+</html>

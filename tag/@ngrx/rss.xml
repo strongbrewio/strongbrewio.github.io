@@ -15,7 +15,7 @@
 	  <title>Redux (@ngrx/store) best practices</title>
 	  <link>//Redux-best-practices/</link>
 	  <author></author>
-	  <pubDate>2018-04-27T00:00:00+00:00</pubDate>
+	  <pubDate>2018-04-27T00:00:00+02:00</pubDate>
 	  <guid>//Redux-best-practices/</guid>
 	  <description><![CDATA[
 	     <p><a href="https://github.com/ngrx/platform/blob/master/docs/store/README.md">@ngrx/store</a> is a library that tries to solve the problems of state management through the principles of <a href="https://redux.js.org/">Redux</a>. The difference between Redux and @ngrx/store is that @ngrx/store is written specifically for <a href="https://angular.io">Angular</a> and it embraces the use of Observables from <a href="http://reactivex.io/rxjs/">RxJS</a>.

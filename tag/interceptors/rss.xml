@@ -15,7 +15,7 @@
 	  <title>A generic way of handling loading-status, saving-status and validation errors in Angular</title>
 	  <link>//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</link>
 	  <author></author>
-	  <pubDate>2019-01-25T00:00:00+00:00</pubDate>
+	  <pubDate>2019-01-25T00:00:00+01:00</pubDate>
 	  <guid>//generic-way-of-handling-loading-saving-and-validationerrors-in-angular/</guid>
 	  <description><![CDATA[
 	     <p>When writing Angular applications there are always pieces of functionality that are being rewritten over and over again. 3 common usecases are:</p>
